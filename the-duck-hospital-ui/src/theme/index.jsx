@@ -13,6 +13,9 @@ function CustomThemeProvider(props) {
       oldPrimary: {
         main: "#42a5f5",
       },
+      oldPrimaryDarker: {
+        main: "#064374",
+      },
       teal: {
         darker: "#033A2A",
         main: "#006451",
@@ -25,6 +28,7 @@ function CustomThemeProvider(props) {
         main: "#F38181",
       },
       yellow: {
+        darker: "#6C5604",
         main: "#FCE38A",
       },
       text: {

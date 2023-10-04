@@ -39,6 +39,10 @@ const Left = styled(Paper)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     display: "none",
   },
+
+  [theme.breakpoints.down("md")]: {
+    display: "none",
+  },
 }));
 
 const Right = styled(Box)(({ theme }) => ({
@@ -61,10 +65,17 @@ const FormLogin = styled(Paper)(({ theme }) => ({
   backgroundColor: "white",
   boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.1)",
 
-  [theme.breakpoints.down("sm")]: {
-    width: "80%",
+  [theme.breakpoints.down("md")]: {
+    width: "90%",
     height: "70%",
     margin: "auto",
+  },
+
+  [theme.breakpoints.down("sm")]: {
+    width: "90%",
+    height: "70%",
+    margin: "auto",
+    padding: theme.spacing(2),
   },
 }));
 function PageLogin(props) {
@@ -148,6 +159,16 @@ function PageLogin(props) {
             </Typography>
           </Box>
           <MuiButton variant="contained">Đăng nhập</MuiButton>
+          <Typography marginTop={2}>
+            Bạn chưa có tài khoản ?{" "}
+            <Typography
+              component={Link}
+              to="/auth/register"
+              color={"teal.main"}
+            >
+              Đăng ký
+            </Typography>
+          </Typography>
         </FormLogin>
       </Right>
     </RootPageLogin>
