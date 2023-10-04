@@ -2,6 +2,7 @@ import React from "react";
 import { useRoutes } from "react-router-dom";
 import Page404 from "../pages/Page404";
 import LogoLayout from "../layouts/LogoLayout";
+import PageLogin from "../pages/auth/PageLogin";
 
 function Router(props) {
   return useRoutes([
@@ -12,6 +13,10 @@ function Router(props) {
         {
           path: "*",
           element: <Page404 />,
+        },
+        {
+          path: "auth/login",
+          element: <PageLogin />,
         },
       ],
     },
