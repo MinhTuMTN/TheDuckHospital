@@ -72,11 +72,13 @@ const typography = {
   },
   body1: {
     lineHeight: 1.5,
-    fontSize: pxToRem(16),
+    fontSize: pxToRem(12),
+    ...responsiveFontSizes({ sm: 18, md: 18, lg: 18 }),
   },
   body2: {
     lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
+    fontSize: pxToRem(11),
+    ...responsiveFontSizes({ sm: 18, md: 18, lg: 18 }),
   },
   caption: {
     lineHeight: 1.5,

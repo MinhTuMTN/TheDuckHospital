@@ -3,6 +3,7 @@ import { useRoutes } from "react-router-dom";
 import Loading from "../components/Loading";
 import LogoLayout from "../layouts/LogoLayout";
 import PageRegister from "../pages/auth/PageRegister";
+import MainLayout from "../layouts/MainLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -38,7 +39,7 @@ function Router(props) {
     },
     {
       path: "/",
-      element: <Loading />,
+      element: <MainLayout />,
     },
   ]);
 }

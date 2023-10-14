@@ -1,13 +1,12 @@
-import React from "react";
-import Page from "../../components/Page";
 import styled from "@emotion/styled";
-import backgroundLogin from "../../assets/background_login.jpg";
 import { Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import MuiTextFeild from "../../components/MuiTextFeild";
-import MuiButton from "../../components/MuiButton";
-import { Link } from "react-router-dom";
+import React from "react";
+import backgroundLogin from "../../assets/background_login.jpg";
 import LinkWithoutDecoratLink from "../../components/LinkWithoutDecoration";
+import MuiButton from "../../components/MuiButton";
+import MuiTextFeild from "../../components/MuiTextFeild";
+import Page from "../../components/Page";
 
 const RootPageRegister = styled(Page)(({ theme }) => ({
   display: "flex",
@@ -17,6 +16,10 @@ const RootPageRegister = styled(Page)(({ theme }) => ({
   backgroundImage: `url(${backgroundLogin})`,
   backgroundSize: "cover",
   backgroundRepeat: "no-repeat",
+
+  [theme.breakpoints.down("sm")]: {
+    overflow: "scroll",
+  },
 }));
 
 const FormRegister = styled(Paper)(({ theme }) => ({
@@ -28,8 +31,17 @@ const FormRegister = styled(Paper)(({ theme }) => ({
   backgroundColor: "#ffffffc7",
   backdropFilter: "blur(10px)",
   boxShadow: theme.shadows[5],
-  width: "100%",
-  maxWidth: 780,
+  width: "60%",
+
+  [theme.breakpoints.between("sm", "lg")]: {
+    width: "90%",
+  },
+
+  [theme.breakpoints.down("sm")]: {
+    width: "95%",
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+  },
 }));
 
 function PageRegister(props) {
@@ -37,7 +49,7 @@ function PageRegister(props) {
     <RootPageRegister title="Đăng ký">
       <FormRegister>
         <Box sx={{ width: "100%" }}>
-          <Typography variant="h4">Đăng ký</Typography>
+          <Typography variant="h3">Đăng ký</Typography>
           <Typography variant="body1">
             Tạo tài khoản để khám, chữa bệnh tại The Duck Hospital
           </Typography>
@@ -86,7 +98,7 @@ function PageRegister(props) {
           </Typography>
         </MuiButton>
         <Typography
-          variant="body1"
+          variant="body2"
           marginTop={2}
           color="teal.main"
           fontWeight={"bold"}

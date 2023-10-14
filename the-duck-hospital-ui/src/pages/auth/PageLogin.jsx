@@ -65,7 +65,7 @@ const FormLogin = styled(Paper)(({ theme }) => ({
   backgroundColor: "white",
   boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.1)",
 
-  [theme.breakpoints.down("md")]: {
+  [theme.breakpoints.between("sm", "lg")]: {
     width: "90%",
     height: "70%",
     margin: "auto",
