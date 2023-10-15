@@ -11,7 +11,7 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 
-const PageUser = styled(Box)(({ themme }) => ({
+const RootPageUser = styled(Box)(({ theme }) => ({
   display: "flex",
   height: "100%",
 }));
@@ -47,30 +47,30 @@ const sidebarItems = [
   {
     display: 'Hồ sơ bệnh nhân',
     icon: <BadgeOutlinedIcon />,
-    to: '/profile',
+    // to: '/user/patient-records',
     section: 'PatientRecords'
   },
   {
     display: 'Phiếu khám bệnh',
     icon: <ReceiptLongOutlinedIcon />,
-    to: '/profile/MedicalBills',
+    // to: '/user/medical-bills',
     section: 'MedicalBills'
   },
   {
     display: 'Thông báo',
     icon: <NotificationsNoneOutlinedIcon />,
-    to: '/profile/Notifications',
+    // to: '/user/notifications',
     section: 'Notifications'
   },
   {
     display: 'Lịch sử thanh toán viện phí',
     icon: <HistoryOutlinedIcon />,
-    to: '/profile/PaymentHistory',
+    // to: '/user/payment-history',
     section: 'PaymentHistory'
   }
 ]
 
-function PageProfile(props) {
+function PageUser(props) {
   const [section, setSection] = useState('PatientRecords')
 
   useEffect(() => {
@@ -80,7 +80,7 @@ function PageProfile(props) {
   return (
     <Page title="User">
       <Breadcrumb />
-      <PageUser>
+      <RootPageUser>
         <Sidebar>
           {/* <Sidebar /> */}
           <List>
@@ -103,9 +103,9 @@ function PageProfile(props) {
         <Right>
           <SidebarItem activeItem={section} />
         </Right>
-      </PageUser>
+      </RootPageUser>
     </Page>
   );
 }
 
-export default PageProfile;
+export default PageUser;

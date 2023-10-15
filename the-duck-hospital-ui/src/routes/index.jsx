@@ -51,19 +51,19 @@ function Router(props) {
     //   element: <PageUser />,
     //   children: [
     //     {
-    //       path: "/user/PatientRecords",
+    //       path: "/user/patient-records",
     //       element: <PatientRecords />,
     //     },
     //     {
-    //       path: "/user/MedicalBills",
+    //       path: "/user/medical-bills",
     //       element: <MedicalBills />,
     //     },
     //     {
-    //       path: "/user/Notifications",
+    //       path: "/user/notifications",
     //       element: <Notifications />,
     //     },
     //     {
-    //       path: "/user/PaymentHistory",
+    //       path: "/user/payment-history",
     //       element: <PaymentHistory />,
     //     },
     //   ],
