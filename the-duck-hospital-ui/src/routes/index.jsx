@@ -4,6 +4,7 @@ import Loading from "../components/Loading";
 import LogoLayout from "../layouts/LogoLayout";
 import PageRegister from "../pages/auth/PageRegister";
 import MainLayout from "../layouts/MainLayout";
+import PageUser from "../pages/PageUser";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -41,6 +42,32 @@ function Router(props) {
       path: "/",
       element: <MainLayout />,
     },
+    {
+      path: "/user",
+      element: <PageUser />,
+    },
+    // {
+    //   path: "/user",
+    //   element: <PageUser />,
+    //   children: [
+    //     {
+    //       path: "/user/PatientRecords",
+    //       element: <PatientRecords />,
+    //     },
+    //     {
+    //       path: "/user/MedicalBills",
+    //       element: <MedicalBills />,
+    //     },
+    //     {
+    //       path: "/user/Notifications",
+    //       element: <Notifications />,
+    //     },
+    //     {
+    //       path: "/user/PaymentHistory",
+    //       element: <PaymentHistory />,
+    //     },
+    //   ],
+    // },
   ]);
 }
 
