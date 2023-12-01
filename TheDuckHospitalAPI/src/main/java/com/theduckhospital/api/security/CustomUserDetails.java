@@ -1,6 +1,6 @@
 package com.theduckhospital.api.security;
 
-import com.theduckhospital.api.entity.User;
+import com.theduckhospital.api.entity.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,21 +12,21 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    private User user;
+    private Account account;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of((GrantedAuthority) () -> "ROLE_" + user.getRole());
+        return List.of((GrantedAuthority) () -> "ROLE_" + account.getRole().toString());
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return account.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUserId().toString();
+        return account.getUserId().toString();
     }
 
     @Override
@@ -46,6 +46,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return !user.isDeleted();
+        return !account.isDeleted();
     }
 }

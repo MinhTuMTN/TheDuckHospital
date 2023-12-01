@@ -1,7 +1,8 @@
 package com.theduckhospital.api;
 
-import com.theduckhospital.api.entity.User;
-import com.theduckhospital.api.repository.UserRepository;
+import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 public class TheDuckHospitalApiApplication implements CommandLineRunner {
 	@Autowired
-	UserRepository userRepository;
+	AccountRepository accountRepository;
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
@@ -21,10 +22,11 @@ public class TheDuckHospitalApiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		User user = new User();
-		user.setEmail("minhtu@a.com");
-		user.setPassword(passwordEncoder.encode("password"));
-		user.setPhoneNumber("0123456789");
-		userRepository.save(user);
+		Account account = new Account();
+		account.setEmail("minhtu@a.com");
+		account.setPassword(passwordEncoder.encode("password"));
+		account.setPhoneNumber("0123456789");
+		account.setRole(Role.ADMIN);
+		accountRepository.save(account);
 	}
 }
