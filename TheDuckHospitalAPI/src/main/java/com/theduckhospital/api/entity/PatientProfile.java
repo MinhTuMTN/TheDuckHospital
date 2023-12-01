@@ -1,42 +1,42 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.constant.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
-import org.hibernate.annotations.Cascade;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
-public class Account {
+@NoArgsConstructor
+@AllArgsConstructor
+public class PatientProfile {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID userId;
-
-    @Email
-    private String email;
-
-    @JsonBackReference
-    private String password;
+    private UUID patientProfileId;
+    private String fullName;
     private String phoneNumber;
-    private boolean deleted;
+    private String email;
+    private Gender gender;
+    private String streetName;
 
-    private int otp;
-    private int otpCount;
-    private Date otpCreatedAt;
-    private Date otpExpiredAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Ward ward;
 
+    private Date dateOfBirth;
     private Date createdAt;
     private Date lastModifiedAt;
+    private boolean deleted;
 
     @PrePersist
     private void onCreate() {
+        this.patientProfileId = UUID.randomUUID();
         this.createdAt = new Date();
         this.lastModifiedAt = new Date();
     }
@@ -46,13 +46,13 @@ public class Account {
         this.lastModifiedAt = new Date();
     }
 
-    @OneToMany(mappedBy = "account")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private List<PatientProfile> patientProfile;
+    private Account account;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "staffId", referencedColumnName = "staffId")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-    private Staff staff;
+    @ToStringExclude
+    private Patient patient;
 }
