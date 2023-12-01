@@ -1,6 +1,6 @@
 package com.theduckhospital.api.security;
 
-import com.theduckhospital.api.repository.UserRepository;
+import com.theduckhospital.api.repository.AccountRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,13 +8,12 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
     @Autowired
-    private UserRepository userRepository;
+    private AccountRepository accountRepository;
 
     private SecretKey getSingingKey() {
         String JWT_SECRET = "1V0UqQy1iDfCX9iiR3PStGtyLPNy138O";
@@ -27,8 +26,8 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
         return Jwts.builder()
-                .subject(String.valueOf((userDetails.getUser().getUserId())))
-                .claim("userId", userDetails.getUser().getUserId())
+                .subject(String.valueOf((userDetails.getAccount().getUserId())))
+                .claim("userId", userDetails.getAccount().getUserId())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSingingKey())

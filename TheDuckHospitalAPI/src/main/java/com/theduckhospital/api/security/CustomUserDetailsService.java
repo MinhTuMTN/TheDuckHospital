@@ -1,7 +1,7 @@
 package com.theduckhospital.api.security;
 
-import com.theduckhospital.api.entity.User;
-import com.theduckhospital.api.repository.UserRepository;
+import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,30 +13,30 @@ import java.util.UUID;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
-    private UserRepository userRepository;
+    private AccountRepository accountRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user;
+        Account account;
         if (username.contains("@")) {
-            user = userRepository.findUserByEmail(username);
+            account = accountRepository.findUserByEmail(username);
         } else {
-            user = userRepository.findUserByPhoneNumber(username);
+            account = accountRepository.findUserByPhoneNumber(username);
         }
 
-        if (user == null) {
+        if (account == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return new CustomUserDetails(user);
+        return new CustomUserDetails(account);
     }
 
     public UserDetails loadUserById(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
+        Account account = accountRepository.findById(UUID.fromString(userId)).orElse(null);
 
-        if (user == null) {
+        if (account == null) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return new CustomUserDetails(user);
+        return new CustomUserDetails(account);
     }
 }

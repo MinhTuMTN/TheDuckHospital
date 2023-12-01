@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller;
 
+import com.theduckhospital.api.dto.GeneralResponse;
 import com.theduckhospital.api.dto.LoginRequest;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -36,6 +39,11 @@ public class AuthController {
         String token = jwtTokenProvider.generateToken(
                 (CustomUserDetails) authentication.getPrincipal()
         );
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Login success")
+                .data(token)
+                .build()
+        );
     }
 }
