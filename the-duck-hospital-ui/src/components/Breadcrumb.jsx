@@ -22,7 +22,7 @@ const BreadcrumbLink = styled(Link)(({ theme }) => ({
 
 function Breadcrumb() {
     const location = useLocation();
-    const pathnames = location.pathname.split('/').filter((crumb) => crumb != '');
+    const pathnames = location.pathname.split('/').filter((crumb) => crumb !== '');
 
     return (
         <BreadcrumbRoot>

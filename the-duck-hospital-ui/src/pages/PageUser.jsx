@@ -101,7 +101,8 @@ function PageUser(props) {
           </List>
         </Sidebar>
         <Right>
-          <SidebarItem activeItem={section} />
+          {/* <SidebarItem activeItem={section} /> */}
+          <Outlet />
         </Right>
       </RootPageUser>
     </Page>

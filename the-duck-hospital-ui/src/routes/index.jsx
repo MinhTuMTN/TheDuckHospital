@@ -5,13 +5,14 @@ import LogoLayout from "../layouts/LogoLayout";
 import PageRegister from "../pages/auth/PageRegister";
 import MainLayout from "../layouts/MainLayout";
 import PageUser from "../pages/PageUser";
+import AdminLayout from "../layouts/AdminLayout";
 
 const LoadComponent = (Component) => (props) =>
-  (
-    <React.Suspense fallback={<Loading />}>
-      <Component {...props} />
-    </React.Suspense>
-  );
+(
+  <React.Suspense fallback={<Loading />}>
+    <Component {...props} />
+  </React.Suspense>
+);
 
 const Login = LoadComponent(
   React.lazy(() => import("../pages/auth/PageLogin"))
@@ -68,6 +69,22 @@ function Router(props) {
     //     },
     //   ],
     // },
+    ,
+    {
+
+      path: "/admin",
+      element: <AdminLayout />,
+      children: [
+        {
+          path: "analytics",
+          element: null,
+        },
+        {
+          path: "address-management/province",
+          element: null,
+        },
+      ],
+    },
   ]);
 }
 
