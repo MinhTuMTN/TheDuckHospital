@@ -16,7 +16,7 @@ public class JwtTokenProvider {
     private AccountRepository accountRepository;
 
     private SecretKey getSingingKey() {
-        String JWT_SECRET = "1V0UqQy1iDfCX9iiR3PStGtyLPNy138O";
+        String JWT_SECRET = "1V0UqQy1iDfCX9iiR3PStGtyLPNy138O1V0UqQy1iDfCX9iiR3PStGtyLPNy138O";
         return Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
     }
 

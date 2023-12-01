@@ -1,20 +1,50 @@
 package com.theduckhospital.api;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.entity.Admin;
+import com.theduckhospital.api.entity.Staff;
 import com.theduckhospital.api.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.io.IOException;
+import java.util.Date;
 
 @SpringBootApplication
 public class TheDuckHospitalApiApplication implements CommandLineRunner {
 	@Autowired
-	AccountRepository accountRepository;
+	private PasswordEncoder passwordEncoder;
+
 	@Autowired
-	PasswordEncoder passwordEncoder;
+	private AccountRepository accountRepository;
+	@Bean
+	FirebaseMessaging firebaseMessaging() throws IOException {
+		GoogleCredentials credentials = GoogleCredentials
+				.fromStream(new ClassPathResource("key.json").getInputStream());
+
+		FirebaseOptions firebaseOptions = FirebaseOptions
+				.builder()
+				.setCredentials(credentials)
+				.build();
+
+		FirebaseApp firebaseApp;
+		if (FirebaseApp.getApps().isEmpty()) {
+			firebaseApp = FirebaseApp.initializeApp(firebaseOptions);
+		} else {
+			firebaseApp = FirebaseApp.getInstance();
+		}
+		return FirebaseMessaging.getInstance(firebaseApp);
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(TheDuckHospitalApiApplication.class, args);
@@ -26,7 +56,15 @@ public class TheDuckHospitalApiApplication implements CommandLineRunner {
 		account.setEmail("minhtu@a.com");
 		account.setPassword(passwordEncoder.encode("password"));
 		account.setPhoneNumber("0123456789");
-		account.setRole(Role.ADMIN);
+		account.setOtp(123456);
+		account.setOtpCount(0);
+		account.setOtpCreatedAt(new Date());
+		account.setOtpExpiredAt(new Date(System.currentTimeMillis() + 5 * 60 * 1000));
+
+		Admin admin = new Admin();
+
+		account.setStaff(admin);
+
 		accountRepository.save(account);
 	}
 }

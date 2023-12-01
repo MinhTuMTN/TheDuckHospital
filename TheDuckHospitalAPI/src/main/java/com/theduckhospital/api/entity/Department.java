@@ -24,7 +24,17 @@ public class Department {
 
     @OneToMany(mappedBy = "department")
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JsonBackReference
     private List<Doctor> doctors;
+
+    @PrePersist
+    private void onCreate() {
+        this.createdAt = new Date();
+        this.lastModifiedAt = new Date();
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        this.lastModifiedAt = new Date();
+    }
 }

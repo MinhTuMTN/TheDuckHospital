@@ -5,5 +5,5 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Pharmacist extends Staff{
+public class Nurse extends Staff{
 }

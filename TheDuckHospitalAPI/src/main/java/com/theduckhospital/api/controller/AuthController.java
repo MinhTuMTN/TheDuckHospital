@@ -1,10 +1,14 @@
 package com.theduckhospital.api.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.theduckhospital.api.dto.CheckAccountExistRequest;
 import com.theduckhospital.api.dto.GeneralResponse;
 import com.theduckhospital.api.dto.LoginRequest;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
+import com.theduckhospital.api.services.IAccountServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,20 +22,55 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+    @Value("${security.secret.password}")
+    private String secretPassword;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+    private final IAccountServices accountServices;
+
+
+    public AuthController(AuthenticationManager authenticationManager,
+                          JwtTokenProvider jwtTokenProvider,
+                          IAccountServices accountServices) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.accountServices = accountServices;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    @PostMapping("/login-password")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) throws Exception {
+        if (!accountServices.loginWithPassword(
+                loginRequest.getEmailOrPhoneNumber(),
+                loginRequest.getPasswordOrOTP()
+        ))
+            return ResponseEntity.status(401).body(GeneralResponse.builder()
+                    .success(false)
+                    .message("Login failed")
+                    .build());
+
+        return authenticate(loginRequest);
+    }
+
+    @PostMapping("/login-otp")
+    public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) throws Exception {
+        if (!accountServices.loginWithOtp(
+                loginRequest.getEmailOrPhoneNumber(),
+                loginRequest.getPasswordOrOTP()
+        ))
+            return ResponseEntity.status(401).body(GeneralResponse.builder()
+                    .success(false)
+                    .message("Login failed")
+                    .build());
+
+        return authenticate(loginRequest);
+    }
+
+    private ResponseEntity<?> authenticate(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmailOrPhoneNumber(),
-                        loginRequest.getPassword()
+                        secretPassword
                 )
         );
 
@@ -43,6 +82,22 @@ public class AuthController {
                 .success(true)
                 .message("Login success")
                 .data(token)
+                .build()
+        );
+    }
+
+    @PostMapping("/check-account-exist")
+    public ResponseEntity<?> checkAccountExistAndSendOtp(@RequestBody CheckAccountExistRequest request)
+            throws FirebaseMessagingException {
+        if (!accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
+            return ResponseEntity.status(401).body(GeneralResponse.builder()
+                    .success(false)
+                    .message("Account not exist")
+                    .build());
+
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Account exist. OTP sent")
                 .build()
         );
     }
