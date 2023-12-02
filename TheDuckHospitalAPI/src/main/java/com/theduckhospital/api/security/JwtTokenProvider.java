@@ -12,8 +12,6 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    @Autowired
-    private AccountRepository accountRepository;
 
     private SecretKey getSingingKey() {
         String JWT_SECRET = "1V0UqQy1iDfCX9iiR3PStGtyLPNy138O1V0UqQy1iDfCX9iiR3PStGtyLPNy138O";
