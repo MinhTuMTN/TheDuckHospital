@@ -1,10 +1,18 @@
 import styled from "@emotion/styled";
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from "@mui/material";
-import React, { useEffect, useState } from 'react';
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Breadcrumb from "../components/Breadcrumb";
 import Page from "../components/Page";
@@ -26,13 +34,13 @@ const Right = styled(Box)(({ theme }) => ({
 }));
 
 const CustomListItemButton = styled(ListItemButton)(({ theme, isActive }) => ({
-  backgroundColor: (isActive ? "#86C8BC" : ""),
+  backgroundColor: isActive ? "#86C8BC" : "",
   borderRadius: "0 25px 25px 0",
   width: "100%",
 
   "&:hover": {
-    backgroundColor: (isActive ? "#86C8BC" : "#EAFAF7"),
-  }
+    backgroundColor: isActive ? "#86C8BC" : "#EAFAF7",
+  },
 }));
 
 const CustomListItemIcon = styled(ListItemIcon)(({ theme, isActive }) => ({
@@ -43,37 +51,37 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme, isActive }) => ({
 
 const sidebarItems = [
   {
-    display: 'Hồ sơ bệnh nhân',
+    display: "Hồ sơ bệnh nhân",
     icon: <BadgeOutlinedIcon />,
     // to: '/user/patient-records',
-    section: 'PatientRecords'
+    section: "PatientRecords",
   },
   {
-    display: 'Phiếu khám bệnh',
+    display: "Phiếu khám bệnh",
     icon: <ReceiptLongOutlinedIcon />,
     // to: '/user/medical-bills',
-    section: 'MedicalBills'
+    section: "MedicalBills",
   },
   {
-    display: 'Thông báo',
+    display: "Thông báo",
     icon: <NotificationsNoneOutlinedIcon />,
     // to: '/user/notifications',
-    section: 'Notifications'
+    section: "Notifications",
   },
   {
-    display: 'Lịch sử thanh toán viện phí',
+    display: "Lịch sử thanh toán viện phí",
     icon: <HistoryOutlinedIcon />,
     // to: '/user/payment-history',
-    section: 'PaymentHistory'
-  }
-]
+    section: "PaymentHistory",
+  },
+];
 
 function PageUser(props) {
-  const [section, setSection] = useState('PatientRecords')
+  const [section, setSection] = useState("PatientRecords");
 
   useEffect(() => {
-    console.log(section)
-  }, [section])
+    console.log(section);
+  }, [section]);
 
   return (
     <Page title="User">
@@ -83,7 +91,6 @@ function PageUser(props) {
           {/* <Sidebar /> */}
           <List>
             {sidebarItems.map((item, index) => (
-
               <ListItem disablePadding key={item.section}>
                 <CustomListItemButton
                   isActive={section === item.section}
