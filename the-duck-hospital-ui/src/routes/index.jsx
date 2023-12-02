@@ -7,6 +7,7 @@ import PageRegister from "../pages/auth/PageRegister";
 import Home from "../pages/customer/Home";
 import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
+import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -26,6 +27,11 @@ function Router(props) {
         {
           path: "/",
           element: <Home />,
+        },
+
+        {
+          path: "/chosen-patient-profiles",
+          element: <ChoosePatientProfiles />,
         },
 
         {
