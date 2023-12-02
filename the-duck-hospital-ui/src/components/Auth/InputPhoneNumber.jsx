@@ -10,7 +10,11 @@ import {
 import React from "react";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "50px",
 
   "& .MuiOutlinedInput-root": {
@@ -24,7 +28,11 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 const CustomButton = styled(Button)(({ theme }) => ({
   background: theme.palette.oldPrimary.main,
   color: "white",
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "45px",
   "&:hover": {
     background: theme.palette.oldPrimary.main, // Đổi màu nền khi hover

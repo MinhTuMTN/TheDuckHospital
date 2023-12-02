@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import {
   Box,
@@ -127,6 +128,7 @@ function InputOTP(props) {
     return () => clearTimeout(timer);
   }, [timeLeft]);
 
+  const theme = useTheme();
   return (
     <Stack
       direction={"column"}
@@ -140,6 +142,14 @@ function InputOTP(props) {
       <Typography
         variant={"body1"}
         style={{ fontWeight: "600", fontSize: "14px" }}
+        sx={{
+          width: "390px", // Default width for larger screens
+
+          [theme.breakpoints.down("sm")]: {
+            width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+            textAlign: "center",
+          },
+        }}
       >
         Vui lòng nhập mã 6 số đã gửi cho bạn qua số điện thoại
       </Typography>

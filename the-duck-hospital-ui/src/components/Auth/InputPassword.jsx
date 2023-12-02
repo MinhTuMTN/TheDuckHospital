@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -17,15 +18,23 @@ import {
 import React from "react";
 
 const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "50px",
   backgroundColor: "#f2f2f2",
 }));
 
 const CustomTextFieldPassword = styled(OutlinedInput)(({ theme }) => ({
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
+
   height: "50px",
-  margin: "0px",
 
   "& .MuiOutlinedInput-root": {
     "&.Mui-focused fieldset": {
@@ -38,7 +47,11 @@ const CustomTextFieldPassword = styled(OutlinedInput)(({ theme }) => ({
 const CustomButton = styled(Button)(({ theme }) => ({
   background: theme.palette.oldPrimary.main,
   color: "white",
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "45px",
   "&:hover": {
     background: theme.palette.oldPrimary.main, // Đổi màu nền khi hover
@@ -76,6 +89,7 @@ function InputPassword(props) {
       // TODO: Thêm logic đăng nhập ở đây
     }
   };
+  const theme = useTheme();
 
   return (
     <Stack
@@ -122,7 +136,16 @@ function InputPassword(props) {
           padding: "0",
         }}
       >
-        <FormControl sx={{ m: 1, width: "390px" }} variant="outlined">
+        <FormControl
+          sx={{
+            width: "390px", // Default width for larger screens
+
+            [theme.breakpoints.down("sm")]: {
+              width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+            },
+          }}
+          variant="outlined"
+        >
           <CustomTextFieldPassword
             autoFocus
             size="large"

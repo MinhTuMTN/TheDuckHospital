@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import { Box, CardMedia, Paper, Stack } from "@mui/material";
 import React from "react";
-//import InputPhoneNumber from "../../components/Auth/InputPhoneNumber";
+import InputPhoneNumber from "../../components/Auth/InputPhoneNumber";
 import Page from "../../components/Page";
+//import InputOTP from "../../components/Auth/InputOTP";
 //import InputPassword from "../../components/Auth/InputPassword";
-import InputOTP from "../../components/Auth/InputOTP";
 
 const urlImage =
   "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701430503/THEDUCK__1_-removebg-preview_iag4sd.png";
@@ -92,7 +92,7 @@ function LoginPage(props) {
               marginTop: "20px",
             }}
           />
-          <InputOTP />
+          <InputPhoneNumber />
         </Stack>
       </Right>
     </RootPageLogin>
