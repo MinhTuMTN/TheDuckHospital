@@ -1,26 +1,42 @@
 package com.theduckhospital.api.entity;
 
-import com.theduckhospital.api.constant.Gender;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Patient {
     @Id
     private UUID patientId;
-    private String fullName;
-    private Date dateOfBirth;
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-    private String identificationCard;
-    private Date createdAt;
-    private Date lastModified;
-    private boolean deleted;
+    @Nationalized
+    protected String fullName;
+    protected String phoneNumber;
+    protected String identityNumber;
+    protected Date dateOfBirth;
+    protected Date createdAt;
+    protected Date lastModifiedAt;
+    protected boolean deleted;
 
+    @OneToMany(mappedBy = "patient")
+    private List<PatientProfile> patientProfile;
+
+    @PreUpdate
+    private void onUpdate() {
+        this.lastModifiedAt = new Date();
+    }
+
+    @PrePersist
+    private void onCreate() {
+        this.patientId = UUID.randomUUID();
+        this.createdAt = new Date();
+        this.lastModifiedAt = new Date();
+    }
 }

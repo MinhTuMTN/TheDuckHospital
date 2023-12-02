@@ -1,9 +1,9 @@
-package com.theduckhospital.api.dto;
+package com.theduckhospital.api.dto.request;
 
 import lombok.Data;
 
 @Data
 public class LoginRequest {
     private String emailOrPhoneNumber;
-    private String password;
+    private String passwordOrOTP;
 }

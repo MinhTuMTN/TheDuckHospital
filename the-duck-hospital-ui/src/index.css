@@ -2,5 +2,9 @@
   box-sizing: border-box !important;
   margin: 0;
   padding: 0;
-  font-family: "Roboto", sans-serif;
+}
+
+body,
+html {
+  font-family: "Poppins", sans-serif !important;
 }

@@ -5,6 +5,8 @@ import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../pages/auth/LoginPage";
 import PageRegister from "../pages/auth/PageRegister";
 import Home from "../pages/customer/Home";
+import PageUser from "../pages/PageUser";
+import AdminLayout from "../layouts/AdminLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -43,6 +45,24 @@ function Router(props) {
     {
       path: "auth/register",
       element: <PageRegister />,
+    },
+    {
+      path: "/user",
+      element: <PageUser />,
+    },
+    {
+      path: "/admin",
+      element: <AdminLayout />,
+      children: [
+        {
+          path: "analytics",
+          element: null,
+        },
+        {
+          path: "address-management/province",
+          element: null,
+        },
+      ],
     },
   ]);
 }

@@ -2,28 +2,26 @@ package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Nationalized;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-@Data
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Ward {
     @Id
-    private UUID wardId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int wardId;
+
+    @Nationalized
     private String wardName;
+
+    private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private District district;
-    private Date createdAt;
-    private Date lastModified;
-    private boolean deleted;
-
-    @OneToMany(mappedBy = "ward")
-    @JsonBackReference
-    private List<Address> addresses;
-
 }
