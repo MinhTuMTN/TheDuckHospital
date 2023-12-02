@@ -12,3 +12,20 @@ html {
 .test-github {
   background-color: green;
 }
+
+/* RowInfo.css */
+.name-text {
+  min-width: 200px;
+  text-transform: uppercase;
+  color: #42a5f5;
+  text-align: left;
+  font-weight: bold;
+}
+
+.default-text {
+  min-width: 200px;
+  text-align: left;
+  /* Màu chữ mặc định, ví dụ màu đen */
+  color: #161414;
+  font-weight: 700;
+}
