@@ -5,6 +5,8 @@ import LogoLayout from "../layouts/LogoLayout";
 import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../pages/auth/LoginPage";
 import PageRegister from "../pages/auth/PageRegister";
+import PageUser from "../pages/PageUser";
+import AdminLayout from "../layouts/AdminLayout";
 
 const LoadComponent = (Component) => (props) =>
 (
@@ -66,7 +68,7 @@ function Router(props) {
     //     },
     //   ],
     // },
-    ,
+    // ,
     {
 
       path: "/admin",
