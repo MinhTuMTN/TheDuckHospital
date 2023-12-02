@@ -7,11 +7,11 @@ import LoginPage from "../pages/auth/LoginPage";
 import PageRegister from "../pages/auth/PageRegister";
 
 const LoadComponent = (Component) => (props) =>
-  (
-    <React.Suspense fallback={<Loading />}>
-      <Component {...props} />
-    </React.Suspense>
-  );
+(
+  <React.Suspense fallback={<Loading />}>
+    <Component {...props} />
+  </React.Suspense>
+);
 
 const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 
@@ -39,6 +39,48 @@ function Router(props) {
     {
       path: "/",
       element: <MainLayout />,
+    },
+    {
+      path: "/user",
+      element: <PageUser />,
+    },
+    // {
+    //   path: "/user",
+    //   element: <PageUser />,
+    //   children: [
+    //     {
+    //       path: "/user/patient-records",
+    //       element: <PatientRecords />,
+    //     },
+    //     {
+    //       path: "/user/medical-bills",
+    //       element: <MedicalBills />,
+    //     },
+    //     {
+    //       path: "/user/notifications",
+    //       element: <Notifications />,
+    //     },
+    //     {
+    //       path: "/user/payment-history",
+    //       element: <PaymentHistory />,
+    //     },
+    //   ],
+    // },
+    ,
+    {
+
+      path: "/admin",
+      element: <AdminLayout />,
+      children: [
+        {
+          path: "analytics",
+          element: null,
+        },
+        {
+          path: "address-management/province",
+          element: null,
+        },
+      ],
     },
   ]);
 }

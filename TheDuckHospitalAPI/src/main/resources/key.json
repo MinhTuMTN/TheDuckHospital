@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "the-duck-mobile",
+  "private_key_id": "7dadc0beff27013e0392ef3171d9d5da58f92e20",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCZzmYQ7fIL2l03\nX/X05rYMSdHDwO/FRA2oEVHm3DXmo3W6TErUCWPjgfx9A9sFjLWM4WDdeh+72eJc\nTUBjY8TDOvH7tQv6PHv7exv5N4qPgU4SpEQUnzGSQcfJGwt/XzqwfmvBbyv/Qo3M\nAUISdC50v5QdIq05WQ9G9W15j56KgHhlVjSZluZvh+AcOIhSMrFnsnHKIn+oLLeG\n2Z8fKLjj2Y7P+iMiDDai5uOodrxk/lHMmVOak+It1sCnf36RIGauh/KvvTnVWkEh\nT0SE32Mlq5VSqJdl99Eoclq7hAybTB3nQ6XQXfK5OEPgUBlC/+IuwuWOUscNFVlO\no5MFBvr/AgMBAAECggEADAFf1ydzkrhHOWjMnoKZqCjk7jYzoP64YCuF7JK4xFly\n+Yk1+AoJmXsOdcWkxXCfxTDcaj07l+KgeBrxkTB67dA+jiqqFiy9cro/yzqqHpx1\ntx/KTp/Ec0meKhTp11XcE2WyzIT8dq6/ubJJcX5PF/7SNVn9EnJgrmW+11O+CMpy\nXkni0xBDMx4W1Hr/Rip2FHihIYB+q/18FPh+XDEQBnmR1yYmYbjunVJbkiE98WAB\nBxwKYwvL+BJNO/rOv+G0Bdm2ZGLTmmpMLf+K/LbpvFO66RRR1ljD8UM4T3s2XRBx\nbFeizmd/hxvM0aeCnYLj5eKkssR6G9lnLmIFor1zAQKBgQDL0c1yGOJ5bGd4Exq/\nzra0gD/b27cCQe2lG9YAafndhvUt5AJtyqZ1F33i8pfp5cpPy78377Q9kl4YKZFR\nocwtynoaj9ZKNCJK7/cYCMQN4uphHO450xCuM+NYk6/dueSLFUSBBs+BmM8gIkXr\nwq6BrTZ94IwPct7um8/TY8eV/wKBgQDBLsIHinvpulK6bfavqJrthNm4oViKHH+s\n1LpwaGT39gwFzkRZZFfaGnzAIRlYVWtJSQl5khe3bjFnvvXe7o5AxSPgYH94fOqp\n/GlqJq/KgHXtCCbD1JSZe6tUZI5awVYIonOwTtVVJYx/01eOqRp7t1f60AXHX/xd\nP1cpwpKbAQKBgH0CXUPRx3Y56uxWq11hZ+YlkwVCKWkVDrDp9cOjPEGG+PIAmwzD\n8nx2wBtmN46aBhATI2EngCETmOqw9BRhbF3ZhjKsbf5tI2ta6u6u0bDCsIaHvAVz\nUxPFd3dofcE8ttQnYzDQAI24L7HB06jaazXWC0oBY2ZGSj2HC1zYIh35AoGBAILM\nOtlKPW3aFutdStpSaVuKSLPGoqEYfKWzfuxe8oYlFKzVpNd1pjnpFzAq+PMjGroK\n9pxWezJaLJ9W3zhrAuv9zrW8AHK++U/QtDsIKJwOcEnl7AFJrLdi0XUZhH0UTEEa\nZQQpzC2Td9aQbMcN3f2H/My4DkGYztD/8u82a3cBAoGBAJrpdbO4A8kY77ERjA9K\nJ8yIuByC6UgLAeZcSnBgLFW1WyyGZLpT2ZrADO9lXUQPKN5G/chqwmW+vPrKyEgt\ncGbythbw4gXzdgOX51wOlE6WLlD5GvqoBna7CMC1VVrec2LjIbUgcy5E//LFk9fH\nfhZxs6z9tTrvxFrWXLxRRBpi\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-n52os@the-duck-mobile.iam.gserviceaccount.com",
+  "client_id": "104053313406866563417",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-n52os%40the-duck-mobile.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
