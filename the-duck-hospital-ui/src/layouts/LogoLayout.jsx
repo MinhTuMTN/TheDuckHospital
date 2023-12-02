@@ -1,8 +1,6 @@
-import { Avatar } from "@mui/material";
-import React from "react";
-import Logo from "../components/Logo";
-import { Link, Outlet } from "react-router-dom";
 import styled from "@emotion/styled";
+import React from "react";
+import { Link, Outlet } from "react-router-dom";
 
 const CustomHeader = styled("header")(({ theme }) => ({
   position: "absolute",
@@ -17,9 +15,7 @@ function LogoLayout(props) {
   return (
     <>
       <CustomHeader>
-        <Link to="/">
-          <Logo />
-        </Link>
+        <Link to="/"></Link>
       </CustomHeader>
       <Outlet />
     </>

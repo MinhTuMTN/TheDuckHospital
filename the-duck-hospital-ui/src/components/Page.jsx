@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
 import { Box } from "@mui/material";
-import styled from "@emotion/styled";
+import React, { useEffect } from "react";
 
 function Page({ title, children, ...other }) {
   useEffect(() => {

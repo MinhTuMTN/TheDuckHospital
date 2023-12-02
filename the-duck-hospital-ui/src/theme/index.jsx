@@ -1,8 +1,6 @@
 import { ThemeProvider } from "@emotion/react";
-import { CssBaseline, createTheme, responsiveFontSizes } from "@mui/material";
+import { CssBaseline, createTheme } from "@mui/material";
 import React from "react";
-
-import typography from "./typography";
 
 function CustomThemeProvider(props) {
   const themeOptions = {
@@ -31,6 +29,16 @@ function CustomThemeProvider(props) {
         darker: "#6C5604",
         main: "#FCE38A",
       },
+      template: {
+        darker: "#17496c",
+        main: "#0b5394",
+        normal1: "	rgb(0, 148, 212)",
+        normal2: "#00a9dd",
+        normal3: "#6fccea",
+        lighter1: "#c7ebf8",
+        lighter2: "#9fc5e8",
+        lightest: "#cfe2f3",
+      },
       text: {
         teal: "#006451",
         green: "#EAFFD0",
@@ -39,7 +47,6 @@ function CustomThemeProvider(props) {
         oldPrimary: "#42a5f5",
       },
     },
-    typography,
   };
 
   let theme = createTheme(themeOptions);

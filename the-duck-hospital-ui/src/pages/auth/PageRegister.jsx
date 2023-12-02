@@ -1,112 +1,99 @@
 import styled from "@emotion/styled";
-import { Paper, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, CardMedia, Paper, Stack } from "@mui/material";
 import React from "react";
-import backgroundLogin from "../../assets/background_login.jpg";
-import LinkWithoutDecoratLink from "../../components/LinkWithoutDecoration";
-import MuiButton from "../../components/MuiButton";
-import MuiTextFeild from "../../components/MuiTextFeild";
+import Register from "../../components/Auth/Register";
 import Page from "../../components/Page";
 
-const RootPageRegister = styled(Page)(({ theme }) => ({
+const urlImage =
+  "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701430503/THEDUCK__1_-removebg-preview_iag4sd.png";
+
+const urlBackground =
+  "https://id-v121.medpro.com.vn/static/media/cover-14.cdc08a1d.jpg";
+
+const RootPageLogin = styled(Page)(({ theme }) => ({
   display: "flex",
   height: "100vh",
+  width: "100%",
   alignItems: "center",
   justifyContent: "center",
-  backgroundImage: `url(${backgroundLogin})`,
+}));
+
+const Left = styled(Box)(({ theme }) => ({
+  flex: 6,
+  height: "100%",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  backgroundImage: `url(${urlBackground})`,
   backgroundSize: "cover",
   backgroundRepeat: "no-repeat",
-
+  backgroundPosition: "center",
   [theme.breakpoints.down("sm")]: {
-    overflow: "scroll",
+    display: "none",
+  },
+
+  [theme.breakpoints.down("md")]: {
+    display: "none",
   },
 }));
 
-const FormRegister = styled(Paper)(({ theme }) => ({
+const Right = styled(Paper)(({ theme }) => ({
+  flex: 4,
+  height: "100%",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  padding: theme.spacing(5),
-  borderRadius: theme.spacing(2),
-  backgroundColor: "#ffffffc7",
-  backdropFilter: "blur(10px)",
-  boxShadow: theme.shadows[5],
-  width: "60%",
-
-  [theme.breakpoints.between("sm", "lg")]: {
-    width: "90%",
-  },
-
-  [theme.breakpoints.down("sm")]: {
-    width: "95%",
-    padding: theme.spacing(2),
-    marginTop: theme.spacing(2),
-  },
+  alignItems: "center",
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+  backgroundColor: "#fbfafc",
 }));
-
 function PageRegister(props) {
   return (
-    <RootPageRegister title="Đăng ký">
-      <FormRegister>
-        <Box sx={{ width: "100%" }}>
-          <Typography variant="h3">Đăng ký</Typography>
-          <Typography variant="body1">
-            Tạo tài khoản để khám, chữa bệnh tại The Duck Hospital
-          </Typography>
-          <Typography variant="body1">
-            Bạn đã có tài khoản?{" "}
-            <Typography
-              component={LinkWithoutDecoratLink}
-              to={"/auth/login"}
-              color={"teal.main"}
-              fontWeight={"bold"}
-            >
-              Đăng nhập
-            </Typography>
-          </Typography>
-        </Box>
+    <RootPageLogin title="Đăng nhập">
+      <Left>
         <Box
           sx={{
+            bgcolor: "white",
+            width: "50px",
+            height: "100%",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-start",
+            marginLeft: "auto",
+            clipPath: "polygon(100% 0, 100% 0%, 100% 100%, 0% 100%)",
+            border: "none",
+            backgroundColor: "#fbfafc",
+          }}
+        />
+      </Left>
+      <Right>
+        <Stack
+          direction={"column"}
+          spacing={2}
+          sx={{
+            paddingX: "auto",
+            width: "100%",
+            height: "100%",
+            alignItems: "center",
+            paddingTop: "20px",
           }}
         >
-          <MuiTextFeild
-            label="Họ"
-            type="text"
-            margin="normal"
-            sx={{ flexBasis: "30%" }}
+          <CardMedia
+            component={"img"}
+            image={urlImage}
+            sx={{
+              width: "220px",
+              height: "220px",
+              objectFit: "cover",
+              objectPosition: "center",
+              marginTop: "20px",
+            }}
           />
-          <MuiTextFeild
-            sx={{ flexBasis: "69%" }}
-            label="Tên"
-            type="text"
-            margin="normal"
-          />
-        </Box>
-
-        <MuiTextFeild label="Email" type="email" margin="normal" />
-        <MuiTextFeild label="Mật khẩu" type="password" margin="normal" />
-        <MuiTextFeild
-          label="Nhập lại mật khẩu"
-          type="password"
-          margin="normal"
-        />
-        <MuiButton variant="contained" color="oldPrimaryDarker">
-          <Typography color={"white"} textTransform={"uppercase"}>
-            Đăng ký
-          </Typography>
-        </MuiButton>
-        <Typography
-          variant="body2"
-          marginTop={2}
-          color="teal.main"
-          fontWeight={"bold"}
-        >
-          Bằng việc đăng ký, bạn đã đồng ý với các điều khoản của chúng tôi
-        </Typography>
-      </FormRegister>
-    </RootPageRegister>
+          <Register />
+        </Stack>
+      </Right>
+    </RootPageLogin>
   );
 }
 

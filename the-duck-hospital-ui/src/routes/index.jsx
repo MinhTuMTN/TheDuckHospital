@@ -2,8 +2,9 @@ import React from "react";
 import { useRoutes } from "react-router-dom";
 import Loading from "../components/Loading";
 import LogoLayout from "../layouts/LogoLayout";
-import PageRegister from "../pages/auth/PageRegister";
 import MainLayout from "../layouts/MainLayout";
+import LoginPage from "../pages/auth/LoginPage";
+import PageRegister from "../pages/auth/PageRegister";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -12,9 +13,6 @@ const LoadComponent = (Component) => (props) =>
     </React.Suspense>
   );
 
-const Login = LoadComponent(
-  React.lazy(() => import("../pages/auth/PageLogin"))
-);
 const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 
 function Router(props) {
@@ -29,8 +27,9 @@ function Router(props) {
         },
         {
           path: "auth/login",
-          element: <Login />,
+          element: <LoginPage />,
         },
+
         {
           path: "auth/register",
           element: <PageRegister />,
