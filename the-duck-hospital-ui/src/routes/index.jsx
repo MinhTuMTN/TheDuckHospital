@@ -7,6 +7,10 @@ import LoginPage from "../pages/auth/LoginPage";
 import PageRegister from "../pages/auth/PageRegister";
 import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
+import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentListPage";
+import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
+import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
+import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
 
 const LoadComponent = (Component) => (props) =>
 (
@@ -68,7 +72,6 @@ function Router(props) {
     //     },
     //   ],
     // },
-    // ,
     {
 
       path: "/admin",
@@ -78,8 +81,36 @@ function Router(props) {
           path: "analytics",
           element: null,
         },
+        // {
+        //   element: <Analytics />,
+        //   index: true,
+        // },
         {
-          path: "address-management/province",
+          path: "appointment-management",
+          element: null,
+        },
+        {
+          path: "staff-management",
+          element: <StaffListPage />,
+        },
+        {
+          path: "staff-management/detail",
+          element: <StaffDetailPage />,
+        },
+        {
+          path: "department-management",
+          element: <DepartmentListPage />,
+        },
+        {
+          path: "department-management/detail",
+          element: <DepartmentDetailPage />,
+        },
+        {
+          path: "patient-management",
+          element: null,
+        },
+        {
+          path: "payment-management",
           element: null,
         },
       ],
