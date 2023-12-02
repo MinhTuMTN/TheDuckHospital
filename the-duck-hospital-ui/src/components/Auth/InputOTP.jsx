@@ -12,7 +12,11 @@ import React, { useEffect } from "react";
 const yourPhone = "0123456789";
 
 const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "50px",
   backgroundColor: "#f2f2f2",
 }));
@@ -20,12 +24,24 @@ const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
 const CustomButton = styled(Button)(({ theme }) => ({
   background: theme.palette.oldPrimary.main,
   color: "white",
-  width: "390px",
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
+  },
   height: "45px",
   "&:hover": {
     background: theme.palette.oldPrimary.main, // Đổi màu nền khi hover
     boxShadow: "0px 0px 5px 0px rgba(171, 169, 169, 0.75)", // Đổ bóng
     transform: "scale(1.01)", // Scale lên 110%
+  },
+}));
+
+const CustomBox = styled(Box)(({ theme }) => ({
+  width: "390px", // Default width for larger screens
+
+  [theme.breakpoints.down("sm")]: {
+    width: "350px", // Adjusted width for smaller screens (e.g., width < 600px)
   },
 }));
 
@@ -151,12 +167,11 @@ function InputOTP(props) {
         }}
       />
 
-      <Box
+      <CustomBox
         style={{
           display: "flex",
           justifyContent: "space-between",
           marginTop: "20px",
-          width: "390px",
         }}
       >
         {otp.map((value, index) => (
@@ -172,7 +187,7 @@ function InputOTP(props) {
             name={`otp-${index}`}
           />
         ))}
-      </Box>
+      </CustomBox>
 
       <Box>
         <CustomButton variant="contained" onClick={handleLogin}>
