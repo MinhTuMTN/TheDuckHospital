@@ -1,10 +1,10 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import Loading from "../components/Loading";
-import LogoLayout from "../layouts/LogoLayout";
 import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../pages/auth/LoginPage";
 import PageRegister from "../pages/auth/PageRegister";
+import Home from "../pages/customer/Home";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -18,27 +18,31 @@ const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 function Router(props) {
   return useRoutes([
     {
-      path: "*",
-      element: <LogoLayout />,
+      path: "/",
+      element: <MainLayout />,
       children: [
         {
-          path: "*",
-          element: <NotFound />,
-        },
-        {
-          path: "auth/login",
-          element: <LoginPage />,
+          path: "/",
+          element: <Home />,
         },
 
         {
-          path: "auth/register",
-          element: <PageRegister />,
+          path: "*",
+          element: <NotFound />,
         },
       ],
     },
     {
       path: "/",
       element: <MainLayout />,
+    },
+    {
+      path: "auth/login",
+      element: <LoginPage />,
+    },
+    {
+      path: "auth/register",
+      element: <PageRegister />,
     },
   ]);
 }
