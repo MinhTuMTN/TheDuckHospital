@@ -12,6 +12,8 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 @Getter
 @Setter
 public class Doctor extends Staff{
+    private String degree;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
     @JsonBackReference

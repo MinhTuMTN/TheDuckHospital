@@ -25,3 +25,5 @@ jobs:
           channelId: live
           projectId: the-duck-hospital
           entryPoint: ./the-duck-hospital-ui
+        env:
+          CI: ""
