@@ -66,7 +66,7 @@ function NavBar(props) {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
   const [iSLogin, setIsLogin] = React.useState(false);
-  //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover
+  //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover.
   return (
     <Wrapper>
       <Stack
