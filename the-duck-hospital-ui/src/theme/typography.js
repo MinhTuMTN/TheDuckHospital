@@ -20,7 +20,7 @@ function responsiveFontSizes({ sm, md, lg }) {
 const typography = {
   fontFamily: '"Poppins", sans-serif',
   fontWeightRegular: 400,
-  fontWeightMedium: 600,
+  fontWeightMedium: 600,  
   fontWeightBold: 700,
   h1: {
     fontWeight: 700,
