@@ -16,6 +16,7 @@ import {
 import React from "react";
 import { usePopover } from "../hooks/use-popover";
 import AccountPopover from "./AccountPopover";
+import { useAuth } from "../auth/AuthProvider";
 
 const TOP_NAV_HEIGHT = 64;
 
@@ -65,7 +66,7 @@ function NavBar(props) {
   const { onDrawerClick } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
-  const [iSLogin, setIsLogin] = React.useState(false);
+  const { token } = useAuth();
   //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover.
   return (
     <Wrapper>
@@ -134,7 +135,7 @@ function NavBar(props) {
               <CustomMenuItem>Liên hệ</CustomMenuItem>
             </Toolbar>
             <Box>
-              {iSLogin ? (
+              {token ? (
                 <Button
                   variant="contained"
                   sx={{

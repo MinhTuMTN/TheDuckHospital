@@ -91,15 +91,19 @@ public class AuthController {
     @PostMapping("/check-account-exist")
     public ResponseEntity<?> checkAccountExistAndSendOtp(@RequestBody CheckAccountExistRequest request)
             throws FirebaseMessagingException {
-        if (!accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
-            return ResponseEntity.status(401).body(GeneralResponse.builder()
-                    .success(false)
+        if (accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
+            return ResponseEntity
+                    .status(request.getEmailOrPhoneNumber().contains("@") ? 400 : 200)
+                    .body(GeneralResponse.builder()
+                    .success(true)
                     .message("Account not exist")
+                    .data(false)
                     .build());
 
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
-                .message("Account exist. OTP sent")
+                .message("Account exist")
+                .data(true)
                 .build()
         );
     }
@@ -113,5 +117,22 @@ public class AuthController {
                 .data(account)
                 .build()
         );
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody CheckAccountExistRequest request)
+            throws FirebaseMessagingException {
+        if (accountServices.sendOTP(request.getEmailOrPhoneNumber()))
+            return ResponseEntity.status(200).body(GeneralResponse.builder()
+                    .success(true)
+                    .message("Send OTP success")
+                    .data(true)
+                    .build());
+
+        return ResponseEntity.status(404).body(GeneralResponse.builder()
+                .success(true)
+                .message("Send OTP failed")
+                .data(false)
+                .build());
     }
 }

@@ -13,9 +13,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { useEffect } from "react";
+import { useAuth } from "../../auth/AuthProvider";
+import { register } from "../../services/customer/AuthServices";
 
-const yourPhone = "0123456789";
 const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
   width: "390px",
   height: "50px",
@@ -48,11 +50,16 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 function Register(props) {
+  const { phone } = props;
+  const [otp, setOTP] = React.useState("");
+  const [fullName, setFullName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwordConfirmation, setPasswordConfirmation] = React.useState("");
   const [errorTextConfirmation, setErrorTextConfirmation] = React.useState("");
   const [errorText, setErrorText] = React.useState("");
+  const { enqueueSnackbar } = useSnackbar();
+  const { setToken } = useAuth();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -93,15 +100,51 @@ function Register(props) {
     }
   }, [passwordConfirmation, password]);
 
-  const handleLogin = () => {
+  const handleRegister = async () => {
     if (password.trim() === "") {
-      setErrorText("Vui lòng nhập mật khẩu!");
-      setPassword("");
-    } else {
-      // Thực hiện đăng nhập khi mật khẩu không rỗng
-      setErrorText("");
-      // TODO: Thêm logic đăng nhập ở đây
+      enqueueSnackbar("Vui lòng nhập mật khẩu!", { variant: "error" });
+      return;
     }
+
+    if (passwordConfirmation.trim() === "") {
+      enqueueSnackbar("Vui lòng xác nhận mật khẩu!", { variant: "error" });
+      return;
+    }
+
+    if (passwordConfirmation !== password) {
+      enqueueSnackbar("Mật khẩu không khớp!", { variant: "error" });
+      return;
+    }
+
+    if (otp.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập mã OTP!", { variant: "error" });
+      return;
+    }
+
+    if (fullName.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập họ và tên!", { variant: "error" });
+      return;
+    }
+
+    const response = await register({
+      phoneNumber: phone,
+      password: password,
+      otp: otp,
+      fullName: fullName,
+    });
+
+    if (!response.success) {
+      enqueueSnackbar("Đã có lỗi xảy ra vui lòng thử lại sau", {
+        variant: "error",
+      });
+      return;
+    }
+
+    enqueueSnackbar("Đăng ký thành công", { variant: "success" });
+    setToken(response.data.data);
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500);
   };
 
   return (
@@ -112,6 +155,7 @@ function Register(props) {
         width: "100%",
         height: "100%",
         alignItems: "center",
+        paddingBottom: 5,
       }}
     >
       <Typography
@@ -125,7 +169,7 @@ function Register(props) {
         variant="outlined"
         size="large"
         disabled
-        value={yourPhone}
+        value={phone}
         InputProps={{
           startAdornment: (
             <img
@@ -143,7 +187,19 @@ function Register(props) {
           },
         }}
       />
-      <CustomTextField autoFocus size="large" placeholder="Nhập họ và tên" />
+      <CustomTextField
+        autoFocus
+        size="large"
+        placeholder="OTP"
+        value={otp}
+        onChange={(e) => setOTP(e.target.value)}
+      />
+      <CustomTextField
+        size="large"
+        placeholder="Nhập họ và tên"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+      />
 
       <FormControl sx={{ width: "390px" }} variant="outlined">
         <CustomTextField
@@ -212,8 +268,8 @@ function Register(props) {
       </Box>
 
       <Box>
-        <CustomButton variant="contained" onClick={handleLogin}>
-          Đăng nhập
+        <CustomButton variant="contained" onClick={handleRegister}>
+          Đăng ký
         </CustomButton>
         {errorText !== "" ? (
           <FormHelperText

@@ -15,7 +15,10 @@ public class HelloController {
 
     @GetMapping
     public String hello() {
-        return graphServices.createMSGraphUser("Phạm Chí Vịnh",
-                "vinhpc@theduckhospital.onmicrosoft.com");
+        graphServices.createMSGraphUser(
+             "Ân Mạnh Hùng",
+             "hungam@theduckhospital.onmicrosoft.com"
+        );
+        return "Hello World";
     }
 }

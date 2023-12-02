@@ -1,6 +1,7 @@
 import { SnackbarProvider } from "notistack";
 import Router from "./routes";
 import CustomThemeProvider from "./theme";
+import AuthProvider from "./auth/AuthProvider";
 
 function App() {
   return (
@@ -10,7 +11,9 @@ function App() {
         maxSnack={3}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Router />
+        <AuthProvider>
+          <Router />
+        </AuthProvider>
       </SnackbarProvider>
     </CustomThemeProvider>
   );

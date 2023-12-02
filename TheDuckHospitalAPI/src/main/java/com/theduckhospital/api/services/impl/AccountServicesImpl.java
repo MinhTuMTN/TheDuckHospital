@@ -9,6 +9,7 @@ import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.TemporaryUserRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IFirebaseServices;
+import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IOTPServices;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,17 +28,20 @@ public class AccountServicesImpl implements IAccountServices {
     private final IOTPServices otpServices;
     private final IFirebaseServices firebaseServices;
     private final TemporaryUserRepository temporaryUserRepository;
+    private final IMSGraphServices graphServices;
 
     public AccountServicesImpl(AccountRepository accountRepository,
                                PasswordEncoder passwordEncoder,
                                IOTPServices otpServices,
                                IFirebaseServices firebaseServices,
-                               TemporaryUserRepository temporaryUserRepository) {
+                               TemporaryUserRepository temporaryUserRepository,
+                               IMSGraphServices graphServices) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpServices = otpServices;
         this.firebaseServices = firebaseServices;
         this.temporaryUserRepository = temporaryUserRepository;
+        this.graphServices = graphServices;
     }
     @Override
     public Account findAccount(String emailOrPhone) {
@@ -82,39 +86,34 @@ public class AccountServicesImpl implements IAccountServices {
         // Check if account already exist
         Account account = findAccount(emailOrPhone);
 
+        if (account != null)
+            return false;
+
+        if (emailOrPhone.contains("@"))
+            return true;
+
         int otp = 0;
-        if (account == null && !emailOrPhone.contains("@")) {
-            Optional<TemporaryUser> optionalTemporaryUser = temporaryUserRepository
-                    .findTemporaryUserByPhoneNumber(emailOrPhone);
+        Optional<TemporaryUser> optionalTemporaryUser = temporaryUserRepository
+                .findTemporaryUserByPhoneNumber(emailOrPhone);
 
-            optionalTemporaryUser.ifPresent(temporaryUserRepository::delete);
+        // If temporary user already exist, delete it
+        optionalTemporaryUser.ifPresent(temporaryUserRepository::delete);
 
-            TemporaryUser temporaryUser = new TemporaryUser();
-            temporaryUser.setPhoneNumber(emailOrPhone);
+        TemporaryUser temporaryUser = new TemporaryUser();
+        temporaryUser.setPhoneNumber(emailOrPhone);
 
-            otp = otpServices.generateOTP(temporaryUser);
-        }
+        otp = otpServices.generateOTP(temporaryUser);
+        Map<String, String> data = new HashMap<>();
+        data.put("phoneNumber", emailOrPhone);
+        data.put("message", "Mã xác nhận của bạn là: " + otp);
+        firebaseServices.sendNotification(
+                fcmToken,
+                "OTP",
+                "Mã xác nhận của bạn là: " + otp,
+                data
+        );
 
-        if (account != null) {
-            otp = otpServices.generateOTP(account);
-        }
-
-        if (emailOrPhone.contains("@")) {
-            // Not implement yet
-            throw new UnsupportedOperationException();
-        } else {
-            Map<String, String> data = new HashMap<>();
-            data.put("phoneNumber", emailOrPhone);
-            data.put("message", "Your OTP is " + otp);
-            firebaseServices.sendNotification(
-                    fcmToken,
-                    "OTP",
-                    "Your OTP is " + otp,
-                    data
-            );
-        }
-
-        return account != null;
+        return true;
     }
 
     @Override
@@ -155,5 +154,36 @@ public class AccountServicesImpl implements IAccountServices {
 
         // Save account to database
         return accountRepository.save(account);
+    }
+
+    @Override
+    public boolean sendOTP(String emailOrPhone) throws FirebaseMessagingException {
+        Account account = findAccount(emailOrPhone);
+
+        if (account == null) {
+            return false;
+        }
+
+        int otp = otpServices.generateOTP(account);
+
+        if (emailOrPhone.contains("@")) {
+            graphServices.sendEmail(
+                    emailOrPhone,
+                    "Mã xác nhận đăng nhập",
+                    "Mã xác nhận đăng nhập The Duck Mobile của bạn là: "
+                            + otp
+            );
+        } else {
+            Map<String, String> data = new HashMap<>();
+            data.put("phoneNumber", emailOrPhone);
+            data.put("message", "Mã xác nhận của bạn là: " + otp);
+            firebaseServices.sendNotification(
+                    fcmToken,
+                    "OTP",
+                    "Mã xác nhận của bạn là: " + otp,
+                    data
+            );
+        }
+        return true;
     }
 }

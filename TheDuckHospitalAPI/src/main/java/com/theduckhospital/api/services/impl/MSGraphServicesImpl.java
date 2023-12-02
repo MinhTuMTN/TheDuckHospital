@@ -3,10 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
-import com.microsoft.graph.models.AssignedLicense;
-import com.microsoft.graph.models.PasswordProfile;
-import com.microsoft.graph.models.User;
-import com.microsoft.graph.models.UserAssignLicenseParameterSet;
+import com.microsoft.graph.models.*;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.services.IMSGraphServices;
@@ -78,6 +75,49 @@ public class MSGraphServicesImpl implements IMSGraphServices {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public boolean sendEmail(String recipient, String subject, String content) {
+        try {
+            final GraphServiceClient<Request> graphClient = createClient();
+
+            Message message = new Message();
+
+            // Subject of the email
+            message.subject = subject;
+
+            // Body of the email
+            ItemBody body = new ItemBody();
+            body.contentType = BodyType.TEXT;
+            body.content = content;
+            message.body = body;
+
+            // Recipient of the email
+            LinkedList<Recipient> recipientsList = new LinkedList<Recipient>();
+            Recipient recipientObj = new Recipient();
+            EmailAddress emailAddress = new EmailAddress();
+            emailAddress.address = recipient;
+            recipientObj.emailAddress = emailAddress;
+            recipientsList.add(recipientObj);
+            message.toRecipients = recipientsList;
+
+            Objects.requireNonNull(graphClient
+                            .users()
+                            .byId(Objects.requireNonNull(
+                                    environment.getProperty("ms.graph.admin-id")
+                            )))
+                    .sendMail(UserSendMailParameterSet
+                            .newBuilder()
+                            .withMessage(message)
+                            .build())
+                    .buildRequest()
+                    .post();
+
+            return true;
+        } catch (Exception e) {
+            throw new BadRequestException("An error occurred while sending email");
         }
     }
 

@@ -10,4 +10,5 @@ public interface IAccountServices {
     boolean loginWithOtp(String emailOrPhone, String otp);
     boolean checkAccountExistAndSendOtp(String emailOrPhone) throws FirebaseMessagingException;
     Account register(RegisterRequest request);
+    boolean sendOTP(String emailOrPhone) throws FirebaseMessagingException;
 }

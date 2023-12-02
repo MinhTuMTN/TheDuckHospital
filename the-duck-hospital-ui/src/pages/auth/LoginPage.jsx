@@ -3,6 +3,9 @@ import { Box, CardMedia, Paper, Stack } from "@mui/material";
 import React from "react";
 import InputPhoneNumber from "../../components/Auth/InputPhoneNumber";
 import Page from "../../components/Page";
+import InputPassword from "../../components/Auth/InputPassword";
+import InputOTP from "../../components/Auth/InputOTP";
+import Register from "../../components/Auth/Register";
 //import InputOTP from "../../components/Auth/InputOTP";
 //import InputPassword from "../../components/Auth/InputPassword";
 
@@ -50,8 +53,14 @@ const Right = styled(Paper)(({ theme }) => ({
   paddingLeft: theme.spacing(2),
   paddingRight: theme.spacing(2),
   backgroundColor: "#fbfafc",
+  overflow: "auto",
 }));
+
 function LoginPage(props) {
+  const [emailOrPhoneNumber, setEmailOrPhoneNumber] = React.useState("");
+  const [loginType, setLoginType] = React.useState("password");
+  const [step, setStep] = React.useState(1);
+
   return (
     <RootPageLogin title="Đăng nhập">
       <Left>
@@ -92,7 +101,29 @@ function LoginPage(props) {
               marginTop: "20px",
             }}
           />
-          <InputPhoneNumber />
+          {step === 1 && (
+            <InputPhoneNumber
+              phone={emailOrPhoneNumber}
+              setPhone={setEmailOrPhoneNumber}
+              setStep={() => setStep(2)}
+              setLoginType={setLoginType}
+            />
+          )}
+
+          {step === 2 && loginType === "password" && (
+            <InputPassword
+              phone={emailOrPhoneNumber}
+              setLoginType={() => setLoginType("otp")}
+            />
+          )}
+
+          {step === 2 && loginType === "otp" && (
+            <InputOTP phone={emailOrPhoneNumber} />
+          )}
+
+          {step === 2 && loginType === "register" && (
+            <Register phone={emailOrPhoneNumber} />
+          )}
         </Stack>
       </Right>
     </RootPageLogin>

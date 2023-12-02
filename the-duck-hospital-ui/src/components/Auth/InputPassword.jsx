@@ -16,6 +16,14 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import PropTypes from "prop-types";
+import {
+  loginWithPassword,
+  sendOTP,
+} from "../../services/customer/AuthServices";
+import { useSnackbar } from "notistack";
+import { useAuth } from "../../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
   width: "390px", // Default width for larger screens
@@ -60,7 +68,18 @@ const CustomButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+InputPassword.propTypes = {
+  phone: PropTypes.string,
+  password: PropTypes.string,
+  setPassword: PropTypes.func,
+  setLoginType: PropTypes.func,
+};
+
 function InputPassword(props) {
+  const { phone, setLoginType } = props;
+  const { setToken } = useAuth();
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [errorText, setErrorText] = React.useState("");
@@ -79,16 +98,50 @@ function InputPassword(props) {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (password.trim() === "") {
       setErrorText("Vui lòng nhập mật khẩu!");
       setPassword("");
     } else {
-      // Thực hiện đăng nhập khi mật khẩu không rỗng
       setErrorText("");
-      // TODO: Thêm logic đăng nhập ở đây
+
+      const response = await loginWithPassword({
+        emailOrPhoneNumber: phone,
+        passwordOrOTP: password,
+      });
+
+      if (!response.success) {
+        enqueueSnackbar(
+          response.statusCode === 401
+            ? "Tài khoản hoặc mật khẩu không chính xác"
+            : "Đã có lỗi xảy ra vui lòng thử lại sau",
+          { variant: "error" }
+        );
+        return;
+      }
+
+      setToken(response.data.data);
+      enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
     }
   };
+
+  const handleSendOTP = async () => {
+    const response = await sendOTP({
+      emailOrPhoneNumber: phone,
+    });
+
+    if (!response.success) {
+      enqueueSnackbar("Đã có lỗi xảy ra vui lòng thử lại sau", {
+        variant: "error",
+      });
+      return;
+    }
+    setLoginType();
+  };
+
   const theme = useTheme();
 
   return (
@@ -184,6 +237,7 @@ function InputPassword(props) {
                 paddingLeft: "8px",
                 cursor: "pointer",
               }}
+              onClick={handleSendOTP}
             >
               Đăng nhập bằng OTP
             </Typography>

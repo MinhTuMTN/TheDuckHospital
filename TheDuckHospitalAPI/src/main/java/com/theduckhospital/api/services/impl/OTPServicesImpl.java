@@ -25,6 +25,11 @@ public class OTPServicesImpl implements IOTPServices {
         if (account == null)
             throw new IllegalArgumentException("Account is null");
 
+        // If account already has OTP which is created less than 5 minutes ago
+        if (account.getOtpCreatedAt() != null && account.getOtpCreatedAt().after(new Date(System.currentTimeMillis() - 5 * 60 * 1000))) {
+            return account.getOtp();
+        }
+
         // Random OTP 6 digits
         int otp = (int) (Math.random() * 900000) + 100000;
 
