@@ -22,11 +22,6 @@ import java.util.Date;
 
 @SpringBootApplication
 public class TheDuckHospitalApiApplication implements CommandLineRunner {
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private AccountRepository accountRepository;
 	@Bean
 	FirebaseMessaging firebaseMessaging() throws IOException {
 		GoogleCredentials credentials = GoogleCredentials
