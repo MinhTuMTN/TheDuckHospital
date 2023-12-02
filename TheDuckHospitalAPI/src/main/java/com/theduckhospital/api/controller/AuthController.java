@@ -4,9 +4,12 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.CheckAccountExistRequest;
 import com.theduckhospital.api.dto.GeneralResponse;
 import com.theduckhospital.api.dto.LoginRequest;
+import com.theduckhospital.api.dto.RegisterRequest;
+import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping("/login-password")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) throws Exception {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         if (!accountServices.loginWithPassword(
                 loginRequest.getEmailOrPhoneNumber(),
                 loginRequest.getPasswordOrOTP()
@@ -53,7 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/login-otp")
-    public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) throws Exception {
+    public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) {
         if (!accountServices.loginWithOtp(
                 loginRequest.getEmailOrPhoneNumber(),
                 loginRequest.getPasswordOrOTP()
@@ -98,6 +101,17 @@ public class AuthController {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Account exist. OTP sent")
+                .build()
+        );
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
+        Account account = accountServices.register(request);
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Register success")
+                .data(account)
                 .build()
         );
     }

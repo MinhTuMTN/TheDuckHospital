@@ -19,6 +19,8 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
+    private String fullName;
+
     @Email
     private String email;
 

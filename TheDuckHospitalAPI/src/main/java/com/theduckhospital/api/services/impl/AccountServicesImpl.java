@@ -2,8 +2,10 @@ package com.theduckhospital.api.services.impl;
 
 import com.google.firebase.auth.hash.Bcrypt;
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.theduckhospital.api.dto.RegisterRequest;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.TemporaryUser;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.TemporaryUserRepository;
 import com.theduckhospital.api.services.IAccountServices;
@@ -78,6 +80,7 @@ public class AccountServicesImpl implements IAccountServices {
 
     @Override
     public boolean checkAccountExistAndSendOtp(String emailOrPhone) throws FirebaseMessagingException {
+        // Check if account already exist
         Account account = findAccount(emailOrPhone);
 
         int otp = 0;
@@ -113,5 +116,45 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         return account != null;
+    }
+
+    @Override
+    public Account register(RegisterRequest request) {
+        // Check if account already exist
+        Account account = findAccount(request.getPhoneNumber());
+        if (account != null) {
+            throw new BadRequestException("Account already exist");
+        }
+
+        // Find temporary user to verify OTP
+        TemporaryUser user = temporaryUserRepository.findTemporaryUserByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new BadRequestException("Invalid request"));
+
+        // Parse OTP to integer. If not valid, throw exception
+        int otp = 0;
+        try {
+            otp = Integer.parseInt(request.getOtp());
+        } catch (Exception e) {
+            throw new BadRequestException("OTP is not valid");
+        }
+
+        // Verify OTP
+        boolean isOtpCorrect = otpServices.verifyOTP(user, otp);
+        if (!isOtpCorrect) {
+            throw new BadRequestException("OTP is not correct");
+        }
+
+        // Delete temporary user
+        temporaryUserRepository.delete(user);
+
+        // Create new account
+        account = new Account();
+        account.setPhoneNumber(request.getPhoneNumber());
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        account.setFullName(request.getFullName());
+        account.setDeleted(false);
+
+        // Save account to database
+        return accountRepository.save(account);
     }
 }
