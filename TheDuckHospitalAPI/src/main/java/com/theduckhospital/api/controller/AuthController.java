@@ -1,16 +1,15 @@
 package com.theduckhospital.api.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.theduckhospital.api.dto.CheckAccountExistRequest;
-import com.theduckhospital.api.dto.GeneralResponse;
-import com.theduckhospital.api.dto.LoginRequest;
-import com.theduckhospital.api.dto.RegisterRequest;
+import com.theduckhospital.api.dto.request.CheckAccountExistRequest;
+import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.request.LoginRequest;
+import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     @Value("${security.secret.password}")
     private String secretPassword;

@@ -2,6 +2,7 @@ package com.theduckhospital.api.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class Patient {
     @Id
     private UUID patientId;
+    @Nationalized
     protected String fullName;
     protected String phoneNumber;
     protected String identityNumber;

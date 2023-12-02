@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class Staff {
     @Id
     protected UUID staffId;
+
+    @Nationalized
     protected String fullName;
     protected String phoneNumber;
     protected String identityNumber;

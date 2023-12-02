@@ -1,7 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.theduckhospital.api.dto.RegisterRequest;
+import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.entity.Account;
 
 public interface IAccountServices {

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.UUID;
@@ -18,10 +19,14 @@ import java.util.UUID;
 public class PatientProfile {
     @Id
     private UUID patientProfileId;
+
+    @Nationalized
     private String fullName;
     private String phoneNumber;
     private String email;
     private Gender gender;
+
+    @Nationalized
     private String streetName;
 
     @ManyToOne(fetch = FetchType.LAZY)

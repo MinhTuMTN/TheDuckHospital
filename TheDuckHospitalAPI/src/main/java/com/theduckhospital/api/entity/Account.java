@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
 
+    @Nationalized
     private String fullName;
 
     @Email
@@ -29,9 +31,13 @@ public class Account {
     private String phoneNumber;
     private boolean deleted;
 
+    @JsonBackReference
     private int otp;
+    @JsonBackReference
     private int otpCount;
+    @JsonBackReference
     private Date otpCreatedAt;
+    @JsonBackReference
     private Date otpExpiredAt;
 
     private Date createdAt;

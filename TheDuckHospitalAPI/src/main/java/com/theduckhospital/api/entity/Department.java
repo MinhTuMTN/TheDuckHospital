@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +17,9 @@ public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int departmentId;
+    @Nationalized
     private String departmentName;
+    @Nationalized
     private String description;
     private boolean deleted;
     private Date createdAt;
@@ -26,6 +29,11 @@ public class Department {
     @ToString.Exclude
     @JsonBackReference
     private List<Doctor> doctors;
+
+    @OneToMany(mappedBy = "department")
+    @ToString.Exclude
+    @JsonBackReference
+    private List<Room> rooms;
 
     @PrePersist
     private void onCreate() {

@@ -1,8 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
-import com.google.firebase.auth.hash.Bcrypt;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.theduckhospital.api.dto.RegisterRequest;
+import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.TemporaryUser;
 import com.theduckhospital.api.error.BadRequestException;

@@ -1,4 +1,4 @@
-package com.theduckhospital.api.dto;
+package com.theduckhospital.api.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

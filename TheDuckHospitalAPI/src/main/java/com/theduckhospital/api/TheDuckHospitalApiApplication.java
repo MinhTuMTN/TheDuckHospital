@@ -52,19 +52,6 @@ public class TheDuckHospitalApiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Account account = new Account();
-		account.setEmail("minhtu@a.com");
-		account.setPassword(passwordEncoder.encode("password"));
-		account.setPhoneNumber("0123456789");
-		account.setOtp(123456);
-		account.setOtpCount(0);
-		account.setOtpCreatedAt(new Date());
-		account.setOtpExpiredAt(new Date(System.currentTimeMillis() + 5 * 60 * 1000));
-
-		Admin admin = new Admin();
-
-		account.setStaff(admin);
-
-		accountRepository.save(account);
+		return;
 	}
 }

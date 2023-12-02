@@ -6,32 +6,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
-import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Nationalized;
-
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class District {
+public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int districtId;
+    private int roomId;
 
     @Nationalized
-    private String districtName;
+    private String roomName;
+    @Nationalized
+    private String description;
+    private boolean deleted;
 
-    private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private Province province;
-
-    @OneToMany(mappedBy = "district")
-    @JsonBackReference
-    @ToStringExclude
-    private List<Ward> wards;
+    private Department department;
 }
