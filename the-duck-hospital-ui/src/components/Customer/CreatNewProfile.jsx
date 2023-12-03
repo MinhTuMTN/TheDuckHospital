@@ -80,7 +80,7 @@ function CreatNewProfile(props) {
           variant="body1"
           style={{
             color: "#12263f",
-            fontWeight: "700 !important",
+            fontWeight: "bold",
             fontSize: "1rem",
             textTransform: "uppercase",
           }}
