@@ -41,7 +41,7 @@ const CustomButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
 }));
 
-function CreatNewProfile(props) {
+function CreateNewProfile(props) {
   //const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   const [gender, setGender] = React.useState("");
@@ -101,6 +101,7 @@ function CreatNewProfile(props) {
             variant="body1"
             style={{
               color: "#004085",
+              textAlign: "justify",
             }}
           >
             Vui lòng cung cấp thông tin chính xác để được phục vụ tốt nhất.
@@ -359,6 +360,27 @@ function CreatNewProfile(props) {
           />
         </Stack>
       </Grid>
+      <Grid item xs={12} md={12}>
+        <Stack spacing={0.7} direction={"column"}>
+          <CustomTypography
+            variant="body1"
+            style={{
+              color: "#12263f",
+              textAlign: "left",
+            }}
+          >
+            Email
+          </CustomTypography>
+          <CustomTextField
+            size="medium"
+            variant="outlined"
+            id="outlined-basic"
+            fullWidth
+            required
+            placeholder="Email"
+          />
+        </Stack>
+      </Grid>
       <Grid
         item
         xs={12}
@@ -387,4 +409,4 @@ function CreatNewProfile(props) {
   );
 }
 
-export default CreatNewProfile;
+export default CreateNewProfile;

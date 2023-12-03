@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import CustomTabPanel from "../../components/Customer/CustomTabPanel";
-import CreatNewProfile from "../../components/Customer/CreatNewProfile";
+import CreateNewProfile from "../../components/Customer/CreateNewProfile";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -126,7 +126,7 @@ function CreatProfile(props) {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <CreatNewProfile />
+              <CreateNewProfile />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
               Item Two

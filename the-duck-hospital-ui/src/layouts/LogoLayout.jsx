@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Avatar, CardMedia } from "@mui/material";
+import { CardMedia } from "@mui/material";
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
