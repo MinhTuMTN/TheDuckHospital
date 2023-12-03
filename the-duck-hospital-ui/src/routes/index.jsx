@@ -8,6 +8,7 @@ import Home from "../pages/customer/Home";
 import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
 import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
+import CreateProfile from "../pages/customer/CreateProfile";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -32,6 +33,11 @@ function Router(props) {
         {
           path: "/chosen-patient-profiles",
           element: <ChoosePatientProfiles />,
+        },
+
+        {
+          path: "/creat-profile",
+          element: <CreateProfile />,
         },
 
         {
