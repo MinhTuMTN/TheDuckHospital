@@ -1,22 +1,29 @@
 import styled from "@emotion/styled";
+import { CardMedia } from "@mui/material";
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-const CustomHeader = styled("header")(({ theme }) => ({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: theme.spacing(10),
-  height: theme.spacing(10),
-  padding: theme.spacing(2),
+const StyledLogo = styled(CardMedia)(({ theme }) => ({
+  width: "150px",
+  cover: "no-repeat",
+  backgroundSize: "contain",
+  height: theme.spacing(8),
+  marginRight: "10px",
 }));
-
 function LogoLayout(props) {
+  const navigate = useNavigate();
   return (
     <>
-      <CustomHeader>
-        <Link to="/"></Link>
-      </CustomHeader>
+      <StyledLogo
+        onClick={() => navigate("/")}
+        style={{
+          cursor: "pointer",
+          position: "fixed",
+          top: "1rem",
+          left: "1rem",
+        }}
+        image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png"
+      />
       <Outlet />
     </>
   );

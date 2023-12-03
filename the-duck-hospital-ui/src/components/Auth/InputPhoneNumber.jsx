@@ -8,6 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import PropTypes from "prop-types";
+import { useSnackbar } from "notistack";
+import { checkPhoneOrEmail } from "../../services/customer/AuthServices";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   width: "390px", // Default width for larger screens
@@ -40,8 +43,50 @@ const CustomButton = styled(Button)(({ theme }) => ({
     transform: "scale(1.01)", // Scale lên 110%
   },
 }));
+
+InputPhoneNumber.propTypes = {
+  phone: PropTypes.string,
+  setPhone: PropTypes.func,
+  setStep: PropTypes.func,
+  setLoginType: PropTypes.func,
+};
+
 function InputPhoneNumber(props) {
-  const [phone, setPhone] = React.useState("");
+  const { phone, setPhone, setStep, setLoginType } = props;
+  const { enqueueSnackbar } = useSnackbar();
+  const handleCheckPhone = async () => {
+    const phoneTrim = phone.trim();
+    if (!phoneTrim.includes("@")) {
+      if (phoneTrim === "") {
+        enqueueSnackbar("Vui lòng nhập số điện thoại!", { variant: "error" });
+        return false;
+      }
+
+      if (phoneTrim.length !== 10 || phoneTrim.startsWith("0") === false) {
+        enqueueSnackbar("Số điện thoại không hợp lệ!", { variant: "error" });
+        return false;
+      }
+    }
+
+    const response = await checkPhoneOrEmail({
+      emailOrPhoneNumber: phoneTrim,
+    });
+
+    if (!response.success) {
+      enqueueSnackbar(
+        response.statusCode === 400
+          ? "Email đăng nhập không tồn tại"
+          : "Đã có lỗi xảy ra vui lòng thử lại sau",
+        { variant: "error" }
+      );
+      return;
+    }
+
+    if (response.data.data) setLoginType("password");
+    else setLoginType("register");
+
+    setStep();
+  };
   return (
     <Stack
       direction={"column"}
@@ -68,6 +113,7 @@ function InputPhoneNumber(props) {
           variant="outlined"
           size="large"
           onChange={(e) => setPhone(e.target.value)}
+          autoComplete="off"
           InputProps={{
             startAdornment: (
               <img
@@ -91,7 +137,9 @@ function InputPhoneNumber(props) {
           </FormHelperText>
         ) : null}
       </Box>
-      <CustomButton variant="contained">Tiết tục</CustomButton>
+      <CustomButton variant="contained" onClick={handleCheckPhone}>
+        Tiết tục
+      </CustomButton>
     </Stack>
   );
 }

@@ -46,7 +46,7 @@ function StaffDetailPage() {
     dateOfBirth: "27/01/2002",
     departmentName: "Khoa nhi",
     deleted: false,
-  }
+  };
   return (
     <Box
       sx={{
@@ -71,7 +71,9 @@ function StaffDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/staff-management") }}
+              onClick={() => {
+                navigate("/admin/staff-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -88,30 +90,30 @@ function StaffDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-                <Stack direction={"column"}>
+              <Stack direction={"column"}>
+                <Typography
+                  variant="h4"
+                  fontWeight={600}
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: ["1.5rem", "2rem"],
+                  }}
+                >
+                  {staff.fullName}
+                </Typography>
+                <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography
-                    variant="h4"
-                    fontWeight={600}
+                    variant="body1"
+                    fontWeight={450}
                     style={{
-                      textTransform: "uppercase",
-                      fontSize: ["1.5rem", "2rem"],
+                      fontSize: "14px",
                     }}
                   >
-                    {staff.fullName}
+                    staff_id:
                   </Typography>
-                  <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={450}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      staff_id:
-                    </Typography>
-                    <StaffId>{staff.staffId}</StaffId>
-                  </Stack>
+                  <StaffId>{staff.staffId}</StaffId>
                 </Stack>
+              </Stack>
             </Grid>
           </Grid>
           <Grid container>

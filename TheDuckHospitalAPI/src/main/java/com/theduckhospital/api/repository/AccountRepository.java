@@ -13,4 +13,5 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     Account findUserByPhoneNumber(String phoneNumber);
     Account findAccountByPhoneNumberAndDeletedIsFalse(String phoneNumber);
     Account findAccountByEmailAndDeletedIsFalse(String email);
+    Account findAccountByUserIdAndDeletedIsFalse(UUID userId);
 }

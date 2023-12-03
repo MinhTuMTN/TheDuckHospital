@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.request.CheckAccountExistRequest;
 import com.theduckhospital.api.dto.request.GeneralResponse;
 import com.theduckhospital.api.dto.request.LoginRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
+import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
@@ -16,10 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -91,15 +89,19 @@ public class AuthController {
     @PostMapping("/check-account-exist")
     public ResponseEntity<?> checkAccountExistAndSendOtp(@RequestBody CheckAccountExistRequest request)
             throws FirebaseMessagingException {
-        if (!accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
-            return ResponseEntity.status(401).body(GeneralResponse.builder()
-                    .success(false)
+        if (accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
+            return ResponseEntity
+                    .status(request.getEmailOrPhoneNumber().contains("@") ? 400 : 200)
+                    .body(GeneralResponse.builder()
+                    .success(true)
                     .message("Account not exist")
+                    .data(false)
                     .build());
 
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
-                .message("Account exist. OTP sent")
+                .message("Account exist")
+                .data(true)
                 .build()
         );
     }
@@ -111,6 +113,36 @@ public class AuthController {
                 .success(true)
                 .message("Register success")
                 .data(account)
+                .build()
+        );
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody CheckAccountExistRequest request)
+            throws FirebaseMessagingException {
+        if (accountServices.sendOTP(request.getEmailOrPhoneNumber()))
+            return ResponseEntity.status(200).body(GeneralResponse.builder()
+                    .success(true)
+                    .message("Send OTP success")
+                    .data(true)
+                    .build());
+
+        return ResponseEntity.status(404).body(GeneralResponse.builder()
+                .success(true)
+                .message("Send OTP failed")
+                .data(false)
+                .build());
+    }
+
+    @GetMapping("/check-token")
+    public ResponseEntity<?> checkToken(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        CheckTokenResponse response = accountServices.checkToken(token);
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(response.isValid())
+                .message(response.isValid() ? "Token is valid" : "Token is invalid")
+                .data(response)
                 .build()
         );
     }

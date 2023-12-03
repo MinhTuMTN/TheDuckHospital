@@ -6,12 +6,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useState } from "react";
-import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
-import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
 import { useNavigate } from "react-router-dom";
+import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
+import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
 
 const department = {
   departmentName: "Khoa Nhi",
@@ -66,14 +65,16 @@ const department = {
       deleted: false,
     },
   ],
-  deleted: false
-}
+  deleted: false,
+};
 
 function DepartmentDetailPage() {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  const headDoctor = department.doctors.find(doctor => doctor.headOfDepartment === true);
+  const headDoctor = department.doctors.find(
+    (doctor) => doctor.headOfDepartment === true
+  );
   department.doctors.sort((a, b) => {
     if (a.headOfDepartment === b.headOfDepartment) {
       return 0;
@@ -106,7 +107,6 @@ function DepartmentDetailPage() {
   // }, [handleGetCustomer]);
 
   return (
-
     <Box
       sx={{
         pt: 3,
@@ -130,7 +130,9 @@ function DepartmentDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/department-management") }}
+              onClick={() => {
+                navigate("/admin/department-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -147,8 +149,6 @@ function DepartmentDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-
-
               <Typography
                 variant="h3"
                 fontWeight={600}
@@ -172,7 +172,10 @@ function DepartmentDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <DepartmentDetail department={department} headDoctor={headDoctor} />
+                <DepartmentDetail
+                  department={department}
+                  headDoctor={headDoctor}
+                />
               </Stack>
             </Grid>
           </Grid>
@@ -203,7 +206,6 @@ function DepartmentDetailPage() {
         </Stack>
       </Stack>
     </Box>
-
   );
 }
 

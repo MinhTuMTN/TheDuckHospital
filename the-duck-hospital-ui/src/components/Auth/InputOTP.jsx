@@ -9,8 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
-
-const yourPhone = "0123456789";
+import { loginWithOTP } from "../../services/customer/AuthServices";
+import { useSnackbar } from "notistack";
+import { useAuth } from "../../auth/AuthProvider";
 
 const CustomTextFieldPhone = styled(TextField)(({ theme }) => ({
   width: "390px", // Default width for larger screens
@@ -64,29 +65,52 @@ const CustomOTPItem = styled(TextField)(({ theme }) => ({
 }));
 
 function InputOTP(props) {
+  const { phone } = props;
   const [timeLeft, setTimeLeft] = React.useState(300);
   const [errorText, setErrorText] = React.useState("");
+  const { enqueueSnackbar } = useSnackbar();
+  const { setToken } = useAuth();
 
   const [otp, setOtp] = React.useState(["", "", "", "", "", ""]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    if (timeLeft === 0) {
+      return;
+    }
+
     const isAnyEmpty = otp.some((value) => {
-      console.log(value);
       return value === "" || value === undefined || value === null;
     });
 
     if (isAnyEmpty) {
       setErrorText("Vui lòng nhập đầy đủ mã OTP!");
-    } else {
-      setErrorText("");
+      return;
     }
+    setErrorText("");
+
+    const response = await loginWithOTP({
+      emailOrPhoneNumber: phone,
+      passwordOrOTP: otp.join(""),
+    });
+
+    if (!response.success) {
+      enqueueSnackbar(
+        response.statusCode === 401
+          ? "Mã OTP không chính xác"
+          : "Đã có lỗi xảy ra vui lòng thử lại sau",
+        { variant: "error" }
+      );
+      return;
+    }
+
+    enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
+    setToken(response.data.data);
   };
 
   const handleChange = (index, e) => {
     const value = e.target.value;
     const newOtp = [...otp];
     newOtp[index] = value[value.length - 1];
-    console.log(index, value, newOtp);
 
     // Kiểm tra nếu giá trị nhập vào không phải là số thì không cập nhật
     if (!isNaN(value) && value !== "") {
@@ -95,14 +119,12 @@ function InputOTP(props) {
 
       // Nếu giá trị nhập vào là số thì chuyển focus đến ô tiếp theo
       if (index < otp.length - 1 && value !== "") {
-        console.log(2);
         document.getElementsByName(`otp-${index + 1}`)[0].focus();
       }
     }
   };
 
   const handleKeyDown = (index, e) => {
-    console.log(index, e.key);
     if (e.key === "Backspace") {
       const newOtp = [...otp];
       newOtp[index] = "";
@@ -151,14 +173,15 @@ function InputOTP(props) {
           },
         }}
       >
-        Vui lòng nhập mã 6 số đã gửi cho bạn qua số điện thoại
+        Vui lòng nhập mã 6 số đã gửi cho bạn qua{" "}
+        {phone.includes("@") ? "email" : "số điện thoại"}
       </Typography>
 
       <CustomTextFieldPhone
         variant="outlined"
         size="large"
         disabled
-        value={yourPhone}
+        value={phone}
         InputProps={{
           startAdornment: (
             <img
@@ -186,6 +209,7 @@ function InputOTP(props) {
       >
         {otp.map((value, index) => (
           <CustomOTPItem
+            autoFocus={index === 0}
             key={index}
             variant="outlined"
             size="large"
