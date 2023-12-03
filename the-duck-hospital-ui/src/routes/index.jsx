@@ -9,6 +9,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import LogoLayout from "../layouts/LogoLayout";
+import CreateProfile from "../pages/customer/CreateProfile";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -33,6 +34,11 @@ function Router(props) {
         {
           path: "/chosen-patient-profiles",
           element: <ChoosePatientProfiles />,
+        },
+
+        {
+          path: "/creat-profile",
+          element: <CreateProfile />,
         },
 
         {
