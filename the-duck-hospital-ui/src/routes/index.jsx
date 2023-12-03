@@ -37,7 +37,7 @@ function Router(props) {
         },
 
         {
-          path: "/creat-profile",
+          path: "/create-profile",
           element: <CreateProfile />,
         },
 
