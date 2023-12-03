@@ -142,9 +142,6 @@ function Register(props) {
 
     enqueueSnackbar("Đăng ký thành công", { variant: "success" });
     setToken(response.data.data);
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1500);
   };
 
   return (
@@ -162,7 +159,7 @@ function Register(props) {
         variant={"body1"}
         style={{ fontWeight: "600", fontSize: "14px" }}
       >
-        Vui lòng đăng nhập để tiếp tục
+        Vui lòng đăng ký để tiếp tục
       </Typography>
 
       <CustomTextFieldPhone

@@ -1,3 +1,7 @@
+import styled from "@emotion/styled";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined";
 import {
   Avatar,
   Divider,
@@ -8,10 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined";
-import styled from "@emotion/styled";
+import { useAuth } from "../auth/AuthProvider";
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   fontSize: "14px",
@@ -32,6 +33,7 @@ const CustomMenuItemLogOut = styled(MenuItem)(({ theme }) => ({
 }));
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
+  const { setToken } = useAuth();
 
   return (
     <Popover
@@ -102,7 +104,11 @@ function AccountPopover(props) {
             sx={{
               color: "red",
             }}
-            onClick={(e) => {}}
+            onClick={(e) => {
+              setToken(null);
+              onClose();
+              window.location.href = "/";
+            }}
           >
             <LogoutOutlinedIcon
               fontSize="small"

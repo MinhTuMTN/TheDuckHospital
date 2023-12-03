@@ -1,11 +1,13 @@
 import styled from "@emotion/styled";
 import { Box, CardMedia, Paper, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import InputPhoneNumber from "../../components/Auth/InputPhoneNumber";
 import Page from "../../components/Page";
 import InputPassword from "../../components/Auth/InputPassword";
 import InputOTP from "../../components/Auth/InputOTP";
 import Register from "../../components/Auth/Register";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthProvider";
 //import InputOTP from "../../components/Auth/InputOTP";
 //import InputPassword from "../../components/Auth/InputPassword";
 
@@ -60,7 +62,16 @@ function LoginPage(props) {
   const [emailOrPhoneNumber, setEmailOrPhoneNumber] = React.useState("");
   const [loginType, setLoginType] = React.useState("password");
   const [step, setStep] = React.useState(1);
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    if (token) {
+      setTimeout(() => {
+        window.location.href = "/user";
+      }, 200);
+    }
+  }, [token, navigate]);
   return (
     <RootPageLogin title="Đăng nhập">
       <Left>

@@ -3,7 +3,6 @@ import { useRoutes } from "react-router-dom";
 import Loading from "../components/Loading";
 import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../pages/auth/LoginPage";
-import PageRegister from "../pages/auth/PageRegister";
 import Home from "../pages/customer/Home";
 import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
@@ -38,23 +37,15 @@ function Router(props) {
           path: "*",
           element: <NotFound />,
         },
+        {
+          path: "/user",
+          element: <PageUser />,
+        },
       ],
-    },
-    {
-      path: "/",
-      element: <MainLayout />,
     },
     {
       path: "auth/login",
       element: <LoginPage />,
-    },
-    {
-      path: "auth/register",
-      element: <PageRegister />,
-    },
-    {
-      path: "/user",
-      element: <PageUser />,
     },
     {
       path: "/admin",

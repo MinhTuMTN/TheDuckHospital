@@ -122,9 +122,6 @@ function InputPassword(props) {
 
       setToken(response.data.data);
       enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1500);
     }
   };
 
