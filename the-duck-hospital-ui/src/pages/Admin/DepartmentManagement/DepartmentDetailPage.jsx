@@ -1,22 +1,15 @@
-import {
-  Box,
-  Grid,
-  IconButton,
-  Paper,
-  Stack,
-  Typography,
-  styled,
-} from "@mui/material";
+import { Box, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useState } from "react";
-import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
-import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
 import { useNavigate } from "react-router-dom";
+import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
+import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
 
 const department = {
   departmentName: "Cardiology",
-  description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
   doctors: [
     {
       fullName: "Nguyễn Văn Doctor 1",
@@ -61,34 +54,16 @@ const department = {
       deleted: false,
     },
   ],
-  deleted: false
-}
-
-const TieuDe = styled(Typography)(({ theme }) => ({
-  fontSize: "1.1rem !important",
-  color: "  #101828",
-  variant: "subtitle1",
-  fontWeight: "700 !important",
-  width: "100%",
-}));
-
-const paperStyle = {
-  marginTop: 4,
-  borderRadius: "8px",
+  deleted: false,
 };
-
-const BoxStyle = styled(Box)(({ theme }) => ({
-  paddingLeft: "24px !important",
-  paddingRight: "24px !important",
-  paddingTop: "12px !important",
-  paddingBottom: "12px !important",
-}));
 
 function DepartmentDetailPage() {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  const headDoctor = department.doctors.find(doctor => doctor.headOfDepartment === true);
+  const headDoctor = department.doctors.find(
+    (doctor) => doctor.headOfDepartment === true
+  );
   department.doctors.sort((a, b) => {
     if (a.headOfDepartment === b.headOfDepartment) {
       return 0;
@@ -121,7 +96,6 @@ function DepartmentDetailPage() {
   // }, [handleGetCustomer]);
 
   return (
-
     <Box
       sx={{
         pt: 3,
@@ -145,7 +119,9 @@ function DepartmentDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/department-management") }}
+              onClick={() => {
+                navigate("/admin/department-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -162,8 +138,6 @@ function DepartmentDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-
-
               <Typography
                 variant="h3"
                 fontWeight={600}
@@ -187,7 +161,10 @@ function DepartmentDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <DepartmentDetail department={department} headDoctor={headDoctor} />
+                <DepartmentDetail
+                  department={department}
+                  headDoctor={headDoctor}
+                />
               </Stack>
             </Grid>
           </Grid>
@@ -203,24 +180,21 @@ function DepartmentDetailPage() {
                 }}
                 spacing={"2px"}
               >
-
-                    <DoctorTable
-                      count={totalItems ? totalItems : 0}
-                      items={department.doctors}
-                      headDoctor={headDoctor}
-                      onPageChange={handlePageChange}
-                      onRowsPerPageChange={handleRowsPerPageChange}
-                      page={page}
-                      rowsPerPage={limit}
-                    />
-                  </Stack>
-
+                <DoctorTable
+                  count={totalItems ? totalItems : 0}
+                  items={department.doctors}
+                  headDoctor={headDoctor}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  page={page}
+                  rowsPerPage={limit}
+                />
+              </Stack>
             </Grid>
           </Grid>
         </Stack>
       </Stack>
     </Box>
-
   );
 }
 
