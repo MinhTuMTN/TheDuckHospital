@@ -9,6 +9,7 @@ import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
 import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
 import CreateProfile from "../pages/customer/CreateProfile";
+import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -31,13 +32,17 @@ function Router(props) {
         },
 
         {
-          path: "/chosen-patient-profiles",
+          path: "/choose-patient-profiles",
           element: <ChoosePatientProfiles />,
         },
 
         {
-          path: "/creat-profile",
+          path: "/create-profile",
           element: <CreateProfile />,
+        },
+        {
+          path: "/choose-doctor",
+          element: <ChooseDoctorPage />,
         },
 
         {
