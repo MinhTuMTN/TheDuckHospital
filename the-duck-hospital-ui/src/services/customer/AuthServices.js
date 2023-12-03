@@ -1,4 +1,4 @@
-import { postNonAuth } from "../AxiosInstance";
+import { get, postNonAuth } from "../AxiosInstance";
 
 export const checkPhoneOrEmail = async (data) => {
   return postNonAuth("/auth/check-account-exist", data);
@@ -18,4 +18,8 @@ export const sendOTP = async (data) => {
 
 export const register = async (data) => {
   return postNonAuth("/auth/register", data);
+};
+
+export const checkToken = async () => {
+  return get("/auth/check-token");
 };

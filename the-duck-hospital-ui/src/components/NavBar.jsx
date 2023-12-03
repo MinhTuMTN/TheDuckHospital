@@ -95,9 +95,12 @@ function NavBar(props) {
                 paddingY: 1.5,
               }}
             >
-              <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
+              <StyledLogo
+                onClick={() => navigate("/")}
+                style={{ cursor: "pointer" }}
+                image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png"
+              />
               <IconButton onClick={() => onDrawerClick(true)}>
-                {" "}
                 <SvgIcon fontSize="medium">
                   <MenuIcon />
                 </SvgIcon>
@@ -120,7 +123,11 @@ function NavBar(props) {
               width: "100%",
             }}
           >
-            <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
+            <StyledLogo
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+              image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png"
+            />
 
             <Toolbar
               component={Stack}

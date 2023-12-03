@@ -2,11 +2,13 @@ package com.theduckhospital.api.services.impl;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.RegisterRequest;
+import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.TemporaryUser;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.TemporaryUserRepository;
+import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IFirebaseServices;
 import com.theduckhospital.api.services.IMSGraphServices;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AccountServicesImpl implements IAccountServices {
@@ -29,19 +32,23 @@ public class AccountServicesImpl implements IAccountServices {
     private final IFirebaseServices firebaseServices;
     private final TemporaryUserRepository temporaryUserRepository;
     private final IMSGraphServices graphServices;
+    private final JwtTokenProvider tokenProvider;
 
     public AccountServicesImpl(AccountRepository accountRepository,
                                PasswordEncoder passwordEncoder,
                                IOTPServices otpServices,
                                IFirebaseServices firebaseServices,
                                TemporaryUserRepository temporaryUserRepository,
-                               IMSGraphServices graphServices) {
+                               IMSGraphServices graphServices,
+                               JwtTokenProvider tokenProvider
+    ) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpServices = otpServices;
         this.firebaseServices = firebaseServices;
         this.temporaryUserRepository = temporaryUserRepository;
         this.graphServices = graphServices;
+        this.tokenProvider = tokenProvider;
     }
     @Override
     public Account findAccount(String emailOrPhone) {
@@ -185,5 +192,45 @@ public class AccountServicesImpl implements IAccountServices {
             );
         }
         return true;
+    }
+
+    @Override
+    public CheckTokenResponse checkToken(String token) {
+        token = token.substring(7); // Remove "Bearer " prefix
+        boolean isValid = false;
+        try {
+            isValid = tokenProvider.validateToken(token);
+        } catch (Exception ignored) {
+        }
+        if (!isValid) {
+            return CheckTokenResponse.builder()
+                    .valid(false)
+                    .role(null)
+                    .build();
+        }
+
+        String userId = tokenProvider.getUserIdFromJwt(token);
+        Account account = accountRepository
+                .findAccountByUserIdAndDeletedIsFalse(
+                        UUID.fromString(userId)
+                );
+
+        if (account == null) {
+            return CheckTokenResponse.builder()
+                    .valid(false)
+                    .role(null)
+                    .build();
+        }
+
+        String role = "User";
+        if (account.getStaff() != null) {
+            String[] roleNames = account.getStaff().getClass().getName().split("\\.");
+            role = roleNames[roleNames.length - 1];
+        }
+
+        return CheckTokenResponse.builder()
+                .valid(true)
+                .role(role)
+                .build();
     }
 }

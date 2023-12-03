@@ -8,10 +8,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
+import javax.annotation.Nullable;
+
 @Entity
 @Getter
 @Setter
 public class Doctor extends Staff{
+    @Nullable
     private String degree;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -19,5 +22,5 @@ public class Doctor extends Staff{
     @JsonBackReference
     private Department department;
 
-    private boolean headOfDepartment;
+    private boolean headOfDepartment = false;
 }

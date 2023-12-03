@@ -7,6 +7,8 @@ import Home from "../pages/customer/Home";
 import PageUser from "../pages/PageUser";
 import AdminLayout from "../layouts/AdminLayout";
 import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
+import ProtectedLayout from "../layouts/ProtectedLayout";
+import LogoLayout from "../layouts/LogoLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -39,13 +41,25 @@ function Router(props) {
         },
         {
           path: "/user",
-          element: <PageUser />,
+          element: <ProtectedLayout forRole={["User", "Admin"]} />,
+          children: [
+            {
+              element: <PageUser />,
+              index: true,
+            },
+          ],
         },
       ],
     },
     {
-      path: "auth/login",
-      element: <LoginPage />,
+      path: "/",
+      element: <LogoLayout />,
+      children: [
+        {
+          path: "/auth/login",
+          element: <LoginPage />,
+        },
+      ],
     },
     {
       path: "/admin",
