@@ -45,8 +45,14 @@ const CustomButton = styled(Button)(({ theme }) => ({
 function ChooseProfileItem(props) {
   return (
     <Accordion
+      className="accordion-hello"
       sx={{
         width: "100%",
+        borderRadius: "15px",
+        transition: "border 0.3s, filter 0.3s",
+        "&:hover": {
+          border: "2px solid #42a5f5",
+        },
       }}
     >
       <StyledAccordionSummary
