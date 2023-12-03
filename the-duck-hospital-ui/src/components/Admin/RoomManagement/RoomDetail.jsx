@@ -21,44 +21,33 @@ import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 
-const doctors = [
+const departments = [
   {
-    value: "123",
-    label: "Nguyễn Quốc Bảo",
+    value: 1,
+    label: "Khoa nhi",
   },
   {
-    value: "124",
-    label: "Quốc Bảo",
+    value: 2,
+    label: "Khoa tim mạch",
   },
   {
-    value: "125",
-    label: "Bảo Nguyễn",
+    value: 3,
+    label: "Khoa ung thư",
   },
   {
-    value: "126",
-    label: "Nguyễn Bảo",
+    value: 4,
+    label: "Khoa da liễu",
   },
   {
-    value: "127",
-    label: "Bảo Quốc Nguyễn",
+    value: 5,
+    label: "Khoa thần kinh",
   },
   {
-    value: "128",
-    label: "Bảo Nguyễn Quốc",
-  },
-  {
-    value: "129",
-    label: "Bảo Quốc",
-  },
-  {
-    value: "120",
-    label: "Bảo",
-  },
-  {
-    value: "111",
-    label: "Chỉ có Bảo làm trưởng khoa",
+    value: 6,
+    label: "Khoa tâm lý",
   },
 ];
+
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
@@ -114,24 +103,24 @@ const MultilineText = styled(TextField)(({ theme }) => ({
   },
 }));
 
-function DepartmentDetail(props) {
-  const { department, headDoctor } = props;
-  let status = department.deleted;
-  const [statusDepartment, setStatusDepartment] = useState(false)
+function RoomDetail(props) {
+  const { room } = props;
+  let status = room.deleted;
+  const [statusRoom, setStatusRoom] = useState(false)
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
-  const [departmentEdit, setDepartmentEdit] = useState({});
+  const [roomEdit, setRoomEdit] = useState({});
 
   useEffect(() => {
     setEditStatus(status);
-    setStatusDepartment(status);
+    setStatusRoom(status);
   }, [status]);
 
   const handleStatusChange = (event) => {
     setEditStatus(event.target.value);
-    if (statusDepartment !== event.target.value) {
+    if (statusRoom !== event.target.value) {
       setDisabledButton(false);
     }
     else {
@@ -166,10 +155,10 @@ function DepartmentDetail(props) {
 
   const handleEditButtonClick = () => {
     setOpenPopup(true);
-    setDepartmentEdit({
-      departmentName: department.departmentName,
-      staffId: headDoctor.staffId,
-      description: department.description,
+    setRoomEdit({
+      roomName: room.roomName,
+      departmentId: room.departmentId,
+      description: room.description,
     })
   };
 
@@ -210,16 +199,26 @@ function DepartmentDetail(props) {
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Tên khoa</TieuDeCot>
+            <TieuDeCot>Tên phòng</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <TieuDeCot>{department.departmentName}</TieuDeCot>
+              <TieuDeCot>{room.roomName}</TieuDeCot>
             </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Tên khoa</TieuDeCot>
+          </Grid>
 
+          <Grid item xs={8} md={9}>
+            <NoiDung>{room.departmentName}</NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
@@ -227,29 +226,7 @@ function DepartmentDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{department.description}</NoiDung>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Trưởng khoa</TieuDeCot>
-          </Grid>
-
-          <Grid item xs={8} md={9}>
-            <NoiDung>{headDoctor.fullName}</NoiDung>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Số lượng bác sĩ</TieuDeCot>
-          </Grid>
-
-          <Grid item xs={8} md={9}>
-            <NoiDung>{department.doctors.length}</NoiDung>
+            <NoiDung>{room.description}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -313,13 +290,13 @@ function DepartmentDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusDepartment ? "Mở khóa khoa" : "Khóa khoa"}
+              title={statusRoom ? "Mở khóa phòng" : "Khóa phòng"}
               content={
-                statusDepartment
-                  ? "Bạn có chắc chắn muốn mở khóa khoa này?"
-                  : "Bạn có chắc chắn muốn khóa khoa này?"
+                statusRoom
+                  ? "Bạn có chắc chắn muốn mở khóa phòng này?"
+                  : "Bạn có chắc chắn muốn khóa phòng này?"
               }
-              okText={statusDepartment ? "Khôi phục" : "Khóa"}
+              okText={statusRoom ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
               // onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}
@@ -367,8 +344,8 @@ function DepartmentDetail(props) {
           }}
         >
           <Stack direction={"column"} spacing={2}>
-          <Stack direction={"row"} spacing={1}>
-              <Box width="52%">
+            <Stack direction={"row"} spacing={2}>
+              <Box width="50%">
                 <Typography
                   variant="body1"
                   style={{
@@ -376,7 +353,7 @@ function DepartmentDetail(props) {
                     marginBottom: "4px",
                   }}
                 >
-                  Tên khoa
+                  Tên phòng
                 </Typography>
                 <InputText
                   sx={{
@@ -387,16 +364,16 @@ function DepartmentDetail(props) {
                   autoFocus
                   required
                   fullWidth
-                  value={departmentEdit.departmentName}
-                  onChange={(e) => setDepartmentEdit((prev) => {
+                  value={roomEdit.roomName}
+                  onChange={(e) => setRoomEdit((prev) => {
                     return {
                       ...prev,
-                      departmentName: e.target.value
+                      roomName: e.target.value
                     };
                   })}
                 />
               </Box>
-              <Box width="48%">
+              <Box width="50%">
                 <Typography
                   variant="body1"
                   style={{
@@ -404,16 +381,16 @@ function DepartmentDetail(props) {
                     marginBottom: "4px",
                   }}
                 >
-                  Trưởng khoa
+                  Khoa
                 </Typography>
                 <FormControl fullWidth>
                   <Select
-                    value={departmentEdit.staffId}
+                    value={roomEdit.departmentId}
                     onChange={(e) =>
-                      setDepartmentEdit((prev) => {
+                      setRoomEdit((prev) => {
                         return {
                           ...prev,
-                          staffId: e.target.value,
+                          departmentId: e.target.value,
                         };
                       })
                     }
@@ -425,7 +402,7 @@ function DepartmentDetail(props) {
                     }}
                     inputProps={{ "aria-label": "Without label" }}
                   >
-                    {doctors?.map((item, index) => (
+                    {departments?.map((item, index) => (
                       <MenuItem value={item.value} key={index} >
                         <Typography style={{ fontSize: "14px" }}>
                           {item.label}
@@ -435,7 +412,7 @@ function DepartmentDetail(props) {
                   </Select>
                 </FormControl>
               </Box>
-              </Stack>
+            </Stack>
             <Box>
               <Typography
                 variant="body1"
@@ -451,9 +428,9 @@ function DepartmentDetail(props) {
                 multiline
                 rows={4}
                 fullWidth
-                value={departmentEdit.description}
+                value={roomEdit.description}
                 onChange={(e) => {
-                  setDepartmentEdit((prev) => {
+                  setRoomEdit((prev) => {
                     return {
                       ...prev,
                       description: e.target.value,
@@ -475,4 +452,4 @@ function DepartmentDetail(props) {
   );
 }
 
-export default DepartmentDetail;
+export default RoomDetail;

@@ -2,7 +2,10 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -12,72 +15,89 @@ import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
 import DialogForm from "../../../components/DialogForm";
 import MuiTextFeild from "../../../components/MuiTextFeild";
-import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
+import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
 
 const items = [
   {
+    roomName: "TDH1-01",
     departmentName: "Khoa nhi",
-    headDoctor: "Nguyễn Văn Head Doctor",
-    numberOfDoctors: 12,
     deleted: false,
   },
   {
+    roomName: "TDH1-02",
     departmentName: "Khoa tim mạch",
-    headDoctor: "Nguyễn Thị Head Doctor",
-    numberOfDoctors: 10,
     deleted: false,
   },
   {
+    roomName: "TDH1-03",
     departmentName: "Khoa ung thư",
-    headDoctor: "Nguyễn Quốc Head Doctor",
-    numberOfDoctors: 9,
     deleted: false,
   },
   {
+    roomName: "TDH1-04",
     departmentName: "Khoa da liễu",
-    headDoctor: "Nguyễn Lâm Head Doctor",
-    numberOfDoctors: 15,
     deleted: false,
   },
   {
+    roomName: "TDH1-05",
     departmentName: "Khoa thần kinh",
-    headDoctor: "Nguyễn Thế Head Doctor",
-    numberOfDoctors: 8,
     deleted: false,
   },
   {
+    roomName: "TDH2-01",
     departmentName: "Khoa tâm lý",
-    headDoctor: "Nguyễn Minh Head Doctor",
-    numberOfDoctors: 13,
     deleted: false,
   },
   {
+    roomName: "TDH2-02",
     departmentName: "Khoa phẫu thuật gây mê",
-    headDoctor: "Nguyễn Ngọc Head Doctor",
-    numberOfDoctors: 17,
     deleted: false,
   },
   {
+    roomName: "TDH2-03",
     departmentName: "Khoa phụ sản",
-    headDoctor: "Nguyễn Thành Head Doctor",
-    numberOfDoctors: 3,
     deleted: false,
   },
   {
+    roomName: "TDH2-04",
     departmentName: "Khoa cấp cứu",
-    headDoctor: "Nguyễn Vĩ Head Doctor",
-    numberOfDoctors: 5,
     deleted: false,
   },
   {
+    roomName: "TDH2-05",
     departmentName: "Khoa nội soi",
-    headDoctor: "Nguyễn Kiều Head Doctor",
-    numberOfDoctors: 12,
     deleted: false,
   },
 ]
 
 const totalItems = items.length;
+
+const departments = [
+  {
+    value: 1,
+    label: "Khoa nhi",
+  },
+  {
+    value: 2,
+    label: "Khoa tim mạch",
+  },
+  {
+    value: 3,
+    label: "Khoa ung thư",
+  },
+  {
+    value: 4,
+    label: "Khoa da liễu",
+  },
+  {
+    value: 5,
+    label: "Khoa thần kinh",
+  },
+  {
+    value: 6,
+    label: "Khoa tâm lý",
+  },
+];
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -91,7 +111,12 @@ const CustomButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function DepartmentListPage(props) {
+const CustomTypography = styled(Typography)(({ theme }) => ({
+  fontSize: "14px !important",
+  marginBottom: "2px !important",
+}));
+
+function RoomListPage(props) {
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
   // const [catalogs, setCatalogs] = useState([]);
@@ -101,8 +126,9 @@ function DepartmentListPage(props) {
   // const [productItems, setProductItems] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
-  const [department, setDepartment] = useState({
-    departmentName: "",
+  const [room, setRoom] = useState({
+    roomName: "",
+    departmentId: 1,
     description: "",
   });
 
@@ -183,14 +209,15 @@ function DepartmentListPage(props) {
                   fontSize: "32px",
                 }}
               >
-                Danh sách khoa
+                Danh sách phòng
               </Typography>
               <CustomButton
                 variant="contained"
                 startIcon={<AddOutlinedIcon />}
                 onClick={() => {
-                  setDepartment({
-                    departmentName: "",
+                  setRoom({
+                    roomName: "",
+                    departmentId: 1,
                     description: "",
                   });
                   setOpenDialogForm(true);
@@ -310,7 +337,7 @@ function DepartmentListPage(props) {
                   page={page}
                   rowsPerPage={rowsPerPage}
                 /> */}
-              <DepartmentTable
+              <RoomTable
                 count={totalItems ? totalItems : 0}
                 items={items}
                 onPageChange={handlePageChange}
@@ -329,47 +356,84 @@ function DepartmentListPage(props) {
         okText={"Thêm"}
         onCancel={() => {
           setOpenDialogForm(false);
-          setDepartment({
-            departmentName: "",
+          setRoom({
+            roomName: "",
+            department: "",
             description: "",
           })
         }}
         // onOk={handleAddCatalog}
         open={openDialogForm}
-        title={"Thêm khoa"}
+        title={"Thêm phòng"}
         onClose={() => setOpenDialogForm(false)}
       >
         <Stack width={"30rem"} mt={3} spacing={4}>
           <MuiTextFeild
-            label={"Tên khoa"}
+            label={"Tên phòng"}
             autoFocus
             autoComplete="off"
-            value={department.departmentName}
+            value={room.roomName}
             onChange={(e) => {
-              setDepartment((prev) => ({
+              setRoom((prev) => ({
                 ...prev,
-                departmentName: e.target.value,
+                roomName: e.target.value,
               }));
             }}
             required
           />
           <MuiTextFeild
             label="Mô tả"
-            value={department.description}
+            value={room.description}
             autoComplete="off"
             multiline
             rows={4}
             onChange={(e) => {
-              setDepartment((prev) => ({
+              setRoom((prev) => ({
                 ...prev,
                 description: e.target.value,
               }));
             }}
           />
+          <Box>
+            <CustomTypography variant="body1">
+              Vai trò
+            </CustomTypography>
+
+            <FormControl fullWidth>
+              <Select
+                value={room.departmentId}
+                onChange={(e) =>
+                  setRoom((prev) => {
+                    return {
+                      ...prev,
+                      departmentId: e.target.value,
+                    };
+                  })
+                }
+                displayEmpty
+                required
+                sx={{
+                  fontSize: "16px !important",
+                }}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                {departments?.map((item, index) => (
+                  <MenuItem
+                    key={index}
+                    value={item.value}
+                  >
+                    <Typography style={{ fontSize: "16px" }}>
+                      {item.label}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Stack>
       </DialogForm>
     </>
   );
 }
 
-export default DepartmentListPage;
+export default RoomListPage;

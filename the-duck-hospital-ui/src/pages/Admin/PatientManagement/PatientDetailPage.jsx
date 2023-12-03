@@ -5,85 +5,84 @@ import {
   Paper,
   Stack,
   Typography,
+  styled,
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useState } from "react";
-import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
-import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
 import { useNavigate } from "react-router-dom";
+import PatientDetail from "../../../components/Admin/PatientManagement/PatientDetail";
+import { useState } from "react";
+import PatientProfileTable from "../../../components/Admin/PatientManagement/PatientProfileTable";
 
-const department = {
-  departmentName: "Khoa Nhi",
-  description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
-  doctors: [
+const StaffId = styled(Typography)(({ theme }) => ({
+  backgroundColor: "#d6d7db",
+  padding: "2px 5px",
+  borderRadius: "15px",
+  fontSize: "13px !important",
+  alignItems: "center",
+  fontWeight: "500",
+  width: "fit-content",
+}));
+
+const patient = {
+  patientId: "1234-5678-9101-1121",
+  fullName: "Nguyễn Quốc Patient",
+  phoneNumber: "0123456789",
+  identityNumber: "123456789012",
+  dateOfBirth: "27/01/2002",
+  deleted: false,
+  patientProfiles: [
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 1",
+      fullName: "Nguyễn Quốc Patient",
       phoneNumber: "0123456789",
-      headOfDepartment: false,
-      identityNumber: "123456789012",
+      createdAt: "27/01/2002",
       deleted: false,
     },
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 2",
-      phoneNumber: "0123456788",
-      headOfDepartment: false,
-      identityNumber: "123456789011",
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
       deleted: false,
     },
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 3",
-      phoneNumber: "0123456787",
-      headOfDepartment: false,
-      identityNumber: "123456789010",
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
       deleted: false,
     },
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 4",
-      phoneNumber: "0123456786",
-      headOfDepartment: false,
-      identityNumber: "123456789013",
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
       deleted: false,
     },
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Head Doctor",
-      phoneNumber: "0123456785",
-      headOfDepartment: true,
-      identityNumber: "123456789014",
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
       deleted: false,
     },
     {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 5",
-      phoneNumber: "0123456784",
-      headOfDepartment: false,
-      identityNumber: "123456789015",
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
       deleted: false,
     },
-  ],
-  deleted: false
+    {
+      fullName: "Nguyễn Quốc Patient",
+      phoneNumber: "0123456789",
+      createdAt: "27/01/2002",
+      deleted: false,
+    },
+  ]
 }
 
-function DepartmentDetailPage() {
+const totalItems = patient.patientProfiles.length;
+
+function PatientDetailPage() {
   const navigate = useNavigate();
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  const headDoctor = department.doctors.find(doctor => doctor.headOfDepartment === true);
-  department.doctors.sort((a, b) => {
-    if (a.headOfDepartment === b.headOfDepartment) {
-      return 0;
-    } else if (a.headOfDepartment) {
-      return -1;
-    } else {
-      return 1;
-    }
-  });
-  const totalItems = department.doctors.length;
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
@@ -106,7 +105,6 @@ function DepartmentDetailPage() {
   // }, [handleGetCustomer]);
 
   return (
-
     <Box
       sx={{
         pt: 3,
@@ -130,7 +128,7 @@ function DepartmentDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/department-management") }}
+              onClick={() => { navigate("/admin/patient-management") }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -142,41 +140,37 @@ function DepartmentDetailPage() {
                 color: "#111927",
               }}
             >
-              Danh sách khoa
+              Danh sách bệnh nhân
             </Typography>
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-
-
-              <Typography
-                variant="h3"
-                fontWeight={600}
-                style={{
-                  textTransform: "uppercase",
-                  fontSize: ["1.5rem", "2rem"],
-                }}
-              >
-                {department.departmentName}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container>
-            <Grid item xs={12}>
-              <Stack
-                component={Paper}
-                elevation={3}
-                sx={{
-                  marginTop: 4,
-                  borderRadius: "15px",
-                }}
-                spacing={"2px"}
-              >
-                <DepartmentDetail department={department} headDoctor={headDoctor} />
+              <Stack direction={"column"}>
+                <Typography
+                  variant="h4"
+                  fontWeight={600}
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: ["1.5rem", "2rem"],
+                  }}
+                >
+                  {patient.fullName}
+                </Typography>
+                <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={450}
+                    style={{
+                      fontSize: "14px",
+                    }}
+                  >
+                    patient_id:
+                  </Typography>
+                  <StaffId>{patient.patientId}</StaffId>
+                </Stack>
               </Stack>
             </Grid>
           </Grid>
-
           <Grid container>
             <Grid item xs={12}>
               <Stack
@@ -188,10 +182,24 @@ function DepartmentDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <DoctorTable
+                <PatientDetail patient={patient} />
+              </Stack>
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item xs={12}>
+              <Stack
+                component={Paper}
+                elevation={3}
+                sx={{
+                  marginTop: 4,
+                  borderRadius: "15px",
+                }}
+                spacing={"2px"}
+              >
+                <PatientProfileTable
                   count={totalItems ? totalItems : 0}
-                  items={department.doctors}
-                  headDoctor={headDoctor}
+                  items={patient.patientProfiles}
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   page={page}
@@ -203,8 +211,7 @@ function DepartmentDetailPage() {
         </Stack>
       </Stack>
     </Box>
-
   );
 }
 
-export default DepartmentDetailPage;
+export default PatientDetailPage;

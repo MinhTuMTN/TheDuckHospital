@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import StaffDetail from "../../../components/Admin/StaffManagement/StaffDetail";
 
 const StaffId = styled(Typography)(({ theme }) => ({
@@ -23,7 +23,6 @@ const StaffId = styled(Typography)(({ theme }) => ({
 }));
 
 function StaffDetailPage() {
-  const { state } = useLocation();
   const navigate = useNavigate();
   // const [customer, setCustomer] = useState({});
 

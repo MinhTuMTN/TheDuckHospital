@@ -11,6 +11,12 @@ import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentLi
 import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
 import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
+import PatientListPage from "../pages/Admin/PatientManagement/PatientListPage";
+import PatientDetailPage from "../pages/Admin/PatientManagement/PatientDetailPage";
+import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
+import AccountDetailPage from "../pages/Admin/AccountManagement/AccountDetailPage";
+import RoomListPage from "../pages/Admin/RoomManagement/RoomListPage";
+import RoomDetailPage from "../pages/Admin/RoomManagement/RoomDetailPage";
 
 const LoadComponent = (Component) => (props) =>
 (
@@ -90,12 +96,28 @@ function Router(props) {
           element: null,
         },
         {
+          path: "account-management",
+          element: <AccountListPage />,
+        },
+        {
+          path: "account-management/detail",
+          element: <AccountDetailPage />,
+        },
+        {
           path: "staff-management",
           element: <StaffListPage />,
         },
         {
           path: "staff-management/detail",
           element: <StaffDetailPage />,
+        },
+        {
+          path: "room-management",
+          element: <RoomListPage />,
+        },
+        {
+          path: "room-management/detail",
+          element: <RoomDetailPage />,
         },
         {
           path: "department-management",
@@ -107,7 +129,11 @@ function Router(props) {
         },
         {
           path: "patient-management",
-          element: null,
+          element: <PatientListPage />,
+        },
+        {
+          path: "patient-management/detail",
+          element: <PatientDetailPage />,
         },
         {
           path: "payment-management",

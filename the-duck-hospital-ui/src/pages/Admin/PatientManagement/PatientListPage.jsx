@@ -1,97 +1,74 @@
 import {
   Box,
-  Button,
   Container,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import styled from "@emotion/styled";
-import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
-import DialogForm from "../../../components/DialogForm";
-import MuiTextFeild from "../../../components/MuiTextFeild";
-import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
+import SearchPatientList from "../../../components/Admin/PatientManagement/SearchPatientList";
+import PatientTable from "../../../components/Admin/PatientManagement/PatientTable";
 
 const items = [
   {
-    departmentName: "Khoa nhi",
-    headDoctor: "Nguyễn Văn Head Doctor",
-    numberOfDoctors: 12,
+    fullName: "Nguyễn Thị Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa tim mạch",
-    headDoctor: "Nguyễn Thị Head Doctor",
-    numberOfDoctors: 10,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa ung thư",
-    headDoctor: "Nguyễn Quốc Head Doctor",
-    numberOfDoctors: 9,
+    fullName: "Nguyễn Thị Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa da liễu",
-    headDoctor: "Nguyễn Lâm Head Doctor",
-    numberOfDoctors: 15,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa thần kinh",
-    headDoctor: "Nguyễn Thế Head Doctor",
-    numberOfDoctors: 8,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa tâm lý",
-    headDoctor: "Nguyễn Minh Head Doctor",
-    numberOfDoctors: 13,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa phẫu thuật gây mê",
-    headDoctor: "Nguyễn Ngọc Head Doctor",
-    numberOfDoctors: 17,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa phụ sản",
-    headDoctor: "Nguyễn Thành Head Doctor",
-    numberOfDoctors: 3,
+    fullName: "Nguyễn Văn Customer",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
   {
-    departmentName: "Khoa cấp cứu",
-    headDoctor: "Nguyễn Vĩ Head Doctor",
-    numberOfDoctors: 5,
+    fullName: "Nguyễn Quốc Staff",
+    phoneNumber: "0123456789",
+    identityNumber: "123456789012",
     deleted: false,
   },
-  {
-    departmentName: "Khoa nội soi",
-    headDoctor: "Nguyễn Kiều Head Doctor",
-    numberOfDoctors: 12,
-    deleted: false,
-  },
-]
+];
 
 const totalItems = items.length;
 
-const CustomButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  backgroundColor: "#FF6969",
-  borderRadius: "6px",
-  fontWeight: "600",
-  fontSize: "15px",
-  height: "42px",
-  "&:hover": {
-    backgroundColor: "#ea4545 !important",
-  },
-}));
-
-function DepartmentListPage(props) {
+function PatientListPage(props) {
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
   // const [catalogs, setCatalogs] = useState([]);
@@ -100,11 +77,6 @@ function DepartmentListPage(props) {
   const [page, setPage] = useState(1);
   // const [productItems, setProductItems] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
-  const [openDialogForm, setOpenDialogForm] = useState(false);
-  const [department, setDepartment] = useState({
-    departmentName: "",
-    description: "",
-  });
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
@@ -183,21 +155,8 @@ function DepartmentListPage(props) {
                   fontSize: "32px",
                 }}
               >
-                Danh sách khoa
+                Danh sách bệnh nhân
               </Typography>
-              <CustomButton
-                variant="contained"
-                startIcon={<AddOutlinedIcon />}
-                onClick={() => {
-                  setDepartment({
-                    departmentName: "",
-                    description: "",
-                  });
-                  setOpenDialogForm(true);
-                }}
-              >
-                Thêm
-              </CustomButton>
             </Stack>
             <Stack
               component={Paper}
@@ -208,7 +167,7 @@ function DepartmentListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchDepartmentList
+              <SearchPatientList
                 value={search}
                 onChange={setSearch}
               // onApply={() => {
@@ -310,7 +269,7 @@ function DepartmentListPage(props) {
                   page={page}
                   rowsPerPage={rowsPerPage}
                 /> */}
-              <DepartmentTable
+              <PatientTable
                 count={totalItems ? totalItems : 0}
                 items={items}
                 onPageChange={handlePageChange}
@@ -323,53 +282,8 @@ function DepartmentListPage(props) {
         </Container>
       </Box>
       {/* )} */}
-
-      <DialogForm
-        cancelText={"Hủy"}
-        okText={"Thêm"}
-        onCancel={() => {
-          setOpenDialogForm(false);
-          setDepartment({
-            departmentName: "",
-            description: "",
-          })
-        }}
-        // onOk={handleAddCatalog}
-        open={openDialogForm}
-        title={"Thêm khoa"}
-        onClose={() => setOpenDialogForm(false)}
-      >
-        <Stack width={"30rem"} mt={3} spacing={4}>
-          <MuiTextFeild
-            label={"Tên khoa"}
-            autoFocus
-            autoComplete="off"
-            value={department.departmentName}
-            onChange={(e) => {
-              setDepartment((prev) => ({
-                ...prev,
-                departmentName: e.target.value,
-              }));
-            }}
-            required
-          />
-          <MuiTextFeild
-            label="Mô tả"
-            value={department.description}
-            autoComplete="off"
-            multiline
-            rows={4}
-            onChange={(e) => {
-              setDepartment((prev) => ({
-                ...prev,
-                description: e.target.value,
-              }));
-            }}
-          />
-        </Stack>
-      </DialogForm>
     </>
   );
 }
 
-export default DepartmentListPage;
+export default PatientListPage;

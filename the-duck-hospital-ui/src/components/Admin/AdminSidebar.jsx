@@ -5,6 +5,8 @@ import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import BabyChangingStationIcon from '@mui/icons-material/BabyChangingStation';
 import HealingIcon from '@mui/icons-material/Healing';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DnsIcon from '@mui/icons-material/Dns';
 // import pic from "../assets/logo-removebg-preview.jpg";
 
 import {
@@ -48,7 +50,12 @@ const sidebarItems = [
     to: "/admin/appointment-management",
     section: "appointment-management",
   },
-
+  {
+    display: "Tài Khoản",
+    icon: <AccountCircleIcon />,
+    to: "/admin/account-management",
+    section: "account-management",
+  },
   {
     display: "Nhân Viên",
     icon: <BabyChangingStationIcon />,
@@ -56,16 +63,22 @@ const sidebarItems = [
     section: "staff-management",
   },
   {
-    display: "Khoa",
-    icon: <MeetingRoomIcon />,
-    to: "/admin/department-management",
-    section: "department-management",
-  },
-  {
     display: "Bệnh Nhân",
     icon: <AssistWalkerIcon />,
     to: "/admin/patient-management",
     section: "patient-management",
+  },
+  {
+    display: "Khoa",
+    icon: <DnsIcon />,
+    to: "/admin/department-management",
+    section: "department-management",
+  },
+  {
+    display: "Phòng",
+    icon: <MeetingRoomIcon />,
+    to: "/admin/room-management",
+    section: "room-management",
   },
   {
     display: "Thanh Toán",
