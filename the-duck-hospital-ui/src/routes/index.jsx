@@ -10,6 +10,10 @@ import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import LogoLayout from "../layouts/LogoLayout";
 import CreateProfile from "../pages/customer/CreateProfile";
+import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentListPage";
+import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
+import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
+import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -75,8 +79,36 @@ function Router(props) {
           path: "analytics",
           element: null,
         },
+        // {
+        //   element: <Analytics />,
+        //   index: true,
+        // },
         {
-          path: "address-management/province",
+          path: "appointment-management",
+          element: null,
+        },
+        {
+          path: "staff-management",
+          element: <StaffListPage />,
+        },
+        {
+          path: "staff-management/detail",
+          element: <StaffDetailPage />,
+        },
+        {
+          path: "department-management",
+          element: <DepartmentListPage />,
+        },
+        {
+          path: "department-management/detail",
+          element: <DepartmentDetailPage />,
+        },
+        {
+          path: "patient-management",
+          element: null,
+        },
+        {
+          path: "payment-management",
           element: null,
         },
       ],
