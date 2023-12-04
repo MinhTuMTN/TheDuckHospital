@@ -14,6 +14,7 @@ import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentLi
 import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
 import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
+import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
 import PatientListPage from "../pages/Admin/PatientManagement/PatientListPage";
 import PatientDetailPage from "../pages/Admin/PatientManagement/PatientDetailPage";
 import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
@@ -42,13 +43,17 @@ function Router(props) {
         },
 
         {
-          path: "/chosen-patient-profiles",
+          path: "/choose-patient-profiles",
           element: <ChoosePatientProfiles />,
         },
 
         {
           path: "/create-profile",
           element: <CreateProfile />,
+        },
+        {
+          path: "/choose-doctor",
+          element: <ChooseDoctorPage />,
         },
 
         {
@@ -57,7 +62,9 @@ function Router(props) {
         },
         {
           path: "/user",
-          element: <ProtectedLayout forRole={["User", "Admin"]} />,
+          element: (
+            <ProtectedLayout forRole={["User", "Admin", "Doctor", "Nurse"]} />
+          ),
           children: [
             {
               element: <PageUser />,

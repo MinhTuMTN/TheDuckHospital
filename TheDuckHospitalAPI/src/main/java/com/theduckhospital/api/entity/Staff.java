@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -23,10 +24,12 @@ public class Staff {
     protected String fullName;
     protected String phoneNumber;
     protected String identityNumber;
+    protected Gender gender;
     protected Date dateOfBirth;
     protected Date createdAt;
     protected Date lastModifiedAt;
     protected boolean deleted;
+    protected String msGraphId;
 
     @OneToOne(mappedBy = "staff", fetch = FetchType.LAZY)
     @JsonBackReference

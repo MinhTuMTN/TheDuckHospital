@@ -25,7 +25,7 @@ public class MSGraphServicesImpl implements IMSGraphServices {
         this.environment = environment;
     }
     @Override
-    public String createMSGraphUser(String fullName, String email) {
+    public String createMSGraphUser(String fullName, String email, String password) {
         try {
             final GraphServiceClient<Request> graphClient = createClient();
 
@@ -37,7 +37,7 @@ public class MSGraphServicesImpl implements IMSGraphServices {
 
             PasswordProfile passwordProfile = new PasswordProfile();
             passwordProfile.forceChangePasswordNextSignIn = true;
-            passwordProfile.password = "HCMUTE@2023";
+            passwordProfile.password = password;
 
             user.passwordProfile = passwordProfile;
             user.usageLocation = "VN";

@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import NavBar from "../components/NavBar";
+import RightNavBar from "../components/Customer/RightNavBar";
 import Footer from "../components/Footer";
+import NavBar from "../components/NavBar";
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",
@@ -23,7 +24,7 @@ function MainLayout(props) {
   return (
     <>
       <NavBar onDrawerClick={setOpen} />
-      {/*<LeftNavBar open={open} onOpenClose={setOpen} />*/}
+      <RightNavBar open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>
           <Outlet />
