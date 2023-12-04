@@ -83,6 +83,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
+        e.printStackTrace();
         return ResponseEntity.status(500).body(GeneralResponse.builder()
                 .success(false)
                 .message("Internal server error")

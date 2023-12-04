@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
+import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Nation;
 import com.theduckhospital.api.entity.PatientProfile;
@@ -14,6 +15,9 @@ import com.theduckhospital.api.repository.WardRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PatientProfileServicesImpl implements IPatientProfileServices {
@@ -66,5 +70,35 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
                 .build();
 
         return patientProfileRepository.save(patientProfile);
+    }
+
+    @Override
+    public List<PatientProfileItemResponse> getActivePatientProfile(String token) {
+        Account account = accountServices.findAccountByToken(token);
+
+
+        return patientProfileRepository
+                .findPatientProfilesByAccountAndDeletedIsFalse(
+                        account
+                )
+                .stream()
+                .map(PatientProfileItemResponse::new).toList();
+    }
+
+    @Override
+    public boolean deletePatientProfile(String token, UUID patientProfileId) {
+        Account account = accountServices.findAccountByToken(token);
+
+        PatientProfile patientProfile = patientProfileRepository
+                .findById(patientProfileId)
+                .orElseThrow(() -> new NotFoundException("Patient profile not found"));
+
+        if (!patientProfile.getAccount().getUserId().equals(account.getUserId()))
+            throw new BadRequestException("Patient profile not belong to this account");
+
+        patientProfile.setDeleted(true);
+        patientProfileRepository.save(patientProfile);
+
+        return true;
     }
 }

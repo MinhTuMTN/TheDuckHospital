@@ -8,10 +8,12 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ChooseProfileItem from "../../components/Customer/ChooseProfileItem";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -43,6 +45,22 @@ function ChoosePatientProfiles(props) {
     WebkitBackgroundClip: "text",
     color: "transparent",
   };
+
+  const [patientProfiles, setPatientProfiles] = useState([]);
+
+  const handleAllPatientProfiles = useCallback(async () => {
+    const response = await getAllPatientProfiles();
+    if (response.success) setPatientProfiles(response.data.data);
+    else
+      enqueueSnackbar("Đã xảy ra lỗi khi lấy danh sách hồ sơ bệnh nhân", {
+        variant: "error",
+      });
+  }, []);
+
+  useEffect(() => {
+    handleAllPatientProfiles();
+  }, [handleAllPatientProfiles]);
+
   return (
     <Box
       sx={{
@@ -137,69 +155,33 @@ function ChoosePatientProfiles(props) {
             paddingLeft: isSmDown ? "16px" : "0px",
           }}
         >
-          <Grid
-            item
-            xs={12}
-            md={5.5}
-            sx={{
-              margin: "auto",
-              borderRadius: "15px",
-            }}
-          >
-            <Box
-              className="choose-profile-item"
-              component={Paper}
-              elevation={3}
-              style={{
+          {patientProfiles.map((profile) => (
+            <Grid
+              key={profile.patientProfileId}
+              item
+              xs={12}
+              md={5.5}
+              sx={{
+                margin: "auto",
                 borderRadius: "15px",
-                width: "100%",
               }}
             >
-              <ChooseProfileItem />
-            </Box>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={5.5}
-            sx={{
-              margin: "auto",
-              borderRadius: "15px",
-            }}
-          >
-            <Box
-              className="choose-profile-item"
-              component={Paper}
-              elevation={3}
-              style={{
-                borderRadius: "15px",
-                width: "100%",
-              }}
-            >
-              <ChooseProfileItem />
-            </Box>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={5.5}
-            sx={{
-              margin: "auto",
-              borderRadius: "15px",
-            }}
-          >
-            <Box
-              className="choose-profile-item"
-              component={Paper}
-              elevation={3}
-              style={{
-                borderRadius: "15px",
-                width: "100%",
-              }}
-            >
-              <ChooseProfileItem />
-            </Box>
-          </Grid>
+              <Box
+                className="choose-profile-item"
+                component={Paper}
+                elevation={3}
+                style={{
+                  borderRadius: "15px",
+                  width: "100%",
+                }}
+              >
+                <ChooseProfileItem
+                  profile={profile}
+                  onReload={handleAllPatientProfiles}
+                />
+              </Box>
+            </Grid>
+          ))}
         </Grid>
       </Grid>
     </Box>
