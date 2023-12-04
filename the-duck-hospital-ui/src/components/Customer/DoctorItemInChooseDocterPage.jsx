@@ -1,4 +1,4 @@
-import { CardMedia, Pagination, Stack, Typography } from "@mui/material";
+import { CardMedia, Stack, Typography } from "@mui/material";
 import React from "react";
 
 function DoctorItemInChooseDocterPage(props) {
@@ -10,17 +10,18 @@ function DoctorItemInChooseDocterPage(props) {
         border: "1px solid #E0E0E0",
         //shadow
         boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.25)",
+        marginRight: "2px !important",
         paddingTop: "14px",
         paddingBottom: "14px",
         paddingLeft: "15px",
         paddingRight: "15px",
-        width: "100%",
+        width: "99%",
         justifyContent: "flex-start",
         alignItems: "flex-start",
         cursor: "pointer",
         "&:hover": {
-          boxShadow: "0px 0px 3px 1px #229CF3",
-          border: "1px solid #229CF3",
+          boxShadow: "0px 0px 3px 1px #1da1f2",
+          border: "1px solid #89d2ff",
         },
       }}
     >
@@ -156,7 +157,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "template.darker",
           }}
         >
-          Phí khám:
+          Phí khám: 150000 d
         </Typography>
       </Stack>
     </Stack>

@@ -80,6 +80,8 @@ const ListDocter = styled(Stack)(({ theme }) => ({
   marginTop: "20px",
   height: "500px",
   overflow: "auto",
+  paddingTop: "5px",
+  paddingBottom: "20px",
 }));
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
