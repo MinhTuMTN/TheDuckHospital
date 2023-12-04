@@ -73,6 +73,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .build());
     }
 
+    @ExceptionHandler(com.theduckhospital.api.error.AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(com.theduckhospital.api.error.AccessDeniedException e) {
+        return ResponseEntity.status(403).body(GeneralResponse.builder()
+                .success(false)
+                .message(e.getMessage())
+                .build());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         return ResponseEntity.status(500).body(GeneralResponse.builder()

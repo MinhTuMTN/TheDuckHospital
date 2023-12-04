@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.theduckhospital.api.constant.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PatientProfile {
     @Id
     private UUID patientProfileId;
@@ -25,6 +27,7 @@ public class PatientProfile {
     private String phoneNumber;
     private String email;
     private Gender gender;
+    private String identityNumber;
 
     @Nationalized
     private String streetName;
@@ -60,4 +63,9 @@ public class PatientProfile {
     @JsonBackReference
     @ToStringExclude
     private Patient patient;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Nation nation;
 }

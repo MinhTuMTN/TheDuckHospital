@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.TemporaryUser;
+import com.theduckhospital.api.error.AccessDeniedException;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.TemporaryUserRepository;
@@ -196,24 +197,11 @@ public class AccountServicesImpl implements IAccountServices {
 
     @Override
     public CheckTokenResponse checkToken(String token) {
-        token = token.substring(7); // Remove "Bearer " prefix
-        boolean isValid = false;
+        Account account = null;
         try {
-            isValid = tokenProvider.validateToken(token);
+            account = findAccountByToken(token);
         } catch (Exception ignored) {
         }
-        if (!isValid) {
-            return CheckTokenResponse.builder()
-                    .valid(false)
-                    .role(null)
-                    .build();
-        }
-
-        String userId = tokenProvider.getUserIdFromJwt(token);
-        Account account = accountRepository
-                .findAccountByUserIdAndDeletedIsFalse(
-                        UUID.fromString(userId)
-                );
 
         if (account == null) {
             return CheckTokenResponse.builder()
@@ -232,5 +220,30 @@ public class AccountServicesImpl implements IAccountServices {
                 .valid(true)
                 .role(role)
                 .build();
+    }
+
+    @Override
+    public Account findAccountByToken(String token) {
+        token = token.substring(7); // Remove "Bearer " prefix
+        boolean isValid = false;
+        try {
+            isValid = tokenProvider.validateToken(token);
+        } catch (Exception ignored) {
+        }
+        if (!isValid) {
+            return null;
+        }
+
+        String userId = tokenProvider.getUserIdFromJwt(token);
+        Account account =  accountRepository
+                .findAccountByUserIdAndDeletedIsFalse(
+                        UUID.fromString(userId)
+                );
+
+        if (account == null) {
+            throw new AccessDeniedException("Token is not valid");
+        }
+
+        return account;
     }
 }

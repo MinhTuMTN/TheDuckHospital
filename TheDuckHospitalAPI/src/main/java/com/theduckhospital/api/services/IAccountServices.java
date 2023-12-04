@@ -13,4 +13,5 @@ public interface IAccountServices {
     Account register(RegisterRequest request);
     boolean sendOTP(String emailOrPhone) throws FirebaseMessagingException;
     CheckTokenResponse checkToken(String token);
+    Account findAccountByToken(String token);
 }

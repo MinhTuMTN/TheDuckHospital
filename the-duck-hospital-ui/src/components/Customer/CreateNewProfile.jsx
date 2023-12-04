@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import {
   Box,
   Button,
@@ -13,9 +14,17 @@ import {
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import dayjs from "dayjs";
-import React from "react";
+import { useSnackbar } from "notistack";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllDistricts,
+  getAllProvinces,
+  getAllWards,
+} from "../../services/common/AddressesServices";
+import { getAllNations } from "../../services/common/NationServices";
+import { createPatientProfile } from "../../services/customer/PatientProfileServices";
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
@@ -42,36 +51,129 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 function CreateNewProfile(props) {
-  //const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const [fullName, setFullName] = React.useState("");
+  const [dateOfBirth, setDateOfBirth] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [identityNumber, setIdentityNumber] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [streetName, setStreetName] = React.useState("");
+  const [gender, setGender] = React.useState(0);
 
-  const [gender, setGender] = React.useState("");
+  // Nations
+  const [nations, setNations] = useState([]);
+  const [selectedNationId, setSelectedNationId] = useState("");
+  const handleGetAllNations = useCallback(async () => {
+    const response = await getAllNations();
+    if (response.success) {
+      setNations(response.data.data);
+      setSelectedNationId(response.data.data[0].nationId);
+    }
+  }, []);
 
-  const handleChange = (event) => {
-    setGender(event.target.value);
-  };
+  // Provinces
+  const [provinces, setProvinces] = React.useState([]);
+  const [selectedProvinceId, setSelectedProvinceId] = React.useState("");
+  const handleGetAllProvinces = useCallback(async () => {
+    const response = await getAllProvinces();
+    if (response.success) {
+      setProvinces(response.data.data);
+      setSelectedProvinceId(response.data.data[0]?.provinceId);
+    }
+  }, []);
 
-  const [ethnic, setEthnic] = React.useState("0");
+  // Districts
+  const [districts, setDistricts] = React.useState([]);
+  const [selectedDistrictId, setSelectedDistrictId] = React.useState("");
+  const handleGetAllDistricts = useCallback(async () => {
+    if (!selectedProvinceId) return;
 
-  const handleChangeEthnic = (event) => {
-    setEthnic(event.target.value);
-  };
+    const response = await getAllDistricts(selectedProvinceId);
+    if (response.success) {
+      setDistricts(response.data.data);
+      setSelectedDistrictId(response.data.data[0]?.districtId);
+    }
+  }, [selectedProvinceId]);
 
-  const [province, setProvince] = React.useState("");
+  // Wards
+  const [wards, setWards] = useState([]);
+  const [selectedWardId, setSelectedWardId] = React.useState("");
+  const handleGetAllWards = useCallback(async () => {
+    if (!selectedDistrictId) return;
 
-  const handleChangeProvince = (event) => {
-    setProvince(event.target.value);
-  };
+    const response = await getAllWards(selectedDistrictId);
+    if (response.success) {
+      setWards(response.data.data);
+      setSelectedWardId(response.data.data[0]?.wardId);
+    }
+  }, [selectedDistrictId]);
 
-  const [district, setDistrict] = React.useState("");
+  useEffect(() => {
+    handleGetAllNations();
+    handleGetAllProvinces();
+  }, [handleGetAllNations, handleGetAllProvinces]);
 
-  const handleChangeDistrict = (event) => {
-    setDistrict(event.target.value);
-  };
+  useEffect(() => {
+    handleGetAllDistricts();
+  }, [handleGetAllDistricts]);
 
-  const [ward, setWard] = React.useState("");
+  useEffect(() => {
+    handleGetAllWards();
+  }, [handleGetAllWards]);
 
-  const handleChangeWard = (event) => {
-    setWard(event.target.value);
+  const handleCreatePatientProfile = async () => {
+    if (fullName.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập họ và tên", { variant: "error" });
+      return;
+    }
+
+    if (phoneNumber.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập số điện thoại", { variant: "error" });
+      return;
+    }
+
+    if (phoneNumber.trim().length !== 10 || !phoneNumber.startsWith("0")) {
+      enqueueSnackbar("Số điện thoại không hợp lệ", { variant: "error" });
+      return;
+    }
+
+    if (streetName.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập địa chỉ", { variant: "error" });
+      return;
+    }
+
+    if (gender === "") {
+      enqueueSnackbar("Vui lòng chọn giới tính", { variant: "error" });
+      return;
+    }
+
+    if (dateOfBirth === "") {
+      enqueueSnackbar("Vui lòng chọn ngày sinh", { variant: "error" });
+      return;
+    }
+
+    const data = {
+      fullName,
+      phoneNumber,
+      dateOfBirth: dayjs(dateOfBirth).add(7, "hour").toISOString(),
+      gender,
+      wardId: selectedWardId,
+      streetName,
+      email,
+      identityNumber,
+      nationId: selectedNationId,
+    };
+
+    enqueueSnackbar("Đang tạo hồ sơ bệnh nhân...", { variant: "info" });
+    const response = await createPatientProfile(data);
+    if (response.success) {
+      enqueueSnackbar("Tạo hồ sơ bệnh nhân thành công", { variant: "success" });
+      window.scrollTo(0, 0);
+      navigate("/user", { replace: true });
+    } else {
+      enqueueSnackbar("Tạo hồ sơ bệnh nhân thất bại", { variant: "error" });
+    }
   };
   return (
     <Grid container spacing={2}>
@@ -132,6 +234,8 @@ function CreateNewProfile(props) {
             fullWidth
             required
             placeholder="Nguyễn Gia Văn"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
         </Stack>
       </Grid>
@@ -148,7 +252,12 @@ function CreateNewProfile(props) {
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <CustomDatePicker defaultValue={dayjs("2022-04-17")} />
+            <CustomDatePicker
+              format="DD/MM/YYYY"
+              value={dateOfBirth}
+              onChange={(newValue) => setDateOfBirth(newValue)}
+              defaultValue={dayjs()}
+            />
           </LocalizationProvider>
         </Stack>
       </Grid>
@@ -171,6 +280,8 @@ function CreateNewProfile(props) {
             fullWidth
             required
             placeholder="Nhập số điện thoại"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </Stack>
       </Grid>
@@ -183,7 +294,7 @@ function CreateNewProfile(props) {
               textAlign: "left",
             }}
           >
-            Giới tính{" "}
+            Giới tính
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <FormControl fullWidth>
@@ -191,13 +302,13 @@ function CreateNewProfile(props) {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={gender}
-              onChange={handleChange}
+              onChange={(e) => setGender(e.target.value)}
               sx={{
                 textAlign: "left",
               }}
             >
-              <MenuItem value={0}>Nữ</MenuItem>
-              <MenuItem value={1}>Nam</MenuItem>
+              <MenuItem value={0}>Nam</MenuItem>
+              <MenuItem value={1}>Nữ</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -220,6 +331,8 @@ function CreateNewProfile(props) {
             fullWidth
             required
             placeholder="Nhập số CCCD/CMND"
+            value={identityNumber}
+            onChange={(e) => setIdentityNumber(e.target.value)}
           />
         </Stack>
       </Grid>
@@ -232,21 +345,26 @@ function CreateNewProfile(props) {
               textAlign: "left",
             }}
           >
-            Dân tộc{" "}
+            Dân tộc
           </CustomTypography>
           <FormControl fullWidth>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={ethnic}
-              onChange={handleChangeEthnic}
+              value={selectedNationId}
+              onChange={(event) => setSelectedNationId(event.target.value)}
               sx={{
                 textAlign: "left",
               }}
             >
-              <MenuItem value={0}>Kinh</MenuItem>
-              <MenuItem value={1}>Tày</MenuItem>
-              <MenuItem value={2}>Thái</MenuItem>
+              {nations?.map((nation) => (
+                <MenuItem
+                  value={nation.nationId}
+                  key={`nation-${nation.nationId}`}
+                >
+                  {nation.nationName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Stack>
@@ -267,15 +385,20 @@ function CreateNewProfile(props) {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={province}
-              onChange={handleChangeProvince}
+              value={selectedProvinceId}
+              onChange={(e) => setSelectedProvinceId(e.target.value)}
               sx={{
                 textAlign: "left",
               }}
             >
-              <MenuItem value={0}>Tp Hồ Chí Minh</MenuItem>
-              <MenuItem value={1}>Hà Nội</MenuItem>
-              <MenuItem value={2}>Lâm Đồng</MenuItem>
+              {provinces?.map((province) => (
+                <MenuItem
+                  key={`province-${province.provinceId}`}
+                  value={province.provinceId}
+                >
+                  {province.provinceName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Stack>
@@ -296,15 +419,20 @@ function CreateNewProfile(props) {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={district}
-              onChange={handleChangeDistrict}
+              value={selectedDistrictId}
+              onChange={(e) => setSelectedDistrictId(e.target.value)}
               sx={{
                 textAlign: "left",
               }}
             >
-              <MenuItem value={0}>Tp Đà Lạt</MenuItem>
-              <MenuItem value={1}>Tp Bảo Lộc</MenuItem>
-              <MenuItem value={2}>Lộc Châu</MenuItem>
+              {districts?.map((district) => (
+                <MenuItem
+                  key={`district-${district.districtId}`}
+                  value={district.districtId}
+                >
+                  {district.districtName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Stack>
@@ -318,22 +446,24 @@ function CreateNewProfile(props) {
               textAlign: "left",
             }}
           >
-            Tỉnh/Thành{" "}
+            Xã/Phường{" "}
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <FormControl fullWidth>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={ward}
-              onChange={handleChangeWard}
+              value={selectedWardId}
+              onChange={(e) => setSelectedWardId(e.target.value)}
               sx={{
                 textAlign: "left",
               }}
             >
-              <MenuItem value={0}>Phường 1</MenuItem>
-              <MenuItem value={1}>Phường 2</MenuItem>
-              <MenuItem value={2}>Phường B'Lao</MenuItem>
+              {wards?.map((ward) => (
+                <MenuItem key={`ward-${ward.wardId}`} value={ward.wardId}>
+                  {ward.wardName}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Stack>
@@ -357,6 +487,8 @@ function CreateNewProfile(props) {
             fullWidth
             required
             placeholder="Nhập địa chỉ"
+            value={streetName}
+            onChange={(e) => setStreetName(e.target.value)}
           />
         </Stack>
       </Grid>
@@ -378,6 +510,8 @@ function CreateNewProfile(props) {
             fullWidth
             required
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </Stack>
       </Grid>
@@ -400,6 +534,7 @@ function CreateNewProfile(props) {
             textAlign: "right",
           }}
           variant="contained"
+          onClick={handleCreatePatientProfile}
         >
           <PersonAddAlt1Icon sx={{ marginRight: "5px" }} />
           Tạo hồ sơ
