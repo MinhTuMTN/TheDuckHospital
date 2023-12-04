@@ -14,6 +14,7 @@ import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentLi
 import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
 import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
+import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -36,13 +37,17 @@ function Router(props) {
         },
 
         {
-          path: "/chosen-patient-profiles",
+          path: "/choose-patient-profiles",
           element: <ChoosePatientProfiles />,
         },
 
         {
           path: "/create-profile",
           element: <CreateProfile />,
+        },
+        {
+          path: "/choose-doctor",
+          element: <ChooseDoctorPage />,
         },
 
         {

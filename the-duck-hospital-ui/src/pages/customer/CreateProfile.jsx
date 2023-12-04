@@ -11,6 +11,7 @@ import {
 import React from "react";
 import CustomTabPanel from "../../components/Customer/CustomTabPanel";
 import CreateNewProfile from "../../components/Customer/CreateNewProfile";
+import FindPatientCode from "../../components/Customer/FindPatientCode";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -86,7 +87,6 @@ function CreatProfile(props) {
         </Grid>
 
         <Grid
-          spacing={2}
           item
           xs={12}
           style={{
@@ -129,7 +129,7 @@ function CreatProfile(props) {
               <CreateNewProfile />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              Item Two
+              <FindPatientCode />
             </CustomTabPanel>
           </Box>
         </Grid>
