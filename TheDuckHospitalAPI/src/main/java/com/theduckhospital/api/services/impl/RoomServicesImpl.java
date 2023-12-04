@@ -1,13 +1,17 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.dto.request.CreateRoomRequest;
-import com.theduckhospital.api.dto.response.RoomResponse;
+import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
+import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
+import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IRoomServices;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -90,6 +94,22 @@ public class RoomServicesImpl implements IRoomServices {
     }
 
     @Override
+    public FilteredRoomsResponse getPaginationRoomsDeleted(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Room> roomPage = roomRepository.findPaginationByOrderByDeleted(pageable);
+
+        List<RoomResponse> filteredRooms = new ArrayList<>();
+
+        for (Room room : roomPage.getContent()) {
+            filteredRooms.add(new RoomResponse(room));
+        }
+
+        List<RoomResponse> rooms = getAllRoomsDeleted();
+
+        return new FilteredRoomsResponse(filteredRooms, rooms.size(), page, limit);
+    }
+
+    @Override
     public List<RoomResponse> getAllRoomsDeleted() {
         List<RoomResponse> responses = new ArrayList<>();
 
@@ -98,5 +118,17 @@ public class RoomServicesImpl implements IRoomServices {
         }
 
         return responses;
+    }
+
+    @Override
+    public RoomResponse getRoomById(int roomId) {
+        Optional<Room> optional = roomRepository.findById(roomId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Room not found");
+        }
+
+        Room room = optional.get();
+
+        return new RoomResponse(room);
     }
 }

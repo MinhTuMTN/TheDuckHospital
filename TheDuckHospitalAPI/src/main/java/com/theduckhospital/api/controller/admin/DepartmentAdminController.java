@@ -1,16 +1,16 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.CreateDepartmentRequest;
+import com.theduckhospital.api.dto.request.admin.CreateDepartmentRequest;
 import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.request.admin.UpdateDepartmentRequest;
 import com.theduckhospital.api.services.IDepartmentServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/departments")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class DepartmentAdminController {
     private final IDepartmentServices departmentServices;
 
@@ -34,7 +34,43 @@ public class DepartmentAdminController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get all departments successfully")
-                        .data(departmentServices.getAllDepartmentsDeleted())
+                        .data(departmentServices.getAllDepartments())
+                        .build()
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> getAllDepartments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get departments pagination successfully")
+                        .data(departmentServices.getPaginationDepartmentsDeleted(page, limit))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{departmentId}")
+    public ResponseEntity<?> getDepartmentById(@PathVariable int departmentId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get department by id successfully")
+                        .data(departmentServices.getDepartmentResponseById(departmentId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{departmentId}/doctors")
+    public ResponseEntity<?> getDoctorsDepartment(@PathVariable int departmentId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get doctors by department id successfully")
+                        .data(departmentServices.getActiveDoctorsDepartment(departmentId))
                         .build()
         );
     }
@@ -53,7 +89,7 @@ public class DepartmentAdminController {
     @PutMapping("/{departmentId}")
     public ResponseEntity<?> updateDepartment(
             @PathVariable int departmentId,
-            @RequestBody CreateDepartmentRequest request) {
+            @RequestBody UpdateDepartmentRequest request) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

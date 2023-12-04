@@ -114,7 +114,7 @@ function Router(props) {
           element: <RoomListPage />,
         },
         {
-          path: "room-management/detail",
+          path: "room-management/:roomId",
           element: <RoomDetailPage />,
         },
         {
@@ -122,7 +122,7 @@ function Router(props) {
           element: <DepartmentListPage />,
         },
         {
-          path: "department-management/detail",
+          path: "department-management/:departmentId",
           element: <DepartmentDetailPage />,
         },
         {

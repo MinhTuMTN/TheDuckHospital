@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import CircleIcon from "@mui/icons-material/Circle";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useTheme } from "@emotion/react";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -14,7 +13,6 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
   useMediaQuery,
