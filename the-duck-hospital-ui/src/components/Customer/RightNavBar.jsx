@@ -95,6 +95,7 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   height: theme.spacing(8),
   paddingX: "16px",
 }));
+
 function RightNavBar(props) {
   const { open, onOpenClose } = props;
   const { token } = useAuth();
@@ -130,6 +131,7 @@ function RightNavBar(props) {
               borderRadius: "50%", // để tạo góc bo tròn
               padding: "4px",
             }}
+            onClick={() => onOpenClose(false)}
           >
             <SvgIcon fontSize="medium">
               <Close />
