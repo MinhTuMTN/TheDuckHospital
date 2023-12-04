@@ -56,7 +56,9 @@ function Router(props) {
         },
         {
           path: "/user",
-          element: <ProtectedLayout forRole={["User", "Admin"]} />,
+          element: (
+            <ProtectedLayout forRole={["User", "Admin", "Doctor", "Nurse"]} />
+          ),
           children: [
             {
               element: <PageUser />,

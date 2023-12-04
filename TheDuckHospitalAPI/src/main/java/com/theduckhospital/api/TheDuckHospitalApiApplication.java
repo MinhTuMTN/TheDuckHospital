@@ -4,11 +4,11 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.Role;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Admin;
-import com.theduckhospital.api.entity.Staff;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.repository.AccountRepository;
+import com.theduckhospital.api.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -47,6 +47,5 @@ public class TheDuckHospitalApiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		return;
 	}
 }

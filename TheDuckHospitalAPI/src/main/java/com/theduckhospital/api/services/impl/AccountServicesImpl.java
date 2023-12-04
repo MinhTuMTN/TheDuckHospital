@@ -175,12 +175,15 @@ public class AccountServicesImpl implements IAccountServices {
         int otp = otpServices.generateOTP(account);
 
         if (emailOrPhone.contains("@")) {
-            graphServices.sendEmail(
+            boolean result = graphServices.sendEmail(
                     emailOrPhone,
                     "Mã xác nhận đăng nhập",
                     "Mã xác nhận đăng nhập The Duck Mobile của bạn là: "
                             + otp
             );
+            if (!result) {
+                throw new BadRequestException("An error occurred while sending email");
+            }
         } else {
             Map<String, String> data = new HashMap<>();
             data.put("phoneNumber", emailOrPhone);
