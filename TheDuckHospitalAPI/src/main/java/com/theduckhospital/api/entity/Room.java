@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Nationalized;
 
+import java.util.Date;
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -28,4 +31,13 @@ public class Room {
     @JsonBackReference
     @ToStringExclude
     private Department department;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private List<DoctorSchedule> doctorSchedule;
+
+    private Date createdDate;
+    private Date updatedDate;
+    private Integer queueNumber;
 }

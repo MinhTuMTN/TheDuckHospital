@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Grid,
   IconButton,
   Paper,
@@ -10,19 +9,20 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/en-gb";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RoomDetail from "../../../components/Admin/RoomManagement/RoomDetail";
 import ScheduleTable from "../../../components/Admin/RoomManagement/ScheduleTable";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
-import "dayjs/locale/en-gb";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 
 const room = {
   roomName: "TDH1-01",
   departmentName: "Khoa nhi",
-  description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
+  description:
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
   schedule: {
     morning: [
       {
@@ -64,9 +64,8 @@ const room = {
       },
     ],
   },
-  deleted: false
-}
-
+  deleted: false,
+};
 
 const BoxStyle1 = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -121,7 +120,6 @@ function RoomDetailPage() {
   // }, [handleGetCustomer]);
 
   return (
-
     <Box
       sx={{
         pt: 3,
@@ -145,7 +143,9 @@ function RoomDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/room-management") }}
+              onClick={() => {
+                navigate("/admin/room-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -162,8 +162,6 @@ function RoomDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-
-
               <Typography
                 variant="h3"
                 fontWeight={600}
@@ -225,31 +223,32 @@ function RoomDetailPage() {
                           }}
                         />
                       </LocalizationProvider>
-
                     </Stack>
                   </BoxStyle1>
-                  {room.schedule.morning &&
+                  {room.schedule.morning && (
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi sáng</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.morning} />
                     </>
-                  }
-                  {room.schedule.afternoon &&
+                  )}
+                  {room.schedule.afternoon && (
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi chiều</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.afternoon} />
-                    </>}
-                  {room.schedule.evening &&
+                    </>
+                  )}
+                  {room.schedule.evening && (
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi tối</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.evening} />
-                    </>}
+                    </>
+                  )}
                 </Stack>
               </Stack>
             </Grid>
@@ -257,7 +256,6 @@ function RoomDetailPage() {
         </Stack>
       </Stack>
     </Box>
-
   );
 }
 
