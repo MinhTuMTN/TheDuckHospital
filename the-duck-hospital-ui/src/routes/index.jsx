@@ -15,6 +15,8 @@ import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/Department
 import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
 import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
+import ChooseDayPage from "../pages/customer/ChooseDayPage";
+import ConfirmBookingInformation from "../pages/customer/ConfirmBookingInformation";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -48,6 +50,15 @@ function Router(props) {
         {
           path: "/choose-doctor",
           element: <ChooseDoctorPage />,
+        },
+        {
+          path: "/choose-date",
+          element: <ChooseDayPage />,
+        },
+
+        {
+          path: "/confirm-booking-information",
+          element: <ConfirmBookingInformation />,
         },
 
         {
