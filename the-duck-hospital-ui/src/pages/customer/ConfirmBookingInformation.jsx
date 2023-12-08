@@ -11,7 +11,6 @@ import {
 import React from "react";
 import ConfirmBookingTable from "../../components/Customer/ConfirmBookingTable";
 import ConfirmPatientInfo from "../../components/Customer/ConfirmPatientInfo";
-import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",

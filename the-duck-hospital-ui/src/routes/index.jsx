@@ -17,6 +17,7 @@ import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
 import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
 import ChooseDayPage from "../pages/customer/ChooseDayPage";
 import ConfirmBookingInformation from "../pages/customer/ConfirmBookingInformation";
+import PaymentOrders from "../pages/customer/PaymentOrders";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -59,6 +60,11 @@ function Router(props) {
         {
           path: "/confirm-booking-information",
           element: <ConfirmBookingInformation />,
+        },
+
+        {
+          path: "/payment-orders",
+          element: <PaymentOrders />,
         },
 
         {
