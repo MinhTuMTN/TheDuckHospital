@@ -113,9 +113,7 @@ function Footer(props) {
             }}
             height="100%"
             title="Map"
-            allowfullscreen=""
             loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
         </Stack>
       </Grid>

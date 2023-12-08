@@ -17,7 +17,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import CustomLink from "../components/General/CustomLink";
 
@@ -101,7 +101,9 @@ const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
 
 function UserLayout() {
   const navigate = useNavigate();
-  const [section, setSection] = useState("PatientRecords");
+  React.useEffect(() => {
+    console.log(window.location.pathname);
+  });
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
@@ -110,7 +112,7 @@ function UserLayout() {
       <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
     </CustomLink>,
     <CustomTextBreakcrumb key={3}>
-      {sidebarItems.find((s) => s.section === section).display}
+      {sidebarItems.find((s) => s.to === window.location.pathname).display}
     </CustomTextBreakcrumb>,
   ];
   return (
@@ -171,9 +173,10 @@ function UserLayout() {
                     sx={{ width: "100%" }}
                   >
                     <CustomListItemButton
-                      isactive={section === item.section ? "true" : "false"}
+                      isactive={
+                        window.location.pathname === item.to ? "true" : "false"
+                      }
                       onClick={() => {
-                        setSection(item.section);
                         navigate(item.to);
                       }}
                     >

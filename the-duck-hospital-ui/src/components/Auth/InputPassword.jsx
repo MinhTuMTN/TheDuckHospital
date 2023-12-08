@@ -202,6 +202,9 @@ function InputPassword(props) {
             type={showPassword ? "text" : "password"}
             style={{ padding: ".5rem .7rem" }}
             onChange={handleChangePassword}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton

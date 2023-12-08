@@ -113,6 +113,9 @@ function InputPhoneNumber(props) {
           variant="outlined"
           size="large"
           onChange={(e) => setPhone(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleCheckPhone();
+          }}
           autoComplete="off"
           InputProps={{
             startAdornment: (

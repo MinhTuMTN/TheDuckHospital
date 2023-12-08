@@ -134,6 +134,8 @@ function InputOTP(props) {
       if (index > 0) {
         document.getElementsByName(`otp-${index - 1}`)[0].focus();
       }
+    } else if (e.key === "Enter") {
+      handleLogin();
     }
   };
 
@@ -218,6 +220,7 @@ function InputOTP(props) {
             onChange={(e) => handleChange(index, e)}
             onKeyDown={(e) => handleKeyDown(index, e)}
             maxLength={1}
+            autoComplete="off"
             name={`otp-${index}`}
           />
         ))}
