@@ -18,6 +18,12 @@ import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
 import ChooseDayPage from "../pages/customer/ChooseDayPage";
 import ConfirmBookingInformation from "../pages/customer/ConfirmBookingInformation";
 import PaymentOrders from "../pages/customer/PaymentOrders";
+import PatientListPage from "../pages/Admin/PatientManagement/PatientListPage";
+import PatientDetailPage from "../pages/Admin/PatientManagement/PatientDetailPage";
+import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
+import AccountDetailPage from "../pages/Admin/AccountManagement/AccountDetailPage";
+import RoomListPage from "../pages/Admin/RoomManagement/RoomListPage";
+import RoomDetailPage from "../pages/Admin/RoomManagement/RoomDetailPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -73,7 +79,9 @@ function Router(props) {
         },
         {
           path: "/user",
-          element: <ProtectedLayout forRole={["User", "Admin"]} />,
+          element: (
+            <ProtectedLayout forRole={["User", "Admin", "Doctor", "Nurse"]} />
+          ),
           children: [
             {
               element: <PageUser />,
@@ -110,12 +118,28 @@ function Router(props) {
           element: null,
         },
         {
+          path: "account-management",
+          element: <AccountListPage />,
+        },
+        {
+          path: "account-management/detail",
+          element: <AccountDetailPage />,
+        },
+        {
           path: "staff-management",
           element: <StaffListPage />,
         },
         {
           path: "staff-management/detail",
           element: <StaffDetailPage />,
+        },
+        {
+          path: "room-management",
+          element: <RoomListPage />,
+        },
+        {
+          path: "room-management/detail",
+          element: <RoomDetailPage />,
         },
         {
           path: "department-management",
@@ -127,7 +151,11 @@ function Router(props) {
         },
         {
           path: "patient-management",
-          element: null,
+          element: <PatientListPage />,
+        },
+        {
+          path: "patient-management/detail",
+          element: <PatientDetailPage />,
         },
         {
           path: "payment-management",

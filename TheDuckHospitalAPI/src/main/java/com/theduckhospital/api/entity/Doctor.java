@@ -1,21 +1,26 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.Degree;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.OneToMany;
+import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Setter
+@Getter
 public class Doctor extends Staff{
     @Nullable
-    private String degree;
+    private Degree degree;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
@@ -23,4 +28,9 @@ public class Doctor extends Staff{
     private Department department;
 
     private boolean headOfDepartment = false;
+
+    @OneToMany(mappedBy = "doctor")
+    @ToStringExclude
+    @JsonBackReference
+    private List<DoctorSchedule> doctorSchedule = new ArrayList<>();
 }

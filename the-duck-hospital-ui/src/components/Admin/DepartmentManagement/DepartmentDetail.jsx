@@ -2,17 +2,63 @@ import styled from "@emotion/styled";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   Stack,
+  TextField,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../DialogConfirm";
+import CloseIcon from "@mui/icons-material/Close";
+
+const doctors = [
+  {
+    value: "123",
+    label: "Nguyễn Quốc Bảo",
+  },
+  {
+    value: "124",
+    label: "Quốc Bảo",
+  },
+  {
+    value: "125",
+    label: "Bảo Nguyễn",
+  },
+  {
+    value: "126",
+    label: "Nguyễn Bảo",
+  },
+  {
+    value: "127",
+    label: "Bảo Quốc Nguyễn",
+  },
+  {
+    value: "128",
+    label: "Bảo Nguyễn Quốc",
+  },
+  {
+    value: "129",
+    label: "Bảo Quốc",
+  },
+  {
+    value: "120",
+    label: "Bảo",
+  },
+  {
+    value: "111",
+    label: "Chỉ có Bảo làm trưởng khoa",
+  },
+];
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
@@ -40,13 +86,43 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
 }));
 
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    paddingX: theme.spacing(0),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(2),
+  },
+}));
+
+const InputText = styled(TextField)(({ theme }) => ({
+  borderRadius: "4px !important",
+  paddingTop: "2px !important",
+  "& .MuiInputBase-input": {
+    // Các thuộc tính của .MuiInputBase-input ở đây
+    fontSize: "14px !important",
+    padding: "18px 12px !important",
+  },
+}));
+
+const MultilineText = styled(TextField)(({ theme }) => ({
+  borderRadius: "4px !important",
+  paddingY: "0px !important",
+  "& .MuiInputBase-input": {
+    // Các thuộc tính của .MuiInputBase-input ở đây
+    fontSize: "14px !important",
+  },
+}));
+
 function DepartmentDetail(props) {
   const { department, headDoctor } = props;
-  let status = department.isDeleted;
+  let status = department.deleted;
   const [statusDepartment, setStatusDepartment] = useState(false)
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [departmentEdit, setDepartmentEdit] = useState({});
 
   useEffect(() => {
     setEditStatus(status);
@@ -88,6 +164,15 @@ function DepartmentDetail(props) {
   //   }
   // };
 
+  const handleEditButtonClick = () => {
+    setOpenPopup(true);
+    setDepartmentEdit({
+      departmentName: department.departmentName,
+      staffId: headDoctor.staffId,
+      description: department.description,
+    })
+  };
+
   return (
     <Stack
       sx={{
@@ -95,8 +180,31 @@ function DepartmentDetail(props) {
         paddingTop: 1,
       }}
     >
-      <BoxStyle>
-        <TieuDe>Thông tin cơ bản</TieuDe>
+      <BoxStyle
+        component={Grid}
+        alignItems={"center"}
+        sx={{
+          borderBottom: "1px solid #E0E0E0",
+        }}
+        container
+      >
+        <Grid item xs={6}>
+          <TieuDe>Thông tin cơ bản</TieuDe>
+        </Grid>
+        <Grid item xs={6} textAlign={"right"}>
+          <Button
+            variant="text"
+            sx={{
+              paddingRight: "0px !important",
+              color: "#4d4f53",
+              fontWeight: "600 !important",
+              fontSize: "14px !important",
+            }}
+            onClick={handleEditButtonClick}
+          >
+            Chỉnh sửa
+          </Button>
+        </Grid>
       </BoxStyle>
 
       <BoxStyle>
@@ -220,6 +328,149 @@ function DepartmentDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
+      <BootstrapDialog
+        open={openPopup}
+        onClose={() => setOpenPopup(false)}
+        aria-labelledby="customized-dialog-title"
+        sx={{
+          maxHeight: "calc(100vh - 64px)",
+        }}
+      >
+        <DialogTitle sx={{ m: 0, px: 4, py: 2 }} id="customized-dialog-title">
+          <Typography
+            style={{
+              fontSize: "24px",
+            }}
+            sx={{
+              fontWeight: 700,
+            }}
+          >
+            Chỉnh sửa
+          </Typography>
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={() => setOpenPopup(false)}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "text.secondary",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent
+          style={{
+            padding: "0px 32px 0px 32px",
+            width: isSmallScreen ? "30rem" : "35rem",
+          }}
+        >
+          <Stack direction={"column"} spacing={2}>
+          <Stack direction={"row"} spacing={1}>
+              <Box width="52%">
+                <Typography
+                  variant="body1"
+                  style={{
+                    fontSize: "14px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Tên khoa
+                </Typography>
+                <InputText
+                  sx={{
+                    size: "small",
+                    padding: "0 !important",
+                    fontSize: "14px !important",
+                  }}
+                  autoFocus
+                  required
+                  fullWidth
+                  value={departmentEdit.departmentName}
+                  onChange={(e) => setDepartmentEdit((prev) => {
+                    return {
+                      ...prev,
+                      departmentName: e.target.value
+                    };
+                  })}
+                />
+              </Box>
+              <Box width="48%">
+                <Typography
+                  variant="body1"
+                  style={{
+                    fontSize: "14px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Trưởng khoa
+                </Typography>
+                <FormControl fullWidth>
+                  <Select
+                    value={departmentEdit.staffId}
+                    onChange={(e) =>
+                      setDepartmentEdit((prev) => {
+                        return {
+                          ...prev,
+                          staffId: e.target.value,
+                        };
+                      })
+                    }
+                    displayEmpty
+                    required
+                    size="small"
+                    sx={{
+                      fontSize: "14px !important",
+                    }}
+                    inputProps={{ "aria-label": "Without label" }}
+                  >
+                    {doctors?.map((item, index) => (
+                      <MenuItem value={item.value} key={index} >
+                        <Typography style={{ fontSize: "14px" }}>
+                          {item.label}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              </Stack>
+            <Box>
+              <Typography
+                variant="body1"
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "4px",
+                }}
+              >
+                Mô tả
+              </Typography>
+              <MultilineText
+                className="multiline-text"
+                multiline
+                rows={4}
+                fullWidth
+                value={departmentEdit.description}
+                onChange={(e) => {
+                  setDepartmentEdit((prev) => {
+                    return {
+                      ...prev,
+                      description: e.target.value,
+                    };
+                  })
+                }}
+              />
+            </Box>
+
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus>
+            Cập nhật
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
     </Stack>
   );
 }

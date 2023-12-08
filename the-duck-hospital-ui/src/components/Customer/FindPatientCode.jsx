@@ -5,7 +5,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
-  minWidth: "400px",
   "& .MuiOutlinedInput-root": {
     padding: "11px 8px",
   },
@@ -16,15 +15,20 @@ const CustomButton = styled(Button)(({ theme }) => ({
   toUpperCase: "none",
   fontSize: "14px !important",
   textTransform: "none",
-  minWidth: "400px",
+  width: "100%",
   background: "#00a0ff",
   ":hover": {
     background: "#1997e0",
   },
 }));
+
+const GridBreak = styled(Grid)(({ theme }) => ({
+  width: "100%",
+}));
+
 function FindPatientCode(props) {
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} justifyContent={"center"}>
       <Grid item xs={12}>
         <Typography
           variant="body1"
@@ -46,6 +50,7 @@ function FindPatientCode(props) {
           justifyContent: "center",
           alignItems: "center",
         }}
+        md={6}
       >
         <CustomTextField
           size="medium"
@@ -53,32 +58,38 @@ function FindPatientCode(props) {
           id="outlined-basic"
           required
           placeholder="Nhập số điện thoại"
+          sx={{
+            width: "100% !important",
+          }}
         />
       </Grid>
-      <Grid item xs={12}>
+
+      <GridBreak />
+      <Grid item xs={12} md={6}>
         <CustomButton variant="contained">
           <SearchIcon style={{ marginRight: "5px" }} />
           Tìm kiếm
         </CustomButton>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+
+      <GridBreak />
+      <Grid item xs={12} md={6}>
         <Stack
           direction={"row"}
           spacing={0.5}
           sx={{
             alignItems: "center",
-            minWidth: "400px",
             cursor: "pointer",
             "&:hover": {
               color: "#0b5394",
+            },
+
+            xs: {
+              width: "100%",
+            },
+
+            md: {
+              minWidth: "400px",
             },
           }}
         >

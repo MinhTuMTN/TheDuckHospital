@@ -1,5 +1,11 @@
-import { Box, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
-
+import {
+  Box,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,11 +13,11 @@ import DepartmentDetail from "../../../components/Admin/DepartmentManagement/Dep
 import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
 
 const department = {
-  departmentName: "Cardiology",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
+  departmentName: "Khoa Nhi",
+  description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
   doctors: [
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Doctor 1",
       phoneNumber: "0123456789",
       headOfDepartment: false,
@@ -19,6 +25,7 @@ const department = {
       deleted: false,
     },
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Doctor 2",
       phoneNumber: "0123456788",
       headOfDepartment: false,
@@ -26,6 +33,7 @@ const department = {
       deleted: false,
     },
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Doctor 3",
       phoneNumber: "0123456787",
       headOfDepartment: false,
@@ -33,6 +41,7 @@ const department = {
       deleted: false,
     },
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Doctor 4",
       phoneNumber: "0123456786",
       headOfDepartment: false,
@@ -40,6 +49,7 @@ const department = {
       deleted: false,
     },
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Head Doctor",
       phoneNumber: "0123456785",
       headOfDepartment: true,
@@ -47,6 +57,7 @@ const department = {
       deleted: false,
     },
     {
+      staffId: "123",
       fullName: "Nguyễn Văn Doctor 5",
       phoneNumber: "0123456784",
       headOfDepartment: false,

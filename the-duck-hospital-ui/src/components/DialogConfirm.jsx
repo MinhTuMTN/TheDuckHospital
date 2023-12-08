@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import {
   Button,
   Dialog,
@@ -24,6 +25,14 @@ DialogConfirm.propTypes = {
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const CustomButton = styled(Button)(({ theme }) => ({
+  borderRadius: "10px",
+  padding: "8px 30px",
+  toUpperCase: "none",
+  fontSize: "14px !important",
+  textTransform: "none",
+}));
 
 function DialogConfirm(props) {
   const [open, setOpen] = React.useState(props.open);
@@ -54,18 +63,41 @@ function DialogConfirm(props) {
         <span style={{ fontSize: "1.5rem" }}>{props.title}</span>
       </DialogTitle>
       <DialogContent>
-        <DialogContentText>{props.content}</DialogContentText>
+        <DialogContentText color={"template.darker"}>
+          {props.content}
+        </DialogContentText>
       </DialogContent>
       <DialogActions style={{ padding: "16px 24px" }}>
         {props.cancelText && (
-          <Button onClick={handleCancel} variant="outlined">
+          <CustomButton
+            variant="contained"
+            sx={{
+              backgroundColor: "rgba(253, 57, 122, 0.229)",
+              color: "#fd397a",
+              marginRight: "20px",
+              "&:hover": {
+                backgroundColor: "rgba(253, 57, 122, 0.229)",
+              },
+            }}
+            onClick={handleCancel}
+          >
             {props.cancelText}
-          </Button>
+          </CustomButton>
         )}
         {props.okText && (
-          <Button onClick={handleOk} variant="outlined">
+          <CustomButton
+            variant="contained"
+            sx={{
+              backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+              color: "#fff", // Màu chữ
+              "&:hover": {
+                backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+              },
+            }}
+            onClick={handleOk}
+          >
             {props.okText}
-          </Button>
+          </CustomButton>
         )}
       </DialogActions>
     </Dialog>

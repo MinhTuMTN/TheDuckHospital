@@ -28,6 +28,9 @@ public class Patient {
     @OneToMany(mappedBy = "patient")
     private List<PatientProfile> patientProfile;
 
+    @OneToMany(mappedBy = "patient")
+    private List<MedicalExaminationRecord> medicalExaminationRecords;
+
     @PreUpdate
     private void onUpdate() {
         this.lastModifiedAt = new Date();

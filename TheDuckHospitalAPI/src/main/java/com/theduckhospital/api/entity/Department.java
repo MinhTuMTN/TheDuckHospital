@@ -35,6 +35,11 @@ public class Department {
     @JsonBackReference
     private List<Room> rooms;
 
+    @OneToMany(mappedBy = "department")
+    @ToString.Exclude
+    @JsonBackReference
+    private List<Service> services;
+
     @PrePersist
     private void onCreate() {
         this.createdAt = new Date();
