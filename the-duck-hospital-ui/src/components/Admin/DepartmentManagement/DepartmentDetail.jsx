@@ -18,7 +18,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../DialogConfirm";
+import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 
 const doctors = [
@@ -117,7 +117,7 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 function DepartmentDetail(props) {
   const { department, headDoctor } = props;
   let status = department.deleted;
-  const [statusDepartment, setStatusDepartment] = useState(false)
+  const [statusDepartment, setStatusDepartment] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -133,8 +133,7 @@ function DepartmentDetail(props) {
     setEditStatus(event.target.value);
     if (statusDepartment !== event.target.value) {
       setDisabledButton(false);
-    }
-    else {
+    } else {
       setDisabledButton(true);
     }
   };
@@ -170,7 +169,7 @@ function DepartmentDetail(props) {
       departmentName: department.departmentName,
       staffId: headDoctor.staffId,
       description: department.description,
-    })
+    });
   };
 
   return (
@@ -268,16 +267,10 @@ function DepartmentDetail(props) {
                 onChange={handleStatusChange}
                 className="custom-select"
               >
-                <MenuItem
-                  value={false}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={false} style={{ fontSize: "14px" }}>
                   Đang hoạt động
                 </MenuItem>
-                <MenuItem
-                  value={true}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={true} style={{ fontSize: "14px" }}>
                   Đã khóa
                 </MenuItem>
               </Select>
@@ -367,7 +360,7 @@ function DepartmentDetail(props) {
           }}
         >
           <Stack direction={"column"} spacing={2}>
-          <Stack direction={"row"} spacing={1}>
+            <Stack direction={"row"} spacing={1}>
               <Box width="52%">
                 <Typography
                   variant="body1"
@@ -388,12 +381,14 @@ function DepartmentDetail(props) {
                   required
                   fullWidth
                   value={departmentEdit.departmentName}
-                  onChange={(e) => setDepartmentEdit((prev) => {
-                    return {
-                      ...prev,
-                      departmentName: e.target.value
-                    };
-                  })}
+                  onChange={(e) =>
+                    setDepartmentEdit((prev) => {
+                      return {
+                        ...prev,
+                        departmentName: e.target.value,
+                      };
+                    })
+                  }
                 />
               </Box>
               <Box width="48%">
@@ -426,7 +421,7 @@ function DepartmentDetail(props) {
                     inputProps={{ "aria-label": "Without label" }}
                   >
                     {doctors?.map((item, index) => (
-                      <MenuItem value={item.value} key={index} >
+                      <MenuItem value={item.value} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
                           {item.label}
                         </Typography>
@@ -435,7 +430,7 @@ function DepartmentDetail(props) {
                   </Select>
                 </FormControl>
               </Box>
-              </Stack>
+            </Stack>
             <Box>
               <Typography
                 variant="body1"
@@ -458,17 +453,14 @@ function DepartmentDetail(props) {
                       ...prev,
                       description: e.target.value,
                     };
-                  })
+                  });
                 }}
               />
             </Box>
-
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus>
-            Cập nhật
-          </Button>
+          <Button autoFocus>Cập nhật</Button>
         </DialogActions>
       </BootstrapDialog>
     </Stack>

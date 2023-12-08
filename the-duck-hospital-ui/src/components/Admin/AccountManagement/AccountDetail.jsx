@@ -12,7 +12,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../DialogConfirm";
+import DialogConfirm from "../../General/DialogConfirm";
+
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
@@ -43,7 +44,7 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 function AccountDetail(props) {
   const { account } = props;
   let status = account.deleted;
-  const [statusAccount, setStatusAccount] = useState(false)
+  const [statusAccount, setStatusAccount] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -57,8 +58,7 @@ function AccountDetail(props) {
     setEditStatus(event.target.value);
     if (statusAccount !== event.target.value) {
       setDisabledButton(false);
-    }
-    else {
+    } else {
       setDisabledButton(true);
     }
   };
@@ -160,16 +160,10 @@ function AccountDetail(props) {
                 onChange={handleStatusChange}
                 className="custom-select"
               >
-                <MenuItem
-                  value={false}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={false} style={{ fontSize: "14px" }}>
                   Đang hoạt động
                 </MenuItem>
-                <MenuItem
-                  value={true}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={true} style={{ fontSize: "14px" }}>
                   Đã khóa
                 </MenuItem>
               </Select>

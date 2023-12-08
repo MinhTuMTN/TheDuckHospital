@@ -5,9 +5,14 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [token, setToken_] = useState(localStorage.getItem("token"));
+  const [fullName, setFullName_] = useState(localStorage.getItem("fullName"));
 
   const setToken = (newToken) => {
     setToken_(newToken);
+  };
+
+  const setFullName = (newFullName) => {
+    setFullName_(newFullName);
   };
 
   useEffect(() => {
@@ -20,13 +25,22 @@ const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
+  useEffect(() => {
+    if (fullName) {
+      localStorage.setItem("fullName", fullName);
+    } else {
+      localStorage.removeItem("fullName");
+    }
+  }, [fullName]);
   // Memoized value of the authentication context
   const contextValue = useMemo(
     () => ({
       token,
       setToken,
+      fullName,
+      setFullName,
     }),
-    [token]
+    [token, fullName]
   );
 
   // Provide the authentication context to the children components
