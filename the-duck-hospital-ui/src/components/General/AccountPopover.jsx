@@ -12,7 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   fontSize: "14px",
@@ -33,7 +34,8 @@ const CustomMenuItemLogOut = styled(MenuItem)(({ theme }) => ({
 }));
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
-  const { setToken } = useAuth();
+  const { setToken, fullName } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Popover
@@ -67,7 +69,7 @@ function AccountPopover(props) {
               variant="h6"
               sx={{ fontSize: "14px", fontWeight: "bold" }}
             >
-              Nguyễn Ngọc Tuyết Vi
+              {fullName}
             </Typography>
           </Stack>
         </Stack>
@@ -81,7 +83,7 @@ function AccountPopover(props) {
             },
           }}
         >
-          <CustomMenuItem>
+          <CustomMenuItem onClick={() => navigate("/user/patient-records")}>
             <InfoOutlinedIcon
               fontSize="small"
               sx={{
@@ -90,7 +92,7 @@ function AccountPopover(props) {
             />
             Hồ sơ bệnh nhân
           </CustomMenuItem>
-          <CustomMenuItem>
+          <CustomMenuItem onClick={() => navigate("/user/medical-bills")}>
             <NoteAddOutlinedIcon
               fontSize="small"
               sx={{

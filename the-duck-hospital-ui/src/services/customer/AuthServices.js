@@ -23,3 +23,7 @@ export const register = async (data) => {
 export const checkToken = async () => {
   return get("/auth/check-token");
 };
+
+export const checkInfo = async () => {
+  return get("/auth/check-info");
+};

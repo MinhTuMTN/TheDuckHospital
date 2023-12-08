@@ -2,14 +2,12 @@ import styled from "@emotion/styled";
 import { Box, CardMedia, Paper, Stack } from "@mui/material";
 import React, { useEffect } from "react";
 import InputPhoneNumber from "../../components/Auth/InputPhoneNumber";
-import Page from "../../components/Page";
+import Page from "../../components/General/Page";
 import InputPassword from "../../components/Auth/InputPassword";
 import InputOTP from "../../components/Auth/InputOTP";
 import Register from "../../components/Auth/Register";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
-//import InputOTP from "../../components/Auth/InputOTP";
-//import InputPassword from "../../components/Auth/InputPassword";
 
 const urlImage =
   "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701430503/THEDUCK__1_-removebg-preview_iag4sd.png";
@@ -68,7 +66,7 @@ function LoginPage(props) {
   useEffect(() => {
     if (token) {
       setTimeout(() => {
-        window.location.href = "/user";
+        window.location.href = "/";
       }, 200);
     }
   }, [token, navigate]);

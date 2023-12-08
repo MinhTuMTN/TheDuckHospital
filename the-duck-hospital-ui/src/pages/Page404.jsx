@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import Icon404 from "../assets/icon_404.jpg";
-import Page from "../components/Page";
+import Page from "../components/General/Page";
 
 const RootPage404 = styled(Page)(({ theme }) => ({
   display: "flex",

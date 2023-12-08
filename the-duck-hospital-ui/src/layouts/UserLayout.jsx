@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { PersonAddOutlined } from "@mui/icons-material";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -16,8 +17,9 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import CustomLink from "../components/General/CustomLink";
 
 const Sidebar = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -26,18 +28,17 @@ const Sidebar = styled(Box)(({ theme }) => ({
 const Right = styled(Paper)(({ theme }) => ({
   display: "flex",
   width: "100%",
-  height: "100vh",
 }));
 
-const CustomListItemButton = styled(ListItemButton)(({ theme, isActive }) => ({
-  backgroundColor: isActive ? "#fff" : "",
-  color: isActive ? "#1da1f2" : "#000",
+const CustomListItemButton = styled(ListItemButton)(({ theme, isactive }) => ({
+  backgroundColor: isactive === "true" ? "#fff" : "",
+  color: isactive === "true" ? "#1da1f2" : "#000",
   width: "100%",
   padding: "4px 16px",
-  boxShadow: isActive ? "0px 4px 4px rgba(0, 0, 0, 0.25)" : "",
+  boxShadow: isactive === "true" ? "0px 4px 4px rgba(0, 0, 0, 0.25)" : "",
 
   svg: {
-    color: isActive ? "#1da1f2" : "#000",
+    color: isactive === "true" ? "#1da1f2" : "#000",
   },
 
   "&:hover": {
@@ -54,13 +55,13 @@ const CustomListItemButton = styled(ListItemButton)(({ theme, isActive }) => ({
   },
 
   span: {
-    fontWeight: isActive ? "bold" : "normal",
+    fontWeight: isactive === "true" ? "bold" : "normal",
   },
   borderRadius: ".5rem",
   marginBottom: ".5rem",
 }));
 
-const CustomListItemIcon = styled(ListItemIcon)(({ theme, isActive }) => ({
+const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   color: "black",
   transform: "scale(1.1)",
 }));
@@ -69,25 +70,25 @@ const sidebarItems = [
   {
     display: "Hồ sơ bệnh nhân",
     icon: <BadgeOutlinedIcon />,
-    // to: '/user/patient-records',
+    to: "/user/patient-records",
     section: "PatientRecords",
   },
   {
     display: "Phiếu khám bệnh",
     icon: <ReceiptLongOutlinedIcon />,
-    // to: '/user/medical-bills',
+    to: "/user/medical-bills",
     section: "MedicalBills",
   },
   {
     display: "Thông báo",
     icon: <NotificationsNoneOutlinedIcon />,
-    // to: '/user/notifications',
+    to: "/user/notifications",
     section: "Notifications",
   },
   {
     display: "Lịch sử thanh toán",
     icon: <HistoryOutlinedIcon />,
-    // to: '/user/payment-history',
+    to: "/user/payment-history",
     section: "PaymentHistory",
   },
 ];
@@ -98,23 +99,26 @@ const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   color: theme.palette.oldPrimaryDarker.main,
 }));
 
-function PageUser(props) {
+function UserLayout() {
+  const navigate = useNavigate();
   const [section, setSection] = useState("PatientRecords");
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-
-  useEffect(() => {
-    console.log(section);
-  }, [section]);
+  const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
   const breakcrumbs = [
-    <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
-    <CustomTextBreakcrumb key={2}>Thông tin tài khoản</CustomTextBreakcrumb>,
+    <CustomLink to="/" key={1}>
+      <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
+    </CustomLink>,
+    <CustomTextBreakcrumb key={3}>
+      {sidebarItems.find((s) => s.section === section).display}
+    </CustomTextBreakcrumb>,
   ];
   return (
     <Box
       sx={{
         paddingX: isLgUp ? 22 : 2,
         py: 3,
+        width: "calc(100% + 8px)",
         borderTop: "1px solid #e0e0e0",
         backgroundColor: "#f1f9fe",
       }}
@@ -123,10 +127,42 @@ function PageUser(props) {
         {breakcrumbs}
       </Breadcrumbs>
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {isLgUp && (
-          <Grid item md={2.5}>
+        {(isLgUp || isMdUp) && (
+          <Grid item md={2.8}>
             <Sidebar>
               <List sx={{ width: "100%" }}>
+                <ListItem
+                  disablePadding
+                  key={`add-profile`}
+                  sx={{
+                    width: "100%",
+                  }}
+                >
+                  <ListItemButton
+                    sx={{
+                      backgroundColor: "normal1.main",
+                      width: "100%",
+                      padding: "4px 16px",
+                      borderRadius: ".5rem",
+                      marginBottom: ".9rem",
+
+                      "&:hover": {
+                        backgroundColor: "normal1.main",
+                      },
+                    }}
+                    onClick={() => {}}
+                  >
+                    <CustomListItemIcon>
+                      <PersonAddOutlined style={{ color: "#fff" }} />
+                    </CustomListItemIcon>
+                    <ListItemText
+                      style={{ color: "#fff", fontWeight: "bold !important" }}
+                    >
+                      <Typography fontWeight={"bold"}>Thêm hồ sơ</Typography>
+                    </ListItemText>
+                  </ListItemButton>
+                </ListItem>
+
                 {sidebarItems.map((item, index) => (
                   <ListItem
                     disablePadding
@@ -134,9 +170,10 @@ function PageUser(props) {
                     sx={{ width: "100%" }}
                   >
                     <CustomListItemButton
-                      isActive={section === item.section}
+                      isactive={section === item.section ? "true" : "false"}
                       onClick={() => {
                         setSection(item.section);
+                        navigate(item.to);
                       }}
                     >
                       <CustomListItemIcon>{item.icon}</CustomListItemIcon>
@@ -148,7 +185,7 @@ function PageUser(props) {
             </Sidebar>
           </Grid>
         )}
-        <Grid item xs={12} md={9.5}>
+        <Grid item xs={12} md={9.2}>
           <Right>
             <Outlet />
           </Right>
@@ -158,4 +195,4 @@ function PageUser(props) {
   );
 }
 
-export default PageUser;
+export default UserLayout;

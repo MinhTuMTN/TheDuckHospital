@@ -9,6 +9,8 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.services.IMSGraphServices;
 import okhttp3.Request;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -20,9 +22,11 @@ import java.util.UUID;
 @Service
 public class MSGraphServicesImpl implements IMSGraphServices {
     private final Environment environment;
+    private final JavaMailSender emailSender;
 
-    public MSGraphServicesImpl(Environment environment) {
+    public MSGraphServicesImpl(Environment environment, JavaMailSender emailSender) {
         this.environment = environment;
+        this.emailSender = emailSender;
     }
     @Override
     public String createMSGraphUser(String fullName, String email, String password) {
@@ -81,45 +85,61 @@ public class MSGraphServicesImpl implements IMSGraphServices {
     @Override
     public boolean sendEmail(String recipient, String subject, String content) {
         try {
-            final GraphServiceClient<Request> graphClient = createClient();
-
-            Message message = new Message();
-
-            // Subject of the email
-            message.subject = subject;
-
-            // Body of the email
-            ItemBody body = new ItemBody();
-            body.contentType = BodyType.TEXT;
-            body.content = content;
-            message.body = body;
-
-            // Recipient of the email
-            LinkedList<Recipient> recipientsList = new LinkedList<Recipient>();
-            Recipient recipientObj = new Recipient();
-            EmailAddress emailAddress = new EmailAddress();
-            emailAddress.address = recipient;
-            recipientObj.emailAddress = emailAddress;
-            recipientsList.add(recipientObj);
-            message.toRecipients = recipientsList;
-
-            Objects.requireNonNull(graphClient
-                            .users()
-                            .byId(Objects.requireNonNull(
-                                    environment.getProperty("ms.graph.admin-id")
-                            )))
-                    .sendMail(UserSendMailParameterSet
-                            .newBuilder()
-                            .withMessage(message)
-                            .build())
-                    .buildRequest()
-                    .post();
-
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("nguyenminhtu00030@gmail.com");
+            message.setTo(recipient);
+            message.setSubject(subject);
+            message.setText(content);
+            emailSender.send(message);
             return true;
         } catch (Exception e) {
-            throw new BadRequestException("An error occurred while sending email");
+            e.printStackTrace();
+            return false;
         }
     }
+
+//    @Override
+//    public boolean sendEmail(String recipient, String subject, String content) {
+//        try {
+//            final GraphServiceClient<Request> graphClient = createClient();
+//
+//            Message message = new Message();
+//
+//            // Subject of the email
+//            message.subject = subject;
+//
+//            // Body of the email
+//            ItemBody body = new ItemBody();
+//            body.contentType = BodyType.TEXT;
+//            body.content = content;
+//            message.body = body;
+//
+//            // Recipient of the email
+//            LinkedList<Recipient> recipientsList = new LinkedList<Recipient>();
+//            Recipient recipientObj = new Recipient();
+//            EmailAddress emailAddress = new EmailAddress();
+//            emailAddress.address = recipient;
+//            recipientObj.emailAddress = emailAddress;
+//            recipientsList.add(recipientObj);
+//            message.toRecipients = recipientsList;
+//
+//            Objects.requireNonNull(graphClient
+//                            .users()
+//                            .byId(Objects.requireNonNull(
+//                                    environment.getProperty("ms.graph.admin-id")
+//                            )))
+//                    .sendMail(UserSendMailParameterSet
+//                            .newBuilder()
+//                            .withMessage(message)
+//                            .build())
+//                    .buildRequest()
+//                    .post();
+//
+//            return true;
+//        } catch (Exception e) {
+//            throw new BadRequestException("An error occurred while sending email");
+//        }
+//    }
 
     private GraphServiceClient<Request> createClient() throws Exception {
         final String clientId = environment.getProperty("ms.graph.client-id");

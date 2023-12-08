@@ -1,10 +1,10 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
-import Loading from "../components/Loading";
+import Loading from "../components/General/Loading";
 import MainLayout from "../layouts/MainLayout";
 import LoginPage from "../pages/auth/LoginPage";
 import Home from "../pages/customer/Home";
-import PageUser from "../pages/PageUser";
+import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
 import ProtectedLayout from "../layouts/ProtectedLayout";
@@ -21,6 +21,10 @@ import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
 import AccountDetailPage from "../pages/Admin/AccountManagement/AccountDetailPage";
 import RoomListPage from "../pages/Admin/RoomManagement/RoomListPage";
 import RoomDetailPage from "../pages/Admin/RoomManagement/RoomDetailPage";
+import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
+import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
+import NotificationPage from "../pages/customer/NotificationPage";
+import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -61,14 +65,33 @@ function Router(props) {
           element: <NotFound />,
         },
         {
-          path: "/user",
+          path: "/",
           element: (
             <ProtectedLayout forRole={["User", "Admin", "Doctor", "Nurse"]} />
           ),
           children: [
             {
-              element: <PageUser />,
-              index: true,
+              element: <UserLayout />,
+              path: "/user",
+              children: [
+                {
+                  path: "patient-records",
+                  element: <PatientRecordsPage />,
+                  index: true,
+                },
+                {
+                  path: "medical-bills",
+                  element: <MedicalBillsPage />,
+                },
+                {
+                  path: "notifications",
+                  element: <NotificationPage />,
+                },
+                {
+                  path: "payment-history",
+                  element: <PaymentHistoryPage />,
+                },
+              ],
             },
           ],
         },

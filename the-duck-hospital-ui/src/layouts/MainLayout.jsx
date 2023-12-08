@@ -2,8 +2,8 @@ import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
 import RightNavBar from "../components/Customer/RightNavBar";
-import Footer from "../components/Footer";
-import NavBar from "../components/NavBar";
+import Footer from "../components/General/Footer";
+import NavBar from "../components/General/NavBar";
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",
