@@ -1,16 +1,21 @@
 import styled from "@emotion/styled";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import AlternateEmailOutlinedIcon from "@mui/icons-material/AlternateEmailOutlined";
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
 import {
   Box,
-  Button,
   Grid,
-  IconButton,
   Paper,
   Stack,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
+import GridInfo from "./GridInfo";
 
 const Header = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, #5ab2f7, #12cff3)`,
@@ -47,13 +52,12 @@ const Body = styled(Grid)(({ theme }) => ({
   },
 }));
 
-const CustomTypographyValue = styled(Typography)(({ theme }) => ({
-  fontSize: "16px",
-  fontWeight: "500",
-}));
-
 const CustomGrid = styled(Grid)(({ theme }) => ({
   textAlign: "left",
+  alignItems: "center",
+  display: "flex",
+  flexDirection: "row",
+  width: "100%",
 }));
 
 function ConfirmPatientInfo(props) {
@@ -81,146 +85,99 @@ function ConfirmPatientInfo(props) {
             Thông tin bệnh nhân
           </Typography>
         </Header>
-        {isLgUp ? (
-          <>
-            <Body container>
-              <Grid
-                xs={12}
-                item
-                container
-                spacing={1}
-                sx={{ borderBottom: "1px solid #000", paddingBottom: "8px" }}
-              >
-                <CustomGrid item xs={4}>
-                  <CustomTypographyValue>Chuyên khoa</CustomTypographyValue>
-                </CustomGrid>
-                <CustomGrid item xs={3}>
-                  <CustomTypographyValue>Bác sĩ</CustomTypographyValue>
-                </CustomGrid>
-                <CustomGrid item xs={2.5}>
-                  <CustomTypographyValue>Thời gian khám</CustomTypographyValue>
-                </CustomGrid>
-                <CustomGrid item xs={1.75}>
-                  <CustomTypographyValue>Tiền khám</CustomTypographyValue>
-                </CustomGrid>
-                <Grid item xs={0.75}>
-                  <CustomTypographyValue
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                    }}
-                  ></CustomTypographyValue>
-                </Grid>
-              </Grid>
-              <Grid xs={12} item container spacing={1}>
-                <CustomGrid item xs={4}>
-                  <Typography
-                    sx={{
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Khoa sản - Chuẩn đoán trước sinh
-                  </Typography>
-                </CustomGrid>
-                <CustomGrid item xs={3}>
-                  <Typography>Nguyễn Ngọc Tuyết Vi</Typography>
-                </CustomGrid>
-                <CustomGrid item xs={2.5}>
-                  <Typography>
-                    Buổi sáng <br /> 11/12/2023
-                  </Typography>
-                </CustomGrid>
-                <CustomGrid item xs={1.75}>
-                  <Typography>150.000đ</Typography>
-                </CustomGrid>
-                <Grid item xs={0.75} p={0}>
-                  <IconButton
-                    sx={{
-                      fontSize: "20px",
-                      ":hover": {
-                        backgroundColor: "#ec7e7e",
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    <DeleteOutlinedIcon
-                      style={{
-                        fonsSize: "10px",
-                      }}
-                    />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Body>
-          </>
-        ) : (
-          <>
-            <Body container spacing={0.7}>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Chuyên khoa:</Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  XƯƠNG KHỚP CHỈNH HÌNH
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Bác sĩ:</Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  Nguyễn Ngọc Tuyết Vi
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Thời gian khám:</Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  Buổi sáng 11/12/2023
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Tiền khám:</Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>150.000 đ</CustomTypographyValue>
-              </CustomGrid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  textAlign: "right",
-                  borderBottomLeftRadius: "8px !important",
-                  borderBottomRightRadius: "8px !important",
-                }}
-              >
-                <Button
-                  variant="contained"
+        <Body container alignItems="flex-start">
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"Họ và tên:"}
+              value={"Nguyễn Ngọc Tuyết Vi"}
+              icon={
+                <PersonOutlineOutlinedIcon
                   sx={{
-                    backgroundColor: "#fde4e4",
-                    borderRadius: "8px",
-                    color: "#fc5064",
-                    textTransform: "none",
-                    alignItems: "center",
-                    fontSize: "14px",
-                    "&:hover": {
-                      backgroundColor: "#fddfdf",
-                    },
+                    fontSize: "16px",
                   }}
-                >
-                  <DeleteOutlinedIcon
-                    sx={{
-                      fontSize: "20px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  Xoá
-                </Button>
-              </Grid>
-            </Body>
-          </>
-        )}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"Giới tính:"}
+              value={"Nữ"}
+              icon={
+                <WcOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"Ngày sinh:"}
+              value={"12/01/1999"}
+              icon={
+                <CalendarMonthOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"CMND:"}
+              value={"291234567"}
+              icon={
+                <BadgeOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"Email:"}
+              value={"20110758@student.hcmute.edu.vn"}
+              icon={
+                <AlternateEmailOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={6}>
+            <GridInfo
+              label={"Dân tộc:"}
+              value={"Kinh"}
+              icon={
+                <GroupsOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+          <CustomGrid item md={12}>
+            <GridInfo
+              label={"Địa chỉ:"}
+              value={"210 Lê Văn Thịnh, Phường Cát Lái, Quận 2, TP.HCM"}
+              icon={
+                <LocationOnOutlinedIcon
+                  sx={{
+                    fontSize: "16px",
+                  }}
+                />
+              }
+            />
+          </CustomGrid>
+        </Body>
       </Stack>
     </Paper>
   );

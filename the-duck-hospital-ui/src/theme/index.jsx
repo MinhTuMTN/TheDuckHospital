@@ -40,6 +40,7 @@ function CustomThemeProvider(props) {
         lightest: "#cfe2f3",
       },
       text: {
+        main: "#003553",
         teal: "#006451",
         green: "#EAFFD0",
         peach: "#F38181",

@@ -50,6 +50,7 @@ const Body = styled(Grid)(({ theme }) => ({
 const CustomTypographyValue = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
   fontWeight: "500",
+  color: theme.palette.text.main,
 }));
 
 const CustomGrid = styled(Grid)(({ theme }) => ({
@@ -117,15 +118,28 @@ function ConfirmBookingTable(props) {
                   <Typography
                     sx={{
                       textTransform: "uppercase",
+                      color: "#003553",
                     }}
                   >
                     Khoa sản - Chuẩn đoán trước sinh
                   </Typography>
                 </CustomGrid>
                 <CustomGrid item xs={3}>
-                  <Typography>Nguyễn Ngọc Tuyết Vi</Typography>
+                  <Typography
+                    sx={{
+                      color: "#003553",
+                    }}
+                  >
+                    Nguyễn Ngọc Tuyết Vi
+                  </Typography>
                 </CustomGrid>
-                <CustomGrid item xs={2.5}>
+                <CustomGrid
+                  item
+                  xs={2.5}
+                  sx={{
+                    color: "#003553",
+                  }}
+                >
                   <Typography>
                     Buổi sáng <br /> 11/12/2023
                   </Typography>
@@ -157,7 +171,13 @@ function ConfirmBookingTable(props) {
           <>
             <Body container spacing={0.7}>
               <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Chuyên khoa:</Typography>
+                <Typography
+                  sx={{
+                    color: "#003553",
+                  }}
+                >
+                  Chuyên khoa:
+                </Typography>
               </CustomGrid>
               <CustomGrid item md={10} xs={7} sm={9}>
                 <CustomTypographyValue>
@@ -165,7 +185,13 @@ function ConfirmBookingTable(props) {
                 </CustomTypographyValue>
               </CustomGrid>
               <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Bác sĩ:</Typography>
+                <Typography
+                  sx={{
+                    color: "#003553",
+                  }}
+                >
+                  Bác sĩ:
+                </Typography>
               </CustomGrid>
               <CustomGrid item md={10} xs={7} sm={9}>
                 <CustomTypographyValue>
@@ -173,7 +199,13 @@ function ConfirmBookingTable(props) {
                 </CustomTypographyValue>
               </CustomGrid>
               <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Thời gian khám:</Typography>
+                <Typography
+                  sx={{
+                    color: "#003553",
+                  }}
+                >
+                  Thời gian khám:
+                </Typography>
               </CustomGrid>
               <CustomGrid item md={10} xs={7} sm={9}>
                 <CustomTypographyValue>
@@ -181,7 +213,13 @@ function ConfirmBookingTable(props) {
                 </CustomTypographyValue>
               </CustomGrid>
               <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography>Tiền khám:</Typography>
+                <Typography
+                  sx={{
+                    color: "#003553",
+                  }}
+                >
+                  Tiền khám:
+                </Typography>
               </CustomGrid>
               <CustomGrid item md={10} xs={7} sm={9}>
                 <CustomTypographyValue>150.000 đ</CustomTypographyValue>
@@ -196,6 +234,7 @@ function ConfirmBookingTable(props) {
                 }}
               >
                 <Button
+                  size="small"
                   variant="contained"
                   sx={{
                     backgroundColor: "#fde4e4",
@@ -210,9 +249,10 @@ function ConfirmBookingTable(props) {
                   }}
                 >
                   <DeleteOutlinedIcon
-                    sx={{
-                      fontSize: "20px",
+                    style={{
+                      fontSize: "14px !important",
                       marginRight: "5px",
+                      color: "#fc5064",
                     }}
                   />
                   Xoá

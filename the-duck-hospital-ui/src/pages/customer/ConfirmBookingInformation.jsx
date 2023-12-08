@@ -11,6 +11,7 @@ import {
 import React from "react";
 import ConfirmBookingTable from "../../components/Customer/ConfirmBookingTable";
 import ConfirmPatientInfo from "../../components/Customer/ConfirmPatientInfo";
+import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -113,6 +114,28 @@ function ConfirmBookingInformation(props) {
           }}
         >
           <ConfirmPatientInfo />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            textAlign: "right",
+            paddingRight: isMdUp ? "75px" : "0",
+          }}
+        >
+          <CustomButton
+            variant="contained"
+            sx={{
+              width: isLgUp ? "10%" : "100px",
+              backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+              color: "#fff", // Màu chữ
+              "&:hover": {
+                backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+              },
+            }}
+          >
+            Xác nhận
+          </CustomButton>
         </Grid>
       </Grid>
     </Box>
