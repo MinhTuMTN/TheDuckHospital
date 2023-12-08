@@ -24,10 +24,16 @@ function PatientRecordItem(props) {
         xs: 1,
         sm: 2,
       }}
+      width={"100% !important"}
+      marginBottom={"5px"}
+      overflow={{
+        xs: "hidden",
+        sm: "auto",
+      }}
       elevation={2}
       borderRadius={3}
     >
-      <Grid container spacing={1.5}>
+      <Grid width={"100%"} container spacing={1.5}>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
           <Person2Outlined sx={{ marginRight: 1 }} />
           <Typography variant="body" fontSize={14}>

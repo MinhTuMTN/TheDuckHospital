@@ -27,7 +27,7 @@ const Sidebar = styled(Box)(({ theme }) => ({
 
 const Right = styled(Paper)(({ theme }) => ({
   display: "flex",
-  width: "100%",
+  minHeight: "55vh",
 }));
 
 const CustomListItemButton = styled(ListItemButton)(({ theme, isactive }) => ({
@@ -118,9 +118,10 @@ function UserLayout() {
       sx={{
         paddingX: isLgUp ? 22 : 2,
         py: 3,
-        width: "calc(100% + 8px)",
+        width: "100%",
         borderTop: "1px solid #e0e0e0",
         backgroundColor: "#f1f9fe",
+        overflow: "hidden",
       }}
     >
       <Breadcrumbs separator="›" aria-label="breadcrumb">
