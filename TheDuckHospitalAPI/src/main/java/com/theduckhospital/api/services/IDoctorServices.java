@@ -11,4 +11,5 @@ public interface IDoctorServices {
     Doctor getDoctorById(UUID staffId);
 
     List<Doctor> getDoctorNotInDepartment();
+    Doctor getDoctorByToken(String token);
 }

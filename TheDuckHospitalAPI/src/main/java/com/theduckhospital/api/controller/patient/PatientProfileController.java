@@ -1,7 +1,7 @@
 package com.theduckhospital.api.controller.patient;
 
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

@@ -23,7 +23,11 @@ import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
-import { deleteRoom, restoreRoom, updateRoom } from "../../../services/admin/RoomServices";
+import {
+  deleteRoom,
+  restoreRoom,
+  updateRoom,
+} from "../../../services/admin/RoomServices";
 import { useNavigate } from "react-router-dom";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -51,7 +55,7 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontSize: "15px !important",
   variant: "body1",
   fontWeight: "400 !important",
-  textAlign: 'justify',
+  textAlign: "justify",
 }));
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -162,7 +166,9 @@ function RoomDetail(props) {
       description: roomEdit.description,
     });
     if (response.success) {
-      enqueueSnackbar("Cập nhật thông tin phòng thành công!", { variant: "success" });
+      enqueueSnackbar("Cập nhật thông tin phòng thành công!", {
+        variant: "success",
+      });
       setOpenPopup(false);
       navigate(0);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
@@ -401,10 +407,7 @@ function RoomDetail(props) {
                 >
                   Khoa
                 </Typography>
-                <FormControl
-                  fullWidth
-                  error={roomEdit.departmentId === -1}
-                >
+                <FormControl fullWidth error={roomEdit.departmentId === -1}>
                   <Select
                     value={roomEdit.departmentId}
                     onChange={(e) =>
@@ -425,14 +428,16 @@ function RoomDetail(props) {
                     error={roomEdit.departmentId === -1}
                   >
                     {departments?.map((item, index) => (
-                      <MenuItem value={item.departmentId} key={index} >
+                      <MenuItem value={item.departmentId} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
                           {item.departmentName}
                         </Typography>
                       </MenuItem>
                     ))}
                   </Select>
-                  {roomEdit.departmentId === -1 && <FormHelperText>Khoa không được để trống</FormHelperText>}
+                  {roomEdit.departmentId === -1 && (
+                    <FormHelperText>Khoa không được để trống</FormHelperText>
+                  )}
                 </FormControl>
               </Box>
             </Stack>

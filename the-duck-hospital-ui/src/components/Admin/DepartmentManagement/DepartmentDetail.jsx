@@ -21,7 +21,12 @@ import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
-import { deleteDepartment, getActiveDoctorsDepartment, restoreDepartment, updateDepartment } from "../../../services/admin/DepartmentServices";
+import {
+  deleteDepartment,
+  getActiveDoctorsDepartment,
+  restoreDepartment,
+  updateDepartment,
+} from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
 import { deleteHeadOfDepartment } from "../../../services/admin/DoctorServices";
 
@@ -50,14 +55,14 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontSize: "15px !important",
   variant: "body1",
   fontWeight: "400 !important",
-  textAlign: 'justify',
+  textAlign: "justify",
 }));
 
 const DeleteText = styled(Typography)(({ theme }) => ({
   fontSize: "15px !important",
   variant: "body1",
   fontWeight: "400 !important",
-  textAlign: 'justify',
+  textAlign: "justify",
   textDecoration: "underline",
   color: "blue",
   cursor: "pointer",
@@ -122,10 +127,11 @@ function DepartmentDetail(props) {
 
   useEffect(() => {
     const handleGetActiveDoctorDepartment = async () => {
-      if (!department.departmentId)
-        return;
+      if (!department.departmentId) return;
 
-      const response = await getActiveDoctorsDepartment(department.departmentId);
+      const response = await getActiveDoctorsDepartment(
+        department.departmentId
+      );
       if (response.success) {
         setDoctors(response.data.data);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
@@ -168,7 +174,9 @@ function DepartmentDetail(props) {
       description: departmentEdit.description,
     });
     if (response.success) {
-      enqueueSnackbar("Cập nhật thông tin khoa thành công!", { variant: "success" });
+      enqueueSnackbar("Cập nhật thông tin khoa thành công!", {
+        variant: "success",
+      });
       setOpenPopup(false);
       navigate(0);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
@@ -186,7 +194,7 @@ function DepartmentDetail(props) {
   const handleDeleteHeadDoctor = () => {
     console.log("clicked");
     setDeleteHead(true);
-  }
+  };
 
   const handleDeleteHeadClick = async () => {
     const response = await deleteHeadOfDepartment(headDoctorId);
@@ -197,7 +205,7 @@ function DepartmentDetail(props) {
     } else {
       enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
     }
-  }
+  };
 
   return (
     <Stack
@@ -268,10 +276,9 @@ function DepartmentDetail(props) {
               <NoiDung>
                 {headDoctorName ? headDoctorName : "Đang cập nhật"}
               </NoiDung>
-              {headDoctorName &&
-                <DeleteText onClick={handleDeleteHeadDoctor}>
-                  Xóa
-                </DeleteText>}
+              {headDoctorName && (
+                <DeleteText onClick={handleDeleteHeadDoctor}>Xóa</DeleteText>
+              )}
             </Stack>
           </Grid>
         </Grid>
@@ -356,7 +363,9 @@ function DepartmentDetail(props) {
             <DialogConfirm
               open={deleteHead}
               title={"Xóa trưởng khoa"}
-              content={"Bạn có chắc chắn muốn xóa người này khỏi chức trưởng khoa?"}
+              content={
+                "Bạn có chắc chắn muốn xóa người này khỏi chức trưởng khoa?"
+              }
               okText={"Xóa"}
               cancelText={"Hủy"}
               onOk={handleDeleteHeadClick}
@@ -466,7 +475,7 @@ function DepartmentDetail(props) {
                     inputProps={{ "aria-label": "Without label" }}
                   >
                     {doctors?.map((item, index) => (
-                      <MenuItem value={item.staffId} key={index} >
+                      <MenuItem value={item.staffId} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
                           {item.fullName}
                         </Typography>

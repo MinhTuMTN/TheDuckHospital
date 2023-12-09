@@ -13,7 +13,10 @@ import SearchDepartmentList from "../../../components/Admin/DepartmentManagement
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
-import { addDepartment, getPaginationDepartments } from "../../../services/admin/DepartmentServices";
+import {
+  addDepartment,
+  getPaginationDepartments,
+} from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 
@@ -105,7 +108,7 @@ function DepartmentListPage(props) {
         setLimit(response.data.data.limit);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
       // setButtonClicked(false);
-    }
+    };
     handleGetDepartments();
   }, [page, limit]);
 

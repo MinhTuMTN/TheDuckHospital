@@ -17,7 +17,10 @@ import SearchDepartmentList from "../../../components/Admin/DepartmentManagement
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
-import { addRoom, getPaginationRooms } from "../../../services/admin/RoomServices";
+import {
+  addRoom,
+  getPaginationRooms,
+} from "../../../services/admin/RoomServices";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
@@ -81,7 +84,7 @@ function RoomListPage(props) {
         setLimit(response.data.data.limit);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
       // setButtonClicked(false);
-    }
+    };
     handleGetRooms();
   }, [page, limit]);
 
@@ -109,7 +112,7 @@ function RoomListPage(props) {
     const response = await addRoom({
       roomName: room.roomName,
       description: room.description,
-      departmentId: room.departmentId
+      departmentId: room.departmentId,
     });
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
@@ -342,8 +345,7 @@ function RoomListPage(props) {
             required
             error={room.roomName?.trim() === ""}
             helperText={
-              room.roomName?.trim() === "" &&
-              "Tên phòng không được để trống"
+              room.roomName?.trim() === "" && "Tên phòng không được để trống"
             }
           />
           <MuiTextFeild
@@ -369,10 +371,7 @@ function RoomListPage(props) {
               Khoa
             </CustomTypography>
 
-            <FormControl
-              fullWidth
-              error={room.departmentId === ""}
-            >
+            <FormControl fullWidth error={room.departmentId === ""}>
               <Select
                 value={room.departmentId}
                 onChange={(e) =>
@@ -391,17 +390,16 @@ function RoomListPage(props) {
                 inputProps={{ "aria-label": "Without label" }}
               >
                 {departments?.map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    value={item.departmentId}
-                  >
+                  <MenuItem key={index} value={item.departmentId}>
                     <Typography style={{ fontSize: "16px" }}>
                       {item.departmentName}
                     </Typography>
                   </MenuItem>
                 ))}
               </Select>
-              {room.departmentId === "" && <FormHelperText>Khoa không được để trống</FormHelperText>}
+              {room.departmentId === "" && (
+                <FormHelperText>Khoa không được để trống</FormHelperText>
+              )}
             </FormControl>
           </Box>
         </Stack>

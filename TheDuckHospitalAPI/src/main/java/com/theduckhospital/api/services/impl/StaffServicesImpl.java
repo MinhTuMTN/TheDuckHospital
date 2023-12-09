@@ -1,7 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
-import com.theduckhospital.api.dto.request.CreateStaffRequest;
+import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.StaffRepository;

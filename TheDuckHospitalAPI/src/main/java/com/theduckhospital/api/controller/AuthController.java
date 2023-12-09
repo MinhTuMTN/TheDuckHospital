@@ -2,7 +2,7 @@ package com.theduckhospital.api.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.CheckAccountExistRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.dto.request.LoginRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
