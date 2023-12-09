@@ -17,8 +17,13 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import DoctorItemInChooseDocterPage from "../../components/Customer/DoctorItemInChooseDocterPage";
+import CustomLink from "../../components/General/CustomLink";
+import { useNavigate } from "react-router-dom";
+import { getDoctorsMedicalExaminations } from "../../services/customer/DoctorServices";
+import { enqueueSnackbar } from "notistack";
+import { getAllDepartments } from "../../services/customer/DepartmentServices";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -107,21 +112,58 @@ const CustomSelect = styled(Select)(({ theme }) => ({
 function ChooseDoctorPage(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const navigate = useNavigate();
 
   const breakcrumbs = [
-    <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
+    <CustomLink to="/" key={1}>
+      <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
+    </CustomLink>,
     <CustomTextBreakcrumb key={2}>Chọn bác sĩ</CustomTextBreakcrumb>,
   ];
   const theme = useTheme();
-  const [degree, setDegree] = React.useState("0");
-  const handleChangeDegree = (event) => {
-    setDegree(event.target.value);
-  };
+  const [selectedDegree, setSelectedDegree] = React.useState("ALL");
 
-  const [deparmment, setDeparmment] = React.useState("0");
-  const handleChangeDeparmment = (event) => {
-    setDeparmment(event.target.value);
-  };
+  const [deparmments, setDeparmments] = React.useState([]);
+  const [selectedDepartmentId, setSelectedDepartmentId] = React.useState("ALL");
+  const handleGetAllDepartment = useCallback(async () => {
+    const response = await getAllDepartments();
+    if (!response.success) {
+      enqueueSnackbar("Đã xảy ra lỗi khi lấy danh sách chuyên khoa", {
+        variant: "error",
+      });
+    } else {
+      setDeparmments(response.data.data);
+    }
+  }, []);
+  useEffect(() => {
+    handleGetAllDepartment();
+  }, [handleGetAllDepartment]);
+  const [fullName, setFullName] = React.useState("");
+  const [fullNameSearch, setFullNameSearch] = React.useState("");
+  const [page, setPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(1);
+
+  const [doctors, setDoctors] = React.useState([]);
+  const handleGetDoctorExaminations = useCallback(async () => {
+    const response = await getDoctorsMedicalExaminations(
+      fullName,
+      page,
+      selectedDepartmentId === "ALL" ? null : selectedDepartmentId,
+      selectedDegree === "ALL" ? null : selectedDegree
+    );
+    if (!response.success) {
+      enqueueSnackbar("Đã xảy ra lỗi khi lấy danh sách bác sĩ", {
+        variant: "error",
+      });
+    } else {
+      setDoctors(response.data.data.items);
+      setPage(response.data.data.page);
+      setTotalPages(response.data.data.totalPages);
+    }
+  }, [fullName, page, selectedDepartmentId, selectedDegree]);
+  useEffect(() => {
+    handleGetDoctorExaminations();
+  }, [handleGetDoctorExaminations]);
   return (
     <Box
       sx={{
@@ -161,6 +203,9 @@ function ChooseDoctorPage(props) {
               "&:hover": {
                 backgroundColor: "	#ffffff",
               },
+            }}
+            onClick={() => {
+              navigate("/choose-patient-profiles");
             }}
           >
             <ArrowBackIcon
@@ -232,6 +277,17 @@ function ChooseDoctorPage(props) {
               InputProps={{
                 endAdornment: <SearchIcon />,
               }}
+              value={fullNameSearch}
+              onChange={(e) => {
+                setFullNameSearch(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setFullName(fullNameSearch);
+                  setPage(1);
+                }
+              }}
+              autoComplete="off"
               sx={{
                 width: "100%",
                 "& .MuiInputBase-input": {
@@ -249,15 +305,16 @@ function ChooseDoctorPage(props) {
                   cursor: "pointer",
                 }}
               >
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={degree}
-                  onChange={handleChangeDegree}
+                <CustomSelect
+                  value={selectedDegree}
+                  onChange={(e) => {
+                    setSelectedDegree(e.target.value);
+                    setPage(1);
+                  }}
                   sx={{
                     textAlign: "left",
-                    color: "white",
                     fontSize: "14px",
+                    color: "white",
                     "& .MuiOutlinedInput-input": {
                       paddingTop: "8px",
                       paddingBottom: "8px",
@@ -266,13 +323,13 @@ function ChooseDoctorPage(props) {
                     },
                   }}
                 >
-                  <CustomMenuItem value={0} disabled>
-                    Học hàm/ Học vị
-                  </CustomMenuItem>
-                  <CustomMenuItem value={1}>BS CKI</CustomMenuItem>
-                  <CustomMenuItem value={2}>BS CKII</CustomMenuItem>
-                  <CustomMenuItem value={3}>BS</CustomMenuItem>
-                </Select>
+                  <CustomMenuItem value={"ALL"}>Học hàm/ Học vị</CustomMenuItem>
+                  <CustomMenuItem value={"BS"}>BS</CustomMenuItem>
+                  <CustomMenuItem value={"ThS"}>ThS</CustomMenuItem>
+                  <CustomMenuItem value={"TS"}>TS</CustomMenuItem>
+                  <CustomMenuItem value={"PGS"}>PGS</CustomMenuItem>
+                  <CustomMenuItem value={"GS"}>GS</CustomMenuItem>
+                </CustomSelect>
               </FormControl>
               <FormControl
                 sx={{
@@ -285,8 +342,11 @@ function ChooseDoctorPage(props) {
                 <CustomSelect
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  value={deparmment}
-                  onChange={handleChangeDeparmment}
+                  value={selectedDepartmentId}
+                  onChange={(e) => {
+                    setSelectedDepartmentId(e.target.value);
+                    setPage(1);
+                  }}
                   sx={{
                     textAlign: "left",
                     fontSize: "14px",
@@ -299,27 +359,25 @@ function ChooseDoctorPage(props) {
                     },
                   }}
                 >
-                  <CustomMenuItem value={0} disabled>
-                    Chuyên khoa
-                  </CustomMenuItem>
-                  <CustomMenuItem value={1}>Phổi</CustomMenuItem>
-                  <CustomMenuItem value={2}>Tai mũi họng</CustomMenuItem>
-                  <CustomMenuItem value={3}>
-                    Chấn thương chỉnh hình
-                  </CustomMenuItem>
-                  <CustomMenuItem value={4}>
-                    Thận nhân tạo - Lọc màng bụng
-                  </CustomMenuItem>
+                  <CustomMenuItem value={"ALL"}>Chuyên khoa</CustomMenuItem>
+                  {deparmments.map((department) => (
+                    <CustomMenuItem
+                      key={department.departmentId}
+                      value={department.departmentId}
+                    >
+                      {department.departmentName}
+                    </CustomMenuItem>
+                  ))}
                 </CustomSelect>
               </FormControl>
             </Filter>
             <ListDocter spacing={1.5}>
-              <DoctorItemInChooseDocterPage />
-              <DoctorItemInChooseDocterPage />
-              <DoctorItemInChooseDocterPage />
-              <DoctorItemInChooseDocterPage />
-              <DoctorItemInChooseDocterPage />
-              <DoctorItemInChooseDocterPage />
+              {doctors.map((doctor) => (
+                <DoctorItemInChooseDocterPage
+                  key={doctor.doctorId}
+                  doctor={doctor}
+                />
+              ))}
             </ListDocter>
 
             <Box
@@ -334,6 +392,9 @@ function ChooseDoctorPage(props) {
                 sx={{
                   marginTop: 2,
                 }}
+                count={totalPages}
+                page={page}
+                onChange={(e, value) => setPage(value)}
               />
             </Box>
           </Body>

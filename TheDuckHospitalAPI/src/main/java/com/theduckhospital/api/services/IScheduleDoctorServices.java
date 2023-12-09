@@ -4,5 +4,11 @@ import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleReques
 import com.theduckhospital.api.entity.DoctorSchedule;
 
 public interface IScheduleDoctorServices {
-    DoctorSchedule createDoctorSchedule(String authorization, CreateDoctorScheduleRequest doctorSchedule);
+    DoctorSchedule createDoctorSchedule(
+            String authorization,
+            CreateDoctorScheduleRequest doctorSchedule
+    );
+
+
+
 }

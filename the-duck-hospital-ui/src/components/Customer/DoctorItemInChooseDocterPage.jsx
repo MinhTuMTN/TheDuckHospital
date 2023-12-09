@@ -1,7 +1,28 @@
 import { CardMedia, Stack, Typography } from "@mui/material";
 import React from "react";
+import FormatCurrency from "../General/FormatCurrency";
+
+const days = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
 
 function DoctorItemInChooseDocterPage(props) {
+  const { doctor } = props;
+  let schedule = "";
+  doctor.doctorSchedules?.sort((a, b) => {
+    if (a.dayOfWeek > b.dayOfWeek) return 1;
+    if (a.dayOfWeek < b.dayOfWeek) return -1;
+    else {
+      if (a.scheduleType === "MORNING") return -1;
+      return 1;
+    }
+  });
+
+  doctor.doctorSchedules?.forEach((item) => {
+    if (item.scheduleType === "MORNING") {
+      schedule += `Sáng ${days[item.dayOfWeek]}, `;
+    } else {
+      schedule += `Chiều ${days[item.dayOfWeek]}, `;
+    }
+  });
   return (
     <Stack
       spacing={0.5}
@@ -49,7 +70,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "#D21616",
           }}
         >
-          Nguyễn Khánh Ngọc
+          {doctor.degree} {doctor.doctorName}
         </Typography>
       </Stack>
       <Stack
@@ -76,7 +97,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "template.darker",
           }}
         >
-          Giới tính:
+          Giới tính: {doctor.gender === "MALE" ? "Nam" : "Nữ"}
         </Typography>
       </Stack>
       <Stack
@@ -103,7 +124,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "template.darker",
           }}
         >
-          Chuyên khoa:
+          Chuyên khoa: {doctor.department?.departmentName}
         </Typography>
       </Stack>
       <Stack
@@ -130,7 +151,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "template.darker",
           }}
         >
-          Lịch khám:
+          Lịch khám: {schedule.trim().slice(0, -1)}
         </Typography>
       </Stack>
       <Stack
@@ -157,7 +178,7 @@ function DoctorItemInChooseDocterPage(props) {
             color: "template.darker",
           }}
         >
-          Phí khám: 150000 d
+          Phí khám: <FormatCurrency amount={doctor.price} />
         </Typography>
       </Stack>
     </Stack>

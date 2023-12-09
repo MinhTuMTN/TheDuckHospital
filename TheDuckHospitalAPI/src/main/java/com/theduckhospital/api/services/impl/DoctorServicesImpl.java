@@ -1,14 +1,23 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.dto.response.DoctorItemResponse;
+import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.DoctorRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
+import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,14 +26,16 @@ public class DoctorServicesImpl implements IDoctorServices {
     private final DoctorRepository doctorRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
+    private final IDepartmentServices departmentServices;
 
     public DoctorServicesImpl(
             DoctorRepository doctorRepository,
             JwtTokenProvider jwtTokenProvider,
-            AccountRepository accountRepository) {
+            AccountRepository accountRepository, IDepartmentServices departmentServices) {
         this.doctorRepository = doctorRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
+        this.departmentServices = departmentServices;
     }
 
     @Override
@@ -65,5 +76,49 @@ public class DoctorServicesImpl implements IDoctorServices {
             throw new NotFoundException("Doctor not found");
 
         return doctor;
+    }
+
+    @Override
+    public PaginationResponse getMedicalExaminationDoctors(
+            String fullName,
+            Integer departmentId,
+            Degree degree,
+            int page,
+            int limit
+    ) {
+        Pageable pageable = Pageable.ofSize(limit).withPage(page - 1);
+
+        Department department = null;
+        if (departmentId != null) {
+            department = departmentServices.getDepartmentById(departmentId);
+        } 
+
+        Page<Doctor> doctors;
+        if (degree == null)
+            doctors = doctorRepository
+                    .findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+                    fullName, department == null ? "" : department.getDepartmentName(),
+                    pageable
+            );
+        else
+            doctors = doctorRepository
+                    .findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+                    fullName, degree,
+                    department == null ? "" : department.getDepartmentName(),
+                    pageable
+            );
+
+        List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
+        doctors.forEach(doctor -> {
+            doctorItemResponses.add(new DoctorItemResponse(doctor));
+        });
+
+        return PaginationResponse.builder()
+                .totalPages(doctors.getTotalPages())
+                .totalItems((int) doctors.getTotalElements())
+                .page(page)
+                .limit(limit)
+                .items(doctorItemResponses)
+                .build();
     }
 }

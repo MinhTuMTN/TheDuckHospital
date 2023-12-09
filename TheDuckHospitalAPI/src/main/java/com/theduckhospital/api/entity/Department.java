@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

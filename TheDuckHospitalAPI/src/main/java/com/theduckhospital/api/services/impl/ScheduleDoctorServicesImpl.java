@@ -65,7 +65,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         // Check doctor is available for this schedule
-        if (doctor.getDoctorSchedule().stream().anyMatch(doctorSchedule ->
+        if (doctor.getDoctorSchedules().stream().anyMatch(doctorSchedule ->
                 doctorSchedule.getDayOfWeek() == request.getDayOfWeek()
                         && doctorSchedule.getScheduleType() == request.getScheduleType()
                         && !doctorSchedule.isDeleted()

@@ -14,8 +14,10 @@ function RowInfo(props) {
       <Box
         display="flex"
         alignItems="center"
-        sx={{
-          minWidth: "150px",
+        flex={{
+          md: 1,
+          sm: 1,
+          xs: 2,
         }}
       >
         {props.icon}
@@ -23,12 +25,26 @@ function RowInfo(props) {
           marginLeft={1}
           sx={{
             color: "#003553",
+            textAlign: "left",
           }}
         >
           {props.title}
         </Typography>
       </Box>
-      <Typography className={isName ? "name-text" : "default-text"}>
+      <Typography
+        flex={{
+          md: 2,
+          sm: 3,
+          xs: 3,
+        }}
+        sx={{
+          width: "100%",
+          textAlign: "left",
+          fontWeight: isName ? "bold" : "500",
+          color: isName ? "#42a5f5" : "#161414",
+          textTransform: isName ? "uppercase" : "none",
+        }}
+      >
         {props.value}
       </Typography>
     </Stack>

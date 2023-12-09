@@ -88,7 +88,6 @@ function ChoosePatientProfiles(props) {
           container
           xs={12}
           style={{
-            paddingLeft: "0px",
             paddingRight: isMdUp ? "20px" : "0",
             textAlign: "left",
             justifyContent: "space-between",
