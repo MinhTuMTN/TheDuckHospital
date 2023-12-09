@@ -1,7 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IRoomServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

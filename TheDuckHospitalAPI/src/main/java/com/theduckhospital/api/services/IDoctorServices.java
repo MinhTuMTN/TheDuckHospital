@@ -8,4 +8,5 @@ public interface IDoctorServices {
     boolean deleteHeadDoctor(UUID staffId);
 
     Doctor getDoctorById(UUID staffId);
+    Doctor getDoctorByToken(String token);
 }

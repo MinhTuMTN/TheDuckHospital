@@ -1,7 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.dto.request.admin.CreateDepartmentRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.dto.request.admin.UpdateDepartmentRequest;
 import com.theduckhospital.api.services.IDepartmentServices;
 import jakarta.validation.Valid;

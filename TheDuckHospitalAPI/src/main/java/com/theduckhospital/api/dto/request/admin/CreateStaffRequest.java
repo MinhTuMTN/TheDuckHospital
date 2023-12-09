@@ -1,4 +1,4 @@
-package com.theduckhospital.api.dto.request;
+package com.theduckhospital.api.dto.request.admin;
 
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.constant.Role;

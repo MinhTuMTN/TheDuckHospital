@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.List;
@@ -20,7 +21,9 @@ public class MedicalService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int serviceId;
 
+    @Nationalized
     private String serviceName;
+    @Nationalized
     private String description;
 
     // Department
@@ -38,6 +41,11 @@ public class MedicalService {
     @JsonBackReference
     @ToStringExclude
     private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "medicalService")
+    @JsonBackReference
+    @ToStringExclude
+    private List<DoctorSchedule> doctorSchedules;
 
     private ServiceType serviceType;
     private double price = 150000;

@@ -131,4 +131,9 @@ public class RoomServicesImpl implements IRoomServices {
 
         return new RoomResponse(room);
     }
+
+    @Override
+    public Room findRoomById(int roomId) {
+        return roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room not found"));
+    }
 }

@@ -1,6 +1,6 @@
 package com.theduckhospital.api.error;
 
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

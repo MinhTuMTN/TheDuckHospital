@@ -1,9 +1,9 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.CreateDistrictRequest;
-import com.theduckhospital.api.dto.request.CreateProvinceRequest;
-import com.theduckhospital.api.dto.request.CreateWardRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.request.admin.CreateDistrictRequest;
+import com.theduckhospital.api.dto.request.admin.CreateProvinceRequest;
+import com.theduckhospital.api.dto.request.admin.CreateWardRequest;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.District;
 import com.theduckhospital.api.entity.Province;
 import com.theduckhospital.api.entity.Ward;

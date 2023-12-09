@@ -36,8 +36,13 @@ public class DoctorSchedule {
     @ToStringExclude
     private List<MedicalExaminationRecord> medicalExaminationRecords;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private MedicalService medicalService;
+
     private int slot;
-    private Date scheduleDate;
+    private int dayOfWeek;
     private ScheduleType scheduleType;
 
     private boolean deleted;
