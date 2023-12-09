@@ -14,8 +14,8 @@ import React, { useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
-import DialogForm from "../../../components/DialogForm";
-import MuiTextFeild from "../../../components/MuiTextFeild";
+import DialogForm from "../../../components/General/DialogForm";
+import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
 import { addRoom, getPaginationRooms } from "../../../services/admin/RoomServices";
 import { enqueueSnackbar } from "notistack";
@@ -200,9 +200,9 @@ function RoomListPage(props) {
               <SearchDepartmentList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                // onApply={() => {
+                //   setButtonClicked(true);
+                // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&

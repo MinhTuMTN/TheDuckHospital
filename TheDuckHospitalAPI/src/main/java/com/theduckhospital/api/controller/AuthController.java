@@ -146,4 +146,17 @@ public class AuthController {
                 .build()
         );
     }
+
+    @GetMapping("/check-info")
+    public ResponseEntity<?> checkInfo(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        String fullName = accountServices.checkInfo(token);
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get info success")
+                .data(fullName)
+                .build()
+        );
+    }
 }

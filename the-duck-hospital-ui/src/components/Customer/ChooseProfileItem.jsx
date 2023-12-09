@@ -19,7 +19,7 @@ import {
 import React from "react";
 import RowInfo from "./RowInfo";
 import dayjs from "dayjs";
-import DialogConfirm from "../DialogConfirm";
+import DialogConfirm from "../General/DialogConfirm";
 import { enqueueSnackbar } from "notistack";
 import { deletePatientProfile } from "../../services/customer/PatientProfileServices";
 

@@ -10,8 +10,8 @@ import React, { useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
-import DialogForm from "../../../components/DialogForm";
-import MuiTextFeild from "../../../components/MuiTextFeild";
+import DialogForm from "../../../components/General/DialogForm";
+import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
 import { addDepartment, getPaginationDepartments } from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
@@ -232,9 +232,9 @@ function DepartmentListPage(props) {
               <SearchDepartmentList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                // onApply={() => {
+                //   setButtonClicked(true);
+                // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -352,7 +352,7 @@ function DepartmentListPage(props) {
           setDepartment({
             departmentName: "",
             description: "",
-          })
+          });
         }}
         onOk={handleAddDepartment}
         open={openDialogForm}

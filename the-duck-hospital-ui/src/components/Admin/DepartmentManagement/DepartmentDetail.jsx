@@ -18,7 +18,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../DialogConfirm";
+import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import { deleteDepartment, getActiveDoctorsDepartment, restoreDepartment, updateDepartment } from "../../../services/admin/DepartmentServices";
@@ -95,7 +95,7 @@ function DepartmentDetail(props) {
   const navigate = useNavigate();
   const { department, headDoctorId, headDoctorName } = props;
   let status = department.deleted;
-  const [statusDepartment, setStatusDepartment] = useState(false)
+  const [statusDepartment, setStatusDepartment] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -115,8 +115,7 @@ function DepartmentDetail(props) {
     setEditStatus(event.target.value);
     if (statusDepartment !== event.target.value) {
       setDisabledButton(false);
-    }
-    else {
+    } else {
       setDisabledButton(true);
     }
   };
@@ -181,7 +180,7 @@ function DepartmentDetail(props) {
       departmentName: department.departmentName,
       staffId: headDoctorId,
       description: department.description,
-    })
+    });
   };
 
   const handleDeleteHeadDoctor = () => {
@@ -303,16 +302,10 @@ function DepartmentDetail(props) {
                 onChange={handleStatusChange}
                 className="custom-select"
               >
-                <MenuItem
-                  value={false}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={false} style={{ fontSize: "14px" }}>
                   Đang hoạt động
                 </MenuItem>
-                <MenuItem
-                  value={true}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={true} style={{ fontSize: "14px" }}>
                   Đã khóa
                 </MenuItem>
               </Select>
@@ -433,12 +426,14 @@ function DepartmentDetail(props) {
                   required
                   fullWidth
                   value={departmentEdit.departmentName}
-                  onChange={(e) => setDepartmentEdit((prev) => {
-                    return {
-                      ...prev,
-                      departmentName: e.target.value
-                    };
-                  })}
+                  onChange={(e) =>
+                    setDepartmentEdit((prev) => {
+                      return {
+                        ...prev,
+                        departmentName: e.target.value,
+                      };
+                    })
+                  }
                 />
               </Box>
               <Box width="48%">
@@ -503,11 +498,10 @@ function DepartmentDetail(props) {
                       ...prev,
                       description: e.target.value,
                     };
-                  })
+                  });
                 }}
               />
             </Box>
-
           </Stack>
         </DialogContent>
         <DialogActions>

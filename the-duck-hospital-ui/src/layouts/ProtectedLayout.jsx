@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
-import Loading from "../components/Loading";
+import Loading from "../components/General/Loading";
 import { checkToken } from "../services/customer/AuthServices";
+import { enqueueSnackbar } from "notistack";
 
 function ProtectedLayout(props) {
   const { forRole = [] } = props;
@@ -14,7 +15,10 @@ function ProtectedLayout(props) {
       const response = await checkToken();
       if (response.success && forRole.includes(response.data.data.role)) {
         setRole(response.data.data.role);
-      } else setRole(null);
+      } else {
+        setRole(null);
+        enqueueSnackbar("Vui lòng đăng nhập để tiếp tục", { variant: "error" });
+      }
     };
     handleCheckToken();
   }, [forRole]);
@@ -24,11 +28,9 @@ function ProtectedLayout(props) {
     return <Navigate to="/auth/login" />;
   }
   if (role === "loading") {
-    console.log("Loading");
     return <Loading />;
   }
   if (role !== "loading" && !forRole.includes(role)) {
-    console.log("Not authorized", forRole.includes(role));
     return <Navigate to="/auth/login" />;
   }
 

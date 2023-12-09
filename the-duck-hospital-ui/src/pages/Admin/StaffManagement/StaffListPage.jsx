@@ -14,8 +14,8 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
 import StaffTable from "../../../components/Admin/StaffManagement/StaffTable";
-import DialogForm from "../../../components/DialogForm";
-import MuiTextFeild from "../../../components/MuiTextFeild";
+import DialogForm from "../../../components/General/DialogForm";
+import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
@@ -250,9 +250,9 @@ function StaffListPage(props) {
               <SearchStaffList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                // onApply={() => {
+                //   setButtonClicked(true);
+                // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -374,7 +374,7 @@ function StaffListPage(props) {
             identityNumber: "",
             dateOfBirth: "",
             role: "",
-          })
+          });
         }}
         // onOk={handleAddCatalog}
         open={openDialogForm}
@@ -442,9 +442,7 @@ function StaffListPage(props) {
             />
           </LocalizationProvider>
           <Box>
-            <CustomTypography variant="body1">
-              Vai trò
-            </CustomTypography>
+            <CustomTypography variant="body1">Vai trò</CustomTypography>
 
             <FormControl fullWidth>
               <Select
@@ -465,10 +463,7 @@ function StaffListPage(props) {
                 inputProps={{ "aria-label": "Without label" }}
               >
                 {roles?.map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    value={item.value}
-                  >
+                  <MenuItem key={index} value={item.value}>
                     <Typography style={{ fontSize: "16px" }}>
                       {item.label}
                     </Typography>

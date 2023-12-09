@@ -60,4 +60,18 @@ public class PatientProfileController {
                 .build()
         );
     }
+
+    @PutMapping("/{patientProfileId}")
+    public ResponseEntity<?> updatePatientProfile(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("patientProfileId") UUID patientProfileId,
+            @RequestBody @Valid CreatePatientProfileRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Update patient profile successfully")
+                .data(patientProfileServices.updatePatientProfile(authorization, patientProfileId, request))
+                .build()
+        );
+    }
 }

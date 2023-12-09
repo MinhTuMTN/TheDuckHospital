@@ -29,3 +29,27 @@ html {
   color: #161414;
   font-weight: 700;
 }
+
+/* Scrollbar */
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: none;
+  scrollbar-color: #79757a #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 14px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #79757a;
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+}
+/* End Scrollbar */

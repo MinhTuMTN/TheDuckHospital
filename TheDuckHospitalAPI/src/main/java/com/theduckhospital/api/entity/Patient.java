@@ -16,6 +16,8 @@ import java.util.UUID;
 public class Patient {
     @Id
     private UUID patientId;
+
+    private String patientCode;
     @Nationalized
     protected String fullName;
     protected String phoneNumber;
@@ -25,11 +27,13 @@ public class Patient {
     protected Date lastModifiedAt;
     protected boolean deleted;
 
-    @OneToMany(mappedBy = "patient")
-    private List<PatientProfile> patientProfile;
 
     @OneToMany(mappedBy = "patient")
     private List<MedicalExaminationRecord> medicalExaminationRecords;
+
+
+    @OneToMany(mappedBy = "patient")
+    private List<PatientProfile> patientProfile;
 
     @PreUpdate
     private void onUpdate() {
@@ -39,6 +43,7 @@ public class Patient {
     @PrePersist
     private void onCreate() {
         this.patientId = UUID.randomUUID();
+        this.patientCode = "BN" + this.patientId.toString().substring(0, 8).toUpperCase();
         this.createdAt = new Date();
         this.lastModifiedAt = new Date();
     }

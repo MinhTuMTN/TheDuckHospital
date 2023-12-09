@@ -22,17 +22,18 @@ import {
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { useAuth } from "../../auth/AuthProvider";
+import { useNavigate } from "react-router-dom";
 const mainItems = [
   {
     display: "Hồ sơ bệnh nhân",
     icon: <PersonOutlineIcon />,
-    to: "/store/products",
+    to: "/user",
   },
 
   {
     display: "Phiếu khám bệnh",
     icon: <PostAddIcon />,
-    to: "/store/orders",
+    to: "/user/medical-bills",
   },
 ];
 
@@ -40,30 +41,30 @@ const basicItems = [
   {
     display: "Trang chủ",
     icon: <HomeOutlinedIcon />,
-    to: "/store/products",
+    to: "/",
   },
 
   {
     display: "Giới thiệu",
     icon: <InfoOutlinedIcon />,
-    to: "/store/orders",
+    to: "/",
   },
 
   {
     display: "Quy trình",
     icon: <SettingsOutlinedIcon />,
-    to: "/store/orders",
+    to: "/",
   },
   {
     display: "Thắc mắc",
     icon: <QuestionAnswerOutlinedIcon />,
-    to: "/store/orders",
+    to: "/",
   },
 
   {
     display: "Liên hệ",
     icon: <HelpOutlineOutlinedIcon />,
-    to: "/store/orders",
+    to: "/",
   },
 ];
 
@@ -98,7 +99,8 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
 
 function RightNavBar(props) {
   const { open, onOpenClose } = props;
-  const { token } = useAuth();
+  const { token, setToken, fullName } = useAuth();
+  const navigate = useNavigate();
 
   const content = (
     <Box
@@ -171,7 +173,7 @@ function RightNavBar(props) {
                 fontWeight: "bold",
               }}
             >
-              Nguyễn Ngọc Tuyết Vi
+              {` ${fullName}`}
             </Typography>
           </Stack>
         ) : (
@@ -183,6 +185,7 @@ function RightNavBar(props) {
               color: "white",
               background: "#00a0ff",
             }}
+            onClick={() => navigate("/auth/login")}
           >
             Đăng nhập
           </Button>
@@ -201,14 +204,19 @@ function RightNavBar(props) {
               width: "100%",
             }}
           >
-            {mainItems.map((item) => (
+            {mainItems.map((item, index) => (
               <Stack
+                key={`item-${index}`}
                 direction={"row"}
                 sx={{
                   borderBottom: "1px solid #e0e0e0",
                   paddingX: 1,
                   paddingY: 1.5,
                   cursor: "pointer",
+                }}
+                onClick={() => {
+                  navigate(item.to);
+                  onOpenClose(false);
                 }}
               >
                 <CustomListItemIcon>{item.icon}</CustomListItemIcon>
@@ -240,7 +248,7 @@ function RightNavBar(props) {
           width: "100%",
         }}
       >
-        {basicItems.map((item) => (
+        {basicItems.map((item, index) => (
           <Stack
             direction={"row"}
             sx={{
@@ -248,6 +256,11 @@ function RightNavBar(props) {
               paddingX: 1,
               paddingY: 1.5,
               cursor: "pointer",
+            }}
+            key={`item-${index}`}
+            onClick={() => {
+              navigate(item.to);
+              onOpenClose(false);
             }}
           >
             <CustomListItemIcon>{item.icon}</CustomListItemIcon>
@@ -277,7 +290,7 @@ function RightNavBar(props) {
           width: "100%",
         }}
       >
-        {contactItems.map((item) => (
+        {contactItems.map((item, index) => (
           <Stack
             direction={"row"}
             sx={{
@@ -286,6 +299,7 @@ function RightNavBar(props) {
               paddingY: 1.5,
               cursor: "pointer",
             }}
+            key={`item-${index}`}
           >
             <CustomListItemIcon
               sx={{
@@ -317,6 +331,11 @@ function RightNavBar(props) {
               paddingX: 1,
               paddingY: 1.5,
               cursor: "pointer",
+            }}
+            onClick={() => {
+              setToken(null);
+              onOpenClose(false);
+              window.location.href = "/";
             }}
           >
             <CustomListItemIcon
