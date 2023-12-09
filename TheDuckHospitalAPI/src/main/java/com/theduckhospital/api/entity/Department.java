@@ -1,10 +1,8 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Nationalized;
 
@@ -38,7 +36,7 @@ public class Department {
     @OneToMany(mappedBy = "department")
     @ToString.Exclude
     @JsonBackReference
-    private List<Service> services;
+    private List<MedicalService> medicalServices;
 
     @PrePersist
     private void onCreate() {
