@@ -3,101 +3,27 @@ import {
   Button,
   Container,
   FormControl,
+  FormHelperText,
   MenuItem,
   Paper,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
-
-const items = [
-  {
-    roomName: "TDH1-01",
-    departmentName: "Khoa nhi",
-    deleted: false,
-  },
-  {
-    roomName: "TDH1-02",
-    departmentName: "Khoa tim mạch",
-    deleted: false,
-  },
-  {
-    roomName: "TDH1-03",
-    departmentName: "Khoa ung thư",
-    deleted: false,
-  },
-  {
-    roomName: "TDH1-04",
-    departmentName: "Khoa da liễu",
-    deleted: false,
-  },
-  {
-    roomName: "TDH1-05",
-    departmentName: "Khoa thần kinh",
-    deleted: false,
-  },
-  {
-    roomName: "TDH2-01",
-    departmentName: "Khoa tâm lý",
-    deleted: false,
-  },
-  {
-    roomName: "TDH2-02",
-    departmentName: "Khoa phẫu thuật gây mê",
-    deleted: false,
-  },
-  {
-    roomName: "TDH2-03",
-    departmentName: "Khoa phụ sản",
-    deleted: false,
-  },
-  {
-    roomName: "TDH2-04",
-    departmentName: "Khoa cấp cứu",
-    deleted: false,
-  },
-  {
-    roomName: "TDH2-05",
-    departmentName: "Khoa nội soi",
-    deleted: false,
-  },
-];
-
-const totalItems = items.length;
-
-const departments = [
-  {
-    value: 1,
-    label: "Khoa nhi",
-  },
-  {
-    value: 2,
-    label: "Khoa tim mạch",
-  },
-  {
-    value: 3,
-    label: "Khoa ung thư",
-  },
-  {
-    value: 4,
-    label: "Khoa da liễu",
-  },
-  {
-    value: 5,
-    label: "Khoa thần kinh",
-  },
-  {
-    value: 6,
-    label: "Khoa tâm lý",
-  },
-];
+import {
+  addRoom,
+  getPaginationRooms,
+} from "../../../services/admin/RoomServices";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -118,17 +44,17 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 
 function RoomListPage(props) {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
   // const [buttonClicked, setButtonClicked] = useState(true);
-  // const [catalogs, setCatalogs] = useState([]);
-  // const [totalItems, setTotalItems] = useState(0);
+  const [rooms, setRooms] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  // const [productItems, setProductItems] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [room, setRoom] = useState({
     roomName: "",
-    departmentId: 1,
+    departmentId: "",
     description: "",
   });
 
@@ -141,17 +67,59 @@ function RoomListPage(props) {
   };
 
   // useEffect(() => {
-  //   const handleGetCatalogs = async () => {
-  //     const response = await getActiveCatalogs();
-  //     if (response.success) {
-  //       setCatalogs(response.data.data);
-  //       setTotalItems(response.data.data.totalObjects);
-  //     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  //   };
-  //   if (catalogs.length === 0) {
-  //     handleGetCatalogs();
-  //   }
-  // }, [catalogs]);
+  //   setButtonClicked(true);
+  // }, [page, limit]);
+
+  useEffect(() => {
+    const handleGetRooms = async () => {
+      // if (!buttonClicked) return;
+      const response = await getPaginationRooms({
+        page: page - 1,
+        limit: limit,
+      });
+      if (response.success) {
+        setRooms(response.data.data.rooms);
+        setTotalItems(response.data.data.total);
+        setPage(response.data.data.page + 1);
+        setLimit(response.data.data.limit);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+      // setButtonClicked(false);
+    };
+    handleGetRooms();
+  }, [page, limit]);
+
+  useEffect(() => {
+    const handleGetDepartment = async () => {
+      const response = await getAllDepartments();
+      if (response.success) {
+        setDepartments(response.data.data);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+    handleGetDepartment();
+  }, []);
+
+  const handleAddRoom = async () => {
+    if (room.roomName?.trim() === "") {
+      enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
+      return;
+    }
+
+    if (room.departmentId === "" || room.departmentId === -1) {
+      enqueueSnackbar("Khoa không được để trống", { variant: "error" });
+      return;
+    }
+
+    const response = await addRoom({
+      roomName: room.roomName,
+      description: room.description,
+      departmentId: room.departmentId,
+    });
+    if (response.success) {
+      enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
+      setOpenDialogForm(false);
+      navigate(0);
+    } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+  };
 
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;
@@ -195,9 +163,6 @@ function RoomListPage(props) {
 
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -217,7 +182,7 @@ function RoomListPage(props) {
                 onClick={() => {
                   setRoom({
                     roomName: "",
-                    departmentId: 1,
+                    departmentId: "",
                     description: "",
                   });
                   setOpenDialogForm(true);
@@ -339,7 +304,7 @@ function RoomListPage(props) {
                 /> */}
               <RoomTable
                 count={totalItems ? totalItems : 0}
-                items={items}
+                items={rooms}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
@@ -349,20 +314,18 @@ function RoomListPage(props) {
           </Stack>
         </Container>
       </Box>
-      {/* )} */}
-
       <DialogForm
         cancelText={"Hủy"}
         okText={"Thêm"}
         onCancel={() => {
-          setOpenDialogForm(false);
           setRoom({
             roomName: "",
-            department: "",
+            departmentId: "",
             description: "",
           });
+          setOpenDialogForm(false);
         }}
-        // onOk={handleAddCatalog}
+        onOk={handleAddRoom}
         open={openDialogForm}
         title={"Thêm phòng"}
         onClose={() => setOpenDialogForm(false)}
@@ -380,6 +343,10 @@ function RoomListPage(props) {
               }));
             }}
             required
+            error={room.roomName?.trim() === ""}
+            helperText={
+              room.roomName?.trim() === "" && "Tên phòng không được để trống"
+            }
           />
           <MuiTextFeild
             label="Mô tả"
@@ -395,9 +362,16 @@ function RoomListPage(props) {
             }}
           />
           <Box>
-            <CustomTypography variant="body1">Vai trò</CustomTypography>
+            <CustomTypography
+              variant="body1"
+              style={{
+                color: room.departmentId === "" ? "red" : "",
+              }}
+            >
+              Khoa
+            </CustomTypography>
 
-            <FormControl fullWidth>
+            <FormControl fullWidth error={room.departmentId === ""}>
               <Select
                 value={room.departmentId}
                 onChange={(e) =>
@@ -416,13 +390,16 @@ function RoomListPage(props) {
                 inputProps={{ "aria-label": "Without label" }}
               >
                 {departments?.map((item, index) => (
-                  <MenuItem key={index} value={item.value}>
+                  <MenuItem key={index} value={item.departmentId}>
                     <Typography style={{ fontSize: "16px" }}>
-                      {item.label}
+                      {item.departmentName}
                     </Typography>
                   </MenuItem>
                 ))}
               </Select>
+              {room.departmentId === "" && (
+                <FormHelperText>Khoa không được để trống</FormHelperText>
+              )}
             </FormControl>
           </Box>
         </Stack>

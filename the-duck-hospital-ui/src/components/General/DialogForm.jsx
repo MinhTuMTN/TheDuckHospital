@@ -32,7 +32,6 @@ function DialogForm(props) {
 
   const handleOk = () => {
     props.onOk();
-    props.onClose();
   };
 
   const handleCancel = () => {

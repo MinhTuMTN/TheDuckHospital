@@ -64,32 +64,32 @@ function Row(props) {
     <React.Fragment>
       <TableRow>
         <TableCell>
-              <CustomText
-                variant="body1"
-                style={{
-                  fontWeight: "500",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: maxWidth,
-                }}
-              >
-                {row.roomName}
-              </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              fontWeight: "500",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.roomName}
+          </CustomText>
         </TableCell>
         <TableCell>
-              <CustomText
-                variant="body1"
-                style={{
-                  fontWeight: "500",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: maxWidth,
-                }}
-              >
-                {row.departmentName}
-              </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              fontWeight: "500",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.departmentName}
+          </CustomText>
         </TableCell>
         <TableCell align="right">
           <Stack direction={"row"} spacing={1} alignItems={"center"}>
@@ -137,20 +137,9 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                      // onClick={(e) => {
-                      //   navigate(`/admin/product-management/${row.productId}`, {
-                      //     state: {
-                      //       id: row.productId,
-                      //     },
-                      //   });
-                      // }}
 
                       onClick={(e) => {
-                        navigate(`/admin/room-management/detail`, {
-                          state: {
-                            id: row.roomId,
-                          },
-                        });
+                        navigate(`/admin/room-management/${row.roomId}`);
                       }}
                     >
                       Xem
@@ -163,19 +152,8 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                  // onClick={(e) => {
-                  //   navigate(`/admin/product-management/${row.productId}`, {
-                  //     state: {
-                  //       id: row.productId,
-                  //     },
-                  //   });
-                  // }}
                   onClick={(e) => {
-                    navigate(`/admin/room-management/detail`, {
-                      state: {
-                        id: row.roomId,
-                      },
-                    });
+                    navigate(`/admin/room-management/${row.roomId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />
@@ -220,7 +198,7 @@ function RoomTable(props) {
                   <CustomText color={"#101828"}>Trạng thái</CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "15%" }}>
-                <CustomText color={"#101828"}>Tùy chọn</CustomText>
+                  <CustomText color={"#101828"}>Tùy chọn</CustomText>
                 </TableCell>
               </TableRow>
             </TableHead>

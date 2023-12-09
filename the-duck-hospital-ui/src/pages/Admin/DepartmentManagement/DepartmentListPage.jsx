@@ -6,78 +6,84 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
+import {
+  addDepartment,
+  getPaginationDepartments,
+} from "../../../services/admin/DepartmentServices";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 
-const items = [
-  {
-    departmentName: "Khoa nhi",
-    headDoctor: "Nguyễn Văn Head Doctor",
-    numberOfDoctors: 12,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa tim mạch",
-    headDoctor: "Nguyễn Thị Head Doctor",
-    numberOfDoctors: 10,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa ung thư",
-    headDoctor: "Nguyễn Quốc Head Doctor",
-    numberOfDoctors: 9,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa da liễu",
-    headDoctor: "Nguyễn Lâm Head Doctor",
-    numberOfDoctors: 15,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa thần kinh",
-    headDoctor: "Nguyễn Thế Head Doctor",
-    numberOfDoctors: 8,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa tâm lý",
-    headDoctor: "Nguyễn Minh Head Doctor",
-    numberOfDoctors: 13,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa phẫu thuật gây mê",
-    headDoctor: "Nguyễn Ngọc Head Doctor",
-    numberOfDoctors: 17,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa phụ sản",
-    headDoctor: "Nguyễn Thành Head Doctor",
-    numberOfDoctors: 3,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa cấp cứu",
-    headDoctor: "Nguyễn Vĩ Head Doctor",
-    numberOfDoctors: 5,
-    deleted: false,
-  },
-  {
-    departmentName: "Khoa nội soi",
-    headDoctor: "Nguyễn Kiều Head Doctor",
-    numberOfDoctors: 12,
-    deleted: false,
-  },
-];
+// const items = [
+//   {
+//     departmentName: "Khoa nhi",
+//     headDoctor: "Nguyễn Văn Head Doctor",
+//     numberOfDoctors: 12,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa tim mạch",
+//     headDoctor: "Nguyễn Thị Head Doctor",
+//     numberOfDoctors: 10,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa ung thư",
+//     headDoctor: "Nguyễn Quốc Head Doctor",
+//     numberOfDoctors: 9,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa da liễu",
+//     headDoctor: "Nguyễn Lâm Head Doctor",
+//     numberOfDoctors: 15,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa thần kinh",
+//     headDoctor: "Nguyễn Thế Head Doctor",
+//     numberOfDoctors: 8,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa tâm lý",
+//     headDoctor: "Nguyễn Minh Head Doctor",
+//     numberOfDoctors: 13,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa phẫu thuật gây mê",
+//     headDoctor: "Nguyễn Ngọc Head Doctor",
+//     numberOfDoctors: 17,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa phụ sản",
+//     headDoctor: "Nguyễn Thành Head Doctor",
+//     numberOfDoctors: 3,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa cấp cứu",
+//     headDoctor: "Nguyễn Vĩ Head Doctor",
+//     numberOfDoctors: 5,
+//     deleted: false,
+//   },
+//   {
+//     departmentName: "Khoa nội soi",
+//     headDoctor: "Nguyễn Kiều Head Doctor",
+//     numberOfDoctors: 12,
+//     deleted: false,
+//   },
+// ]
 
-const totalItems = items.length;
+// const totalItems = items.length;
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -92,14 +98,13 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 function DepartmentListPage(props) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
-  // const [catalogs, setCatalogs] = useState([]);
-  // const [totalItems, setTotalItems] = useState(0);
+  const [departments, setDepartments] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  // const [productItems, setProductItems] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [department, setDepartment] = useState({
     departmentName: "",
@@ -113,19 +118,6 @@ function DepartmentListPage(props) {
     setLimit(event.target.value);
     setPage(1);
   };
-
-  // useEffect(() => {
-  //   const handleGetCatalogs = async () => {
-  //     const response = await getActiveCatalogs();
-  //     if (response.success) {
-  //       setCatalogs(response.data.data);
-  //       setTotalItems(response.data.data.totalObjects);
-  //     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  //   };
-  //   if (catalogs.length === 0) {
-  //     handleGetCatalogs();
-  //   }
-  // }, [catalogs]);
 
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;
@@ -167,11 +159,43 @@ function DepartmentListPage(props) {
   //   handleGetFilteredProduct();
   // }, [handleGetFilteredProduct]);
 
+  useEffect(() => {
+    const handleGetDepartments = async () => {
+      // if (!buttonClicked) return;
+      const response = await getPaginationDepartments({
+        page: page - 1,
+        limit: limit,
+      });
+      if (response.success) {
+        setDepartments(response.data.data.departments);
+        setTotalItems(response.data.data.total);
+        setPage(response.data.data.page + 1);
+        setLimit(response.data.data.limit);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+      // setButtonClicked(false);
+    };
+    handleGetDepartments();
+  }, [page, limit]);
+
+  const handleAddDepartment = async () => {
+    if (department.departmentName?.trim() === "") {
+      enqueueSnackbar("Tên khoa không được để trống", { variant: "error" });
+      return;
+    }
+
+    const response = await addDepartment({
+      departmentName: department.departmentName,
+      description: department.description,
+    });
+    if (response.success) {
+      enqueueSnackbar("Thêm khoa thành công!", { variant: "success" });
+      setOpenDialogForm(false);
+      navigate(0);
+    } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+  };
+
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -312,7 +336,7 @@ function DepartmentListPage(props) {
                 /> */}
               <DepartmentTable
                 count={totalItems ? totalItems : 0}
-                items={items}
+                items={departments}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
@@ -322,7 +346,6 @@ function DepartmentListPage(props) {
           </Stack>
         </Container>
       </Box>
-      {/* )} */}
 
       <DialogForm
         cancelText={"Hủy"}
@@ -334,7 +357,7 @@ function DepartmentListPage(props) {
             description: "",
           });
         }}
-        // onOk={handleAddCatalog}
+        onOk={handleAddDepartment}
         open={openDialogForm}
         title={"Thêm khoa"}
         onClose={() => setOpenDialogForm(false)}
@@ -352,6 +375,11 @@ function DepartmentListPage(props) {
               }));
             }}
             required
+            error={department.departmentName?.trim() === ""}
+            helperText={
+              department.departmentName?.trim() === "" &&
+              "Tên khoa không được để trống"
+            }
           />
           <MuiTextFeild
             label="Mô tả"

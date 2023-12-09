@@ -9,63 +9,64 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import "dayjs/locale/en-gb";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import RoomDetail from "../../../components/Admin/RoomManagement/RoomDetail";
 import ScheduleTable from "../../../components/Admin/RoomManagement/ScheduleTable";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import "dayjs/locale/en-gb";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import { getRoomById } from "../../../services/admin/RoomServices";
 
-const room = {
-  roomName: "TDH1-01",
-  departmentName: "Khoa nhi",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
-  schedule: {
-    morning: [
-      {
-        fullName: "Nguyễn Văn Doctor 1",
-        phoneNumber: "0123456789",
-        headOfDepartment: false,
-        role: "Bác sĩ",
-        time: "7h - 11h",
-      },
-      {
-        fullName: "Nguyễn Văn Doctor 2",
-        phoneNumber: "0123456788",
-        headOfDepartment: false,
-        role: "Bác sĩ",
-        time: "7h - 11h",
-      },
-    ],
-    afternoon: [
-      {
-        fullName: "Nguyễn Văn Doctor 1",
-        phoneNumber: "0123456789",
-        headOfDepartment: false,
-        role: "Bác sĩ",
-        time: "13h - 17h",
-      },
-      {
-        fullName: "Nguyễn Văn Doctor 2",
-        phoneNumber: "0123456788",
-        headOfDepartment: true,
-        role: "Bác sĩ",
-        time: "13h - 17h",
-      },
-      {
-        fullName: "Nguyễn Văn Doctor 3",
-        phoneNumber: "0123456788",
-        headOfDepartment: false,
-        role: "Bác sĩ",
-        time: "13h - 17h",
-      },
-    ],
-  },
-  deleted: false,
-};
+// const room = {
+//   roomName: "TDH1-01",
+//   departmentName: "Khoa nhi",
+//   description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
+//   schedule: {
+//     morning: [
+//       {
+//         fullName: "Nguyễn Văn Doctor 1",
+//         phoneNumber: "0123456789",
+//         headOfDepartment: false,
+//         role: "Bác sĩ",
+//         time: "7h - 11h",
+//       },
+//       {
+//         fullName: "Nguyễn Văn Doctor 2",
+//         phoneNumber: "0123456788",
+//         headOfDepartment: false,
+//         role: "Bác sĩ",
+//         time: "7h - 11h",
+//       },
+//     ],
+//     afternoon: [
+//       {
+//         fullName: "Nguyễn Văn Doctor 1",
+//         phoneNumber: "0123456789",
+//         headOfDepartment: false,
+//         role: "Bác sĩ",
+//         time: "13h - 17h",
+//       },
+//       {
+//         fullName: "Nguyễn Văn Doctor 2",
+//         phoneNumber: "0123456788",
+//         headOfDepartment: true,
+//         role: "Bác sĩ",
+//         time: "13h - 17h",
+//       },
+//       {
+//         fullName: "Nguyễn Văn Doctor 3",
+//         phoneNumber: "0123456788",
+//         headOfDepartment: false,
+//         role: "Bác sĩ",
+//         time: "13h - 17h",
+//       },
+//     ],
+//   },
+//   deleted: false
+// }
+
 
 const BoxStyle1 = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -103,21 +104,21 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
 }));
 
 function RoomDetailPage() {
+  const { roomId } = useParams();
   const navigate = useNavigate();
   const [date, setDate] = useState(dayjs);
+  const [room, setRoom] = useState({});
 
-  // const [customer, setCustomer] = useState({});
+  useEffect(() => {
+    const handleGetRoom = async () => {
+      const response = await getRoomById(roomId);
+      if (response.success) {
+        setRoom(response.data.data);
+      }
+    }
+    handleGetRoom();
+  }, [roomId]);
 
-  // const handleGetCustomer = useCallback(async () => {
-  //   const response = await getCustomerById(state.id);
-  //   if (response.success) {
-  //     setCustomer(response.data.data);
-  //   }
-  // }, [state.id]);
-
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
 
   return (
     <Box
@@ -170,7 +171,7 @@ function RoomDetailPage() {
                   fontSize: ["1.5rem", "2rem"],
                 }}
               >
-                {room.roomName}
+                {"Phòng " + room.roomName}
               </Typography>
             </Grid>
           </Grid>
@@ -225,30 +226,29 @@ function RoomDetailPage() {
                       </LocalizationProvider>
                     </Stack>
                   </BoxStyle1>
-                  {room.schedule.morning && (
+                  {room.schedule?.morning &&
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi sáng</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.morning} />
                     </>
-                  )}
-                  {room.schedule.afternoon && (
+                  }
+                  {room.schedule?.afternoon &&
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi chiều</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.afternoon} />
-                    </>
-                  )}
-                  {room.schedule.evening && (
+                    </>}
+                  {room.schedule?.evening &&
                     <>
                       <BoxStyle2 sx={{ mt: 1.5 }}>
                         <TieuDe2>Buổi tối</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.evening} />
                     </>
-                  )}
+                  }
                 </Stack>
               </Stack>
             </Grid>

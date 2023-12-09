@@ -64,46 +64,44 @@ function Row(props) {
     <React.Fragment>
       <TableRow>
         <TableCell>
-              <CustomText
-                variant="body1"
-                style={{
-                  fontWeight: "500",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: maxWidth,
-                }}
-              >
-                {row.departmentName}
-              </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              fontWeight: "500",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.departmentName}
+          </CustomText>
         </TableCell>
         <TableCell>
-              <CustomText
-                variant="body1"
-                style={{
-                  fontWeight: "500",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: maxWidth,
-                }}
-              >
-                {row.headDoctor}
-              </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.headDoctorName ? row.headDoctorName : "Đang cập nhật"}
+          </CustomText>
         </TableCell>
         <TableCell align="center">
-              <CustomText
-                variant="body1"
-                style={{
-                  fontWeight: "500",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: maxWidth,
-                }}
-              >
-                {row.numberOfDoctors}
-              </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.totalDoctors}
+          </CustomText>
         </TableCell>
         <TableCell align="right">
           <Stack direction={"row"} spacing={1} alignItems={"center"}>
@@ -151,20 +149,8 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                      // onClick={(e) => {
-                      //   navigate(`/admin/product-management/${row.productId}`, {
-                      //     state: {
-                      //       id: row.productId,
-                      //     },
-                      //   });
-                      // }}
-
                       onClick={(e) => {
-                        navigate(`/admin/department-management/detail`, {
-                          state: {
-                            id: row.departmentId,
-                          },
-                        });
+                        navigate(`/admin/department-management/${row.departmentId}`);
                       }}
                     >
                       Xem
@@ -177,19 +163,8 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                  // onClick={(e) => {
-                  //   navigate(`/admin/product-management/${row.productId}`, {
-                  //     state: {
-                  //       id: row.productId,
-                  //     },
-                  //   });
-                  // }}
                   onClick={(e) => {
-                    navigate(`/admin/department-management/detail`, {
-                      state: {
-                        id: row.departmentId,
-                      },
-                    });
+                    navigate(`/admin/department-management/${row.departmentId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />
@@ -225,19 +200,19 @@ function DepartmentTable(props) {
             >
               <TableRow>
                 <TableCell style={{ width: "30%" }}>
-                  <CustomText color={"#101828"}>Khoa</CustomText>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Khoa</CustomText>
                 </TableCell>
                 <TableCell style={{ width: "20%" }}>
-                  <CustomText color={"#101828"}>Trưởng khoa</CustomText>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Trưởng khoa</CustomText>
                 </TableCell>
                 <TableCell style={{ width: "20%" }} align="center">
-                  <CustomText color={"#101828"}>Số bác sĩ</CustomText>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Số bác sĩ</CustomText>
                 </TableCell>
                 <TableCell style={{ width: "20%" }}>
-                  <CustomText color={"#101828"}>Trạng thái</CustomText>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Trạng thái</CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "10%" }}>
-                <CustomText color={"#101828"}>Tùy chọn</CustomText>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Tùy chọn</CustomText>
                 </TableCell>
               </TableRow>
             </TableHead>
