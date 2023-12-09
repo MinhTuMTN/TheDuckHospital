@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -68,4 +69,14 @@ public class PatientProfile {
     @JsonBackReference
     @ToStringExclude
     private Nation nation;
+
+    @OneToMany(mappedBy = "patientProfile")
+    @ToStringExclude
+    @JsonBackReference
+    private List<MedicalExaminationRecord> medicalExaminationRecords;
+
+    @OneToMany(mappedBy = "patientProfile")
+    @ToStringExclude
+    @JsonBackReference
+    private List<Booking> bookings;
 }

@@ -1,7 +1,7 @@
-import styled from "@emotion/styled";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useTheme } from "@emotion/react";
+import styled from "@emotion/styled";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Box,
   Button,
@@ -62,7 +62,6 @@ function Row(props) {
       <TableRow>
         <TableCell>
           <CustomText
-
             variant="body1"
             style={{
               fontWeight: "500",
@@ -72,7 +71,8 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.fullName}{row.headOfDepartment ? " (Trưởng khoa)" : ""}
+            {row.fullName}
+            {row.headOfDepartment ? " (Trưởng khoa)" : ""}
           </CustomText>
         </TableCell>
         <TableCell>
@@ -149,13 +149,13 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                    // onClick={(e) => {
-                    //   navigate(`/admin/product-management/${row.productId}`, {
-                    //     state: {
-                    //       id: row.productId,
-                    //     },
-                    //   });
-                    // }}
+                      // onClick={(e) => {
+                      //   navigate(`/admin/product-management/${row.productId}`, {
+                      //     state: {
+                      //       id: row.productId,
+                      //     },
+                      //   });
+                      // }}
                     >
                       Xem
                     </Button>
@@ -167,13 +167,13 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                // onClick={(e) => {
-                //   navigate(`/admin/product-management/${row.productId}`, {
-                //     state: {
-                //       id: row.productId,
-                //     },
-                //   });
-                // }}
+                  // onClick={(e) => {
+                  //   navigate(`/admin/product-management/${row.productId}`, {
+                  //     state: {
+                  //       id: row.productId,
+                  //     },
+                  //   });
+                  // }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>
@@ -191,73 +191,56 @@ function ScheduleTable(props) {
 
   return (
     <>
-      
-        <Box paddingX={5} sx={{ width: "100%" }}>
+      <Box paddingX={5} sx={{ width: "100%" }}>
         <Paper>
-            <Table
+          <Table
+            sx={{
+              "& .MuiTableCell-sizeMedium": {
+                paddingX: "20px !important",
+              },
+            }}
+          >
+            <TableHead
               sx={{
-                "& .MuiTableCell-sizeMedium": {
-                  paddingX: "20px !important",
-                },
+                bgcolor: "#F5F6FA",
               }}
             >
-              <TableHead
-                sx={{
-                  bgcolor: "#F5F6FA",
-                }}
-              >
-                <TableRow>
-                  <TableCell style={{ width: "30%" }}>
-                    <CustomText
-                      style={{ fontWeight: "500" }}
-                      color={"#101828"}
-                    >
-                      Họ tên
-                    </CustomText>
-                  </TableCell>
-                  <TableCell style={{ width: "20%" }}>
-                    <CustomText
-                      style={{ fontWeight: "500" }}
-                      color={"#101828"}
-                    >
-                      Số điện thoại
-                    </CustomText>
-                  </TableCell>
-                  <TableCell style={{ width: "20%" }}>
-                    <CustomText
-                      style={{ fontWeight: "500" }}
-                      color={"#101828"}
-                    >
-                      Vai trò
-                    </CustomText>
-                  </TableCell>
-                  <TableCell style={{ width: "20%" }}>
-                    <CustomText
-                      style={{ fontWeight: "500" }}
-                      color={"#101828"}
-                    >
-                      Lịch trực
-                    </CustomText>
-                  </TableCell>
-                  <TableCell align="center" style={{ width: "10%" }}>
-                    <CustomText
-                      style={{ fontWeight: "500" }}
-                      color={"#101828"}
-                    >
-                      Tùy chọn
-                    </CustomText>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {items?.map((row, index) => (
-                  <Row key={index} row={row} />
-                ))}
-              </TableBody>
-            </Table>
-          </Paper>
-        </Box>
-        
+              <TableRow>
+                <TableCell style={{ width: "30%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Họ tên
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "20%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Số điện thoại
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "20%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Vai trò
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "20%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Lịch trực
+                  </CustomText>
+                </TableCell>
+                <TableCell align="center" style={{ width: "10%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Tùy chọn
+                  </CustomText>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items?.map((row, index) => (
+                <Row key={index} row={row} />
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Box>
     </>
   );
 }

@@ -121,7 +121,6 @@ function RoomDetailPage() {
 
 
   return (
-
     <Box
       sx={{
         pt: 3,
@@ -145,7 +144,9 @@ function RoomDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/room-management") }}
+              onClick={() => {
+                navigate("/admin/room-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -162,8 +163,6 @@ function RoomDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-
-
               <Typography
                 variant="h3"
                 fontWeight={600}
@@ -225,7 +224,6 @@ function RoomDetailPage() {
                           }}
                         />
                       </LocalizationProvider>
-
                     </Stack>
                   </BoxStyle1>
                   {room.schedule?.morning &&
@@ -249,7 +247,8 @@ function RoomDetailPage() {
                         <TieuDe2>Buổi tối</TieuDe2>
                       </BoxStyle2>
                       <ScheduleTable items={room.schedule?.evening} />
-                    </>}
+                    </>
+                  }
                 </Stack>
               </Stack>
             </Grid>
@@ -257,7 +256,6 @@ function RoomDetailPage() {
         </Stack>
       </Stack>
     </Box>
-
   );
 }
 
