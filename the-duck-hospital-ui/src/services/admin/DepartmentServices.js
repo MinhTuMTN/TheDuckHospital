@@ -31,3 +31,11 @@ export const deleteDepartment = (departmentId) => {
 export const restoreDepartment = (departmentId) => {
   return put(`/admin/departments/${departmentId}/restore`, null, { Authorization: "" });
 };
+
+export const addDoctorDepartment = (departmentId, doctorId) => {
+  return put(`/admin/departments/${departmentId}/doctors/${doctorId}`, null, { Authorization: "" });
+};
+
+export const removeDoctorDepartment = (departmentId, doctorId) => {
+  return del(`/admin/departments/${departmentId}/doctors/${doctorId}`, null, { Authorization: "" });
+};

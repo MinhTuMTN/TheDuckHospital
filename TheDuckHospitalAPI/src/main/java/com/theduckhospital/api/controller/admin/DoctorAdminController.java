@@ -5,10 +5,7 @@ import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -29,6 +26,17 @@ public class DoctorAdminController {
                         .success(true)
                         .message("Department deleted successfully")
                         .data(doctorServices.deleteHeadDoctor(staffId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/not-in-department")
+    public ResponseEntity<?> getAllDepartments() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all doctor not in department successfully")
+                        .data(doctorServices.getDoctorNotInDepartment())
                         .build()
         );
     }

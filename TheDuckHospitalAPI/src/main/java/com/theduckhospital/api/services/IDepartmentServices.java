@@ -8,6 +8,7 @@ import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IDepartmentServices {
     Department createDepartment(CreateDepartmentRequest request);
@@ -20,4 +21,8 @@ public interface IDepartmentServices {
     List<Department> getAllDepartmentsDeleted();
     DepartmentResponse getDepartmentResponseById(int departmentId);
     Department getDepartmentById(int departmentId);
+
+    Doctor addDoctorDepartment(int departmentId, UUID doctorId);
+
+    boolean removeDoctorDepartment(int departmentId, UUID doctorId);
 }

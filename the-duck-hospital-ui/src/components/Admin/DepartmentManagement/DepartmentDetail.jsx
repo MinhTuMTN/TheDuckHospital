@@ -265,13 +265,13 @@ function DepartmentDetail(props) {
 
           <Grid item xs={8} md={9}>
             <Stack direction={"row"} spacing={2}>
-            <NoiDung>
-              {headDoctorName ? headDoctorName : "Đang cập nhật"}
-            </NoiDung>
-            {headDoctorName && 
-            <DeleteText onClick={handleDeleteHeadDoctor}>
-              Xóa
-            </DeleteText>}
+              <NoiDung>
+                {headDoctorName ? headDoctorName : "Đang cập nhật"}
+              </NoiDung>
+              {headDoctorName &&
+                <DeleteText onClick={handleDeleteHeadDoctor}>
+                  Xóa
+                </DeleteText>}
             </Stack>
           </Grid>
         </Grid>

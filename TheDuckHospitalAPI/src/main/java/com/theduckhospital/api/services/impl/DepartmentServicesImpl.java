@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DepartmentServicesImpl implements IDepartmentServices {
@@ -153,5 +154,46 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         }
 
         return optional.get();
+    }
+
+    @Override
+    public Doctor addDoctorDepartment(int departmentId, UUID doctorId) {
+        Department department = getDepartmentById(departmentId);
+
+        Optional<Doctor> optional = doctorRepository.findById(doctorId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Doctor not found");
+        }
+
+        Doctor doctor = optional.get();
+        if (doctor.getDepartment() != null) {
+            throw new IllegalStateException("Doctor already belongs to another department");
+        }
+
+        doctor.setDepartment(department);
+
+        return doctorRepository.save(doctor);
+    }
+
+    @Override
+    public boolean removeDoctorDepartment(int departmentId, UUID doctorId) {
+        Department department = getDepartmentById(departmentId);
+
+        Optional<Doctor> optionalDoctor = doctorRepository.findByStaffIdAndDepartment(doctorId, department);
+        if (optionalDoctor.isEmpty()) {
+            throw new NotFoundException("Doctor not found");
+        }
+
+        Doctor doctor = optionalDoctor.get();
+
+        if (doctor.isHeadOfDepartment()) {
+            doctor.setHeadOfDepartment(false);
+        }
+
+        doctor.setDepartment(null);
+
+        doctorRepository.save(doctor);
+
+        return true;
     }
 }

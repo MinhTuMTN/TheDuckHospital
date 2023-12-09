@@ -6,6 +6,7 @@ import com.theduckhospital.api.repository.DoctorRepository;
 import com.theduckhospital.api.services.IDoctorServices;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,5 +35,10 @@ public class DoctorServicesImpl implements IDoctorServices {
         }
 
         return optional.get();
+    }
+
+    @Override
+    public List<Doctor> getDoctorNotInDepartment() {
+        return doctorRepository.findByDepartmentIsNull();
     }
 }

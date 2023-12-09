@@ -81,7 +81,6 @@ function Row(props) {
           <CustomText
             variant="body1"
             style={{
-              fontWeight: "500",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -189,16 +188,36 @@ function RoomTable(props) {
             >
               <TableRow>
                 <TableCell style={{ width: "35%" }}>
-                  <CustomText color={"#101828"}>Phòng</CustomText>
+                  <CustomText
+                    color={"#101828"}
+                    style={{ fontWeight: "500" }}
+                  >
+                    Phòng
+                  </CustomText>
                 </TableCell>
                 <TableCell style={{ width: "25%" }}>
-                  <CustomText color={"#101828"}>Khoa</CustomText>
+                  <CustomText
+                    color={"#101828"}
+                    style={{ fontWeight: "500" }}
+                  >
+                    Khoa
+                  </CustomText>
                 </TableCell>
                 <TableCell style={{ width: "25%" }}>
-                  <CustomText color={"#101828"}>Trạng thái</CustomText>
+                  <CustomText
+                    color={"#101828"}
+                    style={{ fontWeight: "500" }}
+                  >
+                    Trạng thái
+                  </CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "15%" }}>
-                  <CustomText color={"#101828"}>Tùy chọn</CustomText>
+                  <CustomText
+                    color={"#101828"}
+                    style={{ fontWeight: "500" }}
+                  >
+                    Tùy chọn
+                  </CustomText>
                 </TableCell>
               </TableRow>
             </TableHead>

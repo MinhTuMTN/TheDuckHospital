@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/admin/departments")
 //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -86,6 +88,17 @@ public class DepartmentAdminController {
         );
     }
 
+    @DeleteMapping("/{departmentId}/doctors/{doctorId}")
+    public ResponseEntity<?> deleteDoctorDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Delete doctor from department successfully")
+                        .data(departmentServices.removeDoctorDepartment(departmentId, doctorId))
+                        .build()
+        );
+    }
+
     @PutMapping("/{departmentId}")
     public ResponseEntity<?> updateDepartment(
             @PathVariable int departmentId,
@@ -106,6 +119,17 @@ public class DepartmentAdminController {
                         .success(true)
                         .message("Department restored successfully")
                         .data(departmentServices.restoreDepartment(departmentId))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{departmentId}/doctors/{doctorId}")
+    public ResponseEntity<?> restoreDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Add doctor to department successfully")
+                        .data(departmentServices.addDoctorDepartment(departmentId, doctorId))
                         .build()
         );
     }
