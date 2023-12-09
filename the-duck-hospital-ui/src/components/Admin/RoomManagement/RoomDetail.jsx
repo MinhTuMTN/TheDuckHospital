@@ -18,7 +18,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../DialogConfirm";
+import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 
 const departments = [
@@ -106,7 +106,7 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 function RoomDetail(props) {
   const { room } = props;
   let status = room.deleted;
-  const [statusRoom, setStatusRoom] = useState(false)
+  const [statusRoom, setStatusRoom] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -122,8 +122,7 @@ function RoomDetail(props) {
     setEditStatus(event.target.value);
     if (statusRoom !== event.target.value) {
       setDisabledButton(false);
-    }
-    else {
+    } else {
       setDisabledButton(true);
     }
   };
@@ -159,7 +158,7 @@ function RoomDetail(props) {
       roomName: room.roomName,
       departmentId: room.departmentId,
       description: room.description,
-    })
+    });
   };
 
   return (
@@ -245,16 +244,10 @@ function RoomDetail(props) {
                 onChange={handleStatusChange}
                 className="custom-select"
               >
-                <MenuItem
-                  value={false}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={false} style={{ fontSize: "14px" }}>
                   Đang hoạt động
                 </MenuItem>
-                <MenuItem
-                  value={true}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={true} style={{ fontSize: "14px" }}>
                   Đã khóa
                 </MenuItem>
               </Select>
@@ -365,12 +358,14 @@ function RoomDetail(props) {
                   required
                   fullWidth
                   value={roomEdit.roomName}
-                  onChange={(e) => setRoomEdit((prev) => {
-                    return {
-                      ...prev,
-                      roomName: e.target.value
-                    };
-                  })}
+                  onChange={(e) =>
+                    setRoomEdit((prev) => {
+                      return {
+                        ...prev,
+                        roomName: e.target.value,
+                      };
+                    })
+                  }
                 />
               </Box>
               <Box width="50%">
@@ -403,7 +398,7 @@ function RoomDetail(props) {
                     inputProps={{ "aria-label": "Without label" }}
                   >
                     {departments?.map((item, index) => (
-                      <MenuItem value={item.value} key={index} >
+                      <MenuItem value={item.value} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
                           {item.label}
                         </Typography>
@@ -435,17 +430,14 @@ function RoomDetail(props) {
                       ...prev,
                       description: e.target.value,
                     };
-                  })
+                  });
                 }}
               />
             </Box>
-
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus>
-            Cập nhật
-          </Button>
+          <Button autoFocus>Cập nhật</Button>
         </DialogActions>
       </BootstrapDialog>
     </Stack>

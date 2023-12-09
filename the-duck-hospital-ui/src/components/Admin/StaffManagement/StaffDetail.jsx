@@ -12,7 +12,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../DialogConfirm";
+import DialogConfirm from "../../General/DialogConfirm";
+
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
@@ -43,7 +44,7 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 function StaffDetail(props) {
   const { staff } = props;
   let status = staff.deleted;
-  const [statusStaff, setStatusStaff] = useState(false)
+  const [statusStaff, setStatusStaff] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -57,8 +58,7 @@ function StaffDetail(props) {
     setEditStatus(event.target.value);
     if (statusStaff !== event.target.value) {
       setDisabledButton(false);
-    }
-    else {
+    } else {
       setDisabledButton(true);
     }
   };
@@ -123,18 +123,19 @@ function StaffDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      {staff.departmentName &&
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Khoa</TieuDeCot>
-          </Grid>
+      {staff.departmentName && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Khoa</TieuDeCot>
+            </Grid>
 
-          <Grid item xs={8} md={9}>
-            <NoiDung>{staff.departmentName}</NoiDung>
+            <Grid item xs={8} md={9}>
+              <NoiDung>{staff.departmentName}</NoiDung>
+            </Grid>
           </Grid>
-        </Grid>
-      </BoxStyle>}
+        </BoxStyle>
+      )}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
@@ -183,16 +184,10 @@ function StaffDetail(props) {
                 onChange={handleStatusChange}
                 className="custom-select"
               >
-                <MenuItem
-                  value={false}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={false} style={{ fontSize: "14px" }}>
                   Đang hoạt động
                 </MenuItem>
-                <MenuItem
-                  value={true}
-                  style={{ fontSize: "14px" }}
-                >
+                <MenuItem value={true} style={{ fontSize: "14px" }}>
                   Đã khóa
                 </MenuItem>
               </Select>

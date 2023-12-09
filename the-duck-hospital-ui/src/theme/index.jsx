@@ -39,6 +39,18 @@ function CustomThemeProvider(props) {
         lighter2: "#9fc5e8",
         lightest: "#cfe2f3",
       },
+      normal1: {
+        main: "	rgb(0, 148, 212)",
+      },
+      normal2: {
+        main: "#00a9dd",
+      },
+      delete: {
+        main: "#f0857f",
+      },
+      black: {
+        main: "#46555e",
+      },
       text: {
         main: "#003553",
         teal: "#006451",
@@ -47,6 +59,12 @@ function CustomThemeProvider(props) {
         yellow: "#FCE38A",
         oldPrimary: "#42a5f5",
       },
+      white: {
+        main: "#fff",
+      },
+    },
+    typography: {
+      fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`,
     },
   };
 

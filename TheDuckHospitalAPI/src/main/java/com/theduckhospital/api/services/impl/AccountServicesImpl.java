@@ -249,4 +249,13 @@ public class AccountServicesImpl implements IAccountServices {
 
         return account;
     }
+
+    @Override
+    public String checkInfo(String token) {
+        Account account = findAccountByToken(token);
+        if (account == null)
+            return null;
+
+        return account.getFullName();
+    }
 }

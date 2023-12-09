@@ -12,6 +12,7 @@ import React from "react";
 import CustomTabPanel from "../../components/Customer/CustomTabPanel";
 import CreateNewProfile from "../../components/Customer/CreateNewProfile";
 import FindPatientCode from "../../components/Customer/FindPatientCode";
+import { useLocation } from "react-router-dom";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -33,11 +34,13 @@ const CustomTab = styled(Tab)(({ theme }) => ({
 
 function CreatProfile(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  //const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const profile = useLocation().state?.profile;
   const breakcrumbs = [
     <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
-    <CustomTextBreakcrumb key={2}>Tạo hồ sơ bệnh nhân</CustomTextBreakcrumb>,
+    <CustomTextBreakcrumb key={2}>
+      {profile ? "Chỉnh sửa hồ sơ bệnh nhân" : "Tạo hồ sơ bệnh nhân"}
+    </CustomTextBreakcrumb>,
   ];
   const gradientStyle = {
     fontWeight: "600",
@@ -83,7 +86,7 @@ function CreatProfile(props) {
           }}
         >
           <Typography variant="h5" style={gradientStyle}>
-            Tạo Hồ Sơ Bệnh Nhân
+            {profile ? "Chỉnh Sửa Hồ Sơ Bệnh Nhân" : "Tạo Hồ Sơ Bệnh Nhân"}
           </Typography>
         </Grid>
 
@@ -105,7 +108,13 @@ function CreatProfile(props) {
               textAlign: "center",
             }}
           >
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: "divider",
+                display: profile ? "none" : "block",
+              }}
+            >
               <Tabs
                 value={value}
                 onChange={handleChange}
@@ -127,7 +136,7 @@ function CreatProfile(props) {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <CreateNewProfile />
+              <CreateNewProfile profile={profile} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
               <FindPatientCode />

@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Service {
+public class MedicalService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int serviceId;
@@ -29,12 +29,12 @@ public class Service {
     @ToStringExclude
     private Department department;
 
-    @OneToMany(mappedBy = "service")
+    @OneToMany(mappedBy = "medicalService")
     @JsonBackReference
     @ToStringExclude
     private List<MedicalTest> medicalTests;
 
-    @OneToMany(mappedBy = "service")
+    @OneToMany(mappedBy = "medicalService")
     @JsonBackReference
     @ToStringExclude
     private List<Booking> bookings;

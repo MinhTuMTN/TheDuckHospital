@@ -13,11 +13,12 @@ import {
   Toolbar,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
-import { usePopover } from "../hooks/use-popover";
+import React, { useEffect } from "react";
+import { usePopover } from "../../hooks/use-popover";
 import AccountPopover from "./AccountPopover";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { checkInfo } from "../../services/customer/AuthServices";
 
 const TOP_NAV_HEIGHT = 64;
 
@@ -67,8 +68,16 @@ function NavBar(props) {
   const { onDrawerClick } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
-  const { token } = useAuth();
+  const { token, setFullName, fullName } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleGetFullName = async () => {
+      const response = await checkInfo();
+      if (response.success) setFullName(response.data.data);
+    };
+    handleGetFullName();
+  }, [setFullName]);
   //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover.
   return (
     <Wrapper>
@@ -169,7 +178,7 @@ function NavBar(props) {
                   ref={accountPopover.anchorRef}
                 >
                   <PersonIcon sx={{ marginRight: "5px" }} />
-                  Nguyễn Ngọc Tuyết Vi
+                  {fullName}
                 </CustomButton>
               )}
             </Box>

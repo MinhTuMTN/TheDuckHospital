@@ -13,8 +13,8 @@ import React, { useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
-import DialogForm from "../../../components/DialogForm";
-import MuiTextFeild from "../../../components/MuiTextFeild";
+import DialogForm from "../../../components/General/DialogForm";
+import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
 
 const items = [
@@ -68,7 +68,7 @@ const items = [
     departmentName: "Khoa nội soi",
     deleted: false,
   },
-]
+];
 
 const totalItems = items.length;
 
@@ -238,9 +238,9 @@ function RoomListPage(props) {
               <SearchDepartmentList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                // onApply={() => {
+                //   setButtonClicked(true);
+                // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -360,7 +360,7 @@ function RoomListPage(props) {
             roomName: "",
             department: "",
             description: "",
-          })
+          });
         }}
         // onOk={handleAddCatalog}
         open={openDialogForm}
@@ -395,9 +395,7 @@ function RoomListPage(props) {
             }}
           />
           <Box>
-            <CustomTypography variant="body1">
-              Vai trò
-            </CustomTypography>
+            <CustomTypography variant="body1">Vai trò</CustomTypography>
 
             <FormControl fullWidth>
               <Select
@@ -418,10 +416,7 @@ function RoomListPage(props) {
                 inputProps={{ "aria-label": "Without label" }}
               >
                 {departments?.map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    value={item.value}
-                  >
+                  <MenuItem key={index} value={item.value}>
                     <Typography style={{ fontSize: "16px" }}>
                       {item.label}
                     </Typography>
