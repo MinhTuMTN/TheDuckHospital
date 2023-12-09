@@ -25,7 +25,7 @@ public class MedicalTest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private Service service;
+    private MedicalService medicalService;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
