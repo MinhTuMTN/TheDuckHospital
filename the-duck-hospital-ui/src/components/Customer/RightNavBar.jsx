@@ -27,7 +27,7 @@ const mainItems = [
   {
     display: "Hồ sơ bệnh nhân",
     icon: <PersonOutlineIcon />,
-    to: "/user/patient-records",
+    to: "/user",
   },
 
   {

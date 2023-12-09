@@ -20,12 +20,14 @@ import {
   Zoom,
 } from "@mui/material";
 import React from "react";
+import FormatDate from "../../General/FormatDate";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Zoom timeout={2000} ref={ref} {...props} />;
 });
 
 function PatientRecordDetailsDialog(props) {
+  const { profile } = props;
   const { open, onClose } = props;
   return (
     <Dialog
@@ -73,7 +75,7 @@ function PatientRecordDetailsDialog(props) {
                   textTransform: "uppercase",
                 }}
               >
-                Nguyễn Văn A
+                {profile.fullName}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -84,7 +86,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                01/01/2000
+                <FormatDate dateTime={profile.dateOfBirth} />
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -95,7 +97,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                0987654321
+                {profile.phoneNumber}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -106,7 +108,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                Nam
+                {profile.gender === "MALE" ? "Nam" : "Nữ"}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -117,8 +119,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                1 Võ Văn Ngân, phường Linh Chiểu, Thành phố Thủ Đức, TP. Hồ Chí
-                Minh
+                {`${profile.streetName}, ${profile.ward?.wardName}, ${profile.district?.districtName}, ${profile.province?.provinceName}`}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -129,7 +130,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                Kinh
+                {profile.nation?.nationName}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -140,7 +141,9 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                082201234756
+                {!profile.identityNumber || profile.identityNumber.trim() === ""
+                  ? "Chưa cập nhật"
+                  : profile.identityNumber}
               </Typography>
             </Grid>
             <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -151,7 +154,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                ABCD-1234
+                {!profile.patientId ? "Chưa cập nhật" : profile.patientId}
               </Typography>
             </Grid>
 
@@ -163,7 +166,9 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item xs={12} md={9.5}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                nguyenminhtu2002@gmail.com
+                {!profile.email || profile.email.trim() === ""
+                  ? "Chưa cập nhật email"
+                  : profile.email}
               </Typography>
             </Grid>
           </Grid>

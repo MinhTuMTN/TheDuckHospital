@@ -59,6 +59,10 @@ function Router(props) {
           element: <CreateProfile />,
         },
         {
+          path: "/edit-profile",
+          element: <CreateProfile />,
+        },
+        {
           path: "/choose-doctor",
           element: <ChooseDoctorPage />,
         },
@@ -92,7 +96,6 @@ function Router(props) {
               path: "/user",
               children: [
                 {
-                  path: "patient-records",
                   element: <PatientRecordsPage />,
                   index: true,
                 },

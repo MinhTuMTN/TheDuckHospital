@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface IPatientProfileServices {
     PatientProfile createPatientProfile(String token, CreatePatientProfileRequest request);
+    PatientProfileItemResponse updatePatientProfile(String token, UUID patientProfileId, CreatePatientProfileRequest request);
     List<PatientProfileItemResponse> getActivePatientProfile(String token);
     boolean deletePatientProfile(String token, UUID patientProfileId);
 }

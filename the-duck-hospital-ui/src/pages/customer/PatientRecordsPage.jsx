@@ -1,8 +1,25 @@
 import { Box, Grid, Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import PatientRecordItem from "../../components/Customer/PatientRecord/PatientRecordItem";
+import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
 
 function PatientRecordsPage(props) {
+  const [profiles, setProfiles] = React.useState([]);
+
+  const handleGetActiveProfiles = useCallback(async () => {
+    const response = await getAllPatientProfiles();
+    if (response.success) setProfiles(response.data.data);
+    else
+      enqueueSnackbar("Lấy danh sách hồ sơ bệnh nhân thất bại", {
+        variant: "error",
+      });
+  }, []);
+
+  useEffect(() => {
+    handleGetActiveProfiles();
+  }, [handleGetActiveProfiles]);
+
   return (
     <Box
       py={4}
@@ -16,15 +33,14 @@ function PatientRecordsPage(props) {
         Hồ sơ bệnh nhân
       </Typography>
       <Grid container spacing={2} mt={2}>
-        <Grid item xs={12}>
-          <PatientRecordItem />
-        </Grid>
-        <Grid item xs={12}>
-          <PatientRecordItem />
-        </Grid>
-        <Grid item xs={12}>
-          <PatientRecordItem />
-        </Grid>
+        {profiles.map((profile) => (
+          <Grid item xs={12} key={profile.patientProfileId}>
+            <PatientRecordItem
+              profile={profile}
+              reload={handleGetActiveProfiles}
+            />
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

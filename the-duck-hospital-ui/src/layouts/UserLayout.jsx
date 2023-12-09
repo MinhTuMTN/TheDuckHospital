@@ -70,7 +70,7 @@ const sidebarItems = [
   {
     display: "Hồ sơ bệnh nhân",
     icon: <BadgeOutlinedIcon />,
-    to: "/user/patient-records",
+    to: "/user",
     section: "PatientRecords",
   },
   {
@@ -101,9 +101,6 @@ const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
 
 function UserLayout() {
   const navigate = useNavigate();
-  React.useEffect(() => {
-    console.log(window.location.pathname);
-  });
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
@@ -112,7 +109,8 @@ function UserLayout() {
       <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
     </CustomLink>,
     <CustomTextBreakcrumb key={3}>
-      {sidebarItems.find((s) => s.to === window.location.pathname).display}
+      {sidebarItems.find((s) => s.to === window.location.pathname)?.display ||
+        "Hồ sơ bệnh nhân"}
     </CustomTextBreakcrumb>,
   ];
   return (
@@ -139,6 +137,9 @@ function UserLayout() {
                   key={`add-profile`}
                   sx={{
                     width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/create-profile");
                   }}
                 >
                   <ListItemButton

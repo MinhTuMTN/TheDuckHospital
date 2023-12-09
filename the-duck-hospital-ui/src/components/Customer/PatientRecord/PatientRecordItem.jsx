@@ -13,10 +13,29 @@ import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import PatientRecordDetailsDialog from "./PatientRecordDetailsDialog";
 import DialogConfirm from "../../General/DialogConfirm";
+import FormatDate from "../../General/FormatDate";
+import { deletePatientProfile } from "../../../services/customer/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 
 function PatientRecordItem(props) {
+  const { profile, reload } = props;
   const [open, setOpen] = React.useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const navigate = useNavigate();
+
+  const handleDeleteProfile = async () => {
+    const response = await deletePatientProfile(profile.patientProfileId);
+    if (response.success) {
+      enqueueSnackbar("Xoá hồ sơ bệnh nhân thành công", {
+        variant: "success",
+      });
+      reload();
+    } else
+      enqueueSnackbar("Xoá hồ sơ bệnh nhân thất bại", {
+        variant: "error",
+      });
+  };
   return (
     <Box
       component={Paper}
@@ -50,7 +69,7 @@ function PatientRecordItem(props) {
               textTransform: "uppercase",
             }}
           >
-            Nguyễn Văn A
+            {profile.fullName}
           </Typography>
         </Grid>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -61,7 +80,7 @@ function PatientRecordItem(props) {
         </Grid>
         <Grid item sm={9.5} xs={7}>
           <Typography variant="body" fontSize={14} fontWeight={500}>
-            01/01/2000
+            <FormatDate dateTime={profile.dateOfBirth} />
           </Typography>
         </Grid>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -72,7 +91,7 @@ function PatientRecordItem(props) {
         </Grid>
         <Grid item sm={9.5} xs={7}>
           <Typography variant="body" fontSize={14} fontWeight={500}>
-            0987654321
+            {profile.phoneNumber}
           </Typography>
         </Grid>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -83,7 +102,7 @@ function PatientRecordItem(props) {
         </Grid>
         <Grid item sm={9.5} xs={7}>
           <Typography variant="body" fontSize={14} fontWeight={500}>
-            Nam
+            {profile.gender === "MALE" ? "Nam" : "Nữ"}
           </Typography>
         </Grid>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -94,7 +113,7 @@ function PatientRecordItem(props) {
         </Grid>
         <Grid item sm={9.5} xs={7}>
           <Typography variant="body" fontSize={14} fontWeight={500}>
-            1 Võ Văn Ngân, phường Linh Chiểu, Thành phố Thủ Đức, TP. Hồ Chí Minh
+            {`${profile.streetName}, ${profile.ward?.wardName}, ${profile.district?.districtName}, ${profile.province?.provinceName}`}
           </Typography>
         </Grid>
         <Grid item sm={2.5} xs={5} component={Stack} alignItems={"center"}>
@@ -105,7 +124,7 @@ function PatientRecordItem(props) {
         </Grid>
         <Grid item sm={9.5} xs={7}>
           <Typography variant="body" fontSize={14} fontWeight={500}>
-            Kinh
+            {profile.nation?.nationName}
           </Typography>
         </Grid>
       </Grid>
@@ -149,6 +168,9 @@ function PatientRecordItem(props) {
               sm: 12.9,
             },
           }}
+          onClick={() => {
+            navigate("/edit-profile", { state: { profile } });
+          }}
         >
           Chỉnh sửa
         </Button>
@@ -168,7 +190,11 @@ function PatientRecordItem(props) {
         </Button>
       </Box>
 
-      <PatientRecordDetailsDialog open={open} onClose={() => setOpen(false)} />
+      <PatientRecordDetailsDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        profile={profile}
+      />
       <DialogConfirm
         cancelText={"Hủy"}
         okText={"Xoá"}
@@ -176,7 +202,7 @@ function PatientRecordItem(props) {
         content={"Bạn có chắc chắn muốn xoá hồ sơ bệnh nhân này?"}
         onCancel={() => setOpenDeleteDialog(false)}
         onClose={() => setOpenDeleteDialog(false)}
-        onOk={() => {}}
+        onOk={() => handleDeleteProfile()}
         open={openDeleteDialog}
       />
     </Box>

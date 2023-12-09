@@ -83,7 +83,12 @@ function AccountPopover(props) {
             },
           }}
         >
-          <CustomMenuItem onClick={() => navigate("/user/patient-records")}>
+          <CustomMenuItem
+            onClick={() => {
+              navigate("/user");
+              onClose();
+            }}
+          >
             <InfoOutlinedIcon
               fontSize="small"
               sx={{
@@ -92,7 +97,12 @@ function AccountPopover(props) {
             />
             Hồ sơ bệnh nhân
           </CustomMenuItem>
-          <CustomMenuItem onClick={() => navigate("/user/medical-bills")}>
+          <CustomMenuItem
+            onClick={() => {
+              navigate("/user/medical-bills");
+              onClose();
+            }}
+          >
             <NoteAddOutlinedIcon
               fontSize="small"
               sx={{

@@ -24,7 +24,10 @@ import {
   getAllWards,
 } from "../../services/common/AddressesServices";
 import { getAllNations } from "../../services/common/NationServices";
-import { createPatientProfile } from "../../services/customer/PatientProfileServices";
+import {
+  createPatientProfile,
+  updatePatientProfile,
+} from "../../services/customer/PatientProfileServices";
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
@@ -51,26 +54,38 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 function CreateNewProfile(props) {
+  const { profile } = props;
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const [fullName, setFullName] = React.useState("");
-  const [dateOfBirth, setDateOfBirth] = React.useState("");
-  const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [identityNumber, setIdentityNumber] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [streetName, setStreetName] = React.useState("");
-  const [gender, setGender] = React.useState(0);
+  const [fullName, setFullName] = React.useState(profile?.fullName || "");
+  const [dateOfBirth, setDateOfBirth] = React.useState(
+    dayjs(profile?.dateOfBirth) || ""
+  );
+  const [phoneNumber, setPhoneNumber] = React.useState(
+    profile?.phoneNumber || ""
+  );
+  const [identityNumber, setIdentityNumber] = React.useState(
+    profile?.identityNumber || ""
+  );
+  const [email, setEmail] = React.useState(profile?.email || "");
+  const [streetName, setStreetName] = React.useState(profile?.streetName || "");
+  const [gender, setGender] = React.useState(
+    profile?.gender === "FEMALE" ? 1 : 0
+  );
 
   // Nations
   const [nations, setNations] = useState([]);
-  const [selectedNationId, setSelectedNationId] = useState("");
+  const [selectedNationId, setSelectedNationId] = useState(
+    profile?.nation?.nationId || ""
+  );
   const handleGetAllNations = useCallback(async () => {
     const response = await getAllNations();
     if (response.success) {
       setNations(response.data.data);
-      setSelectedNationId(response.data.data[0].nationId);
+      if (profile) setSelectedNationId(profile?.nation?.nationId);
+      else setSelectedNationId(response.data.data[0].nationId);
     }
-  }, []);
+  }, [profile]);
 
   // Provinces
   const [provinces, setProvinces] = React.useState([]);
@@ -79,9 +94,10 @@ function CreateNewProfile(props) {
     const response = await getAllProvinces();
     if (response.success) {
       setProvinces(response.data.data);
-      setSelectedProvinceId(response.data.data[0]?.provinceId);
+      if (profile) setSelectedProvinceId(profile?.province?.provinceId);
+      else setSelectedProvinceId(response.data.data[0]?.provinceId);
     }
-  }, []);
+  }, [profile]);
 
   // Districts
   const [districts, setDistricts] = React.useState([]);
@@ -92,9 +108,10 @@ function CreateNewProfile(props) {
     const response = await getAllDistricts(selectedProvinceId);
     if (response.success) {
       setDistricts(response.data.data);
-      setSelectedDistrictId(response.data.data[0]?.districtId);
+      if (profile) setSelectedDistrictId(profile?.district?.districtId);
+      else setSelectedDistrictId(response.data.data[0]?.districtId);
     }
-  }, [selectedProvinceId]);
+  }, [selectedProvinceId, profile]);
 
   // Wards
   const [wards, setWards] = useState([]);
@@ -105,9 +122,10 @@ function CreateNewProfile(props) {
     const response = await getAllWards(selectedDistrictId);
     if (response.success) {
       setWards(response.data.data);
-      setSelectedWardId(response.data.data[0]?.wardId);
+      if (profile) setSelectedWardId(profile?.ward?.wardId);
+      else setSelectedWardId(response.data.data[0]?.wardId);
     }
-  }, [selectedDistrictId]);
+  }, [selectedDistrictId, profile]);
 
   useEffect(() => {
     handleGetAllNations();
@@ -122,7 +140,7 @@ function CreateNewProfile(props) {
     handleGetAllWards();
   }, [handleGetAllWards]);
 
-  const handleCreatePatientProfile = async () => {
+  const handleCreateUpdatePatientProfile = async () => {
     if (fullName.trim() === "") {
       enqueueSnackbar("Vui lòng nhập họ và tên", { variant: "error" });
       return;
@@ -133,7 +151,10 @@ function CreateNewProfile(props) {
       return;
     }
 
-    if (phoneNumber.trim().length !== 10 || !phoneNumber.startsWith("0")) {
+    if (
+      !profile &&
+      (phoneNumber.trim().length !== 10 || !phoneNumber.startsWith("0"))
+    ) {
       enqueueSnackbar("Số điện thoại không hợp lệ", { variant: "error" });
       return;
     }
@@ -165,14 +186,31 @@ function CreateNewProfile(props) {
       nationId: selectedNationId,
     };
 
-    enqueueSnackbar("Đang tạo hồ sơ bệnh nhân...", { variant: "info" });
-    const response = await createPatientProfile(data);
+    if (profile)
+      enqueueSnackbar("Đang cập nhật hồ sơ bệnh nhân...", {
+        variant: "info",
+      });
+    else enqueueSnackbar("Đang tạo hồ sơ bệnh nhân...", { variant: "info" });
+    let response;
+    if (profile) {
+      response = await updatePatientProfile(profile.patientProfileId, data);
+    } else {
+      response = await createPatientProfile(data);
+    }
     if (response.success) {
-      enqueueSnackbar("Tạo hồ sơ bệnh nhân thành công", { variant: "success" });
+      let message = "Tạo hồ sơ bệnh nhân thành công";
+      if (profile) message = "Cập nhật hồ sơ bệnh nhân thành công";
+
+      enqueueSnackbar(message, { variant: "success" });
       window.scrollTo(0, 0);
       navigate("/user", { replace: true });
+    } else if (response.statusCode === 409) {
+      enqueueSnackbar("Số điện thoại không hợp lệ", { variant: "error" });
     } else {
-      enqueueSnackbar("Tạo hồ sơ bệnh nhân thất bại", { variant: "error" });
+      let message = "Tạo hồ sơ bệnh nhân thất bại";
+      if (profile) message = "Cập nhật hồ sơ bệnh nhân thất bại";
+
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
   return (
@@ -228,6 +266,7 @@ function CreateNewProfile(props) {
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <CustomTextField
+            disabled={profile?.patientCode}
             size="medium"
             variant="outlined"
             id="outlined-basic"
@@ -253,6 +292,7 @@ function CreateNewProfile(props) {
           </CustomTypography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <CustomDatePicker
+              disabled={profile?.patientCode}
               format="DD/MM/YYYY"
               value={dateOfBirth}
               onChange={(newValue) => setDateOfBirth(newValue)}
@@ -299,6 +339,7 @@ function CreateNewProfile(props) {
           </CustomTypography>
           <FormControl fullWidth>
             <Select
+              disabled={profile?.patientCode}
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={gender}
@@ -322,9 +363,10 @@ function CreateNewProfile(props) {
               textAlign: "left",
             }}
           >
-            Số CMND/CCCD{" "}
+            Số CMND/CCCD
           </CustomTypography>
           <CustomTextField
+            disabled={profile?.patientCode}
             size="medium"
             variant="outlined"
             id="outlined-basic"
@@ -349,6 +391,7 @@ function CreateNewProfile(props) {
           </CustomTypography>
           <FormControl fullWidth>
             <Select
+              disabled={profile?.patientCode}
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={selectedNationId}
@@ -534,10 +577,10 @@ function CreateNewProfile(props) {
             textAlign: "right",
           }}
           variant="contained"
-          onClick={handleCreatePatientProfile}
+          onClick={handleCreateUpdatePatientProfile}
         >
           <PersonAddAlt1Icon sx={{ marginRight: "5px" }} />
-          Tạo hồ sơ
+          {profile ? "Cập nhật hồ sơ" : "Tạo hồ sơ"}
         </CustomButton>
       </Grid>
     </Grid>
