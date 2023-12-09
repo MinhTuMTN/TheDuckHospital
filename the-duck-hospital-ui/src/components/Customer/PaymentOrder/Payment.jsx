@@ -1,11 +1,8 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import MedicationIcon from "@mui/icons-material/Medication";
-import PaidIcon from "@mui/icons-material/Paid";
-import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Button,
@@ -15,11 +12,10 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PropTypes from "prop-types";
 import React from "react";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import createTableLine from "./TableLine";
+import FormatCurrency from "../../General/FormatCurrency";
 
 Payment.propTypes = {
   booking: PropTypes.object,
@@ -67,6 +63,7 @@ function Row(props) {
     row.label.toLowerCase() === "tiền khám:" ? "#109df5" : "#17496c";
   const textFontWeightValue =
     row.label.toLowerCase() === "tiền khám:" ? "500" : "400";
+  const isFee = row.label.toLowerCase() === "tiền khám:";
   return (
     <Stack
       direction={"row"}
@@ -97,7 +94,7 @@ function Row(props) {
           fontWeight: textFontWeightValue,
         }}
       >
-        {props.value}
+        {isFee ? <FormatCurrency amount={row.value} /> : row.value}
       </CustomTypographyValue>
     </Stack>
   );
@@ -205,7 +202,7 @@ function Payment(props) {
                 textAlign: "right",
               }}
             >
-              10.000 VNĐ
+              <FormatCurrency amount={10000} />
             </CustomTypographyValue>{" "}
           </Stack>
           <Stack
@@ -235,7 +232,7 @@ function Payment(props) {
                 fontSize: "20px",
               }}
             >
-              {totalFee} VNĐ
+              <FormatCurrency amount={totalFee} />
             </Typography>{" "}
           </Stack>
           <Stack
