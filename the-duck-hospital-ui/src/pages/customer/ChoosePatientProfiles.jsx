@@ -14,6 +14,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
 import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import CustomLink from "../../components/General/CustomLink";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -32,9 +34,12 @@ function ChoosePatientProfiles(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const navigate = useNavigate();
 
   const breakcrumbs = [
-    <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
+    <CustomLink key={1} to="/">
+      <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>
+    </CustomLink>,
     <CustomTextBreakcrumb key={2}>Đăng ký khám bệnh</CustomTextBreakcrumb>,
     <CustomTextBreakcrumb key={3}>Chọn hồ sơ bệnh nhân</CustomTextBreakcrumb>,
   ];
@@ -88,7 +93,6 @@ function ChoosePatientProfiles(props) {
           container
           xs={12}
           style={{
-            paddingLeft: "0px",
             paddingRight: isMdUp ? "20px" : "0",
             textAlign: "left",
             justifyContent: "space-between",
@@ -101,6 +105,9 @@ function ChoosePatientProfiles(props) {
                 "&:hover": {
                   backgroundColor: "	#ffffff",
                 },
+              }}
+              onClick={() => {
+                navigate("/");
               }}
             >
               <ArrowBackIcon
@@ -128,6 +135,9 @@ function ChoosePatientProfiles(props) {
                   backgroundColor: "	#dbf1fb",
                 },
                 textAlign: "right",
+              }}
+              onClick={() => {
+                navigate("/create-profile");
               }}
             >
               <PersonAddAlt1Icon />

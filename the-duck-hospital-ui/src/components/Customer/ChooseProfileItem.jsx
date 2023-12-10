@@ -16,15 +16,16 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-import React from "react";
-import RowInfo from "./RowInfo";
 import dayjs from "dayjs";
-import DialogConfirm from "../General/DialogConfirm";
 import { enqueueSnackbar } from "notistack";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { deletePatientProfile } from "../../services/customer/PatientProfileServices";
+import DialogConfirm from "../General/DialogConfirm";
+import RowInfo from "./RowInfo";
 
 const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
-  "& Mui-expanded MuiAccordionSummary-contentGutters": {
+  "& .MuiAccordionSummary-contentGutters.Mui-expanded": {
     margin: "20px 0 0 0",
   },
 }));
@@ -35,11 +36,17 @@ const CustomButton = styled(Button)(({ theme }) => ({
   toUpperCase: "none",
   fontSize: "14px !important",
   textTransform: "none",
+
+  // Extra small devices (portrait phones, less than 576px)
+  "@media (max-width: 575.98px)": {
+    padding: "8px 10px",
+  },
 }));
 
 function ChooseProfileItem(props) {
   const { profile } = props;
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleDeleteProfile = async () => {
     const response = await deletePatientProfile(profile.patientProfileId);
@@ -58,9 +65,7 @@ function ChooseProfileItem(props) {
   return (
     <>
       <Accordion
-        className="accordion-hello"
         sx={{
-          width: "100%",
           borderRadius: "15px",
           transition: "border 0.3s, filter 0.3s",
           "&:hover": {
@@ -71,11 +76,8 @@ function ChooseProfileItem(props) {
         <StyledAccordionSummary
           aria-controls="panel1a-content"
           id="panel1a-header"
-          sx={{
-            width: "100%",
-          }}
         >
-          <Stack direction={"column"} spacing={0.5}>
+          <Stack direction={"column"} spacing={0.5} width={"100%"}>
             <RowInfo
               title={"Họ và tên:"}
               value={profile.fullName}
@@ -95,7 +97,7 @@ function ChooseProfileItem(props) {
         </StyledAccordionSummary>
         <AccordionDetails
           sx={{
-            width: "100%",
+            maxWidth: "100%",
           }}
         >
           <Stack direction={"column"} spacing={0.5}>
@@ -125,10 +127,13 @@ function ChooseProfileItem(props) {
                 alignItems={"center"}
                 sx={{
                   margin: "20px 0 0 0",
-                  justifyContent: "space-between",
+                  justifyContent: {
+                    xs: "center",
+                    md: "space-between",
+                  },
                 }}
               >
-                <Box>
+                <Box flex={{ xs: 3, md: 2 }} textAlign={"left"}>
                   <CustomButton
                     variant="contained"
                     sx={{
@@ -153,6 +158,13 @@ function ChooseProfileItem(props) {
                         backgroundColor: "	#dbf1fb",
                       },
                     }}
+                    onClick={() => {
+                      navigate("/edit-profile", {
+                        state: {
+                          profile,
+                        },
+                      });
+                    }}
                   >
                     <EditIcon />
                     Chỉnh sửa
@@ -160,6 +172,7 @@ function ChooseProfileItem(props) {
                 </Box>
 
                 <CustomButton
+                  flex={{ xs: 1, md: 1 }}
                   variant="contained"
                   sx={{
                     backgroundImage:
@@ -169,6 +182,13 @@ function ChooseProfileItem(props) {
                       backgroundImage:
                         "linear-gradient(to right, #42a5f5, #6fccea)",
                     },
+                  }}
+                  onClick={() => {
+                    navigate("/choose-doctor", {
+                      state: {
+                        profile,
+                      },
+                    });
                   }}
                 >
                   Tiếp tục
