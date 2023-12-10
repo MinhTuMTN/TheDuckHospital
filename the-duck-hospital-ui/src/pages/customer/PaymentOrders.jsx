@@ -113,7 +113,10 @@ function PaymentOrders(props) {
             <Header>
               <TextHeader variant="body2">Thanh toán</TextHeader>
             </Header>
-            <Payment schedules={location.state?.schedules} />
+            <Payment
+              schedules={location.state?.schedules}
+              profile={location.state?.profile}
+            />
           </CustomOutline>
         </Grid>
       </Grid>

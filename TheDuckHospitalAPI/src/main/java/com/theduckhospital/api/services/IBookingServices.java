@@ -3,8 +3,9 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.dto.request.BookingRequest;
 
 import java.util.Map;
+import java.util.UUID;
 
 public interface IBookingServices {
     String createBookingAndPayment(String token, BookingRequest request);
-    boolean checkBookingCallback(Map<String, String> vnpParams);
+    UUID checkBookingCallback(Map<String, String> vnpParams);
 }

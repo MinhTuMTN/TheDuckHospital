@@ -26,6 +26,8 @@ public class Transaction {
     private Date createdAt;
     private Date lastModifiedAt;
     private boolean deleted;
+    private String bankCode;
+    private String paymentMethod;
 
     @OneToMany(mappedBy = "transaction")
     @JsonBackReference

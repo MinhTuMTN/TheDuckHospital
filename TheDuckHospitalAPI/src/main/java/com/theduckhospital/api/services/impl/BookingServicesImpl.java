@@ -98,7 +98,7 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public boolean checkBookingCallback(Map<String, String> vnpParams) {
+    public UUID checkBookingCallback(Map<String, String> vnpParams) {
         Map<String, String> results = new HashMap<>();
         List<String> keys = vnpParams.keySet().stream().toList();
         for (String key : keys) {
@@ -113,18 +113,24 @@ public class BookingServicesImpl implements IBookingServices {
         String secureHash = VNPayConfig.hashAllFields(results);
         String vnp_SecureHash = vnpParams.get("vnp_SecureHash");
         if (!secureHash.equals(vnp_SecureHash) || !vnpParams.get("vnp_ResponseCode").equals("00"))
-            return false;
+            return null;
 
         UUID transactionId = UUID.fromString(vnpParams.get("vnp_OrderInfo").split(":")[1]);
-        return updateTransactionAndBooking(transactionId);
+        String bankCode = vnpParams.get("vnp_BankCode");
+        String paymentMethod = "VNPAY";
+        updateTransactionAndBooking(transactionId, bankCode, paymentMethod);
+
+        return transactionId;
     }
 
-    private boolean updateTransactionAndBooking(UUID transactionId) {
+    private boolean updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
         Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
         if (transaction == null)
             return false;
 
         transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setBankCode(bankCode);
+        transaction.setPaymentMethod(paymentMethod);
         transactionRepository.save(transaction);
 
         List<Booking> bookings = transaction.getBookings();

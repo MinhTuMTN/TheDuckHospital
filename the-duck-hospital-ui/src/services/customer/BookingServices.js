@@ -1,5 +1,5 @@
-import { get } from "../AxiosInstance";
+import { post } from "../AxiosInstance";
 
-export const test = () => {
-  return get("/booking");
+export const createBooking = (data) => {
+  return post("/booking", data);
 };

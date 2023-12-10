@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -39,8 +40,9 @@ public class BookingController {
             @RequestParam(required=false) Map<String,String> params,
             HttpServletResponse response
     ) throws IOException {
-        if (bookingServices.checkBookingCallback(params))
-            response.sendRedirect("http://localhost:3000/payment-success");
+        UUID transactionId = bookingServices.checkBookingCallback(params);
+        if (transactionId != null)
+            response.sendRedirect("http://localhost:3000/payment-success?transactionId=" + transactionId);
         else
             response.sendRedirect("http://localhost:3000/payment-failed");
     }

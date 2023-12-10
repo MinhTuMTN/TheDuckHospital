@@ -17,8 +17,9 @@ import React from "react";
 import createTableLine from "./TableLine";
 import FormatCurrency from "../../General/FormatCurrency";
 import { useNavigate } from "react-router-dom";
-import { test } from "../../../services/customer/BookingServices";
+import { createBooking } from "../../../services/customer/BookingServices";
 import Loading from "../../General/Loading";
+import { enqueueSnackbar } from "notistack";
 
 Payment.propTypes = {
   booking: PropTypes.object,
@@ -105,7 +106,7 @@ function Row(props) {
 }
 
 function Payment(props) {
-  const { schedules } = props;
+  const { schedules, profile } = props;
   const navigate = useNavigate();
   let total = 0;
   const tableLines = schedules.map((item) => {
@@ -118,10 +119,17 @@ function Payment(props) {
 
   const handlePayment = async () => {
     setIsLoading(true);
-    const response = await test();
+    const response = await createBooking({
+      patientProfileId: profile.patientProfileId,
+      doctorScheduleIds: schedules.map(
+        (schedule) => schedule.schedule.doctorScheduleId
+      ),
+    });
     setIsLoading(false);
     if (response.success) {
       window.location.href = response.data.data;
+    } else {
+      enqueueSnackbar("Đặt lịch không thành công", { variant: "error" });
     }
   };
 
