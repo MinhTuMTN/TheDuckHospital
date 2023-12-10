@@ -6,6 +6,7 @@ import BabyChangingStationIcon from "@mui/icons-material/BabyChangingStation";
 import HealingIcon from "@mui/icons-material/Healing";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import DnsIcon from "@mui/icons-material/Dns";
 // import pic from "../assets/logo-removebg-preview.jpg";
 
@@ -79,6 +80,12 @@ const sidebarItems = [
     icon: <MeetingRoomIcon />,
     to: "/admin/room-management",
     section: "room-management",
+  },
+  {
+    display: "Dịch vụ",
+    icon: <MedicalServicesIcon />,
+    to: "/admin/service-management",
+    section: "service-management",
   },
   {
     display: "Thanh Toán",

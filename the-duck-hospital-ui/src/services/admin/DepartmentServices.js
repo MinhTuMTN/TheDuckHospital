@@ -8,6 +8,10 @@ export const getAllDepartments = () => {
   return get("/admin/departments", null, { Authorization: "" });
 };
 
+export const getDepartmentsWithoutServices = () => {
+  return get("/admin/departments/without-services", null, { Authorization: "" });
+};
+
 export const getActiveDoctorsDepartment = (departmentId) => {
   return get(`/admin/departments/${departmentId}/doctors`, null, { Authorization: "" });
 };

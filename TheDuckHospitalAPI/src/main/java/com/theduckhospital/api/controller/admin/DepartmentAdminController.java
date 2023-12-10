@@ -77,6 +77,17 @@ public class DepartmentAdminController {
         );
     }
 
+    @GetMapping("/without-services")
+    public ResponseEntity<?> getDepartmentsWithoutServices() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get departments without services successfully")
+                        .data(departmentServices.getDepartmentsWithoutServices())
+                        .build()
+        );
+    }
+
     @DeleteMapping("/{departmentId}")
     public ResponseEntity<?> deleteDepartment(@PathVariable int departmentId) {
         return ResponseEntity.ok(
@@ -124,7 +135,7 @@ public class DepartmentAdminController {
     }
 
     @PutMapping("/{departmentId}/doctors/{doctorId}")
-    public ResponseEntity<?> restoreDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
+    public ResponseEntity<?> addDoctorDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

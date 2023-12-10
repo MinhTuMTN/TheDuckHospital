@@ -196,4 +196,9 @@ public class DepartmentServicesImpl implements IDepartmentServices {
 
         return true;
     }
+
+    @Override
+    public List<Department> getDepartmentsWithoutServices() {
+        return departmentRepository.findDepartmentByMedicalServicesEmpty();
+    }
 }

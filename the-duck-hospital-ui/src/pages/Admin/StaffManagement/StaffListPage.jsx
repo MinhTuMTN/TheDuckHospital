@@ -49,28 +49,7 @@ const roles = [
   },
 ];
 
-const degrees = [
-  {
-    value: "BS",
-    label: "BS",
-  },
-  {
-    value: "ThS",
-    label: "ThS",
-  },
-  {
-    value: "TS",
-    label: "TS",
-  },
-  {
-    value: "PGS",
-    label: "PGS",
-  },
-  {
-    value: "GS",
-    label: "GS",
-  },
-];
+const degrees = ["BS", "ThS", "TS", "PGS", "GS"];
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -661,9 +640,9 @@ function StaffListPage(props) {
                       inputProps={{ "aria-label": "Without label" }}
                     >
                       {degrees?.map((item, index) => (
-                        <MenuItem key={index} value={item.value}>
+                        <MenuItem key={index} value={item}>
                           <Typography style={{ fontSize: "16px" }}>
-                            {item.label}
+                            {item}
                           </Typography>
                         </MenuItem>
                       ))}

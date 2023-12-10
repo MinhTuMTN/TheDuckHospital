@@ -25,4 +25,6 @@ public interface IDepartmentServices {
     Doctor addDoctorDepartment(int departmentId, UUID doctorId);
 
     boolean removeDoctorDepartment(int departmentId, UUID doctorId);
+
+    List<Department> getDepartmentsWithoutServices();
 }

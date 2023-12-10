@@ -20,11 +20,11 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
-import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
 import { addDoctorDepartment, getDepartmentById } from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
 import CloseIcon from "@mui/icons-material/Close";
 import { getDoctorsNotInDepartment } from "../../../services/admin/DoctorServices";
+import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -154,7 +154,6 @@ function DepartmentDetailPage() {
               </Stack>
             </Grid>
           </Grid>
-
           <Grid container>
             <Grid item xs={12}>
               <Stack
@@ -195,7 +194,7 @@ function DepartmentDetailPage() {
               fontWeight: 700,
             }}
           >
-            Chỉnh sửa
+            Thêm bác sĩ vào {department.departmentName}
           </Typography>
         </DialogTitle>
         <IconButton

@@ -33,7 +33,7 @@ public class DoctorAdminController {
     }
 
     @GetMapping("/not-in-department")
-    public ResponseEntity<?> getAllDepartments() {
+    public ResponseEntity<?> getDoctorsNotInDepartment() {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
