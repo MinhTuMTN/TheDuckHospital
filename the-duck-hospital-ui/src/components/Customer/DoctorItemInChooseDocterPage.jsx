@@ -13,8 +13,7 @@ const days = [
   "Thứ 7",
 ];
 
-function DoctorItemInChooseDocterPage(props) {
-  const { doctor } = props;
+const getSchedule = (doctor) => {
   let schedule = "";
   doctor.doctorSchedules?.sort((a, b) => {
     if (a.dayOfWeek > b.dayOfWeek) return 1;
@@ -25,13 +24,31 @@ function DoctorItemInChooseDocterPage(props) {
     }
   });
 
+  let previousSchedule = {
+    dayOfWeek: 0,
+    scheduleType: "",
+  };
   doctor.doctorSchedules?.forEach((item) => {
+    if (
+      item.scheduleType === previousSchedule.scheduleType &&
+      item.dayOfWeek === previousSchedule.dayOfWeek
+    )
+      return;
     if (item.scheduleType === "MORNING") {
       schedule += `Sáng ${days[item.dayOfWeek]}, `;
     } else {
       schedule += `Chiều ${days[item.dayOfWeek]}, `;
     }
+
+    previousSchedule.dayOfWeek = item.dayOfWeek;
+    previousSchedule.scheduleType = item.scheduleType;
   });
+  return schedule;
+};
+
+function DoctorItemInChooseDocterPage(props) {
+  const { doctor } = props;
+  const schedule = getSchedule(doctor);
   return (
     <Stack
       spacing={0.5}
