@@ -3,13 +3,17 @@ import {
   Button,
   Container,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
   MenuItem,
   Paper,
+  Radio,
+  RadioGroup,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
@@ -20,63 +24,64 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { createStaff, getAllStaffs } from "../../../services/admin/StaffServices";
+import { enqueueSnackbar } from "notistack";
+import { getAllDepartments } from "../../../services/admin/DepartmentServices";
+import { useNavigate } from "react-router-dom";
+import DialogConfirm from "../../../components/General/DialogConfirm";
 
-const items = [
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Thu ngân",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Điều dưỡng",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Thu ngân",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Dược sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-];
+// const items = [
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Thu ngân",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Điều dưỡng",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Thu ngân",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Dược sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+// ];
 
 const roles = [
-  {
-    value: "ADMIN",
-    label: "Quản lý",
-  },
   {
     value: "DOCTOR",
     label: "Bác sĩ",
@@ -93,12 +98,30 @@ const roles = [
     value: "CASHIER",
     label: "Thu ngân",
   },
+];
+
+const degrees = [
   {
-    value: "RECEPTIONIST",
-    label: "Lễ tân",
+    value: "BS",
+    label: "BS",
+  },
+  {
+    value: "ThS",
+    label: "ThS",
+  },
+  {
+    value: "TS",
+    label: "TS",
+  },
+  {
+    value: "PGS",
+    label: "PGS",
+  },
+  {
+    value: "GS",
+    label: "GS",
   },
 ];
-const totalItems = items.length;
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -125,21 +148,34 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 }));
 
 function StaffListPage(props) {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
   // const [catalogs, setCatalogs] = useState([]);
-  // const [totalItems, setTotalItems] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   // const [productItems, setProductItems] = useState([]);
   // const [isLoading, setIsLoading] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
+  const [staffs, setStaffs] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [openDialogConfirm, setOpenDialogConfirm] = useState(false);
+  const [addButtonClicked, setAddButtonClicked] = useState(false);
+  const maxDateOfBirth = dayjs().subtract(18, 'year');
   const [staff, setStaff] = useState({
     fullName: "",
     phoneNumber: "",
     identityNumber: "",
-    dateOfBirth: dayjs(),
+    dateOfBirth: maxDateOfBirth,
+    degree: null,
     role: "",
+    gender: 1,
+    email: "",
+    departmentId: null,
   });
 
   const handlePageChange = (event, newPage) => {
@@ -150,19 +186,70 @@ function StaffListPage(props) {
     setPage(1);
   };
 
-  // useEffect(() => {
-  //   const handleGetCatalogs = async () => {
-  //     const response = await getActiveCatalogs();
-  //     if (response.success) {
-  //       setCatalogs(response.data.data);
-  //       setTotalItems(response.data.data.totalObjects);
-  //     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  //   };
-  //   if (catalogs.length === 0) {
-  //     handleGetCatalogs();
-  //   }
-  // }, [catalogs]);
+  useEffect(() => {
+    const handleGetStaffs = async () => {
+      const response = await getAllStaffs();
+      if (response.success) {
+        setStaffs(response.data.data);
+        setTotalItems(response.data.data.length);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+    handleGetStaffs();
+  }, []);
 
+  const handleGetDepartment = async () => {
+    const response = await getAllDepartments();
+    if (response.success) {
+      setDepartments(response.data.data);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  };
+
+  const handleCreateStaff = async () => {
+    setAddButtonClicked(true);
+
+    if (staff.fullName?.trim() === "" || staff.email?.trim() === "" ||
+      staff.phoneNumber?.trim() === "" || staff.identityNumber?.trim() === "" ||
+      staff.role?.trim() === ""
+    ) {
+      enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
+      return;
+    }
+
+    if (staff.role?.trim() === "DOCTOR") {
+      if (staff.degree === null || staff.departmentId === null) {
+        enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
+        return;
+      }
+    }
+    let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
+    const response = await createStaff({
+      fullName: staff.fullName,
+      phoneNumber: staff.phoneNumber,
+      identityNumber: staff.identityNumber,
+      dateOfBirth: dateOfBirth,
+      degree: staff.degree,
+      role: staff.role,
+      gender: staff.gender,
+      email: staff.email,
+      departmentId: staff.departmentId,
+    });
+    if (response.success) {
+      enqueueSnackbar("Thêm nhân viên thành công", { variant: "success" });
+      setOpenDialogForm(false);
+      setOpenDialogConfirm(true);
+      setEmail(response.data.data.email);
+      setPhoneNumber(response.data.data.phoneNumber);
+      setPassword(response.data.data.password);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialogConfirm(false);
+    setPassword("");
+    setPhoneNumber("");
+    setEmail("");
+    navigate(0);
+  };
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;
   //   setIsLoading(true);
@@ -229,9 +316,14 @@ function StaffListPage(props) {
                     fullName: "",
                     phoneNumber: "",
                     identityNumber: "",
-                    dateOfBirth: "",
+                    dateOfBirth: maxDateOfBirth,
+                    degree: null,
                     role: "",
+                    gender: 1,
+                    email: "",
+                    departmentId: null,
                   });
+                  handleGetDepartment();
                   setOpenDialogForm(true);
                 }}
               >
@@ -250,9 +342,9 @@ function StaffListPage(props) {
               <SearchStaffList
                 value={search}
                 onChange={setSearch}
-                // onApply={() => {
-                //   setButtonClicked(true);
-                // }}
+              // onApply={() => {
+              //   setButtonClicked(true);
+              // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -351,7 +443,7 @@ function StaffListPage(props) {
                 /> */}
               <StaffTable
                 count={totalItems ? totalItems : 0}
-                items={items}
+                items={staffs}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
@@ -363,25 +455,54 @@ function StaffListPage(props) {
       </Box>
       {/* )} */}
 
+      <DialogConfirm
+        open={openDialogConfirm}
+        okText={"Đồng ý"}
+        onCancel={handleCloseDialog}
+        onOk={handleCloseDialog}
+        title={"Tạo tài khoản thành công"}
+        onClose={handleCloseDialog}
+        content={`Mật khẩu của nhân viên ${email} (số điện thoại: ${phoneNumber}) là ${password}`}
+      />
+
       <DialogForm
         cancelText={"Hủy"}
         okText={"Thêm"}
         onCancel={() => {
           setOpenDialogForm(false);
+          setAddButtonClicked(false);
           setStaff({
             fullName: "",
             phoneNumber: "",
             identityNumber: "",
-            dateOfBirth: "",
+            dateOfBirth: dayjs(),
+            degree: null,
             role: "",
+            gender: 1,
+            email: "",
+            departmentId: null,
           });
         }}
-        // onOk={handleAddCatalog}
+        onOk={handleCreateStaff}
         open={openDialogForm}
         title={"Thêm nhân viên"}
-        onClose={() => setOpenDialogForm(false)}
+        onClose={() => {
+          setOpenDialogForm(false);
+          setAddButtonClicked(false);
+          setStaff({
+            fullName: "",
+            phoneNumber: "",
+            identityNumber: "",
+            dateOfBirth: maxDateOfBirth,
+            degree: null,
+            role: "",
+            gender: 1,
+            email: "",
+            departmentId: null,
+          });
+        }}
       >
-        <Stack width={"30rem"} mt={3} spacing={4}>
+        <Stack width={"30rem"} mt={1} spacing={3}>
           <MuiTextFeild
             label={"Họ tên"}
             autoFocus
@@ -394,8 +515,12 @@ function StaffListPage(props) {
               }));
             }}
             required
+            error={staff.fullName?.trim() === "" && addButtonClicked}
+            helperText={
+              staff.fullName?.trim() === "" && addButtonClicked && "Tên nhân viên không được để trống"
+            }
           />
-          <Stack direction={"row"} spacing={1}>
+          <Stack direction={"row"} spacing={2}>
             <MuiTextFeild
               label="Số điện thoại"
               value={staff.phoneNumber}
@@ -408,6 +533,10 @@ function StaffListPage(props) {
                 }));
               }}
               required
+              error={staff.phoneNumber?.trim() === "" && addButtonClicked}
+              helperText={
+                staff.phoneNumber?.trim() === "" && addButtonClicked && "Số điện thoại không được để trống"
+              }
             />
             <MuiTextFeild
               label="CCCD"
@@ -421,30 +550,98 @@ function StaffListPage(props) {
                 }));
               }}
               required
+              error={staff.identityNumber?.trim() === "" && addButtonClicked}
+              helperText={
+                staff.identityNumber?.trim() === "" && addButtonClicked && "CCCD không được để trống"
+              }
             />
           </Stack>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale="en-gb"
-          >
-            <CustomDatePicker
-              label="Ngày sinh"
-              value={dayjs(staff.dateOfBirth)}
-              onChange={(newDate) => {
-                setStaff((prev) => {
-                  return {
-                    ...prev,
-                    dateOfBirth: newDate,
-                  };
-                });
-              }}
-              sx={{ mt: 2 }}
-            />
-          </LocalizationProvider>
+          <Stack direction={"row"} spacing={2}>
+            <Box
+              style={{ width: "50%" }}>
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="en-gb"
+              >
+                <CustomDatePicker
+                  label="Ngày sinh"
+                  value={dayjs(staff.dateOfBirth)}
+                  maxDate={maxDateOfBirth}
+                  defaultValue={maxDateOfBirth}
+                  onChange={(newDate) => {
+                    setStaff((prev) => {
+                      return {
+                        ...prev,
+                        dateOfBirth: newDate,
+                      };
+                    });
+                  }}
+                  sx={{ mt: 2 }}
+                />
+              </LocalizationProvider>
+            </Box>
+            <Stack>
+              <FormControl>
+                <CustomTypography variant="body1">Giới tính</CustomTypography>
+                <RadioGroup
+                  defaultValue="female"
+                  value={staff.gender}
+                  row
+                >
+                  <FormControlLabel
+                    checked={staff.gender === 0}
+                    onChange={(e) => {
+                      setStaff((prev) => ({
+                        ...prev,
+                        gender: parseInt(e.target.value),
+                      }));
+                    }}
+                    value="0"
+                    control={<Radio />}
+                    label="Nam"
+                  />
+                  <FormControlLabel
+                    checked={staff.gender === 1}
+                    onChange={(e) => {
+                      setStaff((prev) => ({
+                        ...prev,
+                        gender: parseInt(e.target.value),
+                      }));
+                    }}
+                    value="1"
+                    control={<Radio />}
+                    label="Nữ"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Stack>
+          </Stack>
+          <MuiTextFeild
+            label={"Email"}
+            autoComplete="off"
+            value={staff.email}
+            onChange={(e) => {
+              setStaff((prev) => ({
+                ...prev,
+                email: e.target.value,
+              }));
+            }}
+            required
+            error={staff.email?.trim() === "" && addButtonClicked}
+            helperText={
+              staff.email?.trim() === "" && addButtonClicked && "Email không được để trống"
+            }
+          />
           <Box>
-            <CustomTypography variant="body1">Vai trò</CustomTypography>
-
-            <FormControl fullWidth>
+            <CustomTypography
+              variant="body1"
+              style={{
+                color: staff.role === "" && addButtonClicked ? "red" : "",
+              }}
+            >
+              Vai trò
+            </CustomTypography>
+            <FormControl fullWidth error={staff.role === "" && addButtonClicked}>
               <Select
                 value={staff.role}
                 onChange={(e) =>
@@ -470,10 +667,98 @@ function StaffListPage(props) {
                   </MenuItem>
                 ))}
               </Select>
+              {staff.role === "" && addButtonClicked && (
+                <FormHelperText>Vai trò không được để trống</FormHelperText>
+              )}
             </FormControl>
           </Box>
-        </Stack>
-      </DialogForm>
+          {staff.role === "DOCTOR" &&
+            <Box>
+              <Stack direction={"row"} spacing={2}>
+                <Box style={{ width: "50%" }}>
+                  <CustomTypography
+                    variant="body1"
+                    style={{
+                      color: staff.degree === null && staff.role === "DOCTOR" && addButtonClicked ? "red" : "",
+                    }}
+                  >
+                    Bằng cấp
+                  </CustomTypography>
+                  <FormControl fullWidth error={staff.degree === null && staff.role === "DOCTOR" && addButtonClicked}>
+                    <Select
+                      value={staff.degree}
+                      onChange={(e) =>
+                        setStaff((prev) => {
+                          return {
+                            ...prev,
+                            degree: e.target.value,
+                          };
+                        })
+                      }
+                      displayEmpty
+                      required
+                      sx={{
+                        fontSize: "16px !important",
+                      }}
+                      inputProps={{ "aria-label": "Without label" }}
+                    >
+                      {degrees?.map((item, index) => (
+                        <MenuItem key={index} value={item.value}>
+                          <Typography style={{ fontSize: "16px" }}>
+                            {item.label}
+                          </Typography>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {staff.degree === null && staff.role === "DOCTOR" && addButtonClicked && (
+                      <FormHelperText>Bằng cấp không được để trống</FormHelperText>
+                    )}
+                  </FormControl>
+                </Box>
+                <Box style={{ width: "50%" }}>
+                  <CustomTypography
+                    variant="body1"
+                    style={{
+                      color: staff.departmentId === null && staff.role === "DOCTOR" && addButtonClicked ? "red" : "",
+                    }}
+                  >
+                    Khoa
+                  </CustomTypography>
+                  <FormControl fullWidth error={staff.departmentId === null && staff.role === "DOCTOR" && addButtonClicked}>
+                    <Select
+                      value={staff.departmentId}
+                      onChange={(e) =>
+                        setStaff((prev) => {
+                          return {
+                            ...prev,
+                            departmentId: e.target.value,
+                          };
+                        })
+                      }
+                      displayEmpty
+                      required
+                      sx={{
+                        fontSize: "16px !important",
+                      }}
+                      inputProps={{ "aria-label": "Without label" }}
+                    >
+                      {departments?.map((item, index) => (
+                        <MenuItem key={index} value={item.departmentId}>
+                          <Typography style={{ fontSize: "16px" }}>
+                            {item.departmentName}
+                          </Typography>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {staff.departmentId === null && staff.role === "DOCTOR" && addButtonClicked && (
+                      <FormHelperText>Khoa không được để trống</FormHelperText>
+                    )}
+                  </FormControl>
+                </Box>
+              </Stack>
+            </Box>}
+        </Stack >
+      </DialogForm >
     </>
   );
 }

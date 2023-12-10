@@ -156,7 +156,7 @@ function Router(props) {
           element: <StaffListPage />,
         },
         {
-          path: "staff-management/detail",
+          path: "staff-management/:staffId",
           element: <StaffDetailPage />,
         },
         {

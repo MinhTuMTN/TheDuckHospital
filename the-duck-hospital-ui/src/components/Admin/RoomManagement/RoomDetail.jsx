@@ -118,7 +118,6 @@ function RoomDetail(props) {
     let response;
     if (statusRoom) {
       response = await restoreRoom(room.roomId);
-      console.log(response);
       if (response.success) {
         enqueueSnackbar("Mở khóa phòng thành công!", { variant: "success" });
         setDisabledButton(true);
@@ -128,7 +127,6 @@ function RoomDetail(props) {
       }
     } else {
       response = await deleteRoom(room.roomId);
-      console.log(response);
       if (response.success) {
         enqueueSnackbar("Khóa phòng thành công!", { variant: "success" });
         setDisabledButton(true);

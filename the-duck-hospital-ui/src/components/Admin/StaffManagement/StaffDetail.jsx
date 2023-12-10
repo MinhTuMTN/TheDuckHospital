@@ -13,6 +13,9 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
+import FormatDate from "../../General/FormatDate";
+import { deleteStaff, restoreStaff } from "../../../services/admin/StaffServices";
+import { enqueueSnackbar } from "notistack";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -65,28 +68,28 @@ function StaffDetail(props) {
 
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
+  const handleUpdateButtonClick = async () => {
+    let response;
+    if (statusStaff) {
+      response = await restoreStaff(staff.staffId);
+      if (response.success) {
+        enqueueSnackbar("Mở khóa nhân viên thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusStaff(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    } else {
+      response = await deleteStaff(staff.staffId);
+      if (response.success) {
+        enqueueSnackbar("Khóa nhân viên thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusStaff(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    }
+  };
 
   return (
     <Stack
@@ -165,7 +168,7 @@ function StaffDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{staff.dateOfBirth}</NoiDung>
+            <NoiDung><FormatDate dateTime={staff.dateOfBirth}/></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -231,7 +234,7 @@ function StaffDetail(props) {
               }
               okText={statusStaff ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
-              // onOk={handleUpdateButtonClick}
+              onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}
               onClose={() => setDeleteDialog(false)}
             />

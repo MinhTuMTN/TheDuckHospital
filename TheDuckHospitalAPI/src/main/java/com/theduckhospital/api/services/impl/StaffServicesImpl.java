@@ -1,8 +1,11 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.*;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.StaffRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
@@ -13,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StaffServicesImpl implements IStaffServices {
@@ -101,5 +104,63 @@ public class StaffServicesImpl implements IStaffServices {
 
     private String generatePassword() {
         return UUID.randomUUID().toString().substring(0, 8) + "@UTE";
+    }
+
+    @Override
+    public List<StaffResponse> getAllStaffs() {
+        List<Staff> staffs = staffRepository.findAll();
+
+        return staffs.stream()
+                .map(StaffResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteStaff(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty() || optional.get().isDeleted()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+        staff.setDeleted(true);
+
+        Account account = staff.getAccount();
+        account.setDeleted(true);
+
+        accountRepository.save(account);
+        staffRepository.save(staff);
+
+        return true;
+    }
+
+    @Override
+    public StaffResponse restoreStaff(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty() || !optional.get().isDeleted()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+        staff.setDeleted(false);
+
+        Account account = staff.getAccount();
+        account.setDeleted(false);
+
+        accountRepository.save(account);
+
+        return new StaffResponse(staffRepository.save(staff));
+    }
+
+    @Override
+    public StaffResponse getStaffById(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+
+        return new StaffResponse(staff);
     }
 }
