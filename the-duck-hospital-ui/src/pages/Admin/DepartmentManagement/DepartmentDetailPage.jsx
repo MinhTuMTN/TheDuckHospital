@@ -171,6 +171,7 @@ function DepartmentDetailPage() {
                   setOpenPopup={setOpenPopup}
                   handleGetAllDoctorNotInDepartment={handleGetAllDoctorNotInDepartment}
                   departmentId={departmentId}
+                  departmentName={department.departmentName}
                 />
               </Stack>
             </Grid>

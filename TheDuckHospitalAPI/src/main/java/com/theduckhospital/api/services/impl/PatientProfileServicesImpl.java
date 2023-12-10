@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
+import com.theduckhospital.api.dto.response.admin.PatientProfileResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Nation;
 import com.theduckhospital.api.entity.PatientProfile;
@@ -18,6 +19,7 @@ import com.theduckhospital.api.services.IPatientProfileServices;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -141,6 +143,34 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
         return true;
     }
 
+    @Override
+    public boolean deletePatientProfileAdmin(UUID patientProfileId) {
+        Optional<PatientProfile> optional = patientProfileRepository.findById(patientProfileId);
+
+        if(optional.isEmpty())
+            throw new NotFoundException("Patient profile not found");
+
+        PatientProfile patientProfile = optional.get();
+
+        patientProfile.setDeleted(true);
+        patientProfileRepository.save(patientProfile);
+
+        return true;
+    }
+
+    @Override
+    public PatientProfile restorePatientProfileAdmin(UUID patientProfileId) {
+        Optional<PatientProfile> optional = patientProfileRepository.findById(patientProfileId);
+
+        if(optional.isEmpty())
+            throw new NotFoundException("Patient profile not found");
+
+        PatientProfile patientProfile = optional.get();
+
+        patientProfile.setDeleted(false);
+        return patientProfileRepository.save(patientProfile);
+    }
+
     private PatientProfile getPatientProfileByTokenAndPatientProfileId(String token, UUID patientProfileId) {
         Account account = accountServices.findAccountByToken(token);
 
@@ -154,5 +184,17 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
             throw new NotFoundException("Patient profile not found");
         }
         return patientProfile;
+    }
+
+    @Override
+    public PatientProfileResponse getPatientProfileByIdAdmin(UUID patientProfileId) {
+        Optional<PatientProfile> optional = patientProfileRepository.findById(patientProfileId);
+
+        if(optional.isEmpty())
+            throw new NotFoundException("Patient profile not found");
+
+        PatientProfile patientProfile = optional.get();
+
+        return new PatientProfileResponse(patientProfile);
     }
 }

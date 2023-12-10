@@ -28,6 +28,7 @@ import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
+import PatientProfileDetailPage from "../pages/Admin/PatientManagement/PatientProfileDetailPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -176,12 +177,20 @@ function Router(props) {
           element: <DepartmentDetailPage />,
         },
         {
+          path: "department-management/:departmentId/staff/:staffId",
+          element: <StaffDetailPage />,
+        },
+        {
           path: "patient-management",
           element: <PatientListPage />,
         },
         {
-          path: "patient-management/detail",
+          path: "patient-management/:patientId",
           element: <PatientDetailPage />,
+        },
+        {
+          path: "patient-management/:patientId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
         },
         {
           path: "payment-management",

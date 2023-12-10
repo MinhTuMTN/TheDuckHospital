@@ -13,7 +13,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
@@ -24,62 +24,11 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { createStaff, getAllStaffs } from "../../../services/admin/StaffServices";
+import { createStaff, getPaginationStaffs } from "../../../services/admin/StaffServices";
 import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import { useNavigate } from "react-router-dom";
 import DialogConfirm from "../../../components/General/DialogConfirm";
-
-// const items = [
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Thu ngân",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Điều dưỡng",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Thu ngân",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Dược sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-// ];
 
 const roles = [
   {
@@ -186,16 +135,24 @@ function StaffListPage(props) {
     setPage(1);
   };
 
+  const handleGetStaffs = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationStaffs({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setStaffs(response.data.data.staffs);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
+  }, [page, limit]);
+
   useEffect(() => {
-    const handleGetStaffs = async () => {
-      const response = await getAllStaffs();
-      if (response.success) {
-        setStaffs(response.data.data);
-        setTotalItems(response.data.data.length);
-      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    };
     handleGetStaffs();
-  }, []);
+  }, [handleGetStaffs]);
 
   const handleGetDepartment = async () => {
     const response = await getAllDepartments();
@@ -240,6 +197,7 @@ function StaffListPage(props) {
       setEmail(response.data.data.email);
       setPhoneNumber(response.data.data.phoneNumber);
       setPassword(response.data.data.password);
+      handleGetStaffs();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }
 

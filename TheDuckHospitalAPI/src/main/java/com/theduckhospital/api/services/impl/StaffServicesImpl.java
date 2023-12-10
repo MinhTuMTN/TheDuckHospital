@@ -1,8 +1,9 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
+import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
 import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
@@ -11,6 +12,9 @@ import com.theduckhospital.api.repository.StaffRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,5 +166,21 @@ public class StaffServicesImpl implements IStaffServices {
         Staff staff = optional.get();
 
         return new StaffResponse(staff);
+    }
+
+    @Override
+    public FilteredStaffsResponse getPaginationStaffsDeleted(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Staff> staffPage = staffRepository.findPaginationByOrderByDeleted(pageable);
+
+        List<StaffResponse> filteredStaffs = new ArrayList<>();
+
+        for (Staff staff : staffPage.getContent()) {
+            filteredStaffs.add(new StaffResponse(staff));
+        }
+
+        List<Staff> staff = staffRepository.findAll();
+
+        return new FilteredStaffsResponse(filteredStaffs, staff.size(), page, limit);
     }
 }

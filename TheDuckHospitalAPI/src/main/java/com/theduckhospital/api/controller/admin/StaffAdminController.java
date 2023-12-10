@@ -53,6 +53,20 @@ public class StaffAdminController {
         );
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<?> getAllStaffsPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all staff successfully")
+                        .data(staffServices.getPaginationStaffsDeleted(page, limit))
+                        .build()
+        );
+    }
+
     @GetMapping("/{staffId}")
     public  ResponseEntity<?> getStaffById(@PathVariable UUID staffId) {
         return ResponseEntity.ok(

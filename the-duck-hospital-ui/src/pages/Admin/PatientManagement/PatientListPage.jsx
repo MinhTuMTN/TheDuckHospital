@@ -5,78 +5,19 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SearchPatientList from "../../../components/Admin/PatientManagement/SearchPatientList";
 import PatientTable from "../../../components/Admin/PatientManagement/PatientTable";
-
-const items = [
-  {
-    fullName: "Nguyễn Thị Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Thị Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Customer",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Quốc Staff",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    deleted: false,
-  },
-];
-
-const totalItems = items.length;
+import { getPaginationPatients } from "../../../services/admin/PatientServices";
+import { enqueueSnackbar } from "notistack";
 
 function PatientListPage(props) {
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
-  // const [catalogs, setCatalogs] = useState([]);
-  // const [totalItems, setTotalItems] = useState(0);
+  const [patients, setPatients] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  // const [productItems, setProductItems] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
@@ -86,64 +27,31 @@ function PatientListPage(props) {
     setPage(1);
   };
 
-  // useEffect(() => {
-  //   const handleGetCatalogs = async () => {
-  //     const response = await getActiveCatalogs();
-  //     if (response.success) {
-  //       setCatalogs(response.data.data);
-  //       setTotalItems(response.data.data.totalObjects);
-  //     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  //   };
-  //   if (catalogs.length === 0) {
-  //     handleGetCatalogs();
-  //   }
-  // }, [catalogs]);
-
-  // const handleGetFilteredProduct = useCallback(async () => {
-  //   if (!buttonClicked) return;
-  //   setIsLoading(true);
-  //   const response = await GetFilteredProducts({
-  //     search: search,
-  //     page: page - 1,
-  //     limit: limit,
-  //     catalogIds: selectedCategory,
-  //     productStatus: selectedStatus,
-  //     productQuantity: selectedQuantity,
-  //   });
-  //   if (response.success) {
-  //     setProductItems(response.data.data.objects);
-  //     setPage(parseInt(response.data.data.page) + 1);
-  //     setTotalItems(response.data.data.totalObjects);
-  //     setLimit(response.data.data.limit);
-  //   } else
-  //     enqueueSnackbar("Đã có lỗi xảy ra khi lấy thông tin sản phẩm", {
-  //       variant: "error",
-  //     });
-  //   setIsLoading(false);
-  //   setButtonClicked(false);
-  // }, [
-  //   limit,
-  //   page,
-  //   search,
-  //   selectedCategory,
-  //   selectedQuantity,
-  //   selectedStatus,
-  //   buttonClicked,
-  // ]);
+  const handleGetPatients = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationPatients({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setPatients(response.data.data.patients);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
+}, [page, limit]);
 
   // useEffect(() => {
   //   setButtonClicked(true);
   // }, [page, limit]);
 
-  // useEffect(() => {
-  //   handleGetFilteredProduct();
-  // }, [handleGetFilteredProduct]);
+  useEffect(() => {
+    handleGetPatients();
+  }, [handleGetPatients]);
 
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -271,7 +179,7 @@ function PatientListPage(props) {
                 /> */}
               <PatientTable
                 count={totalItems ? totalItems : 0}
-                items={items}
+                items={patients}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}

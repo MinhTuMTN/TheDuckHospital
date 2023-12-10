@@ -1,18 +1,12 @@
 import styled from "@emotion/styled";
 import {
   Box,
-  Button,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   Typography,
-  useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import DialogConfirm from "../../General/DialogConfirm";
+import React from "react";
+import FormatDate from "../../General/FormatDate";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -43,27 +37,6 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 
 function PatientDetail(props) {
   const { patient } = props;
-  let status = patient.deleted;
-  const [statusPatient, setStatusPatient] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
-  const [disabledButton, setDisabledButton] = useState(true);
-  const [deleteDialog, setDeleteDialog] = useState(false);
-
-  useEffect(() => {
-    setEditStatus(status);
-    setStatusPatient(status);
-  }, [status]);
-
-  const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusPatient !== event.target.value) {
-      setDisabledButton(false);
-    } else {
-      setDisabledButton(true);
-    }
-  };
-
-  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   // const handleUpdateButtonClick = async () => {
   //   let response;
@@ -141,76 +114,18 @@ function PatientDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.dateOfBirth}</NoiDung>
+            <NoiDung><FormatDate dateTime={patient.dateOfBirth} /></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
       <BoxStyle>
-        <Grid container alignItems={"center"} paddingBottom={1}>
+        <Grid container>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Trạng thái</TieuDeCot>
           </Grid>
 
-          <Grid item xs={5} md={7.5}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
-              <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
-                label="Trạng thái"
-                onChange={handleStatusChange}
-                className="custom-select"
-              >
-                <MenuItem value={false} style={{ fontSize: "14px" }}>
-                  Đang hoạt động
-                </MenuItem>
-                <MenuItem value={true} style={{ fontSize: "14px" }}>
-                  Đã khóa
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            item
-            xs={3}
-            md={1.5}
-            display={"flex"}
-            sx={{
-              justifyContent: "center",
-            }}
-          >
-            <Button
-              variant="contained"
-              size={isSmallScreen ? "small" : "large"}
-              sx={{
-                padding: "auto",
-                height: "100%",
-                background: "#e37272",
-                ":hover": {
-                  background: "#e05656",
-                  color: "#fff",
-                },
-              }}
-              disabled={disabledButton}
-              onClick={(e) => {
-                setDeleteDialog(true);
-              }}
-            >
-              Cập nhật
-            </Button>
-            <DialogConfirm
-              open={deleteDialog}
-              title={statusPatient ? "Mở khóa bệnh nhân" : "Khóa bệnh nhân"}
-              content={
-                statusPatient
-                  ? "Bạn có chắc chắn muốn mở khóa bệnh nhân này?"
-                  : "Bạn có chắc chắn muốn khóa bệnh nhân này?"
-              }
-              okText={statusPatient ? "Khôi phục" : "Khóa"}
-              cancelText={"Hủy"}
-              // onOk={handleUpdateButtonClick}
-              onCancel={() => setDeleteDialog(false)}
-              onClose={() => setDeleteDialog(false)}
-            />
+          <Grid item xs={8} md={9}>
+            <NoiDung>{patient.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>

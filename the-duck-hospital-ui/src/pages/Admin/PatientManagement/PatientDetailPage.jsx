@@ -9,12 +9,13 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PatientDetail from "../../../components/Admin/PatientManagement/PatientDetail";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PatientProfileTable from "../../../components/Admin/PatientManagement/PatientProfileTable";
+import { getPatientById } from "../../../services/admin/PatientServices";
 
-const StaffId = styled(Typography)(({ theme }) => ({
+const PatientId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
   padding: "2px 5px",
   borderRadius: "15px",
@@ -24,85 +25,22 @@ const StaffId = styled(Typography)(({ theme }) => ({
   width: "fit-content",
 }));
 
-const patient = {
-  patientId: "1234-5678-9101-1121",
-  fullName: "Nguyễn Quốc Patient",
-  phoneNumber: "0123456789",
-  identityNumber: "123456789012",
-  dateOfBirth: "27/01/2002",
-  deleted: false,
-  patientProfiles: [
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-  ]
-}
-
-const totalItems = patient.patientProfiles.length;
-
 function PatientDetailPage() {
   const navigate = useNavigate();
-  const [limit, setLimit] = useState(5);
-  const [page, setPage] = useState(1);
+  const { patientId } = useParams();
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage + 1);
-  };
-  const handleRowsPerPageChange = (event) => {
-    setLimit(event.target.value);
-    setPage(1);
-  };
-  // const [customer, setCustomer] = useState({});
+  const [patient, setPatient] = useState({});
 
-  // const handleGetCustomer = useCallback(async () => {
-  //   const response = await getCustomerById(state.id);
-  //   if (response.success) {
-  //     setCustomer(response.data.data);
-  //   }
-  // }, [state.id]);
+  const handleGetPatient = useCallback(async () => {
+    const response = await getPatientById(patientId);
+    if (response.success) {
+      setPatient(response.data.data);
+    }
+  }, [patientId]);
 
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
+  useEffect(() => {
+    handleGetPatient();
+  }, [handleGetPatient]);
 
   return (
     <Box
@@ -164,9 +102,9 @@ function PatientDetailPage() {
                       fontSize: "14px",
                     }}
                   >
-                    patient_id:
+                    patient_code:
                   </Typography>
-                  <StaffId>{patient.patientId}</StaffId>
+                  <PatientId>{patient.patientCode}</PatientId>
                 </Stack>
               </Stack>
             </Grid>
@@ -198,12 +136,9 @@ function PatientDetailPage() {
                 spacing={"2px"}
               >
                 <PatientProfileTable
-                  count={totalItems ? totalItems : 0}
                   items={patient.patientProfiles}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={limit}
+                  patientId={patient.patientId}
+                  patientName={patient.fullName}
                 />
               </Stack>
             </Grid>

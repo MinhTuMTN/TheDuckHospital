@@ -69,7 +69,7 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row, departmentId } = props;
+  const { row, departmentId, departmentName } = props;
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -188,13 +188,13 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                    // onClick={(e) => {
-                    //   navigate(`/admin/product-management/${row.productId}`, {
-                    //     state: {
-                    //       id: row.productId,
-                    //     },
-                    //   });
-                    // }}
+                      onClick={(e) => {
+                        navigate(`/admin/department-management/${departmentId}/staff/${row.staffId}`, {
+                          state: {
+                            departmentName: departmentName
+                          }
+                        });
+                      }}
                     >
                       Xem
                     </Button>
@@ -221,13 +221,13 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                // onClick={(e) => {
-                //   navigate(`/admin/product-management/${row.productId}`, {
-                //     state: {
-                //       id: row.productId,
-                //     },
-                //   });
-                // }}
+                  onClick={(e) => {
+                    navigate(`/admin/department-management/${departmentId}/staff/${row.staffId}`, {
+                      state: {
+                        departmentName: departmentName,
+                      }
+                    });
+                  }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>
@@ -260,7 +260,7 @@ function Row(props) {
 }
 
 function DoctorTable(props) {
-  const { items, setOpenPopup, handleGetAllDoctorNotInDepartment, departmentId } = props;
+  const { items, setOpenPopup, handleGetAllDoctorNotInDepartment, departmentId, departmentName } = props;
 
   return (
     <>
@@ -346,7 +346,7 @@ function DoctorTable(props) {
               </TableHead>
               <TableBody>
                 {items?.map((row, index) => (
-                  <Row key={index} row={row} departmentId={departmentId} />
+                  <Row key={index} row={row} departmentId={departmentId} departmentName={departmentName} />
                 ))}
               </TableBody>
             </Table>

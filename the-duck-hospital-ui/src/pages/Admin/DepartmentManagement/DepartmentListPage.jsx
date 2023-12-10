@@ -6,7 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
@@ -18,7 +18,6 @@ import {
   getPaginationDepartments,
 } from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "#fff",
@@ -33,7 +32,6 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 function DepartmentListPage(props) {
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
   const [departments, setDepartments] = useState([]);
@@ -41,6 +39,7 @@ function DepartmentListPage(props) {
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   const [openDialogForm, setOpenDialogForm] = useState(false);
+  const [addButtonClicked, setAddButtonClicked] = useState(false);
   const [department, setDepartment] = useState({
     departmentName: "",
     description: "",
@@ -94,25 +93,27 @@ function DepartmentListPage(props) {
   //   handleGetFilteredProduct();
   // }, [handleGetFilteredProduct]);
 
-  useEffect(() => {
-    const handleGetDepartments = async () => {
-      // if (!buttonClicked) return;
-      const response = await getPaginationDepartments({
-        page: page - 1,
-        limit: limit,
-      });
-      if (response.success) {
-        setDepartments(response.data.data.departments);
-        setTotalItems(response.data.data.total);
-        setPage(response.data.data.page + 1);
-        setLimit(response.data.data.limit);
-      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-      // setButtonClicked(false);
-    };
-    handleGetDepartments();
+  const handleGetDepartments = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationDepartments({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setDepartments(response.data.data.departments);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
   }, [page, limit]);
 
+  useEffect(() => {
+    handleGetDepartments();
+  }, [handleGetDepartments]);
+
   const handleAddDepartment = async () => {
+    setAddButtonClicked(true);
     if (department.departmentName?.trim() === "") {
       enqueueSnackbar("Tên khoa không được để trống", { variant: "error" });
       return;
@@ -125,7 +126,7 @@ function DepartmentListPage(props) {
     if (response.success) {
       enqueueSnackbar("Thêm khoa thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      navigate(0);
+      handleGetDepartments();
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 
@@ -153,6 +154,7 @@ function DepartmentListPage(props) {
                     description: "",
                   });
                   setOpenDialogForm(true);
+                  setAddButtonClicked(false);
                 }}
               >
                 Thêm
@@ -170,9 +172,9 @@ function DepartmentListPage(props) {
               <SearchDepartmentList
                 value={search}
                 onChange={setSearch}
-                // onApply={() => {
-                //   setButtonClicked(true);
-                // }}
+              // onApply={() => {
+              //   setButtonClicked(true);
+              // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -291,11 +293,19 @@ function DepartmentListPage(props) {
             departmentName: "",
             description: "",
           });
+          setAddButtonClicked(false);
         }}
         onOk={handleAddDepartment}
         open={openDialogForm}
         title={"Thêm khoa"}
-        onClose={() => setOpenDialogForm(false)}
+        onClose={() => {
+          setOpenDialogForm(false);
+          setDepartment({
+            departmentName: "",
+            description: "",
+          });
+          setAddButtonClicked(false);
+        }}
       >
         <Stack width={"30rem"} mt={3} spacing={4}>
           <MuiTextFeild
@@ -310,9 +320,9 @@ function DepartmentListPage(props) {
               }));
             }}
             required
-            error={department.departmentName?.trim() === ""}
+            error={department.departmentName?.trim() === "" && addButtonClicked}
             helperText={
-              department.departmentName?.trim() === "" &&
+              department.departmentName?.trim() === "" && addButtonClicked &&
               "Tên khoa không được để trống"
             }
           />

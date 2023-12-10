@@ -33,7 +33,7 @@ public class Patient {
 
 
     @OneToMany(mappedBy = "patient")
-    private List<PatientProfile> patientProfile;
+    private List<PatientProfile> patientProfiles;
 
     @PreUpdate
     private void onUpdate() {

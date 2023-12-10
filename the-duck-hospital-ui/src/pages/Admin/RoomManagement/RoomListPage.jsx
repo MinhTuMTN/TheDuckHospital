@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
@@ -22,7 +22,6 @@ import {
   getPaginationRooms,
 } from "../../../services/admin/RoomServices";
 import { enqueueSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -44,7 +43,6 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 
 function RoomListPage(props) {
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
   // const [buttonClicked, setButtonClicked] = useState(true);
   const [rooms, setRooms] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -52,6 +50,7 @@ function RoomListPage(props) {
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   const [openDialogForm, setOpenDialogForm] = useState(false);
+  const [addButtonClicked, setAddButtonClicked] = useState(false);
   const [room, setRoom] = useState({
     roomName: "",
     departmentId: "",
@@ -70,23 +69,24 @@ function RoomListPage(props) {
   //   setButtonClicked(true);
   // }, [page, limit]);
 
-  useEffect(() => {
-    const handleGetRooms = async () => {
-      // if (!buttonClicked) return;
-      const response = await getPaginationRooms({
-        page: page - 1,
-        limit: limit,
-      });
-      if (response.success) {
-        setRooms(response.data.data.rooms);
-        setTotalItems(response.data.data.total);
-        setPage(response.data.data.page + 1);
-        setLimit(response.data.data.limit);
-      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-      // setButtonClicked(false);
-    };
-    handleGetRooms();
+  const handleGetRooms = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationRooms({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setRooms(response.data.data.rooms);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
   }, [page, limit]);
+
+  useEffect(() => {
+    handleGetRooms();
+  }, [handleGetRooms]);
 
   useEffect(() => {
     const handleGetDepartment = async () => {
@@ -99,6 +99,7 @@ function RoomListPage(props) {
   }, []);
 
   const handleAddRoom = async () => {
+    setAddButtonClicked(true);
     if (room.roomName?.trim() === "") {
       enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
       return;
@@ -117,7 +118,7 @@ function RoomListPage(props) {
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      navigate(0);
+      handleGetRooms();
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 
@@ -186,6 +187,7 @@ function RoomListPage(props) {
                     description: "",
                   });
                   setOpenDialogForm(true);
+                  setAddButtonClicked(false);
                 }}
               >
                 Thêm
@@ -203,9 +205,9 @@ function RoomListPage(props) {
               <SearchDepartmentList
                 value={search}
                 onChange={setSearch}
-                // onApply={() => {
-                //   setButtonClicked(true);
-                // }}
+              // onApply={() => {
+              //   setButtonClicked(true);
+              // }}
               />
               {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
@@ -324,11 +326,20 @@ function RoomListPage(props) {
             description: "",
           });
           setOpenDialogForm(false);
+          setAddButtonClicked(false);
         }}
         onOk={handleAddRoom}
         open={openDialogForm}
         title={"Thêm phòng"}
-        onClose={() => setOpenDialogForm(false)}
+        onClose={() => {
+          setRoom({
+            roomName: "",
+            departmentId: "",
+            description: "",
+          });
+          setOpenDialogForm(false);
+          setAddButtonClicked(false);
+        }}
       >
         <Stack width={"30rem"} mt={3} spacing={4}>
           <MuiTextFeild
@@ -343,9 +354,9 @@ function RoomListPage(props) {
               }));
             }}
             required
-            error={room.roomName?.trim() === ""}
+            error={room.roomName?.trim() === "" && addButtonClicked}
             helperText={
-              room.roomName?.trim() === "" && "Tên phòng không được để trống"
+              room.roomName?.trim() === "" && "Tên phòng không được để trống" && addButtonClicked
             }
           />
           <MuiTextFeild
@@ -365,13 +376,13 @@ function RoomListPage(props) {
             <CustomTypography
               variant="body1"
               style={{
-                color: room.departmentId === "" ? "red" : "",
+                color: room.departmentId === "" && addButtonClicked ? "red" : "",
               }}
             >
               Khoa
             </CustomTypography>
 
-            <FormControl fullWidth error={room.departmentId === ""}>
+            <FormControl fullWidth error={room.departmentId === "" && addButtonClicked}>
               <Select
                 value={room.departmentId}
                 onChange={(e) =>
@@ -397,7 +408,7 @@ function RoomListPage(props) {
                   </MenuItem>
                 ))}
               </Select>
-              {room.departmentId === "" && (
+              {room.departmentId === "" && addButtonClicked && (
                 <FormHelperText>Khoa không được để trống</FormHelperText>
               )}
             </FormControl>

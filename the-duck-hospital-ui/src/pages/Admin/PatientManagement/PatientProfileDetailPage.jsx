@@ -10,11 +10,11 @@ import {
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import StaffDetail from "../../../components/Admin/StaffManagement/StaffDetail";
-import { getStaffById } from "../../../services/admin/StaffServices";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import PatientProfileDetail from "../../../components/Admin/PatientManagement/PatientProfileDetail";
+import { getPatientProfileById } from "../../../services/admin/PatientProfileServices";
 
-const StaffId = styled(Typography)(({ theme }) => ({
+const PatientProfileId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
   padding: "2px 5px",
   borderRadius: "15px",
@@ -24,25 +24,23 @@ const StaffId = styled(Typography)(({ theme }) => ({
   width: "fit-content",
 }));
 
-function StaffDetailPage() {
+function PatientProfileDetailPage() {
   const navigate = useNavigate();
-  const { staffId, departmentId } = useParams();
+  const { patientProfileId, patientId } = useParams();
   const { state } = useLocation();
-  const [staff, setStaff] = useState({});
+
+  const [patientProfile, setPatientProfile] = useState({});
+
+  const handleGetPatientProfile = useCallback(async () => {
+    const response = await getPatientProfileById(patientProfileId);
+    if (response.success) {
+      setPatientProfile(response.data.data);
+    }
+  }, [patientProfileId]);
 
   useEffect(() => {
-    const handleGetStaff = async () => {
-      const response = await getStaffById(staffId);
-      if (response.success) {
-        setStaff(response.data.data);
-      }
-    }
-    handleGetStaff();
-  }, [staffId]);
-
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
+    handleGetPatientProfile();
+  }, [handleGetPatientProfile]);
 
   return (
     <Box
@@ -68,11 +66,7 @@ function StaffDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => {
-                state ?
-                navigate(`/admin/department-management/${departmentId}`) :
-                navigate("/admin/staff-management");
-              }}
+              onClick={() => { navigate(`/admin/patient-management/${patientId}`) }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -84,7 +78,7 @@ function StaffDetailPage() {
                 color: "#111927",
               }}
             >
-              {state ? `Thông tin khoa ${state?.departmentName}` : "Danh sách nhân viên"}
+              Thông tin bệnh nhân {state?.patientName}
             </Typography>
           </Stack>
           <Grid container>
@@ -98,7 +92,7 @@ function StaffDetailPage() {
                     fontSize: ["1.5rem", "2rem"],
                   }}
                 >
-                  {staff.fullName}
+                  {patientProfile.fullName}
                 </Typography>
                 <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography
@@ -108,9 +102,9 @@ function StaffDetailPage() {
                       fontSize: "14px",
                     }}
                   >
-                    staff_id:
+                    patient_profile_id:
                   </Typography>
-                  <StaffId>{staff.staffId}</StaffId>
+                  <PatientProfileId>{patientProfile.patientProfileId}</PatientProfileId>
                 </Stack>
               </Stack>
             </Grid>
@@ -126,14 +120,29 @@ function StaffDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <StaffDetail staff={staff} />
+                <PatientProfileDetail patientProfile={patientProfile} />
               </Stack>
             </Grid>
           </Grid>
+          {/* {patientProfile.medicalExaminationRecords?.length > 0 && <Grid container>
+            <Grid item xs={12}>
+              <Stack
+                component={Paper}
+                elevation={3}
+                sx={{
+                  marginTop: 4,
+                  borderRadius: "15px",
+                }}
+                spacing={"2px"}
+              >
+                <MedicalExamRecordTable items={patientProfile.medicalExaminationRecords} />
+              </Stack>
+            </Grid>
+          </Grid>} */}
         </Stack>
       </Stack>
     </Box>
   );
 }
 
-export default StaffDetailPage;
+export default PatientProfileDetailPage;

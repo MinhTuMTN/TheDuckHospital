@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
 import com.theduckhospital.api.dto.response.admin.StaffResponse;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface IStaffServices {
     StaffResponse restoreStaff(UUID staffId);
 
     StaffResponse getStaffById(UUID staffId);
+
+    FilteredStaffsResponse getPaginationStaffsDeleted(int page, int limit);
 }
