@@ -28,6 +28,7 @@ import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
+import BookingItemPage from "../pages/customer/BookingItemPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -114,6 +115,10 @@ function Router(props) {
               ],
             },
           ],
+        },
+        {
+          path: "medical-bills/:medicalBillId",
+          element: <BookingItemPage />,
         },
       ],
     },
