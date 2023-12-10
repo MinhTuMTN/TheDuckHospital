@@ -6,6 +6,7 @@ import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
+import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.DoctorRepository;
@@ -16,10 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DoctorServicesImpl implements IDoctorServices {
@@ -109,13 +108,24 @@ public class DoctorServicesImpl implements IDoctorServices {
             );
 
         List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
+        AtomicInteger remove = new AtomicInteger();
         doctors.forEach(doctor -> {
+            List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
+            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted() || doctorSchedule.getDate().before(new Date()));
+            if (doctorSchedules.isEmpty()) {
+                remove.getAndIncrement();
+                return;
+            }
             doctorItemResponses.add(new DoctorItemResponse(doctor));
         });
 
+        // Recalculate total pages
+        int totalPages = (int) Math.ceil((double) (doctors.getTotalElements() - remove.get()) / limit);
+        int totalItems = (int) (doctors.getTotalElements() - remove.get());
+
         return PaginationResponse.builder()
-                .totalPages(doctors.getTotalPages())
-                .totalItems((int) doctors.getTotalElements())
+                .totalPages(totalPages)
+                .totalItems(totalItems)
                 .page(page)
                 .limit(limit)
                 .items(doctorItemResponses)

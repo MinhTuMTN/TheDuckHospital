@@ -114,18 +114,24 @@ function ChooseDoctorPage(props) {
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const location = useLocation();
+  const [schedules, setSchedules] = React.useState([]);
 
   useEffect(() => {
     if (!location.state || !location.state.profile) {
       navigate("/choose-patient-profiles");
     }
+
+    setSchedules(location.state.schedules);
   }, [location, navigate]);
 
   const breakcrumbs = [
-    <CustomLink to="/" key={1}>
+    <CustomLink to={"/"} key={1}>
       <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
     </CustomLink>,
-    <CustomTextBreakcrumb key={2}>Chọn bác sĩ</CustomTextBreakcrumb>,
+    <CustomLink to={"/choose-patient-profiles"} key={2}>
+      <CustomTextBreakcrumb>Đăng ký khám bệnh</CustomTextBreakcrumb>
+    </CustomLink>,
+    <CustomTextBreakcrumb key={3}>Chọn bác sĩ</CustomTextBreakcrumb>,
   ];
   const theme = useTheme();
   const [selectedDegree, setSelectedDegree] = React.useState("ALL");
@@ -163,11 +169,19 @@ function ChooseDoctorPage(props) {
         variant: "error",
       });
     } else {
-      setDoctors(response.data.data.items);
+      let doctors = response.data.data.items;
+      schedules?.forEach((schedule) => {
+        doctors = doctors.filter(
+          (doctor) =>
+            doctor.department?.departmentName !==
+            schedule.doctor.department?.departmentName
+        );
+      });
+      setDoctors(doctors);
       setPage(response.data.data.page);
       setTotalPages(response.data.data.totalPages);
     }
-  }, [fullName, page, selectedDepartmentId, selectedDegree]);
+  }, [schedules, fullName, page, selectedDepartmentId, selectedDegree]);
   useEffect(() => {
     handleGetDoctorExaminations();
   }, [handleGetDoctorExaminations]);
@@ -385,6 +399,7 @@ function ChooseDoctorPage(props) {
                       state: {
                         doctor: doctor,
                         profile: location.state.profile,
+                        schedules: schedules,
                       },
                     });
                   }}

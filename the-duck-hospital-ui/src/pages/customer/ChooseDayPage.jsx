@@ -20,7 +20,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useState } from "react";
 import InfoLine from "../../components/Customer/InfoLine";
 import dayjs from "dayjs";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import CustomLink from "../../components/General/CustomLink";
+import { enqueueSnackbar } from "notistack";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -65,14 +67,17 @@ const Body = styled(Box)(({ theme }) => ({
   },
 }));
 
-const CustomButtonChoosen = styled(Button)(({ theme, isActive }) => ({
+const CustomButtonChoosen = styled(Button)(({ theme, isactive }) => ({
   borderRadius: "4px",
   border: "1.5px solid ",
   borderImage: `linear-gradient(45deg, #5a96f7, #12b3f3)`, // Đặt đường viền gradient khi hover
   borderImageSlice: 1,
   textTransform: "none",
-  background: isActive ? "linear-gradient(to right, #42a5f5, #6fccea)" : "#fff",
-  color: isActive ? "#fff" : "#000",
+  background:
+    isactive === "true"
+      ? "linear-gradient(to right, #42a5f5, #6fccea)"
+      : "#fff",
+  color: isactive === "true" ? "#fff" : "#000",
 
   "&:hover": {
     backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
@@ -80,17 +85,13 @@ const CustomButtonChoosen = styled(Button)(({ theme, isActive }) => ({
   },
 }));
 
-const disableDate = (date, startDate, endDate, dayOfWeek) => {
-  // Check date is before start date.
-  const isBeforeStart = startDate ? dayjs(date).isBefore(startDate) : false;
-
-  // Check date is after end date.
-  const isAfterEnd = endDate ? dayjs(date).isAfter(endDate) : false;
-
-  // Check if date's day of week is not equal to dayOfWeek.
-  const isDayOfWeek = dayOfWeek ? dayjs(date).day() !== dayOfWeek : false;
-
-  return isBeforeStart || isAfterEnd || isDayOfWeek;
+let doctorSchedules = [];
+const disableDate = (date) => {
+  const dateStr = dayjs(date).format("DD/MM/YYYY");
+  const isDisable = doctorSchedules.some((schedule) => {
+    return dayjs(schedule.date).format("DD/MM/YYYY") === dateStr;
+  });
+  return !isDisable;
 };
 
 function ChooseDayPage(props) {
@@ -98,25 +99,60 @@ function ChooseDayPage(props) {
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [selectedDate, setSelectedDate] = useState(null);
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const navigate = useNavigate();
 
-  const { doctor, profile } = useLocation().state;
+  const { doctor, profile, schedules = [] } = useLocation().state;
+  doctorSchedules = doctor.doctorSchedules;
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     setConfirmationOpen(true);
+
+    const dateStr = dayjs(newDate).format("DD/MM/YYYY");
+    const selectedSchedules = doctorSchedules.filter((schedule) => {
+      return dayjs(schedule.date).format("DD/MM/YYYY") === dateStr;
+    });
+    setSelectedSchedules(selectedSchedules);
   };
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false);
+    setSelectedSchedule(null);
+    handleButtonClick(null);
   };
 
   const handleConfirmationProceed = () => {
-    // Xử lý khi người dùng xác nhận
-    console.log("Ngày được chọn:", selectedDate);
+    if (!selectedSchedule) {
+      enqueueSnackbar("Vui lòng chọn buổi khám", { variant: "error" });
+      return;
+    }
     setConfirmationOpen(false);
+
+    schedules.push({
+      doctor,
+      schedule: selectedSchedule,
+    });
+    navigate("/confirm-booking-information", {
+      state: {
+        doctor,
+        profile,
+        date: selectedDate,
+        schedules,
+      },
+    });
   };
   const breakcrumbs = [
-    <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
-    <CustomTextBreakcrumb key={2}>Chọn ngày khám</CustomTextBreakcrumb>,
+    <CustomLink to={"/"} key={1}>
+      <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
+    </CustomLink>,
+    <CustomLink to={"/choose-patient-profiles"} key={2}>
+      <CustomTextBreakcrumb>Đăng ký khám bệnh</CustomTextBreakcrumb>
+    </CustomLink>,
+    <CustomTextBreakcrumb key={3} onClick={() => navigate(-1)}>
+      Chọn bác sĩ
+    </CustomTextBreakcrumb>,
+    <CustomTextBreakcrumb key={4}>Chọn ngày khám</CustomTextBreakcrumb>,
   ];
   const theme = useTheme();
   const [activeButton, setActiveButton] = useState(null);
@@ -169,6 +205,9 @@ function ChooseDayPage(props) {
               "&:hover": {
                 backgroundColor: "	#ffffff",
               },
+            }}
+            onClick={() => {
+              navigate(-1);
             }}
           >
             <ArrowBackIcon
@@ -251,9 +290,15 @@ function ChooseDayPage(props) {
             </DialogTitle>
             <DialogContent
               sx={{
-                paddingX: "24px",
+                paddingX: {
+                  xs: "16px !important",
+                  md: "24px !important",
+                },
                 paddingY: "14px !important",
-                width: "400px",
+                width: {
+                  xs: "310px",
+                  md: "400px",
+                },
               }}
             >
               <Stack direction={"column"} spacing={0.7}>
@@ -265,12 +310,12 @@ function ChooseDayPage(props) {
 
                 <InfoLine
                   lableName="Bác sĩ:"
-                  value="Nguyễn Ngọc Tuyết Vi"
+                  value={`${doctor.degree} ${doctor.doctorName}`}
                   urlImage="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701685343/stethoscope_ysrsda.png"
                 />
                 <InfoLine
                   lableName="Chuyên khoa:"
-                  value="Nội khoa"
+                  value={doctor.department?.departmentName}
                   urlImage="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701791362/aid-kit_v8w5qp.png"
                 />
                 <InfoLine
@@ -286,20 +331,25 @@ function ChooseDayPage(props) {
                   marginTop: "8px",
                 }}
               >
-                <CustomButtonChoosen
-                  variant="contained"
-                  isActive={activeButton === "morning"}
-                  onClick={() => handleButtonClick("morning")}
-                >
-                  Buổi sáng
-                </CustomButtonChoosen>
-                <CustomButtonChoosen
-                  variant="contained"
-                  isActive={activeButton === "afternoon"}
-                  onClick={() => handleButtonClick("afternoon")}
-                >
-                  Buổi chiều
-                </CustomButtonChoosen>
+                {selectedSchedules.map((schedule) => (
+                  <CustomButtonChoosen
+                    key={schedule.doctorScheduleId}
+                    variant="contained"
+                    isactive={
+                      activeButton === schedule.doctorScheduleId
+                        ? "true"
+                        : "false"
+                    }
+                    onClick={() => {
+                      handleButtonClick(schedule.doctorScheduleId);
+                      setSelectedSchedule(schedule);
+                    }}
+                  >
+                    {schedule.scheduleType === "MORNING"
+                      ? "Buổi sáng"
+                      : "Buổi chiều"}
+                  </CustomButtonChoosen>
+                ))}
               </Stack>
             </DialogContent>
             <DialogActions>

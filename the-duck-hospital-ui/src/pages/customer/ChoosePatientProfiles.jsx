@@ -41,7 +41,6 @@ function ChoosePatientProfiles(props) {
       <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>
     </CustomLink>,
     <CustomTextBreakcrumb key={2}>Đăng ký khám bệnh</CustomTextBreakcrumb>,
-    <CustomTextBreakcrumb key={3}>Chọn hồ sơ bệnh nhân</CustomTextBreakcrumb>,
   ];
   const gradientStyle = {
     fontWeight: "600",

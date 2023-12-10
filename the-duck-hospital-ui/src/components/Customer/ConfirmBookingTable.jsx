@@ -10,7 +10,10 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import dayjs from "dayjs";
 import React from "react";
+import FormatCurrency from "../General/FormatCurrency";
+import { useNavigate } from "react-router-dom";
 
 const Header = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, #5ab2f7, #12cff3)`,
@@ -58,7 +61,26 @@ const CustomGrid = styled(Grid)(({ theme }) => ({
 }));
 
 function ConfirmBookingTable(props) {
+  const { schedules, profile } = props;
+  const navigate = useNavigate();
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const handleDelete = (schedule) => {
+    if (schedules.length === 1) {
+      navigate("/choose-doctor", {
+        state: {
+          schedules: [],
+          profile,
+        },
+      });
+      return;
+    }
+    navigate("/confirm-booking-information", {
+      state: {
+        schedules: schedules.filter((item) => item !== schedule),
+        profile,
+      },
+    });
+  };
   return (
     <Paper
       elevation={3}
@@ -113,152 +135,175 @@ function ConfirmBookingTable(props) {
                   ></CustomTypographyValue>
                 </Grid>
               </Grid>
-              <Grid xs={12} item container spacing={1}>
-                <CustomGrid item xs={4}>
-                  <Typography
-                    sx={{
-                      textTransform: "uppercase",
-                      color: "#003553",
-                    }}
-                  >
-                    Khoa sản - Chuẩn đoán trước sinh
-                  </Typography>
-                </CustomGrid>
-                <CustomGrid item xs={3}>
-                  <Typography
-                    sx={{
-                      color: "#003553",
-                    }}
-                  >
-                    Nguyễn Ngọc Tuyết Vi
-                  </Typography>
-                </CustomGrid>
-                <CustomGrid
+              {schedules.map((schedule, index) => (
+                <Grid
+                  xs={12}
                   item
-                  xs={2.5}
-                  sx={{
-                    color: "#003553",
-                  }}
+                  container
+                  spacing={1}
+                  key={`schedule-row-${index}`}
                 >
-                  <Typography>
-                    Buổi sáng <br /> 11/12/2023
-                  </Typography>
-                </CustomGrid>
-                <CustomGrid item xs={1.75}>
-                  <Typography>150.000đ</Typography>
-                </CustomGrid>
-                <Grid item xs={0.75} p={0}>
-                  <IconButton
+                  <CustomGrid item xs={4}>
+                    <Typography
+                      sx={{
+                        textTransform: "uppercase",
+                        color: "#003553",
+                      }}
+                    >
+                      {schedule.doctor.department?.departmentName}
+                    </Typography>
+                  </CustomGrid>
+                  <CustomGrid item xs={3}>
+                    <Typography
+                      sx={{
+                        color: "#003553",
+                      }}
+                    >
+                      {`${schedule.doctor.degree} ${schedule.doctor.doctorName}`}
+                    </Typography>
+                  </CustomGrid>
+                  <CustomGrid
+                    item
+                    xs={2.5}
                     sx={{
-                      fontSize: "20px",
-                      ":hover": {
-                        backgroundColor: "#ec7e7e",
-                        color: "#fff",
-                      },
+                      color: "#003553",
                     }}
                   >
-                    <DeleteOutlinedIcon
-                      style={{
-                        fonsSize: "10px",
+                    <Typography>
+                      {schedule.schedule.scheduleType === "MORNING"
+                        ? "Buổi sáng"
+                        : "Buổi chiều"}
+                      <br />{" "}
+                      {dayjs(schedule.schedule.date).format("DD/MM/YYYY")}
+                    </Typography>
+                  </CustomGrid>
+                  <CustomGrid item xs={1.75}>
+                    <Typography>
+                      <FormatCurrency amount={schedule.doctor.price} />
+                    </Typography>
+                  </CustomGrid>
+                  <Grid item xs={0.75} p={0}>
+                    <IconButton
+                      sx={{
+                        fontSize: "20px",
+                        ":hover": {
+                          backgroundColor: "#ec7e7e",
+                          color: "#fff",
+                        },
                       }}
-                    />
-                  </IconButton>
+                      onClick={() => handleDelete(schedule)}
+                    >
+                      <DeleteOutlinedIcon
+                        style={{
+                          fonsSize: "10px",
+                        }}
+                      />
+                    </IconButton>
+                  </Grid>
                 </Grid>
-              </Grid>
+              ))}
             </Body>
           </>
         ) : (
           <>
-            <Body container spacing={0.7}>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography
-                  sx={{
-                    color: "#003553",
-                  }}
-                >
-                  Chuyên khoa:
-                </Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  XƯƠNG KHỚP CHỈNH HÌNH
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography
-                  sx={{
-                    color: "#003553",
-                  }}
-                >
-                  Bác sĩ:
-                </Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  Nguyễn Ngọc Tuyết Vi
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography
-                  sx={{
-                    color: "#003553",
-                  }}
-                >
-                  Thời gian khám:
-                </Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>
-                  Buổi sáng 11/12/2023
-                </CustomTypographyValue>
-              </CustomGrid>
-              <CustomGrid item md={2} xs={5} sm={3}>
-                <Typography
-                  sx={{
-                    color: "#003553",
-                  }}
-                >
-                  Tiền khám:
-                </Typography>
-              </CustomGrid>
-              <CustomGrid item md={10} xs={7} sm={9}>
-                <CustomTypographyValue>150.000 đ</CustomTypographyValue>
-              </CustomGrid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  textAlign: "right",
-                  borderBottomLeftRadius: "8px !important",
-                  borderBottomRightRadius: "8px !important",
-                }}
-              >
-                <Button
-                  size="small"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#fde4e4",
-                    borderRadius: "8px",
-                    color: "#fc5064",
-                    textTransform: "none",
-                    alignItems: "center",
-                    fontSize: "14px",
-                    "&:hover": {
-                      backgroundColor: "#fddfdf",
-                    },
-                  }}
-                >
-                  <DeleteOutlinedIcon
-                    style={{
-                      fontSize: "14px !important",
-                      marginRight: "5px",
-                      color: "#fc5064",
+            {schedules.map((schedule, index) => (
+              <Body container spacing={0.7} key={`small-schedule-${index}`}>
+                <CustomGrid item md={2} xs={5} sm={3}>
+                  <Typography
+                    sx={{
+                      color: "#003553",
                     }}
-                  />
-                  Xoá
-                </Button>
-              </Grid>
-            </Body>
+                  >
+                    Chuyên khoa:
+                  </Typography>
+                </CustomGrid>
+                <CustomGrid item md={10} xs={7} sm={9}>
+                  <CustomTypographyValue>
+                    {schedule.doctor.department?.departmentName}
+                  </CustomTypographyValue>
+                </CustomGrid>
+                <CustomGrid item md={2} xs={5} sm={3}>
+                  <Typography
+                    sx={{
+                      color: "#003553",
+                    }}
+                  >
+                    Bác sĩ:
+                  </Typography>
+                </CustomGrid>
+                <CustomGrid item md={10} xs={7} sm={9}>
+                  <CustomTypographyValue>
+                    {`${schedule.doctor.degree} ${schedule.doctor.doctorName}`}
+                  </CustomTypographyValue>
+                </CustomGrid>
+                <CustomGrid item md={2} xs={5} sm={3}>
+                  <Typography
+                    sx={{
+                      color: "#003553",
+                    }}
+                  >
+                    Thời gian khám:
+                  </Typography>
+                </CustomGrid>
+                <CustomGrid item md={10} xs={7} sm={9}>
+                  <CustomTypographyValue>
+                    {schedule.schedule.scheduleType === "MORNING"
+                      ? "Buổi sáng "
+                      : "Buổi chiều "}
+                    {dayjs(schedule.schedule.date).format("DD/MM/YYYY")}
+                  </CustomTypographyValue>
+                </CustomGrid>
+                <CustomGrid item md={2} xs={5} sm={3}>
+                  <Typography
+                    sx={{
+                      color: "#003553",
+                    }}
+                  >
+                    Tiền khám:
+                  </Typography>
+                </CustomGrid>
+                <CustomGrid item md={10} xs={7} sm={9}>
+                  <CustomTypographyValue>
+                    <FormatCurrency amount={schedule.doctor.price} />
+                  </CustomTypographyValue>
+                </CustomGrid>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    textAlign: "right",
+                    borderBottomLeftRadius: "8px !important",
+                    borderBottomRightRadius: "8px !important",
+                  }}
+                >
+                  <Button
+                    size="small"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#fde4e4",
+                      borderRadius: "8px",
+                      color: "#fc5064",
+                      textTransform: "none",
+                      alignItems: "center",
+                      fontSize: "14px",
+                      "&:hover": {
+                        backgroundColor: "#fddfdf",
+                      },
+                    }}
+                    onClick={() => handleDelete(schedule)}
+                  >
+                    <DeleteOutlinedIcon
+                      style={{
+                        fontSize: "14px !important",
+                        marginRight: "5px",
+                        color: "#fc5064",
+                      }}
+                    />
+                    Xoá
+                  </Button>
+                </Grid>
+              </Body>
+            ))}
           </>
         )}
       </Stack>
