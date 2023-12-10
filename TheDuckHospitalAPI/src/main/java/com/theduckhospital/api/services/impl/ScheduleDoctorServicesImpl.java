@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
+import com.theduckhospital.api.dto.request.headdoctor.DoctorScheduleItemRequest;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
@@ -10,7 +11,10 @@ import com.theduckhospital.api.services.IRoomServices;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
@@ -29,10 +33,10 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.doctorScheduleRepository = doctorScheduleRepository;
     }
     @Override
-    public DoctorSchedule createDoctorSchedule(
+    public List<DoctorSchedule> createDoctorSchedule(
             String authorization,
             CreateDoctorScheduleRequest request
-    ) {
+    ) throws ParseException {
         Doctor headDoctor = getHeadDoctor(authorization);
 
         Department department = headDoctor.getDepartment();
@@ -47,43 +51,104 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Medical service is not in your department");
         }
 
-        Room room = roomServices.findRoomById(request.getRoomId());
-        if (room.getDepartment().getDepartmentId() != (department.getDepartmentId())) {
+        Calendar startTime = getCalendar(request.getStartTime());
+        Calendar endTime = getCalendar(request.getEndTime());
+        if (!checkDateIsValid(startTime, endTime)) {
+            throw new BadRequestException("Start time or end time is invalid");
+        }
+
+        List<DoctorSchedule> doctorSchedules = new ArrayList<>();
+        for (DoctorScheduleItemRequest scheduleItemRequest : request.getScheduleItems()) {
+            Calendar startTime1 = getCalendar(request.getStartTime());
+            Calendar endTime1 = getCalendar(request.getEndTime());
+            List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
+                    startTime1,
+                    endTime1,
+                    medicalService,
+                    department,
+                    doctor,
+                    scheduleItemRequest
+            );
+
+            doctorSchedules.addAll(doctorScheduleRange);
+        }
+
+        return doctorScheduleRepository.saveAll(doctorSchedules);
+    }
+
+    private List<DoctorSchedule> createDoctorScheduleRange(
+            Calendar startTime,
+            Calendar endTime,
+            MedicalService medicalService,
+            Department department,
+            Doctor doctor,
+            DoctorScheduleItemRequest scheduleItemRequest
+    ) {
+        List<DoctorSchedule> doctorSchedules = new ArrayList<>();
+
+        // Check room is available
+        Room room = roomServices.findRoomById(scheduleItemRequest.getRoomId());
+        if (room.getDepartment().getDepartmentId() != department.getDepartmentId()) {
             throw new BadRequestException("Room is not in your department");
         }
 
-        // Check room is available for this schedule
-        Optional<DoctorSchedule> optional = doctorScheduleRepository
-                .findDoctorScheduleByRoomAndScheduleTypeAndDayOfWeekAndDeletedIsFalse(
-                        room,
-                        request.getScheduleType(),
-                        request.getDayOfWeek()
-                );
+        for (; startTime.before(endTime); startTime.add(Calendar.DATE, 1)) {
+            if (startTime.get(Calendar.DAY_OF_WEEK) - scheduleItemRequest.getDayOfWeek() != 0) {
+                continue;
+            }
 
-        if (optional.isPresent()) {
-            throw new BadRequestException("Doctor schedule already exists");
+            Optional<DoctorSchedule> doctorScheduleOptional = doctorScheduleRepository
+                    .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+                            room,
+                            startTime.getTime(),
+                            scheduleItemRequest.getScheduleType()
+                    );
+            if (doctorScheduleOptional.isPresent()) {
+                throw new BadRequestException("Room is not available");
+            }
+
+            // Check doctor is available
+            Optional<DoctorSchedule> optional = doctorScheduleRepository
+                    .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
+                            doctor,
+                            startTime.getTime(),
+                            scheduleItemRequest.getScheduleType()
+                    );
+            if (optional.isPresent()) {
+                throw new BadRequestException("Doctor is not available");
+            }
+
+            DoctorSchedule doctorSchedule = new DoctorSchedule();
+            doctorSchedule.setDoctor(doctor);
+            doctorSchedule.setRoom(room);
+            doctorSchedule.setMedicalService(medicalService);
+            doctorSchedule.setSlot(scheduleItemRequest.getSlot());
+            doctorSchedule.setDayOfWeek(scheduleItemRequest.getDayOfWeek());
+            doctorSchedule.setDate(startTime.getTime());
+            doctorSchedule.setScheduleType(scheduleItemRequest.getScheduleType());
+            doctorSchedule.setDeleted(false);
+
+            doctorSchedules.add(doctorSchedule);
         }
 
-        // Check doctor is available for this schedule
-        if (doctor.getDoctorSchedules().stream().anyMatch(doctorSchedule ->
-                doctorSchedule.getDayOfWeek() == request.getDayOfWeek()
-                        && doctorSchedule.getScheduleType() == request.getScheduleType()
-                        && !doctorSchedule.isDeleted()
-        )) {
-            throw new BadRequestException("Doctor is not available for this schedule");
+        return doctorSchedules;
+    }
+
+    private boolean checkDateIsValid (Calendar startTime, Calendar endTime) {
+        Calendar now = Calendar.getInstance();
+        if (startTime.before(now)) {
+            return false;
         }
 
-        // Create doctor schedule
-        DoctorSchedule doctorSchedule = new DoctorSchedule();
-        doctorSchedule.setDoctor(doctor);
-        doctorSchedule.setMedicalService(medicalService);
-        doctorSchedule.setRoom(room);
-        doctorSchedule.setSlot(request.getSlot());
-        doctorSchedule.setDayOfWeek(request.getDayOfWeek());
-        doctorSchedule.setScheduleType(request.getScheduleType());
-        doctorSchedule.setDeleted(false);
+        return !startTime.after(endTime);
+    }
 
-        return doctorScheduleRepository.save(doctorSchedule);
+    private Calendar getCalendar(Date date) throws ParseException {
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date dateWithoutTime = formatter.parse(formatter.format(date));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateWithoutTime);
+        return calendar;
     }
 
     private Doctor getHeadDoctor(String authorization) {

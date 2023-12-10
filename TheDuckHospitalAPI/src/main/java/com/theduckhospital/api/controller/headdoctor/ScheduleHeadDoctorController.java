@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/api/head-doctor/schedules")
 @PreAuthorize("hasRole('ROLE_HEAD_DOCTOR')")
@@ -21,7 +23,7 @@ public class ScheduleHeadDoctorController {
     public ResponseEntity<?> createDoctorSchedule(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody CreateDoctorScheduleRequest request
-    ) {
+    ) throws ParseException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

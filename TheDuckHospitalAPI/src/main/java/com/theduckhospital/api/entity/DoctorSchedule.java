@@ -43,8 +43,7 @@ public class DoctorSchedule {
 
     private int slot;
     private int dayOfWeek;
-    private Date startTime;
-    private Date endTime;
+    private Date date;
     private ScheduleType scheduleType;
 
     private boolean deleted;

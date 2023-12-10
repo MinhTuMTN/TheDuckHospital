@@ -20,7 +20,7 @@ import {
 import React, { useCallback, useEffect } from "react";
 import DoctorItemInChooseDocterPage from "../../components/Customer/DoctorItemInChooseDocterPage";
 import CustomLink from "../../components/General/CustomLink";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getDoctorsMedicalExaminations } from "../../services/customer/DoctorServices";
 import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../services/customer/DepartmentServices";
@@ -113,6 +113,13 @@ function ChooseDoctorPage(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.state || !location.state.profile) {
+      navigate("/choose-patient-profiles");
+    }
+  }, [location, navigate]);
 
   const breakcrumbs = [
     <CustomLink to="/" key={1}>
@@ -177,14 +184,21 @@ function ChooseDoctorPage(props) {
       </Breadcrumbs>
       <Grid
         container
-        spacing={2}
+        spacing={{
+          xs: 1,
+          md: 2,
+        }}
         sx={{
           display: "flex",
-          mt: 3,
+          mt: {
+            xs: 4,
+            md: 3,
+          },
           justifyContent: "flex-start",
           alignItems: "center",
           textAlign: "center",
           width: "100%",
+          marginLeft: "-8px",
         }}
       >
         <Grid
@@ -221,18 +235,10 @@ function ChooseDoctorPage(props) {
           xs={12}
           md={12}
           sx={{
-            width: "825px",
             borderRadius: "8px",
-            padding: "0px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            [theme.breakpoints.down("md")]: {
-              width: 600, // Set width for medium screens
-            },
-            [theme.breakpoints.down("sm")]: {
-              width: 470, // Set width for small screens
-            },
           }}
         >
           <Header component={Paper} elevation={3}>
@@ -373,10 +379,22 @@ function ChooseDoctorPage(props) {
             </Filter>
             <ListDocter spacing={1.5}>
               {doctors.map((doctor) => (
-                <DoctorItemInChooseDocterPage
+                <Box
+                  onClick={() => {
+                    navigate("/choose-date", {
+                      state: {
+                        doctor: doctor,
+                        profile: location.state.profile,
+                      },
+                    });
+                  }}
                   key={doctor.doctorId}
-                  doctor={doctor}
-                />
+                  sx={{
+                    width: "100%",
+                  }}
+                >
+                  <DoctorItemInChooseDocterPage doctor={doctor} />
+                </Box>
               ))}
             </ListDocter>
 

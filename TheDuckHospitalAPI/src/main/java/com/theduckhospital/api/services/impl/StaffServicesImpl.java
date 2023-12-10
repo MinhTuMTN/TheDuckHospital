@@ -50,6 +50,7 @@ public class StaffServicesImpl implements IStaffServices {
                 default -> staff = new Staff();
             }
 
+            staff.setStaffId(UUID.randomUUID());
             staff.setGender(Gender.values()[request.getGender()]);
             staff.setFullName(request.getFullName());
             staff.setIdentityNumber(request.getIdentityNumber());
@@ -83,6 +84,7 @@ public class StaffServicesImpl implements IStaffServices {
                     "password", password
             );
         } catch (Exception e) {
+            e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }

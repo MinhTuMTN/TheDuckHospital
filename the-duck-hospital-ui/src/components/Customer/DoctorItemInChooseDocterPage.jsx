@@ -2,7 +2,16 @@ import { CardMedia, Stack, Typography } from "@mui/material";
 import React from "react";
 import FormatCurrency from "../General/FormatCurrency";
 
-const days = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"];
+const days = [
+  "",
+  "Chủ nhật",
+  "Thứ 2",
+  "Thứ 3",
+  "Thứ 4",
+  "Thứ 5",
+  "Thứ 6",
+  "Thứ 7",
+];
 
 function DoctorItemInChooseDocterPage(props) {
   const { doctor } = props;
@@ -149,6 +158,7 @@ function DoctorItemInChooseDocterPage(props) {
             fontSize: "16px",
             fontWeight: "400",
             color: "template.darker",
+            textAlign: "left",
           }}
         >
           Lịch khám: {schedule.trim().slice(0, -1)}

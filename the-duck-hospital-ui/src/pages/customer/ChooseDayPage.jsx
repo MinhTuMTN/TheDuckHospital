@@ -19,6 +19,8 @@ import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useState } from "react";
 import InfoLine from "../../components/Customer/InfoLine";
+import dayjs from "dayjs";
+import { useLocation } from "react-router-dom";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -78,9 +80,17 @@ const CustomButtonChoosen = styled(Button)(({ theme, isActive }) => ({
   },
 }));
 
-const dayOfWork = ["01/12/2023", "07/12/2023", "08/12/2023"];
-const disableDate = (date) => {
-  return dayOfWork.indexOf(date.format("DD/MM/YYYY")) === -1;
+const disableDate = (date, startDate, endDate, dayOfWeek) => {
+  // Check date is before start date.
+  const isBeforeStart = startDate ? dayjs(date).isBefore(startDate) : false;
+
+  // Check date is after end date.
+  const isAfterEnd = endDate ? dayjs(date).isAfter(endDate) : false;
+
+  // Check if date's day of week is not equal to dayOfWeek.
+  const isDayOfWeek = dayOfWeek ? dayjs(date).day() !== dayOfWeek : false;
+
+  return isBeforeStart || isAfterEnd || isDayOfWeek;
 };
 
 function ChooseDayPage(props) {
@@ -88,6 +98,8 @@ function ChooseDayPage(props) {
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [selectedDate, setSelectedDate] = useState(null);
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
+
+  const { doctor, profile } = useLocation().state;
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     setConfirmationOpen(true);
@@ -125,15 +137,20 @@ function ChooseDayPage(props) {
       </Breadcrumbs>
       <Grid
         container
-        spacing={2}
+        spacing={{
+          xs: 1,
+          md: 2,
+        }}
+        marginLeft={{
+          xs: "-8px",
+          md: "-8px",
+        }}
         sx={{
           display: "flex",
           mt: 3,
           justifyContent: "flex-start",
           alignItems: "center",
           textAlign: "center",
-          width: "100%",
-          marginLeft: "0px",
         }}
       >
         <Grid
@@ -167,18 +184,10 @@ function ChooseDayPage(props) {
           xs={12}
           md={12}
           sx={{
-            width: "825px",
             borderRadius: "8px",
-            padding: "0px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            [theme.breakpoints.down("md")]: {
-              width: 600, // Set width for medium screens
-            },
-            [theme.breakpoints.down("sm")]: {
-              width: 470, // Set width for small screens
-            },
           }}
         >
           <Header component={Paper} elevation={3}>
