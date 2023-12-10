@@ -39,5 +39,4 @@ public class Room {
 
     private Date createdDate;
     private Date updatedDate;
-    private Integer queueNumber;
 }

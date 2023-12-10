@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,9 +27,21 @@ public class Transaction {
     private Date lastModifiedAt;
     private boolean deleted;
 
-    @OneToOne
-    @JoinColumn(name = "bookingId", referencedColumnName = "bookingId")
-    @ToStringExclude
+    @OneToMany(mappedBy = "transaction")
     @JsonBackReference
-    private Booking booking;
+    @ToStringExclude
+    private List<Booking> bookings;
+
+    @PrePersist
+    public void prePersist() {
+        this.transactionId = UUID.randomUUID();
+        this.createdAt = new Date();
+        this.lastModifiedAt = new Date();
+        this.status = TransactionStatus.PENDING;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastModifiedAt = new Date();
+    }
 }

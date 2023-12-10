@@ -7,9 +7,10 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomerProfileInPaymentPage from "../../components/Customer/PaymentOrder/CustomerProfileInPaymentPage";
 import Payment from "../../components/Customer/PaymentOrder/Payment";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -17,18 +18,6 @@ const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   color: theme.palette.oldPrimaryDarker.main,
 }));
 
-const patient = {
-  name: "Nguyễn Ngọc Tuyết Vi",
-  phone: "0123456789",
-  address: "210 Lê Văn Thịnh, phường Cát Lái, quận 2, thành phố Hồ Chí Minh",
-};
-const booking = {
-  doctor: "Nguyễn Thị B",
-  departmentName: "Nội thần kinh",
-  date: "27/12/2023",
-  scheduleType: "Sáng",
-  fee: 200000,
-};
 const CustomOutline = styled(Paper)(({ theme }) => ({
   borderRadius: "8px",
   width: "100%",
@@ -60,6 +49,15 @@ const TextHeader = styled(Typography)(({ theme }) => ({
 
 function PaymentOrders(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!location.state?.profile || !location.state?.schedules)
+      navigate("/choose-patient-profiles", {
+        replace: true,
+      });
+  }, [location.state, navigate]);
   const breakcrumbs = [
     <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
     <CustomTextBreakcrumb key={2}>Thanh toán</CustomTextBreakcrumb>,
@@ -95,7 +93,7 @@ function PaymentOrders(props) {
             <Header>
               <TextHeader variant="body2">Thông tin bệnh nhân</TextHeader>
             </Header>
-            <CustomerProfileInPaymentPage patient={patient} />
+            <CustomerProfileInPaymentPage profile={location.state?.profile} />
           </CustomOutline>
         </Grid>
         <Grid
@@ -115,7 +113,7 @@ function PaymentOrders(props) {
             <Header>
               <TextHeader variant="body2">Thanh toán</TextHeader>
             </Header>
-            <Payment booking={booking} />
+            <Payment schedules={location.state?.schedules} />
           </CustomOutline>
         </Grid>
       </Grid>

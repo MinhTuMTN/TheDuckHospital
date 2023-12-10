@@ -37,10 +37,10 @@ public class MedicalService {
     @ToStringExclude
     private List<MedicalTest> medicalTests;
 
-    @OneToMany(mappedBy = "medicalService")
-    @JsonBackReference
-    @ToStringExclude
-    private List<Booking> bookings;
+//    @OneToMany(mappedBy = "medicalService")
+//    @JsonBackReference
+//    @ToStringExclude
+//    private List<Booking> bookings;
 
     @OneToMany(mappedBy = "medicalService")
     @JsonBackReference

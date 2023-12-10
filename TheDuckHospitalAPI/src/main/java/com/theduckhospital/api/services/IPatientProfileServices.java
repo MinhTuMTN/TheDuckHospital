@@ -12,4 +12,5 @@ public interface IPatientProfileServices {
     PatientProfileItemResponse updatePatientProfile(String token, UUID patientProfileId, CreatePatientProfileRequest request);
     List<PatientProfileItemResponse> getActivePatientProfile(String token);
     boolean deletePatientProfile(String token, UUID patientProfileId);
+    PatientProfile getPatientProfileById(String token, UUID patientProfileId);
 }

@@ -26,6 +26,7 @@ CustomTypographyValue.propTypes = {
   patient: PropTypes.object,
 };
 function CustomerProfileInPaymentPage(props) {
+  const { profile } = props;
   return (
     <Body
       sx={{
@@ -45,7 +46,7 @@ function CustomerProfileInPaymentPage(props) {
             textTransform: "uppercase",
           }}
         >
-          {props.patient.name}
+          {profile.fullName}
         </CustomTypographyValue>
       </Stack>
       <Stack
@@ -63,7 +64,7 @@ function CustomerProfileInPaymentPage(props) {
           }}
         />
         <CustomTypographyValue variant="subtitle1">
-          {props.patient.phone}
+          {profile.phoneNumber}
         </CustomTypographyValue>
       </Stack>
       <Stack
@@ -82,7 +83,7 @@ function CustomerProfileInPaymentPage(props) {
           }}
         />
         <CustomTypographyValue variant="subtitle1">
-          {props.patient.address}
+          {`${profile.streetName}, ${profile.ward?.wardName}, ${profile.district?.districtName}, ${profile.province?.provinceName}`}
         </CustomTypographyValue>
       </Stack>
     </Body>

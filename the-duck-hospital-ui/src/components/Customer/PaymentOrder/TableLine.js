@@ -3,8 +3,10 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import MedicationIcon from "@mui/icons-material/Medication";
 import PaidIcon from "@mui/icons-material/Paid";
 import PersonIcon from "@mui/icons-material/Person";
+import dayjs from "dayjs";
 
-const createTableLine = (booking) => {
+const createTableLine = (schedule) => {
+  console.log(schedule);
   const tableLine = [
     {
       icon: (
@@ -16,7 +18,7 @@ const createTableLine = (booking) => {
         />
       ),
       label: "Chuyên khoa:",
-      value: booking.departmentName,
+      value: schedule.doctor?.department?.departmentName,
     },
     {
       icon: (
@@ -28,7 +30,7 @@ const createTableLine = (booking) => {
         />
       ),
       label: "Bác sĩ:",
-      value: booking.doctor,
+      value: `${schedule?.doctor?.degree} ${schedule?.doctor?.doctorName}`,
     },
 
     {
@@ -41,7 +43,7 @@ const createTableLine = (booking) => {
         />
       ),
       label: "Thời gian khám:",
-      value: booking.date,
+      value: dayjs(schedule?.schedule?.date).format("DD/MM/YYYY"),
     },
     {
       icon: (
@@ -53,7 +55,7 @@ const createTableLine = (booking) => {
         />
       ),
       label: "Buổi:",
-      value: booking.scheduleType,
+      value: schedule?.schedule?.scheduleType === "MORNING" ? "Sáng" : "Chiều",
     },
     {
       icon: (
@@ -65,7 +67,7 @@ const createTableLine = (booking) => {
         />
       ),
       label: "Tiền khám:",
-      value: booking.fee,
+      value: schedule?.doctor?.price,
     },
   ];
 
