@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import GridInfo from "./GridInfo";
+import dayjs from "dayjs";
 
 const Header = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, #5ab2f7, #12cff3)`,
@@ -61,6 +62,7 @@ const CustomGrid = styled(Grid)(({ theme }) => ({
 }));
 
 function ConfirmPatientInfo(props) {
+  const { profile } = props;
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   return (
     <Paper
@@ -89,7 +91,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"Họ và tên:"}
-              value={"Nguyễn Ngọc Tuyết Vi"}
+              value={profile.fullName}
               icon={
                 <PersonOutlineOutlinedIcon
                   sx={{
@@ -102,7 +104,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"Giới tính:"}
-              value={"Nữ"}
+              value={profile.gender === "MALE" ? "Nam" : "Nữ"}
               icon={
                 <WcOutlinedIcon
                   sx={{
@@ -115,7 +117,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"Ngày sinh:"}
-              value={"12/01/1999"}
+              value={dayjs(profile.dateOfBirth).format("DD/MM/YYYY")}
               icon={
                 <CalendarMonthOutlinedIcon
                   sx={{
@@ -128,7 +130,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"CMND:"}
-              value={"291234567"}
+              value={profile.identityNumber || "Chưa cập nhật"}
               icon={
                 <BadgeOutlinedIcon
                   sx={{
@@ -141,7 +143,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"Email:"}
-              value={"20110758@student.hcmute.edu.vn"}
+              value={profile.email || "Chưa cập nhật"}
               icon={
                 <AlternateEmailOutlinedIcon
                   sx={{
@@ -154,7 +156,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={6}>
             <GridInfo
               label={"Dân tộc:"}
-              value={"Kinh"}
+              value={profile.nation?.nationName || "Chưa cập nhật"}
               icon={
                 <GroupsOutlinedIcon
                   sx={{
@@ -167,7 +169,7 @@ function ConfirmPatientInfo(props) {
           <CustomGrid item md={12}>
             <GridInfo
               label={"Địa chỉ:"}
-              value={"210 Lê Văn Thịnh, Phường Cát Lái, Quận 2, TP.HCM"}
+              value={`${profile.streetName}, ${profile.ward?.wardName}, ${profile.district?.districtName}, ${profile.province?.provinceName}`}
               icon={
                 <LocationOnOutlinedIcon
                   sx={{

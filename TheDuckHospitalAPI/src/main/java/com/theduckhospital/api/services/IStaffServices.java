@@ -1,7 +1,6 @@
 package com.theduckhospital.api.services;
 
-import com.theduckhospital.api.dto.request.CreateStaffRequest;
-import com.theduckhospital.api.entity.Staff;
+import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 
 import java.util.Map;
 

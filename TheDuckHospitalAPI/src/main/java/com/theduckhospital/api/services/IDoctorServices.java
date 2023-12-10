@@ -1,0 +1,21 @@
+package com.theduckhospital.api.services;
+
+import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.entity.Doctor;
+
+import java.util.UUID;
+
+public interface IDoctorServices {
+    boolean deleteHeadDoctor(UUID staffId);
+    Doctor getDoctorById(UUID staffId);
+    Doctor getDoctorByToken(String token);
+
+    PaginationResponse getMedicalExaminationDoctors(
+            String fullName,
+            Integer departmentId,
+            Degree degree,
+            int page,
+            int limit
+    );
+}

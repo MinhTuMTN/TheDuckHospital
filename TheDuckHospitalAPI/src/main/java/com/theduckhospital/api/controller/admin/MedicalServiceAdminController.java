@@ -1,7 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.CreateServicesRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.request.admin.CreateServicesRequest;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

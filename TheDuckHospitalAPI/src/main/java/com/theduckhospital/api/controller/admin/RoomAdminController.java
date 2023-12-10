@@ -1,16 +1,15 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.CreateRoomRequest;
-import com.theduckhospital.api.dto.request.GeneralResponse;
+import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IRoomServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/rooms")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class RoomAdminController {
     private final IRoomServices roomServices;
 
@@ -36,6 +35,31 @@ public class RoomAdminController {
                         .success(true)
                         .message("Get all rooms successfully")
                         .data(roomServices.getAllRoomsDeleted())
+                        .build()
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> getAllRooms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all rooms successfully")
+                        .data(roomServices.getPaginationRoomsDeleted(page, limit))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{roomId}")
+    public  ResponseEntity<?> getRoomById(@PathVariable int roomId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get room by id successfully")
+                        .data(roomServices.getRoomById(roomId))
                         .build()
         );
     }

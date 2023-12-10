@@ -32,5 +32,5 @@ public class Doctor extends Staff{
     @OneToMany(mappedBy = "doctor")
     @ToStringExclude
     @JsonBackReference
-    private List<DoctorSchedule> doctorSchedule = new ArrayList<>();
+    private List<DoctorSchedule> doctorSchedules = new ArrayList<>();
 }

@@ -1,7 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.ServiceType;
-import com.theduckhospital.api.dto.request.CreateServicesRequest;
+import com.theduckhospital.api.dto.request.admin.CreateServicesRequest;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.error.StatusCodeException;
@@ -38,6 +38,15 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         MedicalService medicalService = getMedicalService(request, department);
 
         return medicalServiceRepository.save(medicalService);
+    }
+
+    @Override
+    public MedicalService getMedicalServiceById(int serviceId) {
+        return medicalServiceRepository
+                .findById(serviceId)
+                .orElseThrow(() ->
+                        new StatusCodeException("Medical service not found", 404)
+                );
     }
 
     @NotNull

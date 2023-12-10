@@ -7,104 +7,91 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
 import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
+import { getDepartmentById } from "../../../services/admin/DepartmentServices";
 
-const department = {
-  departmentName: "Khoa Nhi",
-  description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
-  doctors: [
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 1",
-      phoneNumber: "0123456789",
-      headOfDepartment: false,
-      identityNumber: "123456789012",
-      deleted: false,
-    },
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 2",
-      phoneNumber: "0123456788",
-      headOfDepartment: false,
-      identityNumber: "123456789011",
-      deleted: false,
-    },
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 3",
-      phoneNumber: "0123456787",
-      headOfDepartment: false,
-      identityNumber: "123456789010",
-      deleted: false,
-    },
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 4",
-      phoneNumber: "0123456786",
-      headOfDepartment: false,
-      identityNumber: "123456789013",
-      deleted: false,
-    },
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Head Doctor",
-      phoneNumber: "0123456785",
-      headOfDepartment: true,
-      identityNumber: "123456789014",
-      deleted: false,
-    },
-    {
-      staffId: "123",
-      fullName: "Nguyễn Văn Doctor 5",
-      phoneNumber: "0123456784",
-      headOfDepartment: false,
-      identityNumber: "123456789015",
-      deleted: false,
-    },
-  ],
-  deleted: false,
-};
+// const department = {
+//   departmentName: "Khoa Nhi",
+//   description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
+//   doctors: [
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Doctor 1",
+//       phoneNumber: "0123456789",
+//       headOfDepartment: false,
+//       identityNumber: "123456789012",
+//       deleted: false,
+//     },
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Doctor 2",
+//       phoneNumber: "0123456788",
+//       headOfDepartment: false,
+//       identityNumber: "123456789011",
+//       deleted: false,
+//     },
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Doctor 3",
+//       phoneNumber: "0123456787",
+//       headOfDepartment: false,
+//       identityNumber: "123456789010",
+//       deleted: false,
+//     },
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Doctor 4",
+//       phoneNumber: "0123456786",
+//       headOfDepartment: false,
+//       identityNumber: "123456789013",
+//       deleted: false,
+//     },
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Head Doctor",
+//       phoneNumber: "0123456785",
+//       headOfDepartment: true,
+//       identityNumber: "123456789014",
+//       deleted: false,
+//     },
+//     {
+//       staffId: "123",
+//       fullName: "Nguyễn Văn Doctor 5",
+//       phoneNumber: "0123456784",
+//       headOfDepartment: false,
+//       identityNumber: "123456789015",
+//       deleted: false,
+//     },
+//   ],
+//   deleted: false,
+// };
 
 function DepartmentDetailPage() {
+  const { departmentId } = useParams();
   const navigate = useNavigate();
-  const [limit, setLimit] = useState(5);
-  const [page, setPage] = useState(1);
-  const headDoctor = department.doctors.find(
-    (doctor) => doctor.headOfDepartment === true
-  );
-  department.doctors.sort((a, b) => {
-    if (a.headOfDepartment === b.headOfDepartment) {
-      return 0;
-    } else if (a.headOfDepartment) {
-      return -1;
-    } else {
-      return 1;
+  const [department, setDepartment] = useState({});
+
+  useEffect(() => {
+    const handleGetDepartment = async () => {
+      const response = await getDepartmentById(departmentId);
+      if (response.success) {
+        response.data.data.doctors.sort((a, b) => {
+          if (a.headOfDepartment === b.headOfDepartment) {
+            return 0;
+          } else if (a.headOfDepartment) {
+            return -1;
+          } else {
+            return 1;
+          }
+        });
+        setDepartment(response.data.data);
+      }
     }
-  });
-  const totalItems = department.doctors.length;
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage + 1);
-  };
-  const handleRowsPerPageChange = (event) => {
-    setLimit(event.target.value);
-    setPage(1);
-  };
-  // const [customer, setCustomer] = useState({});
-
-  // const handleGetCustomer = useCallback(async () => {
-  //   const response = await getCustomerById(state.id);
-  //   if (response.success) {
-  //     setCustomer(response.data.data);
-  //   }
-  // }, [state.id]);
-
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
+    handleGetDepartment();
+  }, [departmentId]);
 
   return (
     <Box
@@ -174,7 +161,8 @@ function DepartmentDetailPage() {
               >
                 <DepartmentDetail
                   department={department}
-                  headDoctor={headDoctor}
+                  headDoctorId={department.headDoctorId}
+                  headDoctorName={department.headDoctorName}
                 />
               </Stack>
             </Grid>
@@ -191,15 +179,7 @@ function DepartmentDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <DoctorTable
-                  count={totalItems ? totalItems : 0}
-                  items={department.doctors}
-                  headDoctor={headDoctor}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={limit}
-                />
+                <DoctorTable items={department.doctors} />
               </Stack>
             </Grid>
           </Grid>

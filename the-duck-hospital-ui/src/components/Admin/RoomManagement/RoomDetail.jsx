@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -20,33 +21,14 @@ import {
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
-
-const departments = [
-  {
-    value: 1,
-    label: "Khoa nhi",
-  },
-  {
-    value: 2,
-    label: "Khoa tim mạch",
-  },
-  {
-    value: 3,
-    label: "Khoa ung thư",
-  },
-  {
-    value: 4,
-    label: "Khoa da liễu",
-  },
-  {
-    value: 5,
-    label: "Khoa thần kinh",
-  },
-  {
-    value: 6,
-    label: "Khoa tâm lý",
-  },
-];
+import { getAllDepartments } from "../../../services/admin/DepartmentServices";
+import { enqueueSnackbar } from "notistack";
+import {
+  deleteRoom,
+  restoreRoom,
+  updateRoom,
+} from "../../../services/admin/RoomServices";
+import { useNavigate } from "react-router-dom";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -73,6 +55,7 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontSize: "15px !important",
   variant: "body1",
   fontWeight: "400 !important",
+  textAlign: "justify",
 }));
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -104,6 +87,7 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 }));
 
 function RoomDetail(props) {
+  const navigate = useNavigate();
   const { room } = props;
   let status = room.deleted;
   const [statusRoom, setStatusRoom] = useState(false);
@@ -112,6 +96,7 @@ function RoomDetail(props) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [roomEdit, setRoomEdit] = useState({});
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     setEditStatus(status);
@@ -129,28 +114,65 @@ function RoomDetail(props) {
 
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
+  const handleUpdateButtonClick = async () => {
+    let response;
+    if (statusRoom) {
+      response = await restoreRoom(room.roomId);
+      console.log(response);
+      if (response.success) {
+        enqueueSnackbar("Mở khóa phòng thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusRoom(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    } else {
+      response = await deleteRoom(room.roomId);
+      console.log(response);
+      if (response.success) {
+        enqueueSnackbar("Khóa phòng thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusRoom(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleGetDepartment = async () => {
+      const response = await getAllDepartments();
+      if (response.success) {
+        setDepartments(response.data.data);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+    handleGetDepartment();
+  }, []);
+
+  const handleUpdateRoom = async () => {
+    if (roomEdit.roomName?.trim() === "") {
+      enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
+      return;
+    }
+
+    if (roomEdit.departmentId === -1) {
+      enqueueSnackbar("Khoa không được để trống", { variant: "error" });
+      return;
+    }
+
+    const response = await updateRoom(room.roomId, {
+      roomName: roomEdit.roomName,
+      departmentId: roomEdit.departmentId,
+      description: roomEdit.description,
+    });
+    if (response.success) {
+      enqueueSnackbar("Cập nhật thông tin phòng thành công!", {
+        variant: "success",
+      });
+      setOpenPopup(false);
+      navigate(0);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  };
 
   const handleEditButtonClick = () => {
     setOpenPopup(true);
@@ -291,7 +313,7 @@ function RoomDetail(props) {
               }
               okText={statusRoom ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
-              // onOk={handleUpdateButtonClick}
+              onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}
               onClose={() => setDeleteDialog(false)}
             />
@@ -344,6 +366,7 @@ function RoomDetail(props) {
                   style={{
                     fontSize: "14px",
                     marginBottom: "4px",
+                    color: roomEdit.roomName?.trim() === "" ? "red" : "",
                   }}
                 >
                   Tên phòng
@@ -357,6 +380,11 @@ function RoomDetail(props) {
                   autoFocus
                   required
                   fullWidth
+                  error={roomEdit.roomName?.trim() === ""}
+                  helperText={
+                    roomEdit.roomName?.trim() === "" &&
+                    "Tên phòng không được để trống"
+                  }
                   value={roomEdit.roomName}
                   onChange={(e) =>
                     setRoomEdit((prev) => {
@@ -374,11 +402,12 @@ function RoomDetail(props) {
                   style={{
                     fontSize: "14px",
                     marginBottom: "4px",
+                    color: roomEdit.roomName?.trim() === "" ? "red" : "",
                   }}
                 >
                   Khoa
                 </Typography>
-                <FormControl fullWidth>
+                <FormControl fullWidth error={roomEdit.departmentId === -1}>
                   <Select
                     value={roomEdit.departmentId}
                     onChange={(e) =>
@@ -396,15 +425,19 @@ function RoomDetail(props) {
                       fontSize: "14px !important",
                     }}
                     inputProps={{ "aria-label": "Without label" }}
+                    error={roomEdit.departmentId === -1}
                   >
                     {departments?.map((item, index) => (
-                      <MenuItem value={item.value} key={index}>
+                      <MenuItem value={item.departmentId} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
-                          {item.label}
+                          {item.departmentName}
                         </Typography>
                       </MenuItem>
                     ))}
                   </Select>
+                  {roomEdit.departmentId === -1 && (
+                    <FormHelperText>Khoa không được để trống</FormHelperText>
+                  )}
                 </FormControl>
               </Box>
             </Stack>
@@ -437,7 +470,9 @@ function RoomDetail(props) {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus>Cập nhật</Button>
+          <Button autoFocus onClick={handleUpdateRoom}>
+            Cập nhật
+          </Button>
         </DialogActions>
       </BootstrapDialog>
     </Stack>

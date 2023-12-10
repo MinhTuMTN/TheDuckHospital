@@ -13,12 +13,10 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import React, { useMemo, useState } from "react";
 
 const CustomText = styled(Typography)(({ theme }) => ({
@@ -202,8 +200,7 @@ function Row(props) {
 }
 
 function DoctorTable(props) {
-  const { count, onPageChange, onRowsPerPageChange, page, rowsPerPage, items } =
-    props;
+  const { items } = props;
 
   return (
     <>
@@ -274,36 +271,17 @@ function DoctorTable(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items?.slice(0, rowsPerPage).map((row, index) => (
+                {items?.map((row, index) => (
                   <Row key={index} row={row} />
                 ))}
               </TableBody>
             </Table>
           </Box>
         </Box>
-        <TablePagination
-          component="div"
-          count={count}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
-          page={page - 1}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[1, 5, 10, 25]}
-        />
       </Stack>
 
     </>
   );
 }
-
-DoctorTable.propTypes = {
-  count: PropTypes.number,
-  items: PropTypes.array,
-  onPageChange: PropTypes.func,
-  onRowsPerPageChange: PropTypes.func,
-  page: PropTypes.number,
-  rowsPerPage: PropTypes.number,
-  selected: PropTypes.array,
-};
 
 export default DoctorTable;

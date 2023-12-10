@@ -1,6 +1,6 @@
 package com.theduckhospital.api.services;
 
-import com.theduckhospital.api.dto.request.CreateProvinceRequest;
+import com.theduckhospital.api.dto.request.admin.CreateProvinceRequest;
 import com.theduckhospital.api.entity.District;
 import com.theduckhospital.api.entity.Province;
 import com.theduckhospital.api.entity.Ward;

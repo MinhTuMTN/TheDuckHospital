@@ -20,45 +20,16 @@ import {
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
+import {
+  deleteDepartment,
+  getActiveDoctorsDepartment,
+  restoreDepartment,
+  updateDepartment,
+} from "../../../services/admin/DepartmentServices";
+import { enqueueSnackbar } from "notistack";
+import { deleteHeadOfDepartment } from "../../../services/admin/DoctorServices";
 
-const doctors = [
-  {
-    value: "123",
-    label: "Nguyễn Quốc Bảo",
-  },
-  {
-    value: "124",
-    label: "Quốc Bảo",
-  },
-  {
-    value: "125",
-    label: "Bảo Nguyễn",
-  },
-  {
-    value: "126",
-    label: "Nguyễn Bảo",
-  },
-  {
-    value: "127",
-    label: "Bảo Quốc Nguyễn",
-  },
-  {
-    value: "128",
-    label: "Bảo Nguyễn Quốc",
-  },
-  {
-    value: "129",
-    label: "Bảo Quốc",
-  },
-  {
-    value: "120",
-    label: "Bảo",
-  },
-  {
-    value: "111",
-    label: "Chỉ có Bảo làm trưởng khoa",
-  },
-];
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
@@ -84,6 +55,17 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontSize: "15px !important",
   variant: "body1",
   fontWeight: "400 !important",
+  textAlign: "justify",
+}));
+
+const DeleteText = styled(Typography)(({ theme }) => ({
+  fontSize: "15px !important",
+  variant: "body1",
+  fontWeight: "400 !important",
+  textAlign: "justify",
+  textDecoration: "underline",
+  color: "blue",
+  cursor: "pointer",
 }));
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -115,14 +97,19 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 }));
 
 function DepartmentDetail(props) {
-  const { department, headDoctor } = props;
+  const navigate = useNavigate();
+  const { department, headDoctorId, headDoctorName } = props;
   let status = department.deleted;
   const [statusDepartment, setStatusDepartment] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [deleteHead, setDeleteHead] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [departmentEdit, setDepartmentEdit] = useState({});
+  const [doctors, setDoctors] = useState([]);
+
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     setEditStatus(status);
@@ -138,38 +125,86 @@ function DepartmentDetail(props) {
     }
   };
 
-  const isSmallScreen = useMediaQuery("(max-width:600px)");
+  useEffect(() => {
+    const handleGetActiveDoctorDepartment = async () => {
+      if (!department.departmentId) return;
 
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
+      const response = await getActiveDoctorsDepartment(
+        department.departmentId
+      );
+      if (response.success) {
+        setDoctors(response.data.data);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+    handleGetActiveDoctorDepartment();
+  }, [department.departmentId]);
+
+  const handleUpdateButtonClick = async () => {
+    let response;
+    if (statusDepartment) {
+      response = await restoreDepartment(department.departmentId);
+      if (response.success) {
+        enqueueSnackbar("Mở khóa khoa thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusDepartment(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    } else {
+      response = await deleteDepartment(department.departmentId);
+      if (response.success) {
+        enqueueSnackbar("Khóa khoa thành công!", { variant: "success" });
+        setDisabledButton(true);
+        setStatusDepartment(editStatus);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    }
+  };
+
+  const handleUpdateDepartment = async () => {
+    if (departmentEdit.departmentName?.trim() === "") {
+      enqueueSnackbar("Tên khoa không được để trống", { variant: "error" });
+      return;
+    }
+
+    const response = await updateDepartment(department.departmentId, {
+      departmentName: departmentEdit.departmentName,
+      staffId: departmentEdit.staffId,
+      description: departmentEdit.description,
+    });
+    if (response.success) {
+      enqueueSnackbar("Cập nhật thông tin khoa thành công!", {
+        variant: "success",
+      });
+      setOpenPopup(false);
+      navigate(0);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  };
 
   const handleEditButtonClick = () => {
     setOpenPopup(true);
     setDepartmentEdit({
       departmentName: department.departmentName,
-      staffId: headDoctor.staffId,
+      staffId: headDoctorId,
       description: department.description,
     });
+  };
+
+  const handleDeleteHeadDoctor = () => {
+    console.log("clicked");
+    setDeleteHead(true);
+  };
+
+  const handleDeleteHeadClick = async () => {
+    const response = await deleteHeadOfDepartment(headDoctorId);
+    if (response.success) {
+      enqueueSnackbar("Xóa trưởng khoa thành công!", { variant: "success" });
+      setDeleteHead(false);
+      navigate(0);
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+    }
   };
 
   return (
@@ -237,7 +272,14 @@ function DepartmentDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{headDoctor.fullName}</NoiDung>
+            <Stack direction={"row"} spacing={2}>
+              <NoiDung>
+                {headDoctorName ? headDoctorName : "Đang cập nhật"}
+              </NoiDung>
+              {headDoctorName && (
+                <DeleteText onClick={handleDeleteHeadDoctor}>Xóa</DeleteText>
+              )}
+            </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -248,7 +290,7 @@ function DepartmentDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{department.doctors.length}</NoiDung>
+            <NoiDung>{department.totalDoctors}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -314,9 +356,21 @@ function DepartmentDetail(props) {
               }
               okText={statusDepartment ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
-              // onOk={handleUpdateButtonClick}
+              onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}
               onClose={() => setDeleteDialog(false)}
+            />
+            <DialogConfirm
+              open={deleteHead}
+              title={"Xóa trưởng khoa"}
+              content={
+                "Bạn có chắc chắn muốn xóa người này khỏi chức trưởng khoa?"
+              }
+              okText={"Xóa"}
+              cancelText={"Hủy"}
+              onOk={handleDeleteHeadClick}
+              onCancel={() => setDeleteHead(false)}
+              onClose={() => setDeleteHead(false)}
             />
           </Grid>
         </Grid>
@@ -421,9 +475,9 @@ function DepartmentDetail(props) {
                     inputProps={{ "aria-label": "Without label" }}
                   >
                     {doctors?.map((item, index) => (
-                      <MenuItem value={item.value} key={index}>
+                      <MenuItem value={item.staffId} key={index}>
                         <Typography style={{ fontSize: "14px" }}>
-                          {item.label}
+                          {item.fullName}
                         </Typography>
                       </MenuItem>
                     ))}
@@ -460,7 +514,9 @@ function DepartmentDetail(props) {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus>Cập nhật</Button>
+          <Button autoFocus onClick={handleUpdateDepartment}>
+            Cập nhật
+          </Button>
         </DialogActions>
       </BootstrapDialog>
     </Stack>

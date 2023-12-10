@@ -102,7 +102,7 @@ export const put = async (url, data, headers, timeout) => {
 };
 
 export const del = async (url, params, headers) => {
-  return handleRequest(axiosInstance.delete, url, null, headers, params);
+  return handleRequest(axiosInstance.delete, url, {headers, params});
 };
 
 export default axiosInstance;

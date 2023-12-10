@@ -1,4 +1,4 @@
-package com.theduckhospital.api.dto.request;
+package com.theduckhospital.api.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
