@@ -31,6 +31,7 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
+import NurseLayout from "../layouts/NurseRoomLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -140,6 +141,10 @@ function Router(props) {
           element: <LoginPage />,
         },
       ],
+    },
+    {
+      path: "/nurse-room",
+      element: <NurseLayout />,
     },
     {
       path: "/admin",
