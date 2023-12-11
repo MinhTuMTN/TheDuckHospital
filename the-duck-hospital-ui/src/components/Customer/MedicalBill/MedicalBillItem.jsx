@@ -7,6 +7,7 @@ import {
 import { Box, Card, CardMedia, Grid, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const StyledMedicalBillItem = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -17,6 +18,7 @@ const StyledMedicalBillItem = styled(Box)(({ theme }) => ({
   backgroundColor: "#fff",
   marginBottom: "8px",
   marginTop: "8px",
+  cursor: "pointer",
 }));
 
 const StyledStatus = styled(Card)(({ theme }) => ({
@@ -65,8 +67,9 @@ function Property(props) {
 
 function MedicalBillItem(props) {
   const { item } = props;
+  const navigate = useNavigate();
   return (
-    <StyledMedicalBillItem>
+    <StyledMedicalBillItem onClick={() => navigate(item.bookingId)}>
       <Grid container spacing={1.5}>
         <Property
           icon={LocalHospitalOutlined}

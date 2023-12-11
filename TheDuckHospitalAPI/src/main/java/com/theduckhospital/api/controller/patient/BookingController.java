@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.patient;
 
+import com.azure.core.annotation.Get;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IBookingServices;
@@ -56,6 +57,20 @@ public class BookingController {
                         .success(true)
                         .message("Get booking successfully")
                         .data(bookingServices.getBookings(token))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<?> getBooking(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable("bookingId") UUID bookingId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get booking successfully")
+                        .data(bookingServices.getBooking(token, bookingId))
                         .build()
         );
     }

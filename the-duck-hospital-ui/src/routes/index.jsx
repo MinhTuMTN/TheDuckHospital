@@ -123,11 +123,11 @@ function Router(props) {
                 },
               ],
             },
+            {
+              path: "/user/medical-bills/:medicalBillId",
+              element: <BookingItemPage />,
+            },
           ],
-        },
-        {
-          path: "medical-bills/:medicalBillId",
-          element: <BookingItemPage />,
         },
       ],
     },

@@ -54,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/login-otp")
     public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) {
-        if (!accountServices.loginWithOtp(
+         if (!accountServices.loginWithOtp(
                 loginRequest.getEmailOrPhoneNumber(),
                 loginRequest.getPasswordOrOTP()
         ))

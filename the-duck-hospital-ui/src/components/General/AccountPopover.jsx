@@ -14,6 +14,7 @@ import {
 import PropTypes from "prop-types";
 import { useAuth } from "../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { BookmarkBorderOutlined } from "@mui/icons-material";
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   fontSize: "14px",
@@ -83,6 +84,20 @@ function AccountPopover(props) {
             },
           }}
         >
+          <CustomMenuItem
+            onClick={() => {
+              navigate("/choose-patient-profiles");
+              onClose();
+            }}
+          >
+            <BookmarkBorderOutlined
+              fontSize="small"
+              sx={{
+                marginRight: "8px",
+              }}
+            />
+            Đặt khám ngay
+          </CustomMenuItem>
           <CustomMenuItem
             onClick={() => {
               navigate("/user");

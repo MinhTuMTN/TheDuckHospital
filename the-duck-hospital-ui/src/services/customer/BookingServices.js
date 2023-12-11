@@ -7,3 +7,7 @@ export const createBooking = (data) => {
 export const getBookings = () => {
   return get("/booking");
 };
+
+export const getBookingById = (id) => {
+  return get(`/booking/${id}`);
+};

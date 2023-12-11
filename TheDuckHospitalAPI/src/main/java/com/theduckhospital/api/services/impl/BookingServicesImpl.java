@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.BookingItemResponse;
+import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.BookingRepository;
@@ -153,6 +154,19 @@ public class BookingServicesImpl implements IBookingServices {
         }
 
         return responses;
+    }
+
+    @Override
+    public MedicalRecordItemResponse getBooking(String token, UUID bookingId) {
+        Account account = accountServices.findAccountByToken(token);
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null || booking.isDeleted() || booking.getQueueNumber() == -1)
+            throw new BadRequestException("Booking not found");
+
+        if (!booking.getPatientProfile().getAccount().getUserId().equals(account.getUserId()))
+            throw new BadRequestException("Booking not found");
+
+        return new MedicalRecordItemResponse(booking);
     }
 
     private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {

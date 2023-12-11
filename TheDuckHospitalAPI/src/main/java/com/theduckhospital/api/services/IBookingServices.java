@@ -2,6 +2,7 @@ package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
+import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -12,4 +13,6 @@ public interface IBookingServices {
     UUID checkBookingCallback(Map<String, String> vnpParams);
 
     List<AccountBookingResponse> getBookings(String token);
+
+    MedicalRecordItemResponse getBooking(String token, UUID bookingId);
 }

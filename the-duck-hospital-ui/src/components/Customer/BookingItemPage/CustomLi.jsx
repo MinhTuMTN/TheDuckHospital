@@ -7,9 +7,7 @@ CustomLi.prototype = {
   value: PropTypes.string,
 };
 function CustomLi(props) {
-  const isNgayKham = props.lableName.includes("Ngày khám");
-  const isBuoiKham = props.lableName.includes("Buổi khám");
-  const isTienKham = props.lableName.includes("Phí khám");
+  const { color = "#000", currency, uppercase } = props;
   return (
     <li
       style={{
@@ -18,36 +16,24 @@ function CustomLi(props) {
         width: "100%",
         marginBottom: "10px",
         textAlign: "left",
+        textTransform: uppercase ? "uppercase" : "none",
       }}
     >
       <Typography variant="body1" sx={{ fontSize: "14px" }}>
         {props.lableName}
       </Typography>
 
-      {isTienKham ? (
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: "14px",
-            fontWeight: "700",
-            textAlign: "right",
-          }}
-        >
-          <FormatCurrency amount={props.value} />
-        </Typography>
-      ) : (
-        <Typography
-          variant="body1"
-          sx={{
-            fontSize: "14px",
-            fontWeight: "700",
-            textAlign: "right",
-            color: isNgayKham || isBuoiKham ? "#1abc9c" : "#000",
-          }}
-        >
-          {props.value}
-        </Typography>
-      )}
+      <Typography
+        variant="body1"
+        sx={{
+          fontSize: "14px",
+          fontWeight: "700",
+          textAlign: "right",
+          color: color,
+        }}
+      >
+        {currency ? <FormatCurrency amount={props.value} /> : props.value}
+      </Typography>
     </li>
   );
 }
