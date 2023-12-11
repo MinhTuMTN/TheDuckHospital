@@ -28,6 +28,8 @@ import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
+import PaymentSuccessPage from "../pages/PaymentSuccessPage";
+import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
 import NurseLayout from "../layouts/NurseRoomLayout";
 
@@ -82,7 +84,14 @@ function Router(props) {
           path: "/payment-orders",
           element: <PaymentOrders />,
         },
-
+        {
+          path: "/payment-success",
+          element: <PaymentSuccessPage />,
+        },
+        {
+          path: "/payment-failed",
+          element: <PaymentFailedPage />,
+        },
         {
           path: "*",
           element: <NotFound />,
@@ -115,11 +124,11 @@ function Router(props) {
                 },
               ],
             },
+            {
+              path: "/user/medical-bills/:medicalBillId",
+              element: <BookingItemPage />,
+            },
           ],
-        },
-        {
-          path: "medical-bills/:medicalBillId",
-          element: <BookingItemPage />,
         },
       ],
     },

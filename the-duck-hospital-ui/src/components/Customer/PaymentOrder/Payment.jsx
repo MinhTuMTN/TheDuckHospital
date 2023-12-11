@@ -16,6 +16,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import createTableLine from "./TableLine";
 import FormatCurrency from "../../General/FormatCurrency";
+import { useNavigate } from "react-router-dom";
+import { createBooking } from "../../../services/customer/BookingServices";
+import Loading from "../../General/Loading";
+import { enqueueSnackbar } from "notistack";
 
 Payment.propTypes = {
   booking: PropTypes.object,
@@ -64,6 +68,7 @@ function Row(props) {
   const textFontWeightValue =
     row.label.toLowerCase() === "tiền khám:" ? "500" : "400";
   const isFee = row.label.toLowerCase() === "tiền khám:";
+
   return (
     <Stack
       direction={"row"}
@@ -101,12 +106,34 @@ function Row(props) {
 }
 
 function Payment(props) {
-  const { booking } = props;
-  const tableLine = createTableLine(booking);
+  const { schedules, profile } = props;
+  const navigate = useNavigate();
+  let total = 0;
+  const tableLines = schedules.map((item) => {
+    total += item?.doctor.price;
+    return createTableLine(item);
+  });
   const theme = useTheme();
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
-  // Tính tổng tiền
-  const totalFee = booking.fee + 10000;
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handlePayment = async () => {
+    setIsLoading(true);
+    const response = await createBooking({
+      patientProfileId: profile.patientProfileId,
+      doctorScheduleIds: schedules.map(
+        (schedule) => schedule.schedule.doctorScheduleId
+      ),
+    });
+    setIsLoading(false);
+    if (response.success) {
+      window.location.href = response.data.data;
+    } else {
+      enqueueSnackbar("Đặt lịch không thành công", { variant: "error" });
+    }
+  };
+
+  if (isLoading) return <Loading />;
   return (
     <Body container spacing={1}>
       <Grid item xs={12} sm={12} md={4.5} justifyContent={"flex-start"}>
@@ -140,45 +167,40 @@ function Payment(props) {
         </Stack>
       </Grid>
       <Grid item xs={12} sm={12} md={7.5}>
-        <CustomGridItem>
-          <Stack
-            direction={"row"}
-            spacing={0.7}
-            alignItems={"center"}
+        <Stack
+          direction={"row"}
+          spacing={0.7}
+          alignItems={"center"}
+          sx={{
+            width: "100%",
+          }}
+        >
+          <CreditCardIcon
             sx={{
-              width: "100%",
+              fontSize: "18px",
+              color: theme.palette.template.darker,
+            }}
+          />
+          <Typography
+            variant="subtitle1"
+            style={{
+              color: theme.palette.template.darker,
+              fontSize: "20px",
+              fontWeight: "600",
             }}
           >
-            <CreditCardIcon
-              sx={{
-                fontSize: "18px",
-                color: theme.palette.template.darker,
-              }}
-            />
-            <Typography
-              variant="subtitle1"
-              style={{
-                color: theme.palette.template.darker,
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              Thông tin thanh toán
-            </Typography>
-          </Stack>
-          <Stack
-            direction={"column"}
-            spacing={0.7}
-            alignItems={"flex-start"}
-            sx={{
-              marginTop: "4px",
-            }}
-          >
-            {tableLine.map((row, index) => (
-              <Row key={index} row={row} value={row.value} />
-            ))}
-          </Stack>
-        </CustomGridItem>
+            Thông tin thanh toán
+          </Typography>
+        </Stack>
+        {tableLines.map((tableLine, index) => (
+          <CustomGridItem marginBottom={1} key={`table-lines-${index}`}>
+            <Stack direction={"column"} spacing={0.7} alignItems={"flex-start"}>
+              {tableLine.map((row, index) => (
+                <Row key={index} row={row} value={row.value} />
+              ))}
+            </Stack>
+          </CustomGridItem>
+        ))}
         <Stack
           alignItems={"flex-end"}
           spacing={0.5}
@@ -232,7 +254,7 @@ function Payment(props) {
                 fontSize: "20px",
               }}
             >
-              <FormatCurrency amount={totalFee} />
+              <FormatCurrency amount={total + 10000} />
             </Typography>{" "}
           </Stack>
           <Stack
@@ -282,6 +304,7 @@ function Payment(props) {
               backgroundColor: "	#ffffff",
             },
           }}
+          onClick={() => navigate(-1)}
         >
           <ArrowBackIcon
             sx={{
@@ -308,6 +331,7 @@ function Payment(props) {
               backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
             },
           }}
+          onClick={handlePayment}
         >
           Thanh toán
         </CustomButton>

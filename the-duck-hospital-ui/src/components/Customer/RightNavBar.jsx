@@ -1,5 +1,9 @@
 import styled from "@emotion/styled";
-import { Close, LogoutOutlined } from "@mui/icons-material";
+import {
+  BookmarkBorderOutlined,
+  Close,
+  LogoutOutlined,
+} from "@mui/icons-material";
 import AttachEmailOutlinedIcon from "@mui/icons-material/AttachEmailOutlined";
 import HeadsetMicOutlinedIcon from "@mui/icons-material/HeadsetMicOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
@@ -23,13 +27,18 @@ import {
 import React, { useEffect } from "react";
 import { useAuth } from "../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+
 const mainItems = [
+  {
+    display: "Đặt khám ngay",
+    icon: <BookmarkBorderOutlined />,
+    to: "/choose-patient-profiles",
+  },
   {
     display: "Hồ sơ bệnh nhân",
     icon: <PersonOutlineIcon />,
     to: "/user",
   },
-
   {
     display: "Phiếu khám bệnh",
     icon: <PostAddIcon />,
@@ -191,12 +200,14 @@ function RightNavBar(props) {
           </Button>
         )}
       </Box>
+
       {token && (
         <>
           <Box
             sx={{
-              height: "8px",
-              background: "#f4f0f0",
+              height: "8px !important",
+              backgroundColor: "#f4f0f0",
+              width: "100%",
             }}
           />
           <Stack
@@ -313,6 +324,7 @@ function RightNavBar(props) {
               sx={{
                 color: "#2a2929",
                 fontWeight: "500! important",
+                overflow: "hidden",
                 "&:hover": {
                   color: "rgb(9, 140, 196)",
                 },

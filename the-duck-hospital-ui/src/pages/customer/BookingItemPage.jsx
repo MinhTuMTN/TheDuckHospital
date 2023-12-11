@@ -1,15 +1,22 @@
+import styled from "@emotion/styled";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
   Breadcrumbs,
+  Button,
+  Grid,
   Stack,
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import dayjs from "dayjs";
+import { enqueueSnackbar } from "notistack";
 import React from "react";
 import Barcode from "react-barcode";
-import CustomLink from "../../components/General/CustomLink";
-import styled from "@emotion/styled";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomLi from "../../components/Customer/BookingItemPage/CustomLi";
+import CustomLink from "../../components/General/CustomLink";
+import { getBookingById } from "../../services/customer/BookingServices";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -17,8 +24,33 @@ const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   color: theme.palette.oldPrimaryDarker.main,
 }));
 
+const CustomButton = styled(Button)(({ theme }) => ({
+  borderRadius: "10px",
+  padding: "8px 15px",
+  toUpperCase: "none",
+  fontSize: "14px !important",
+  textTransform: "none",
+}));
+
 function BookingItemPage(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+
+  const { medicalBillId } = useParams();
+  const [medicalBill, setMedicalBill] = React.useState({});
+  const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    const handleGetMedicalBill = async () => {
+      const response = await getBookingById(medicalBillId);
+      if (response.success) setMedicalBill(response.data.data);
+      else
+        enqueueSnackbar("Lỗi lấy dữ liệu phiếu khám bệnh", {
+          variant: "error",
+        });
+    };
+    handleGetMedicalBill();
+  }, [medicalBillId]);
+
   const breakcrumbs = [
     <CustomLink to={"/"} key={1}>
       <CustomTextBreakcrumb>Trang chủ</CustomTextBreakcrumb>
@@ -39,6 +71,40 @@ function BookingItemPage(props) {
       <Breadcrumbs separator="›" aria-label="breadcrumb">
         {breakcrumbs}
       </Breadcrumbs>
+
+      <Grid
+        item
+        container
+        xs={12}
+        style={{
+          paddingRight: isMdUp ? "20px" : "0",
+          textAlign: "left",
+          justifyContent: "space-between",
+          marginTop: 6,
+        }}
+      >
+        <Grid item xs={6}>
+          <CustomButton
+            variant="text"
+            sx={{
+              "&:hover": {
+                backgroundColor: "	#ffffff",
+              },
+            }}
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
+            <ArrowBackIcon
+              sx={{
+                marginRight: "5px",
+              }}
+            />
+            Quay lại
+          </CustomButton>
+        </Grid>
+      </Grid>
+
       <Box
         sx={{
           padding: "20px 0px",
@@ -144,15 +210,17 @@ function BookingItemPage(props) {
                 Mã phiếu
               </Typography>
               <Barcode
-                value="123456789"
+                value={medicalBill.bookingCode?.toUpperCase() || "0000000000"}
                 width={1.2}
-                height={"80px"}
+                height={80}
                 margin={0}
-                fontSize={"14px"}
+                fontSize={14}
               />
               <Box
                 sx={{
-                  backgroundColor: "#3bb54a",
+                  backgroundColor: medicalBill.status
+                    ? "#3bb54a"
+                    : "template.normal1",
                   fontSize: "14px",
                   display: "inline-block",
                   padding: "10px 25px",
@@ -164,7 +232,7 @@ function BookingItemPage(props) {
                   margin: "20px",
                 }}
               >
-                Đã khám
+                {medicalBill.status ? "Đã khám" : "Chưa khám"}
               </Box>
             </Stack>
             <Box
@@ -212,18 +280,42 @@ function BookingItemPage(props) {
                     lineHeight: "1.3rem",
                   }}
                 >
-                  07
+                  {medicalBill.queueNumber < 10
+                    ? "0" + medicalBill.queueNumber
+                    : medicalBill.queueNumber}
                 </Typography>
               </Stack>
               <ul style={{ width: "100%" }}>
-                <CustomLi lableName="Mã phiếu" value="A2134678" />
+                <CustomLi
+                  lableName="Mã phiếu"
+                  uppercase
+                  value={medicalBill.bookingCode}
+                />
                 <CustomLi lableName="Dịch vụ" value="Khám dịch vụ" />
-                <CustomLi lableName="Phòng khám" value="Phòng 77" />
-                <CustomLi lableName="Chuyên khoa" value="Tâm thần kinh" />
-                <CustomLi lableName="Bác sĩ" value="Hứa Thị Ngọc Hà" />
-                <CustomLi lableName="Ngày khám" value="20/10/2021" />
-                <CustomLi lableName="Buổi khám" value="Sáng" />
-                <CustomLi lableName="Phí khám" value="150000" />
+                <CustomLi lableName="Khu vực" value={medicalBill.roomArea} />
+                <CustomLi lableName="Phòng khám" value={medicalBill.roomName} />
+                <CustomLi
+                  lableName="Chuyên khoa"
+                  value={medicalBill.departmentName}
+                />
+                <CustomLi lableName="Bác sĩ" value={medicalBill.doctorName} />
+                <CustomLi
+                  lableName="Ngày khám"
+                  value={dayjs(medicalBill.date).format("DD/MM/YYYY")}
+                  color="#1abc9c"
+                />
+                <CustomLi
+                  lableName="Buổi khám"
+                  value={
+                    medicalBill.scheduleType === "MORING" ? "Sáng" : "Chiều"
+                  }
+                  color="#1abc9a"
+                />
+                <CustomLi
+                  lableName="Phí khám"
+                  value={medicalBill.price}
+                  currency
+                />
               </ul>
             </Box>
             <Box
@@ -254,9 +346,24 @@ function BookingItemPage(props) {
               }}
             >
               <ul style={{ width: "100%" }}>
-                <CustomLi lableName="Bệnh nhân:" value="NGUYỄN NGỌC TUYẾT VI" />
-                <CustomLi lableName="Ngày sinh:" value="12/01/2001" />
-                <CustomLi lableName="Mã bệnh nhân:" value="Chưa cập nhật" />
+                <CustomLi
+                  lableName="Bệnh nhân:"
+                  value={medicalBill.patientName}
+                />
+                <CustomLi
+                  lableName="Ngày sinh:"
+                  value={dayjs(medicalBill.patientDateOfBirth).format(
+                    "DD/MM/YYYY"
+                  )}
+                />
+                <CustomLi
+                  lableName="Mã bệnh nhân:"
+                  value={
+                    medicalBill.patientCode
+                      ? medicalBill.patientCode
+                      : "Chưa cập nhật"
+                  }
+                />
               </ul>
             </Box>
             <Box

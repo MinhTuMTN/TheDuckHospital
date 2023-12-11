@@ -76,6 +76,22 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         return doctorScheduleRepository.saveAll(doctorSchedules);
     }
 
+    @Override
+    public DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId) {
+        DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
+                .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
+
+        if (doctorSchedule.isDeleted()) {
+            throw new BadRequestException("Doctor schedule not found");
+        }
+
+        if (doctorSchedule.getDate().before(new Date())) {
+            throw new BadRequestException("Doctor schedule is not available");
+        }
+
+        return doctorSchedule;
+    }
+
     private List<DoctorSchedule> createDoctorScheduleRange(
             Calendar startTime,
             Calendar endTime,

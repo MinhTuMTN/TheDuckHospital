@@ -141,6 +141,12 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
         return true;
     }
 
+    @Override
+    public PatientProfile getPatientProfileById(String token, UUID patientProfileId) {
+        return getPatientProfileByTokenAndPatientProfileId(token, patientProfileId);
+    }
+
+
     private PatientProfile getPatientProfileByTokenAndPatientProfileId(String token, UUID patientProfileId) {
         Account account = accountServices.findAccountByToken(token);
 
