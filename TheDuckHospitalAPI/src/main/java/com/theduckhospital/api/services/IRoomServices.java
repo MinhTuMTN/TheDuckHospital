@@ -16,4 +16,5 @@ public interface IRoomServices {
     List<RoomResponse> getAllRoomsDeleted();
     RoomResponse getRoomById(int roomId);
     Room findRoomById(int roomId);
+    List<RoomResponse> findRoomByRoomName(String roomName);
 }

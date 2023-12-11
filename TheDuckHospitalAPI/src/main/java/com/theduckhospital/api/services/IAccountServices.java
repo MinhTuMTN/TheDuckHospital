@@ -5,6 +5,8 @@ import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.entity.Account;
 
+import java.util.Map;
+
 public interface IAccountServices {
     Account findAccount(String emailOrPhone);
     boolean loginWithPassword(String emailOrPhone, String password);
@@ -14,5 +16,5 @@ public interface IAccountServices {
     boolean sendOTP(String emailOrPhone) throws FirebaseMessagingException;
     CheckTokenResponse checkToken(String token);
     Account findAccountByToken(String token);
-    String checkInfo(String token);
+    Map<String, String> checkInfo(String token);
 }

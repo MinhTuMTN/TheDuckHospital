@@ -154,7 +154,7 @@ function PatientRecordDetailsDialog(props) {
             </Grid>
             <Grid item sm={9.5} xs={7}>
               <Typography variant="body" fontSize={14} fontWeight={500}>
-                {!profile.patientId ? "Chưa cập nhật" : profile.patientId}
+                {!profile.patientCode ? "Chưa cập nhật" : profile.patientCode}
               </Typography>
             </Grid>
 

@@ -174,6 +174,11 @@ function CreateNewProfile(props) {
       return;
     }
 
+    if (dateOfBirth > dayjs()) {
+      enqueueSnackbar("Ngày sinh không hợp lệ", { variant: "error" });
+      return;
+    }
+
     const data = {
       fullName,
       phoneNumber,
