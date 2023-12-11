@@ -1,12 +1,11 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Filter9PlusIcon from "@mui/icons-material/Filter9Plus";
-import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Button,
-  Card,
   CardMedia,
   Drawer,
   List,

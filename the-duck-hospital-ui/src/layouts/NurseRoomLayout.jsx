@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import React from "react";
 import TopNavBar from "../components/Nurse/TopNavBar";
 import LeftNavbar from "../components/Nurse/LeftNavbar";
+import { Outlet } from "react-router-dom";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
@@ -26,6 +27,11 @@ function NurseLayout(props) {
     <>
       <TopNavBar onDrawerClick={setOpen} />
       <LeftNavbar open={open} onOpenClose={setOpen} />
+      <LayoutRoot>
+        <LayoutContainer>
+          <Outlet />
+        </LayoutContainer>
+      </LayoutRoot>
     </>
   );
 }

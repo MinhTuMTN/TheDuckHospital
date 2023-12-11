@@ -31,7 +31,8 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
-import NurseLayout from "../layouts/NurseRoomLayout";
+import NurseRoomLayout from "../layouts/NurseRoomLayout";
+import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -144,7 +145,13 @@ function Router(props) {
     },
     {
       path: "/nurse-room",
-      element: <NurseLayout />,
+      element: <NurseRoomLayout />,
+      children: [
+        {
+          path: "receiving-patients",
+          element: <ReceivingPatients />,
+        },
+      ],
     },
     {
       path: "/admin",
