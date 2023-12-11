@@ -27,7 +27,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createStaff, getPaginationStaffs } from "../../../services/admin/StaffServices";
 import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
-import { useNavigate } from "react-router-dom";
 import DialogConfirm from "../../../components/General/DialogConfirm";
 
 const roles = [
@@ -76,7 +75,6 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 }));
 
 function StaffListPage(props) {
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
   // const [catalogs, setCatalogs] = useState([]);
@@ -185,7 +183,6 @@ function StaffListPage(props) {
     setPassword("");
     setPhoneNumber("");
     setEmail("");
-    navigate(0);
   };
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;

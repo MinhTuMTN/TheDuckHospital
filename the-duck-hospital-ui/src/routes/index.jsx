@@ -165,8 +165,12 @@ function Router(props) {
           element: <AccountListPage />,
         },
         {
-          path: "account-management/detail",
+          path: "account-management/:userId",
           element: <AccountDetailPage />,
+        },
+        {
+          path: "account-management/:userId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
         },
         {
           path: "staff-management",

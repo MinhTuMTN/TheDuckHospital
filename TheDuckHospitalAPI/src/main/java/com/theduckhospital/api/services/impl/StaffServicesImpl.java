@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
+import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.StaffRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.print.Doc;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class StaffServicesImpl implements IStaffServices {
     private final StaffRepository staffRepository;
     private final AccountRepository accountRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
     private final IDepartmentServices departmentServices;
     private final PasswordEncoder passwordEncoder;
     private final IMSGraphServices graphServices;
@@ -36,13 +39,15 @@ public class StaffServicesImpl implements IStaffServices {
             IMSGraphServices graphServices,
             IDepartmentServices departmentServices,
             PasswordEncoder passwordEncoder,
-            AccountRepository accountRepository
+            AccountRepository accountRepository,
+            DoctorScheduleRepository doctorScheduleRepository
     ) {
         this.staffRepository = staffRepository;
         this.graphServices = graphServices;
         this.departmentServices = departmentServices;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
+        this.doctorScheduleRepository = doctorScheduleRepository;
     }
     @Override
     @Transactional
@@ -129,6 +134,16 @@ public class StaffServicesImpl implements IStaffServices {
         Staff staff = optional.get();
         staff.setDeleted(true);
 
+        if (staff instanceof  Doctor) {
+            List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+            if(!schedules.isEmpty()) {
+                schedules.forEach(schedule -> {
+                    schedule.setDeleted(true);
+                    doctorScheduleRepository.save(schedule);
+                });
+            }
+        }
+
         Account account = staff.getAccount();
         account.setDeleted(true);
 
@@ -147,6 +162,16 @@ public class StaffServicesImpl implements IStaffServices {
 
         Staff staff = optional.get();
         staff.setDeleted(false);
+
+        if (staff instanceof  Doctor) {
+            List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+            if(!schedules.isEmpty()) {
+                schedules.forEach(schedule -> {
+                    schedule.setDeleted(false);
+                    doctorScheduleRepository.save(schedule);
+                });
+            }
+        }
 
         Account account = staff.getAccount();
         account.setDeleted(false);

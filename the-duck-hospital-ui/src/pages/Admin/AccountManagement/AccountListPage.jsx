@@ -5,68 +5,68 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
 import AccountTable from "../../../components/Admin/AccountManagement/AccountTable";
+import { getPaginationAccounts } from "../../../services/admin/AccountServices";
+import { enqueueSnackbar } from "notistack";
 
-const items = [
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Thu ngân",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Điều dưỡng",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Thu ngân",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bệnh nhân",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Dược sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-  {
-    fullName: "Nguyễn Văn Staff",
-    phoneNumber: "0123456789",
-    role: "Bác sĩ",
-    deleted: false,
-  },
-];
-
-const totalItems = items.length;
+// const items = [
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Thu ngân",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Điều dưỡng",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Thu ngân",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bệnh nhân",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Dược sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+//   {
+//     fullName: "Nguyễn Văn Staff",
+//     phoneNumber: "0123456789",
+//     role: "Bác sĩ",
+//     deleted: false,
+//   },
+// ];
 
 function AccountListPage(props) {
   const [search, setSearch] = useState("");
   // const [buttonClicked, setButtonClicked] = useState(true);
-  // const [catalogs, setCatalogs] = useState([]);
-  // const [totalItems, setTotalItems] = useState(0);
+  const [accounts, setAccounts] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   // const [productItems, setProductItems] = useState([]);
@@ -80,18 +80,24 @@ function AccountListPage(props) {
     setPage(1);
   };
 
-  // useEffect(() => {
-  //   const handleGetCatalogs = async () => {
-  //     const response = await getActiveCatalogs();
-  //     if (response.success) {
-  //       setCatalogs(response.data.data);
-  //       setTotalItems(response.data.data.totalObjects);
-  //     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  //   };
-  //   if (catalogs.length === 0) {
-  //     handleGetCatalogs();
-  //   }
-  // }, [catalogs]);
+  const handleGetAccounts = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationAccounts({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setAccounts(response.data.data.accounts);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
+  }, [page, limit]);
+
+  useEffect(() => {
+    handleGetAccounts();
+  }, [handleGetAccounts]);
 
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;
@@ -265,7 +271,7 @@ function AccountListPage(props) {
                 /> */}
               <AccountTable
                 count={totalItems ? totalItems : 0}
-                items={items}
+                items={accounts}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}

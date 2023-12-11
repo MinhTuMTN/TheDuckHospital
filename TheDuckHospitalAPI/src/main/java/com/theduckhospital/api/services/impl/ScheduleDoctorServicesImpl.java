@@ -2,8 +2,10 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.request.headdoctor.DoctorScheduleItemRequest;
+import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
+import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IMedicalServiceServices;
@@ -15,6 +17,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
@@ -22,15 +25,19 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final IRoomServices roomServices;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final BookingRepository bookingRepository;
 
     public ScheduleDoctorServicesImpl(
             IDoctorServices doctorServices,
             IMedicalServiceServices medicalServiceServices,
-            IRoomServices roomServices, DoctorScheduleRepository doctorScheduleRepository) {
+            IRoomServices roomServices,
+            DoctorScheduleRepository doctorScheduleRepository,
+            BookingRepository bookingRepository) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
         this.roomServices = roomServices;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.bookingRepository = bookingRepository;
     }
     @Override
     public List<DoctorSchedule> createDoctorSchedule(
@@ -90,6 +97,25 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         return doctorSchedule;
+    }
+
+    @Override
+    public List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date) {
+        if(date == null) {
+            date =  new Date();
+        }
+
+        Room room = roomServices.findRoomById(roomId);
+
+        List<DoctorSchedule> schedules = doctorScheduleRepository.findByRoomAndDateOrderByScheduleType(room, date);
+
+        return schedules.stream()
+                .map(schedule -> new DoctorScheduleRoomResponse(schedule, calculateNumberOfBookings(schedule)))
+                .collect(Collectors.toList());
+    }
+
+    public long calculateNumberOfBookings(DoctorSchedule schedule) {
+        return bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(schedule, -1);
     }
 
     private List<DoctorSchedule> createDoctorScheduleRange(

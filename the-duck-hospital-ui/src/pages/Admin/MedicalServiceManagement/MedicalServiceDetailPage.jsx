@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getServiceById } from "../../../services/admin/MedicalServiceServices";
 import MedicalServiceDetail from "../../../components/Admin/MedicalServiceManagment/MedicalServiceDetail";
@@ -17,15 +17,16 @@ function MedicalServiceDetailPage() {
   const navigate = useNavigate();
   const [service, setService] = useState({});
 
-  useEffect(() => {
-    const handleGetMedicalService = async () => {
-      const response = await getServiceById(serviceId);
-      if (response.success) {
-        setService(response.data.data);
-      }
+  const handleGetMedicalService = useCallback(async () => {
+    const response = await getServiceById(serviceId);
+    if (response.success) {
+      setService(response.data.data);
     }
-    handleGetMedicalService();
   }, [serviceId]);
+
+  useEffect(() => {
+    handleGetMedicalService();
+  }, [handleGetMedicalService]);
 
   return (
     <Box
@@ -93,7 +94,10 @@ function MedicalServiceDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <MedicalServiceDetail service={service} />
+                <MedicalServiceDetail
+                  service={service}
+                  handleGetMedicalService={handleGetMedicalService}
+                />
               </Stack>
             </Grid>
           </Grid>

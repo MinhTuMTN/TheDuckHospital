@@ -26,7 +26,7 @@ const PatientProfileId = styled(Typography)(({ theme }) => ({
 
 function PatientProfileDetailPage() {
   const navigate = useNavigate();
-  const { patientProfileId, patientId } = useParams();
+  const { patientProfileId, patientId, userId } = useParams();
   const { state } = useLocation();
 
   const [patientProfile, setPatientProfile] = useState({});
@@ -66,7 +66,11 @@ function PatientProfileDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate(`/admin/patient-management/${patientId}`) }}
+              onClick={() => {
+                patientId ?
+                  navigate(`/admin/patient-management/${patientId}`) :
+                  navigate(`/admin/account-management/${userId}`)
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -78,7 +82,10 @@ function PatientProfileDetailPage() {
                 color: "#111927",
               }}
             >
-              Thông tin bệnh nhân {state?.patientName}
+              {patientId ?
+                `Thông tin bệnh nhân ${state?.patientName}` :
+                `Thông tin tài khoản ${state?.userName}`
+              }
             </Typography>
           </Stack>
           <Grid container>
@@ -120,7 +127,10 @@ function PatientProfileDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <PatientProfileDetail patientProfile={patientProfile} />
+                <PatientProfileDetail
+                  patientProfile={patientProfile}
+                  handleGetPatientProfile={handleGetPatientProfile}
+                />
               </Stack>
             </Grid>
           </Grid>

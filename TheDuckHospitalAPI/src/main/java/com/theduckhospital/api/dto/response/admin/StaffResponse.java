@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.response.admin;
 
+import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.entity.*;
 import lombok.Data;
 
@@ -15,6 +16,8 @@ public class StaffResponse {
     private String role;
     private String departmentName;
     private Date dateOfBirth;
+    private boolean headOfDepartment;
+    private Degree degree;
     private boolean deleted;
 
     public StaffResponse(Staff staff) {
@@ -28,6 +31,8 @@ public class StaffResponse {
         if (staff instanceof Doctor) {
             this.role = "Bác sĩ";
             this.departmentName = ((Doctor) staff).getDepartment().getDepartmentName();
+            this.headOfDepartment = ((Doctor) staff).isHeadOfDepartment();
+            this.degree = ((Doctor) staff).getDegree();
         } else if (staff instanceof Nurse) {
             this.role = "Điều dưỡng";
         } else if (staff instanceof Cashier) {

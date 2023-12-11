@@ -45,7 +45,7 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 }));
 
 function StaffDetail(props) {
-  const { staff } = props;
+  const { staff, handleGetStaff } = props;
   let status = staff.deleted;
   const [statusStaff, setStatusStaff] = useState(false);
   const [editStatus, setEditStatus] = useState(false);
@@ -75,7 +75,7 @@ function StaffDetail(props) {
       if (response.success) {
         enqueueSnackbar("Mở khóa nhân viên thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusStaff(editStatus);
+        handleGetStaff();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -84,7 +84,7 @@ function StaffDetail(props) {
       if (response.success) {
         enqueueSnackbar("Khóa nhân viên thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusStaff(editStatus);
+        handleGetStaff();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -121,7 +121,7 @@ function StaffDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{staff.role}</NoiDung>
+              <NoiDung>{staff.role}  {staff.headOfDepartment ? "(Trưởng khoa)" : ""}</NoiDung>
             </Stack>
           </Grid>
         </Grid>
@@ -135,6 +135,19 @@ function StaffDetail(props) {
 
             <Grid item xs={8} md={9}>
               <NoiDung>{staff.departmentName}</NoiDung>
+            </Grid>
+          </Grid>
+        </BoxStyle>
+      )}
+      {staff.degree && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Bằng cấp</TieuDeCot>
+            </Grid>
+
+            <Grid item xs={8} md={9}>
+              <NoiDung>{staff.degree}</NoiDung>
             </Grid>
           </Grid>
         </BoxStyle>

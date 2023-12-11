@@ -45,22 +45,19 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 }));
 
 function PatientProfileDetail(props) {
-  const { patientProfile } = props;
-  let status = patientProfile.deleted;
-  const [statusPatientProfile, setStatusPatientProfile] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
+  const { patientProfile, handleGetPatientProfile } = props;
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [statusSelected, setStatusSelected] = useState(false);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    setEditStatus(status);
-    setStatusPatientProfile(status);
-  }, [status]);
+    setStatusSelected(typeof patientProfile.deleted !== "undefined" ? patientProfile.deleted : false);
+  }, [patientProfile]);
 
   const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusPatientProfile !== event.target.value) {
+    setStatusSelected(event.target.value);
+    if (patientProfile.deleted !== event.target.value) {
       setDisabledButton(false);
     } else {
       setDisabledButton(true);
@@ -69,12 +66,12 @@ function PatientProfileDetail(props) {
 
   const handleUpdateButtonClick = async () => {
     let response;
-    if (statusPatientProfile) {
+    if (patientProfile.deleted) {
       response = await restorePatientProfile(patientProfile.patientProfileId);
       if (response.success) {
         enqueueSnackbar("Mở khóa hồ sơ bệnh nhân thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusPatientProfile(editStatus);
+        handleGetPatientProfile();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -83,7 +80,7 @@ function PatientProfileDetail(props) {
       if (response.success) {
         enqueueSnackbar("Khóa hồ sơ bệnh nhân thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusPatientProfile(editStatus);
+        handleGetPatientProfile();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -195,7 +192,7 @@ function PatientProfileDetail(props) {
             <FormControl fullWidth size="small">
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
+                value={statusSelected}
                 label="Trạng thái"
                 onChange={handleStatusChange}
                 className="custom-select"
@@ -239,13 +236,13 @@ function PatientProfileDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusPatientProfile ? "Mở khóa hồ sơ bệnh nhân" : "Khóa hồ sơ bệnh nhân"}
+              title={patientProfile.deleted ? "Mở khóa hồ sơ bệnh nhân" : "Khóa hồ sơ bệnh nhân"}
               content={
-                statusPatientProfile
+                patientProfile.deleted
                   ? "Bạn có chắc chắn muốn mở khóa hồ sơ này?"
                   : "Bạn có chắc chắn muốn khóa hồ sơ này?"
               }
-              okText={statusPatientProfile ? "Khôi phục" : "Khóa"}
+              okText={patientProfile.deleted ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
               onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}

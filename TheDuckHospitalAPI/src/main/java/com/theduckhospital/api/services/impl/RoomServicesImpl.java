@@ -4,8 +4,10 @@ import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.entity.Department;
+import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IRoomServices;
@@ -21,10 +23,15 @@ import java.util.Optional;
 @Service
 public class RoomServicesImpl implements IRoomServices {
     private final RoomRepository roomRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
     private final IDepartmentServices departmentServices;
 
-    public RoomServicesImpl(RoomRepository roomRepository, IDepartmentServices departmentServices) {
+    public RoomServicesImpl(RoomRepository roomRepository,
+                            IDepartmentServices departmentServices,
+                            DoctorScheduleRepository doctorScheduleRepository
+    ) {
         this.roomRepository = roomRepository;
+        this.doctorScheduleRepository = doctorScheduleRepository;
         this.departmentServices = departmentServices;
     }
     @Override
@@ -76,6 +83,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(true);
+
         roomRepository.save(room);
 
         return true;
@@ -90,6 +98,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(false);
+
         return new RoomResponse(roomRepository.save(room));
     }
 

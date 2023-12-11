@@ -20,7 +20,6 @@ import {
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
-import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import { deleteService, restoreService, updateService } from "../../../services/admin/MedicalServiceServices";
 import FormatCurrency from "../../General/FormatCurrency";
@@ -86,27 +85,22 @@ const InputText = styled(TextField)(({ theme }) => ({
 }));
 
 function MedicalServiceDetail(props) {
-  const navigate = useNavigate();
-  const { service } = props;
-  let status = service.deleted;
-  const [statusService, setStatusService] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
+  const { service, handleGetMedicalService } = props;
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [serviceEdit, setServiceEdit] = useState({});
   const [updateButtonClicked, setUpdateButtonClicked] = useState(false);
-
+  const [statusSelected, setStatusSelected] = useState(false);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    setEditStatus(status);
-    setStatusService(status);
-  }, [status]);
+    setStatusSelected(typeof service.deleted !== "undefined" ? service.deleted : false);
+  }, [service]);
 
   const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusService !== event.target.value) {
+    setStatusSelected(event.target.value);
+    if (service.deleted !== event.target.value) {
       setDisabledButton(false);
     } else {
       setDisabledButton(true);
@@ -115,12 +109,12 @@ function MedicalServiceDetail(props) {
 
   const handleUpdateStatusButtonClick = async () => {
     let response;
-    if (statusService) {
+    if (service.deleted) {
       response = await restoreService(service.serviceId);
       if (response.success) {
         enqueueSnackbar("Mở khóa dịch vụ thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusService(editStatus);
+        handleGetMedicalService();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -129,7 +123,7 @@ function MedicalServiceDetail(props) {
       if (response.success) {
         enqueueSnackbar("Khóa dịch vụ thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusService(editStatus);
+        handleGetMedicalService();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -149,7 +143,7 @@ function MedicalServiceDetail(props) {
         variant: "success",
       });
       setOpenPopup(false);
-      navigate(0);
+      handleGetMedicalService();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
 
@@ -249,7 +243,7 @@ function MedicalServiceDetail(props) {
             <FormControl fullWidth size="small">
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
+                value={statusSelected}
                 label="Trạng thái"
                 onChange={handleStatusChange}
                 className="custom-select"
@@ -293,13 +287,13 @@ function MedicalServiceDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusService ? "Mở khóa dịch vụ" : "Khóa dịch vụ"}
+              title={service.deleted ? "Mở khóa dịch vụ" : "Khóa dịch vụ"}
               content={
-                statusService
+                service.deleted
                   ? "Bạn có chắc chắn muốn mở khóa dịch vụ này?"
                   : "Bạn có chắc chắn muốn khóa dịch vụ này?"
               }
-              okText={statusService ? "Khôi phục" : "Khóa"}
+              okText={service.deleted ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
               onOk={handleUpdateStatusButtonClick}
               onCancel={() => setDeleteDialog(false)}

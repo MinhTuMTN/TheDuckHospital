@@ -17,7 +17,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
 import { addDoctorDepartment, getDepartmentById } from "../../../services/admin/DepartmentServices";
@@ -45,31 +45,32 @@ function DepartmentDetailPage() {
   const [doctors, setDoctors] = useState([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  useEffect(() => {
-    const handleGetDepartment = async () => {
-      const response = await getDepartmentById(departmentId);
-      if (response.success) {
-        response.data.data.doctors.sort((a, b) => {
-          if (a.headOfDepartment === b.headOfDepartment) {
-            return 0;
-          } else if (a.headOfDepartment) {
-            return -1;
-          } else {
-            return 1;
-          }
-        });
-        setDepartment(response.data.data);
-      }
+  const handleGetDepartment = useCallback(async () => {
+    const response = await getDepartmentById(departmentId);
+    if (response.success) {
+      response.data.data.doctors.sort((a, b) => {
+        if (a.headOfDepartment === b.headOfDepartment) {
+          return 0;
+        } else if (a.headOfDepartment) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      setDepartment(response.data.data);
     }
-    handleGetDepartment();
   }, [departmentId]);
+
+  useEffect(() => {
+    handleGetDepartment();
+  }, [handleGetDepartment]);
 
   const handleAddDoctorDepartment = async () => {
     const response = await addDoctorDepartment(departmentId, selectedDoctor);
     if (response.success) {
       enqueueSnackbar("Thêm bác sĩ vào khoa thành công", { variant: "success" });
       setOpenPopup(false);
-      navigate(0);
+      handleGetDepartment();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }
 
@@ -150,6 +151,7 @@ function DepartmentDetailPage() {
                   department={department}
                   headDoctorId={department.headDoctorId}
                   headDoctorName={department.headDoctorName}
+                  handleGetDepartment={handleGetDepartment}
                 />
               </Stack>
             </Grid>

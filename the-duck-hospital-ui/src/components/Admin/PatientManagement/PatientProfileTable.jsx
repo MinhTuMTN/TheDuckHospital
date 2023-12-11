@@ -56,7 +56,7 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row, patientId, patientName } = props;
+  const { row, patientId, patientName, userId, userName } = props;
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -166,11 +166,17 @@ function Row(props) {
                         textAlign: "left",
                       }}
                       onClick={(e) => {
-                        navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
-                          state: {
-                            patientName: patientName,
-                          }
-                        });
+                        patientId ?
+                          navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
+                            state: {
+                              patientName: patientName,
+                            }
+                          }) :
+                          navigate(`/admin/account-management/${userId}/patient-profile/${row.patientProfileId}`, {
+                            state: {
+                              userName: userName,
+                            }
+                          })
                       }}
                     >
                       Xem
@@ -183,13 +189,19 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                onClick={(e) => {
-                  navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
-                    state: {
-                      patientName: patientName,
-                    }
-                  });
-                }}
+                  onClick={(e) => {
+                    patientId ?
+                      navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
+                        state: {
+                          patientName: patientName,
+                        }
+                      }) :
+                      navigate(`/admin/account-management/${userId}/patient-profile/${row.patientProfileId}`, {
+                        state: {
+                          userName: userName,
+                        }
+                      })
+                  }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>
@@ -203,7 +215,7 @@ function Row(props) {
 }
 
 function PatientProfileTable(props) {
-  const { items, patientId, patientName } = props;
+  const { items, patientId, patientName, userId, userName } = props;
 
   return (
     <>
@@ -275,7 +287,14 @@ function PatientProfileTable(props) {
               </TableHead>
               <TableBody>
                 {items?.map((row, index) => (
-                  <Row key={index} row={row} patientId={patientId} patientName={patientName} />
+                  <Row
+                    key={index}
+                    row={row}
+                    patientId={patientId}
+                    patientName={patientName}
+                    userId={userId}
+                    userName={userName}
+                  />
                 ))}
               </TableBody>
             </Table>

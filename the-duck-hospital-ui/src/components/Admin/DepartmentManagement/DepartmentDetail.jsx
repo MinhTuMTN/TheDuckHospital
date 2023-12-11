@@ -20,7 +20,6 @@ import {
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
-import { useNavigate } from "react-router-dom";
 import {
   deleteDepartment,
   getActiveDoctorsDepartment,
@@ -97,28 +96,24 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 }));
 
 function DepartmentDetail(props) {
-  const navigate = useNavigate();
-  const { department, headDoctorId, headDoctorName } = props;
-  let status = department.deleted;
-  const [statusDepartment, setStatusDepartment] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
+  const { department, headDoctorId, headDoctorName, handleGetDepartment } = props;
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteHead, setDeleteHead] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [departmentEdit, setDepartmentEdit] = useState({});
   const [doctors, setDoctors] = useState([]);
+  const [statusSelected, setStatusSelected] = useState(false);
 
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
-    setEditStatus(status);
-    setStatusDepartment(status);
-  }, [status]);
+    setStatusSelected(typeof department.deleted !== "undefined" ? department.deleted : false);
+  }, [department]);
 
   const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusDepartment !== event.target.value) {
+    setStatusSelected(event.target.value);
+    if (department.deleted !== event.target.value) {
       setDisabledButton(false);
     } else {
       setDisabledButton(true);
@@ -141,12 +136,12 @@ function DepartmentDetail(props) {
 
   const handleUpdateButtonClick = async () => {
     let response;
-    if (statusDepartment) {
+    if (department.deleted) {
       response = await restoreDepartment(department.departmentId);
       if (response.success) {
         enqueueSnackbar("Mở khóa khoa thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusDepartment(editStatus);
+        handleGetDepartment();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -155,7 +150,7 @@ function DepartmentDetail(props) {
       if (response.success) {
         enqueueSnackbar("Khóa khoa thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusDepartment(editStatus);
+        handleGetDepartment();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -178,7 +173,7 @@ function DepartmentDetail(props) {
         variant: "success",
       });
       setOpenPopup(false);
-      navigate(0);
+      handleGetDepartment();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
 
@@ -186,13 +181,12 @@ function DepartmentDetail(props) {
     setOpenPopup(true);
     setDepartmentEdit({
       departmentName: department.departmentName,
-      staffId: headDoctorId,
+      staffId: headDoctorId === null ? "" : headDoctorId,
       description: department.description,
     });
   };
 
   const handleDeleteHeadDoctor = () => {
-    console.log("clicked");
     setDeleteHead(true);
   };
 
@@ -201,7 +195,7 @@ function DepartmentDetail(props) {
     if (response.success) {
       enqueueSnackbar("Xóa trưởng khoa thành công!", { variant: "success" });
       setDeleteHead(false);
-      navigate(0);
+      handleGetDepartment();
     } else {
       enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
     }
@@ -304,7 +298,7 @@ function DepartmentDetail(props) {
             <FormControl fullWidth size="small">
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
+                value={statusSelected}
                 label="Trạng thái"
                 onChange={handleStatusChange}
                 className="custom-select"
@@ -348,13 +342,13 @@ function DepartmentDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusDepartment ? "Mở khóa khoa" : "Khóa khoa"}
+              title={department.deleted ? "Mở khóa khoa" : "Khóa khoa"}
               content={
-                statusDepartment
+                department.deleted
                   ? "Bạn có chắc chắn muốn mở khóa khoa này?"
                   : "Bạn có chắc chắn muốn khóa khoa này?"
               }
-              okText={statusDepartment ? "Khôi phục" : "Khóa"}
+              okText={department.deleted ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
               onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}

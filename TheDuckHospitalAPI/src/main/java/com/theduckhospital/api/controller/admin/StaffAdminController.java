@@ -61,7 +61,7 @@ public class StaffAdminController {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get all staff successfully")
+                        .message("Get staffs pagination successfully")
                         .data(staffServices.getPaginationStaffsDeleted(page, limit))
                         .build()
         );
