@@ -4,12 +4,14 @@ import React from "react";
 import MedicalBillItem from "./MedicalBillItem";
 
 function MedicalBillProfileItem(props) {
+  const { booking } = props;
   const [open, setOpen] = React.useState(false);
   return (
     <Box
       component={Paper}
       sx={{
         borderRadius: ".5rem",
+        marginBottom: 2,
       }}
       px={1}
     >
@@ -40,15 +42,16 @@ function MedicalBillProfileItem(props) {
           }}
           color={"template.normal1"}
         >
-          Nguyen Van A
+          {booking.fullName}
         </Typography>
         <IconButton>
           {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
         </IconButton>
       </Box>
       <Collapse in={open} timeout="auto" unmountOnExit>
-        <MedicalBillItem />
-        <MedicalBillItem />
+        {booking.bookings.map((item) => (
+          <MedicalBillItem key={`${item.bookingId}`} item={item} />
+        ))}
       </Collapse>
     </Box>
   );

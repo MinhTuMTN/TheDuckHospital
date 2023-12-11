@@ -5,6 +5,7 @@ import {
   LooksOneOutlined,
 } from "@mui/icons-material";
 import { Box, Card, CardMedia, Grid, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import React from "react";
 
 const StyledMedicalBillItem = styled(Box)(({ theme }) => ({
@@ -63,29 +64,38 @@ function Property(props) {
 }
 
 function MedicalBillItem(props) {
+  const { item } = props;
   return (
     <StyledMedicalBillItem>
       <Grid container spacing={1.5}>
         <Property
           icon={LocalHospitalOutlined}
           propName="Chuyên khoa"
-          value="Chuyên khoa da liễu - trị mụn bla bla"
+          value={item.departmentName}
         />
         <Property
           icon={"https://cdn-icons-png.flaticon.com/512/3481/3481061.png"}
           propName="Bác sĩ"
-          value="Nguyễn Thị C"
+          value={item.doctorName}
         />
         <Property
           icon={CalendarMonth}
           propName="Ngày khám"
-          value="11/11/2021"
+          value={dayjs(item.date).format("DD/MM/YYYY")}
         />
-        <Property icon={LooksOneOutlined} propName="Số thứ tự" value="420" />
+        <Property
+          icon={LooksOneOutlined}
+          propName="Số thứ tự"
+          value={item.queueNumber}
+        />
         <Property
           icon={LooksOneOutlined}
           propName="Trạng thái"
-          value={<StyledStatus status={"false"}>Đã khám</StyledStatus>}
+          value={
+            <StyledStatus status={item.status}>
+              {item.status ? "Đã khám" : "Chưa khám"}
+            </StyledStatus>
+          }
         />
       </Grid>
     </StyledMedicalBillItem>

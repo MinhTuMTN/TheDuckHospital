@@ -3,17 +3,13 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.request.BookingRequest;
-import com.theduckhospital.api.entity.Booking;
-import com.theduckhospital.api.entity.DoctorSchedule;
-import com.theduckhospital.api.entity.PatientProfile;
-import com.theduckhospital.api.entity.Transaction;
+import com.theduckhospital.api.dto.response.AccountBookingResponse;
+import com.theduckhospital.api.dto.response.BookingItemResponse;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
-import com.theduckhospital.api.services.IBookingServices;
-import com.theduckhospital.api.services.IPatientProfileServices;
-import com.theduckhospital.api.services.IScheduleDoctorServices;
-import com.theduckhospital.api.services.IVNPayServices;
+import com.theduckhospital.api.services.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -29,13 +25,15 @@ public class BookingServicesImpl implements IBookingServices {
     private final IPatientProfileServices patientProfileServices;
     private final IScheduleDoctorServices doctorScheduleServices;
     private final IVNPayServices vnPayServices;
+    private final IAccountServices accountServices;
 
-    public BookingServicesImpl(BookingRepository bookingRepository, TransactionRepository transactionRepository, IPatientProfileServices patientProfileServices, IScheduleDoctorServices doctorScheduleServices, IVNPayServices vnPayServices) {
+    public BookingServicesImpl(BookingRepository bookingRepository, TransactionRepository transactionRepository, IPatientProfileServices patientProfileServices, IScheduleDoctorServices doctorScheduleServices, IVNPayServices vnPayServices, IAccountServices accountServices) {
         this.bookingRepository = bookingRepository;
         this.transactionRepository = transactionRepository;
         this.patientProfileServices = patientProfileServices;
         this.doctorScheduleServices = doctorScheduleServices;
         this.vnPayServices = vnPayServices;
+        this.accountServices = accountServices;
     }
 
     @Override
@@ -123,10 +121,44 @@ public class BookingServicesImpl implements IBookingServices {
         return transactionId;
     }
 
-    private boolean updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
+    @Override
+    public List<AccountBookingResponse> getBookings(String token) {
+        List<AccountBookingResponse> responses = new ArrayList<>();
+        Account account = accountServices.findAccountByToken(token);
+
+        List<PatientProfile> patientProfile = account.getPatientProfile();
+
+        for (PatientProfile profile : patientProfile) {
+            List<Booking> bookings = profile.getBookings().stream()
+                    .filter(booking -> !booking.isDeleted())
+                    .toList().stream()
+                    .sorted((b1, b2) -> {
+                        if (b1.getDoctorSchedule().getDate().after(b2.getDoctorSchedule().getDate()))
+                            return 1;
+                        else if (b1.getDoctorSchedule().getDate().before(b2.getDoctorSchedule().getDate()))
+                            return -1;
+                        else
+                            return 0;
+                    })
+                    .toList()
+                    .stream().limit(5).toList();
+
+            if (bookings.isEmpty())
+                continue;
+
+            AccountBookingResponse response = new AccountBookingResponse();
+            response.setFullName(profile.getFullName());
+            response.setBookings(bookings.stream().map(BookingItemResponse::new).toList());
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
         Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
         if (transaction == null)
-            return false;
+            return;
 
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setBankCode(bankCode);
@@ -148,7 +180,6 @@ public class BookingServicesImpl implements IBookingServices {
             bookingRepository.save(booking);
         }
 
-        return true;
     }
 
 }

@@ -46,4 +46,17 @@ public class BookingController {
         else
             response.sendRedirect("http://localhost:3000/payment-failed");
     }
+
+    @GetMapping
+    public ResponseEntity<?> getBookings(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get booking successfully")
+                        .data(bookingServices.getBookings(token))
+                        .build()
+        );
+    }
 }
