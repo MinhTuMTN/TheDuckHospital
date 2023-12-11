@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Search } from "@mui/icons-material";
 import {
   Box,
   Grid,
-  IconButton,
   InputAdornment,
   Paper,
   Stack,
@@ -12,7 +12,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import { Search } from "@mui/icons-material";
 import ReceivingPatientsItem from "./ReceivingPatientsItem";
 
 const SearchTextField = styled(TextField)(({ theme }) => ({}));
@@ -28,10 +27,12 @@ function ReceivingPatients(props) {
         py: 3,
         px: isFullScreen ? 5 : 3,
         backgroundColor: "#f4fbff",
-        height: "100vh",
+        height: "calc(100vh - 64px)",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Grid item xs={12}>
+      <Grid item flex={1}>
         <Stack
           direction={"row"}
           justifyContent={"space-between"}
@@ -65,17 +66,22 @@ function ReceivingPatients(props) {
           />
         </Stack>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item flex={3}>
         <Stack
           component={Paper}
           elevation={3}
           sx={{
             borderRadius: "10px",
+            width: "50%",
+            justifyContent: "center",
+            display: "flex",
+            margin: "0 auto",
           }}
         >
           <Box
             sx={{
-              paddingX: 4,
+              paddingLeft: 4,
+              paddingRight: 3,
               paddingY: 2,
               borderRadius: "10px 10px 0 0 ",
               borderBottom: "1px solid #e0e0e0",
