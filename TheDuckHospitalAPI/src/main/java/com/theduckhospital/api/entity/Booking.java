@@ -57,7 +57,8 @@ public class Booking {
         this.bookingId = UUID.randomUUID();
         this.bookingCode = this.bookingId.toString()
                 .replace("-", "")
-                .substring(0, 12);
+                .substring(0, 12)
+                .toUpperCase();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }

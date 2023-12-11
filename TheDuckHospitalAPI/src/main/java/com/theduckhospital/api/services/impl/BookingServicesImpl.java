@@ -6,8 +6,11 @@ import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.BookingItemResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
+import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
@@ -90,7 +93,6 @@ public class BookingServicesImpl implements IBookingServices {
                     transaction.getTransactionId()
             );
         } catch (Exception e) {
-            e.printStackTrace();
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
         return null;
@@ -167,6 +169,37 @@ public class BookingServicesImpl implements IBookingServices {
             throw new BadRequestException("Booking not found");
 
         return new MedicalRecordItemResponse(booking);
+    }
+
+    @Override
+    public NurseBookingItemResponse checkBooking(String bookingCode, int roomId) {
+        Booking booking = bookingIsValid(bookingCode, roomId);
+
+        return new NurseBookingItemResponse(booking);
+    }
+
+    @Override
+    public Booking bookingIsValid(String bookingCode, int roomId) {
+        Booking booking = bookingRepository
+                .findByBookingCodeAndDeletedIsFalse(
+                        bookingCode
+                ).orElse(null);
+
+        if (booking == null)
+            throw new NotFoundException("Booking not found");
+
+        /*
+        Check date booking with current date
+        Date date = booking.getDoctorSchedule().getDate();
+        Date currentDate = new Date();
+        if (DateCommon.compareDate(date, currentDate) != 0 )
+            throw new StatusCodeException("Invalid examination date", 409);
+        */
+
+        if (booking.getDoctorSchedule().getRoom().getRoomId() != roomId)
+            throw new StatusCodeException("Room not valid", 410);
+
+        return booking;
     }
 
     private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
