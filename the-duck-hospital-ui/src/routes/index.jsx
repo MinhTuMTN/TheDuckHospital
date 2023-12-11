@@ -30,6 +30,7 @@ import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/PaymentFailedPage";
+import BookingItemPage from "../pages/customer/BookingItemPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -123,6 +124,10 @@ function Router(props) {
               ],
             },
           ],
+        },
+        {
+          path: "medical-bills/:medicalBillId",
+          element: <BookingItemPage />,
         },
       ],
     },
