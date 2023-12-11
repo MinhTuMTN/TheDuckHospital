@@ -1,4 +1,4 @@
-package com.theduckhospital.api.controller;
+package com.theduckhospital.api.controller.patient;
 
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.GeneralResponse;

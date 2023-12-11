@@ -8,7 +8,6 @@ RowInfo.propTypes = {
 };
 function RowInfo(props) {
   const isName = props.title.toLowerCase().includes("họ và tên");
-  console.log(isName);
   return (
     <Stack direction={"row"} alignItems={"center"}>
       <Box

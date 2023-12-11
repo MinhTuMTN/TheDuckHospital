@@ -1,0 +1,26 @@
+package com.theduckhospital.api.dto.response;
+
+import com.theduckhospital.api.entity.Booking;
+import lombok.Data;
+
+import java.util.Date;
+import java.util.UUID;
+
+@Data
+public class BookingItemResponse {
+    private UUID bookingId;
+    private String departmentName;
+    private String doctorName;
+    private Date date;
+    private int queueNumber;
+    private boolean status;
+
+    public BookingItemResponse(Booking booking) {
+        this.bookingId = booking.getBookingId();
+        this.departmentName = booking.getDoctorSchedule().getDoctor().getDepartment().getDepartmentName();
+        this.doctorName = booking.getDoctorSchedule().getDoctor().getFullName();
+        this.date = booking.getDoctorSchedule().getDate();
+        this.queueNumber = booking.getQueueNumber();
+        this.status = booking.getMedicalExaminationRecord() != null;
+    }
+}

@@ -19,7 +19,7 @@ public class VNPayServicesImpl implements IVNPayServices {
         this.environment = environment;
     }
     @Override
-    public String createPaymentUrl(int amount)  throws UnsupportedEncodingException {
+    public String createPaymentUrl(double amount, UUID transactionId)  throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
@@ -32,11 +32,11 @@ public class VNPayServicesImpl implements IVNPayServices {
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(amount * 100));
+        vnp_Params.put("vnp_Amount", String.valueOf((int) amount * 100));
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + transactionId.toString());
         vnp_Params.put("vnp_OrderType", orderType);
 
         vnp_Params.put("vnp_Locale", "vn");

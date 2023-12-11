@@ -31,6 +31,9 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PatientProfileDetailPage from "../pages/Admin/PatientManagement/PatientProfileDetailPage";
 import MedicalServiceListPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceListPage";
 import MedicalServiceDetailPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceDetailPage";
+import PaymentSuccessPage from "../pages/PaymentSuccessPage";
+import PaymentFailedPage from "../pages/PaymentFailedPage";
+import BookingItemPage from "../pages/customer/BookingItemPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -83,7 +86,14 @@ function Router(props) {
           path: "/payment-orders",
           element: <PaymentOrders />,
         },
-
+        {
+          path: "/payment-success",
+          element: <PaymentSuccessPage />,
+        },
+        {
+          path: "/payment-failed",
+          element: <PaymentFailedPage />,
+        },
         {
           path: "*",
           element: <NotFound />,
@@ -115,6 +125,10 @@ function Router(props) {
                   element: <PaymentHistoryPage />,
                 },
               ],
+            },
+            {
+              path: "/user/medical-bills/:medicalBillId",
+              element: <BookingItemPage />,
             },
           ],
         },

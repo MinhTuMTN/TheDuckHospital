@@ -19,4 +19,5 @@ public interface IPatientProfileServices {
     PatientProfile restorePatientProfileAdmin(UUID patientProfileId);
 
     PatientProfileResponse getPatientProfileByIdAdmin(UUID patientProfileId);
+    PatientProfile getPatientProfileById(String token, UUID patientProfileId);
 }

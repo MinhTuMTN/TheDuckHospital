@@ -15,7 +15,7 @@ function formatCurrency(amount) {
     currency: "VND",
   });
 
-  return formatter.format(amount).replace("₫", "VND");
+  return formatter.format(amount).replace("₫", "VNĐ");
 }
 
 function FormatCurrency(props) {

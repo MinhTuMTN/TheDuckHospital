@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -17,12 +18,14 @@ public class Booking {
     @Id
     private UUID bookingId;
 
+    private String bookingCode;
+
     private int queueNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    @ToStringExclude
-    private MedicalService medicalService;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JsonBackReference
+//    @ToStringExclude
+//    private MedicalService medicalService;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
@@ -40,8 +43,27 @@ public class Booking {
     @ToStringExclude
     private MedicalExaminationRecord medicalExaminationRecord;
 
-    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean deleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
     private Transaction transaction;
+
+    @PrePersist
+    private void onPersist() {
+        this.bookingId = UUID.randomUUID();
+        this.bookingCode = this.bookingId.toString()
+                .replace("-", "")
+                .substring(0, 12);
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        this.updatedAt = new Date();
+    }
 }

@@ -55,8 +55,9 @@ function ConfirmBookingInformation(props) {
     <Box
       sx={{
         paddingX: isLgUp ? 22 : 2,
-        py: 3,
+        py: 4,
         borderTop: "1px solid #e0e0e0",
+        backgroundColor: "#E8F2F7",
       }}
     >
       <Breadcrumbs separator="›" aria-label="breadcrumb">

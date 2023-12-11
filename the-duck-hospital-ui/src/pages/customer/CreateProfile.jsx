@@ -60,7 +60,8 @@ function CreatProfile(props) {
     <Box
       sx={{
         paddingX: isLgUp ? 22 : 2,
-        py: 3,
+        py: 4,
+        backgroundColor: "#E8F2F7",
         borderTop: "1px solid #e0e0e0",
       }}
     >

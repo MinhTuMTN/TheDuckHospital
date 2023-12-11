@@ -42,6 +42,7 @@ public class DoctorSchedule {
     private MedicalService medicalService;
 
     private int slot;
+    private int queueNumber = 0;
     private int dayOfWeek;
     private Date date;
     private ScheduleType scheduleType;

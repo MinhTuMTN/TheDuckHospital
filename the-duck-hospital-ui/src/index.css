@@ -47,3 +47,78 @@
   border: 3px solid #ffffff;
 }
 /* End Scrollbar */
+
+.back-ground {
+  background-image: url("https://preview.colorlib.com/theme/medex/images/bg_2.jpg.webp");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 90vh;
+  z-index: -1;
+}
+.back-ground .overlay {
+  background-image: linear-gradient(45deg, #167ce9 10%, #79efb4 100%);
+  position: absolute;
+  opacity: 0.7;
+  width: 100%;
+  height: 100vh;
+  z-index: -100; /* Gửi overlay xuống dưới */
+}
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  z-index: 1; /* Gửi container lên trên */
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.slider-text {
+  text-align: center;
+  color: #fff;
+  height: 650px;
+}
+
+.cover {
+  background-color: #000;
+  opacity: 0.5;
+}
+
+@media screen and (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .container {
+    max-width: 720px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .back-ground {
+    background-position: left center;
+  }
+}
