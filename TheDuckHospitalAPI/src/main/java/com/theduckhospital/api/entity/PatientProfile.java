@@ -28,7 +28,8 @@ public class PatientProfile {
     private String phoneNumber;
     private String email;
     private Gender gender;
-    private String identityNumber;
+    private
+    String identityNumber;
 
     @Nationalized
     private String streetName;

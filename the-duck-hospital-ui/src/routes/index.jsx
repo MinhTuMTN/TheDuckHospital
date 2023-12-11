@@ -29,6 +29,7 @@ import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
+import NurseLayout from "../layouts/NurseRoomLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -131,6 +132,10 @@ function Router(props) {
           element: <LoginPage />,
         },
       ],
+    },
+    {
+      path: "/nurse-room",
+      element: <NurseLayout />,
     },
     {
       path: "/admin",
