@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import { Search } from "@mui/icons-material";
 import {
   Box,
   Grid,
-  IconButton,
   InputAdornment,
   Paper,
   Stack,
@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import { Search } from "@mui/icons-material";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
 import ReceivingPatientsItem from "./ReceivingPatientsItem";
 
 const SearchTextField = styled(TextField)(({ theme }) => ({}));
@@ -21,6 +21,7 @@ function ReceivingPatients(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [searchString, setSearchString] = React.useState("");
+  const notFound = false;
   return (
     <Grid
       container
@@ -28,7 +29,7 @@ function ReceivingPatients(props) {
         py: 3,
         px: isFullScreen ? 5 : 3,
         backgroundColor: "#f4fbff",
-        height: "100vh",
+        height: "calc(100vh - 64px)",
       }}
     >
       <Grid item xs={12}>
@@ -65,7 +66,7 @@ function ReceivingPatients(props) {
           />
         </Stack>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={12}>
         <Stack
           component={Paper}
           elevation={3}
@@ -84,6 +85,11 @@ function ReceivingPatients(props) {
             <ReceivingPatientsItem />
           </Box>
         </Stack>
+        {notFound && (
+          <Stack>
+            <SearchNotFound />
+          </Stack>
+        )}
       </Grid>
     </Grid>
   );

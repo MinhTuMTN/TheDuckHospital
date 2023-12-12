@@ -33,6 +33,7 @@ import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
 import NurseRoomLayout from "../layouts/NurseRoomLayout";
 import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
+import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -150,6 +151,10 @@ function Router(props) {
         {
           path: "receiving-patients",
           element: <ReceivingPatients />,
+        },
+        {
+          path: "queue-number",
+          element: <QueueNumberPage />,
         },
       ],
     },

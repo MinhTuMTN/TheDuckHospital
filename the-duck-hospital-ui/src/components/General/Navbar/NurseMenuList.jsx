@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import { ClearOutlined, LocalHospitalOutlined } from "@mui/icons-material";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import {
@@ -15,10 +16,8 @@ import {
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CustomMenuItem, CustomMenuItemLogOut } from "./PatientMenuList";
-import DialogForm from "../DialogForm";
-import styled from "@emotion/styled";
 import { findRoom } from "../../../services/customer/RoomServices";
+import { CustomMenuItem, CustomMenuItemLogOut } from "./PatientMenuList";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -93,7 +92,6 @@ function NurseMenuList(props) {
         <CustomMenuItem
           onClick={() => {
             setOpen(true);
-            // onClose();
           }}
         >
           <LocalHospitalOutlined
