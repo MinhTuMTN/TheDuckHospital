@@ -3,6 +3,8 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
+import com.theduckhospital.api.entity.Booking;
 
 import java.util.List;
 import java.util.Map;
@@ -15,4 +17,7 @@ public interface IBookingServices {
     List<AccountBookingResponse> getBookings(String token);
 
     MedicalRecordItemResponse getBooking(String token, UUID bookingId);
+
+    NurseBookingItemResponse checkBooking(String bookingCode, int roomId);
+    Booking bookingIsValid(String bookingCode, int roomId);
 }

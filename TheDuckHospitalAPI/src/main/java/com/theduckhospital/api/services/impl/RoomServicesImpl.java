@@ -145,4 +145,15 @@ public class RoomServicesImpl implements IRoomServices {
     public Room findRoomById(int roomId) {
         return roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room not found"));
     }
+
+    @Override
+    public List<RoomResponse> findRoomByRoomName(String roomName) {
+        return roomRepository
+                .findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
+                        roomName
+                )
+                .stream()
+                .map(RoomResponse::new)
+                .toList();
+    }
 }

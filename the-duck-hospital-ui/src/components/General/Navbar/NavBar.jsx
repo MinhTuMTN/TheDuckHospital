@@ -14,11 +14,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { usePopover } from "../../hooks/use-popover";
+import { usePopover } from "../../../hooks/use-popover";
 import AccountPopover from "./AccountPopover";
-import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { checkInfo } from "../../services/customer/AuthServices";
+import { checkInfo } from "../../../services/customer/AuthServices";
 
 const TOP_NAV_HEIGHT = 64;
 
@@ -68,16 +68,19 @@ function NavBar(props) {
   const { onDrawerClick } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
-  const { token, setFullName, fullName } = useAuth();
+  const { token, setFullName, fullName, setRole } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleGetFullName = async () => {
       const response = await checkInfo();
-      if (response.success) setFullName(response.data.data);
+      if (response.success) {
+        setFullName(response.data.data.fullName);
+        setRole(response.data.data.role);
+      }
     };
     handleGetFullName();
-  }, [setFullName]);
+  }, [setFullName, setRole]);
   //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover.
   return (
     <Wrapper>

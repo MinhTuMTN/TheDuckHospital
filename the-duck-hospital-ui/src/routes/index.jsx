@@ -37,6 +37,9 @@ import BookingItemPage from "../pages/customer/BookingItemPage";
 import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
 import MedicineListPage from "../pages/Admin/MedicineManagement/MedicineListPage";
 import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetailPage";
+import NurseRoomLayout from "../layouts/NurseRoomLayout";
+import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
+import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -144,6 +147,20 @@ function Router(props) {
         {
           path: "/auth/login",
           element: <LoginPage />,
+        },
+      ],
+    },
+    {
+      path: "/nurse-room",
+      element: <NurseRoomLayout />,
+      children: [
+        {
+          path: "receiving-patients",
+          element: <ReceivingPatients />,
+        },
+        {
+          path: "queue-number",
+          element: <QueueNumberPage />,
         },
       ],
     },

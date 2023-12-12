@@ -3,7 +3,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import RightNavBar from "../components/Customer/RightNavBar";
 import Footer from "../components/General/Footer";
-import NavBar from "../components/General/NavBar";
+import NavBar from "../components/General/Navbar/NavBar";
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",

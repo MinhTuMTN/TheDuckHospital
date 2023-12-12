@@ -1,5 +1,6 @@
 package com.theduckhospital.api.entity;
 
+import com.theduckhospital.api.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
@@ -23,6 +24,7 @@ public class Patient {
     protected String phoneNumber;
     protected String identityNumber;
     protected Date dateOfBirth;
+    protected Gender gender;
     protected Date createdAt;
     protected Date lastModifiedAt;
     protected boolean deleted;

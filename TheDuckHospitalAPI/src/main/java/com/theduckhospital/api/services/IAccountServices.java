@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
 import com.theduckhospital.api.entity.Account;
 
 import java.util.UUID;
+import java.util.Map;
 
 public interface IAccountServices {
     Account findAccount(String emailOrPhone);
@@ -18,7 +19,7 @@ public interface IAccountServices {
     boolean sendOTP(String emailOrPhone) throws FirebaseMessagingException;
     CheckTokenResponse checkToken(String token);
     Account findAccountByToken(String token);
-    String checkInfo(String token);
+    // String checkInfo(String token);
 
     FilteredAccountsResponse getPaginationAccounts(int page, int limit);
 
@@ -27,4 +28,5 @@ public interface IAccountServices {
     boolean deleteAccount(UUID userID);
 
     AccountResponse restoreAccount(UUID userId);
+    Map<String, String> checkInfo(String token);
 }

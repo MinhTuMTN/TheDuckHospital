@@ -226,12 +226,7 @@ public class AccountServicesImpl implements IAccountServices {
                     .build();
         }
 
-        String role = "User";
-        if (account.getStaff() != null) {
-            String[] roleNames = account.getStaff().getClass().getName().split("\\.");
-            role = roleNames[roleNames.length - 1];
-        }
-
+        String role = getRoleFromAccount(account);
         return CheckTokenResponse.builder()
                 .valid(true)
                 .role(role)
@@ -264,12 +259,29 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public String checkInfo(String token) {
+    public Map<String, String> checkInfo(String token) {
         Account account = findAccountByToken(token);
         if (account == null)
             return null;
 
-        return account.getFullName();
+        String fullName = account.getFullName();
+        String role = getRoleFromAccount(account);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("fullName", fullName);
+        data.put("role", role);
+
+        return data;
+    }
+
+    private String getRoleFromAccount(Account account) {
+        String role = "User";
+        if (account.getStaff() != null) {
+            String[] roleNames = account.getStaff().getClass().getName().split("\\.");
+            role = roleNames[roleNames.length - 1];
+        }
+
+        return role;
     }
 
     @Override

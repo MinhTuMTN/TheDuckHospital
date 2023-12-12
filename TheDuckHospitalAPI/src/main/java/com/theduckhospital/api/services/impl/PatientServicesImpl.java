@@ -3,9 +3,11 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.dto.response.admin.FilteredPatientsResponse;
 import com.theduckhospital.api.dto.response.admin.PatientResponse;
 import com.theduckhospital.api.entity.Patient;
+import com.theduckhospital.api.entity.PatientProfile;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.PatientRepository;
+import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.services.IPatientServices;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +22,13 @@ import java.util.UUID;
 @Service
 public class PatientServicesImpl implements IPatientServices {
     private final PatientRepository patientRepository;
+    private final PatientProfileRepository patientProfileRepository;
 
-    public PatientServicesImpl(PatientRepository patientRepository) {
+    public PatientServicesImpl(
+            PatientRepository patientRepository,
+            PatientProfileRepository patientProfileRepository) {
         this.patientRepository = patientRepository;
+        this.patientProfileRepository = patientProfileRepository;
     }
 
     @Override
@@ -51,5 +57,34 @@ public class PatientServicesImpl implements IPatientServices {
         Patient patient = optional.get();
 
         return new PatientResponse(patient);
+    }
+
+    @Override
+    public Patient createPatient(String identityNumber, PatientProfile patientProfile) {
+        Optional<Patient> optional = patientRepository
+                .findByIdentityNumberAndDeletedIsFalse(identityNumber);
+
+        if (optional.isPresent())
+            return optional.get();
+
+        Patient patient = new Patient();
+        patient.setIdentityNumber(identityNumber);
+
+        List<PatientProfile> patientProfiles = new ArrayList<>();
+        patientProfiles.add(patientProfile);
+        patient.setPatientProfiles(patientProfiles);
+
+        patient.setDateOfBirth(patientProfile.getDateOfBirth());
+        patient.setFullName(patientProfile.getFullName());
+        patient.setPhoneNumber(patientProfile.getPhoneNumber());
+        patient.setGender(patientProfile.getGender());
+        patient.setDeleted(false);
+        patientRepository.save(patient);
+
+        patientProfile.setIdentityNumber(identityNumber);
+        patientProfile.setPatient(patient);
+        patientProfileRepository.save(patientProfile);
+
+        return patient;
     }
 }

@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -151,11 +153,11 @@ public class AuthController {
     public ResponseEntity<?> checkInfo(
             @RequestHeader(name = "Authorization") String token
     ) {
-        String fullName = accountServices.checkInfo(token);
+        Map<String, String> data = accountServices.checkInfo(token);
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Get info success")
-                .data(fullName)
+                .data(data)
                 .build()
         );
     }

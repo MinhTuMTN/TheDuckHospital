@@ -1,7 +1,7 @@
 import { SnackbarProvider } from "notistack";
+import AuthProvider from "./auth/AuthProvider";
 import Router from "./routes";
 import CustomThemeProvider from "./theme";
-import AuthProvider from "./auth/AuthProvider";
 
 function App() {
   return (
