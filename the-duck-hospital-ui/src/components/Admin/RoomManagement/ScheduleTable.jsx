@@ -39,6 +39,17 @@ function useCustomMediaQuery() {
   }, [isLargeScreen, isMediumScreen]);
 }
 
+const scheduleTypes = [
+  {
+    key: "MORNING",
+    value: "Buổi sáng",
+  },
+  {
+    key: "AFTERNOON",
+    value: "Buổi chiều",
+  }
+]
+
 function Row(props) {
   const { row } = props;
   const [anchorEl, setAnchorEl] = useState(null);
@@ -71,8 +82,7 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.fullName}
-            {row.headOfDepartment ? " (Trưởng khoa)" : ""}
+            {row.doctorName}
           </CustomText>
         </TableCell>
         <TableCell>
@@ -98,7 +108,7 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.role}
+            {scheduleTypes.find(type => type.key === row.scheduleType).value}
           </CustomText>
         </TableCell>
         <TableCell>
@@ -111,7 +121,20 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.time}
+            {row.numberOfBookings}
+          </CustomText>
+        </TableCell>
+        <TableCell>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {row.queueNumber}
           </CustomText>
         </TableCell>
         <TableCell align="center">
@@ -149,13 +172,13 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                      // onClick={(e) => {
-                      //   navigate(`/admin/product-management/${row.productId}`, {
-                      //     state: {
-                      //       id: row.productId,
-                      //     },
-                      //   });
-                      // }}
+                    // onClick={(e) => {
+                    //   navigate(`/admin/product-management/${row.productId}`, {
+                    //     state: {
+                    //       id: row.productId,
+                    //     },
+                    //   });
+                    // }}
                     >
                       Xem
                     </Button>
@@ -167,13 +190,13 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                  // onClick={(e) => {
-                  //   navigate(`/admin/product-management/${row.productId}`, {
-                  //     state: {
-                  //       id: row.productId,
-                  //     },
-                  //   });
-                  // }}
+                // onClick={(e) => {
+                //   navigate(`/admin/product-management/${row.productId}`, {
+                //     state: {
+                //       id: row.productId,
+                //     },
+                //   });
+                // }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>
@@ -191,7 +214,7 @@ function ScheduleTable(props) {
 
   return (
     <>
-      <Box paddingX={5} sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <Paper>
           <Table
             sx={{
@@ -218,12 +241,17 @@ function ScheduleTable(props) {
                 </TableCell>
                 <TableCell style={{ width: "20%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
-                    Vai trò
+                    Buổi trực
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }}>
+                <TableCell style={{ width: "10%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
-                    Lịch trực
+                    Đặt trước
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "10%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Số hiện tại
                   </CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "10%" }}>

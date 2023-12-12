@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogTitle,
   Slide,
+  styled,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React, { useEffect } from "react";
@@ -23,6 +24,28 @@ DialogForm.propTypes = {
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const CustomAddButton = styled(Button)(({ theme }) => ({
+  borderRadius: "6px",
+  fontWeight: "600",
+  fontSize: "15px",
+  height: "42px",
+  "&:hover": {
+    background: theme.palette.normal2.main,
+    color: "white"
+  },
+}));
+
+const CustomCancelButton = styled(Button)(({ theme }) => ({
+  borderRadius: "6px",
+  fontWeight: "600",
+  fontSize: "15px",
+  height: "42px",
+  "&:hover": {
+    background: theme.palette.delete.main,
+    color: "white"
+  },
+}));
 
 function DialogForm(props) {
   const [open, setOpen] = React.useState(props.open);
@@ -54,14 +77,14 @@ function DialogForm(props) {
       <DialogContent>{props.children || props.content}</DialogContent>
       <DialogActions style={{ padding: "16px 24px" }}>
         {props.cancelText && (
-          <Button onClick={handleCancel} variant="outlined">
+          <CustomCancelButton onClick={handleCancel} variant="outlined" color="delete">
             {props.cancelText}
-          </Button>
+          </CustomCancelButton>
         )}
         {props.okText && (
-          <Button onClick={handleOk} variant="outlined">
+          <CustomAddButton onClick={handleOk} variant="outlined" color="normal2">
             {props.okText}
-          </Button>
+          </CustomAddButton>
         )}
       </DialogActions>
     </Dialog>

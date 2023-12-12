@@ -3,31 +3,36 @@ package com.theduckhospital.api.services.impl;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.TemporaryUser;
+import com.theduckhospital.api.dto.response.admin.AccountResponse;
+import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.AccessDeniedException;
 import com.theduckhospital.api.error.BadRequestException;
-import com.theduckhospital.api.repository.AccountRepository;
-import com.theduckhospital.api.repository.TemporaryUserRepository;
+import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IFirebaseServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IOTPServices;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AccountServicesImpl implements IAccountServices {
     @Value("${settings.fcm.token}")
     private String fcmToken;
     private final AccountRepository accountRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
+    private final PatientProfileRepository patientProfileRepository;
+    private final DoctorRepository doctorRepository;
+    private final StaffRepository staffRepository;
     private final PasswordEncoder passwordEncoder;
     private final IOTPServices otpServices;
     private final IFirebaseServices firebaseServices;
@@ -36,6 +41,10 @@ public class AccountServicesImpl implements IAccountServices {
     private final JwtTokenProvider tokenProvider;
 
     public AccountServicesImpl(AccountRepository accountRepository,
+                               DoctorScheduleRepository doctorScheduleRepository,
+                               PatientProfileRepository patientProfileRepository,
+                               StaffRepository staffRepository,
+                               DoctorRepository doctorRepository,
                                PasswordEncoder passwordEncoder,
                                IOTPServices otpServices,
                                IFirebaseServices firebaseServices,
@@ -50,6 +59,10 @@ public class AccountServicesImpl implements IAccountServices {
         this.temporaryUserRepository = temporaryUserRepository;
         this.graphServices = graphServices;
         this.tokenProvider = tokenProvider;
+        this.doctorScheduleRepository = doctorScheduleRepository;
+        this.patientProfileRepository = patientProfileRepository;
+        this.staffRepository = staffRepository;
+        this.doctorRepository = doctorRepository;
     }
     @Override
     public Account findAccount(String emailOrPhone) {
@@ -269,5 +282,113 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         return role;
+    }
+
+    @Override
+    public FilteredAccountsResponse getPaginationAccounts(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Account> accountPage = accountRepository.findPaginationByOrderByDeleted(pageable);
+
+        List<AccountResponse> filteredAccounts = new ArrayList<>();
+
+        for (Account account : accountPage.getContent()) {
+            filteredAccounts.add(new AccountResponse(account));
+        }
+
+        List<Account> accounts = accountRepository.findAll();
+
+        return new FilteredAccountsResponse(filteredAccounts, accounts.size(), page, limit);
+    }
+
+    @Override
+    public AccountResponse getAccountById(UUID userId) {
+        Optional<Account> optional = accountRepository.findById(userId);
+
+        if(optional.isEmpty()) {
+            throw new NotFoundException("Account not found");
+        }
+
+        return new AccountResponse(optional.get());
+    }
+
+    @Override
+    public boolean deleteAccount(UUID userID) {
+        Optional<Account> optional = accountRepository.findById(userID);
+        if (optional.isEmpty() || optional.get().isDeleted()) {
+            throw new NotFoundException("Account not found");
+        }
+
+        Account account = optional.get();
+        account.setDeleted(true);
+
+        Staff staff = account.getStaff();
+        if (staff != null) {
+            staff.setDeleted(true);
+            staffRepository.save(staff);
+            if (staff instanceof Doctor) {
+                Doctor doctor = ((Doctor)staff);
+
+                if(doctor.isHeadOfDepartment()){
+                    doctor.setHeadOfDepartment(false);
+                    doctorRepository.save(doctor);
+                }
+
+                List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+                if(!schedules.isEmpty()) {
+                    schedules.forEach(schedule -> {
+                        schedule.setDeleted(true);
+                        doctorScheduleRepository.save(schedule);
+                    });
+                }
+            }
+        }
+
+        List<PatientProfile> patientProfile = account.getPatientProfile();
+        if(!patientProfile.isEmpty()) {
+            patientProfile.forEach(profile -> {
+                profile.setDeleted(true);
+                patientProfileRepository.save(profile);
+            });
+        }
+
+        accountRepository.save(account);
+
+        return true;
+    }
+
+    @Override
+    public AccountResponse restoreAccount(UUID userId) {
+        Optional<Account> optional = accountRepository.findById(userId);
+        if (optional.isEmpty() || !optional.get().isDeleted()) {
+            throw new NotFoundException("Account not found");
+        }
+
+        Account account = optional.get();
+        account.setDeleted(false);
+
+        Staff staff = account.getStaff();
+        if (staff != null) {
+            staff.setDeleted(false);
+            staffRepository.save(staff);
+            if (staff instanceof Doctor) {
+                List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+                if(!schedules.isEmpty()) {
+                    schedules.forEach(schedule -> {
+                        schedule.setDeleted(false);
+                        doctorScheduleRepository.save(schedule);
+                    });
+                }
+            }
+        }
+
+        List<PatientProfile> patientProfile = account.getPatientProfile();
+        if(!patientProfile.isEmpty()) {
+            patientProfile.forEach(profile -> {
+                profile.setDeleted(false);
+                patientProfileRepository.save(profile);
+            });
+        }
+
+        return new AccountResponse(accountRepository.save(account));
     }
 }

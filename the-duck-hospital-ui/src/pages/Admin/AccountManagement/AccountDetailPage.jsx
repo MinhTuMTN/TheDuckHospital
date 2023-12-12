@@ -9,10 +9,11 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AccountDetail from "../../../components/Admin/AccountManagement/AccountDetail";
 import PatientProfileTable from "../../../components/Admin/PatientManagement/PatientProfileTable";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getAccountById } from "../../../services/admin/AccountServices";
 
 const UserId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -24,86 +25,77 @@ const UserId = styled(Typography)(({ theme }) => ({
   width: "fit-content",
 }));
 
-const account = {
-  userId: "1234-5678-9101-1121",
-  fullName: "Nguyễn Quốc Patient",
-  role: "Bệnh nhân",
-  phoneNumber: "0123456789",
-  email: "patient-nq@minhtunguyen.onmicrosoft.com",
-  deleted: false,
-  patientProfiles: [
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-    {
-      fullName: "Nguyễn Quốc Patient",
-      phoneNumber: "0123456789",
-      createdAt: "27/01/2002",
-      deleted: false,
-    },
-  ]
-}
-const totalItems = account.patientProfiles?.length;
+// const account = {
+//   userId: "1234-5678-9101-1121",
+//   fullName: "Nguyễn Quốc Patient",
+//   role: "Bệnh nhân",
+//   phoneNumber: "0123456789",
+//   email: "patient-nq@minhtunguyen.onmicrosoft.com",
+//   deleted: false,
+//   patientProfiles: [
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//     {
+//       fullName: "Nguyễn Quốc Patient",
+//       phoneNumber: "0123456789",
+//       createdAt: "27/01/2002",
+//       deleted: false,
+//     },
+//   ]
+// }
+// const totalItems = account.patientProfiles?.length;
 
 function AccountDetailPage() {
+  const { userId } = useParams();
   const navigate = useNavigate();
-  const [limit, setLimit] = useState(5);
-  const [page, setPage] = useState(1);
+  const [account, setAccount] = useState({});
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage + 1);
-  };
-  const handleRowsPerPageChange = (event) => {
-    setLimit(event.target.value);
-    setPage(1);
-  };
-  // const [customer, setCustomer] = useState({});
+  const handleGetAccount = useCallback(async () => {
+    const response = await getAccountById(userId);
+    if (response.success) {
+      setAccount(response.data.data);
+    }
+  }, [userId]);
 
-  // const handleGetCustomer = useCallback(async () => {
-  //   const response = await getCustomerById(state.id);
-  //   if (response.success) {
-  //     setCustomer(response.data.data);
-  //   }
-  // }, [state.id]);
+  useEffect(() => {
+    handleGetAccount();
+  }, [handleGetAccount]);
 
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
 
-  
   return (
     <Box
       sx={{
@@ -145,30 +137,30 @@ function AccountDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-                <Stack direction={"column"}>
+              <Stack direction={"column"}>
+                <Typography
+                  variant="h4"
+                  fontWeight={600}
+                  style={{
+                    textTransform: "uppercase",
+                    fontSize: ["1.5rem", "2rem"],
+                  }}
+                >
+                  {account.fullName}
+                </Typography>
+                <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography
-                    variant="h4"
-                    fontWeight={600}
+                    variant="body1"
+                    fontWeight={450}
                     style={{
-                      textTransform: "uppercase",
-                      fontSize: ["1.5rem", "2rem"],
+                      fontSize: "14px",
                     }}
                   >
-                    {account.fullName}
+                    user_id:
                   </Typography>
-                  <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={450}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      user_id:
-                    </Typography>
-                    <UserId>{account.userId}</UserId>
-                  </Stack>
+                  <UserId>{account.userId}</UserId>
                 </Stack>
+              </Stack>
             </Grid>
           </Grid>
           <Grid container>
@@ -182,33 +174,33 @@ function AccountDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <AccountDetail account={account} />
+                <AccountDetail
+                  account={account}
+                  handleGetAccount={handleGetAccount}
+                />
               </Stack>
             </Grid>
           </Grid>
           {account.patientProfiles?.length > 0 &&
-          <Grid container>
-            <Grid item xs={12}>
-              <Stack
-                component={Paper}
-                elevation={3}
-                sx={{
-                  marginTop: 4,
-                  borderRadius: "15px",
-                }}
-                spacing={"2px"}
-              >
-                <PatientProfileTable
-                  count={totalItems ? totalItems : 0}
-                  items={account.patientProfiles}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={limit}
-                />
-              </Stack>
-            </Grid>
-          </Grid>}
+            <Grid container>
+              <Grid item xs={12}>
+                <Stack
+                  component={Paper}
+                  elevation={3}
+                  sx={{
+                    marginTop: 4,
+                    borderRadius: "15px",
+                  }}
+                  spacing={"2px"}
+                >
+                  <PatientProfileTable
+                    items={account.patientProfiles}
+                    userId={userId}
+                    userName={account.fullName}
+                  />
+                </Stack>
+              </Grid>
+            </Grid>}
         </Stack>
       </Stack>
     </Box>

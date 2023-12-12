@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import CircleIcon from "@mui/icons-material/Circle";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useTheme } from "@emotion/react";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import {
@@ -18,6 +19,10 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
+import DialogConfirm from "../../General/DialogConfirm";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
+import { removeDoctorDepartment } from "../../../services/admin/DepartmentServices";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -38,6 +43,17 @@ const TieuDe = styled(Typography)(({ theme }) => ({
   width: "100%",
 }));
 
+const CustomButton = styled(Button)(({ theme }) => ({
+  color: "white",
+  borderRadius: "6px",
+  fontWeight: "600",
+  fontSize: "15px",
+  height: "42px",
+  "&:hover": {
+    background: "#00a0ff",
+  },
+}));
+
 function useCustomMediaQuery() {
   const isLargeScreen = useMediaQuery("(min-width: 850px)");
   const isMediumScreen = useMediaQuery("(min-width: 750px)");
@@ -54,12 +70,15 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row } = props;
+  const { row, departmentId, departmentName } = props;
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [doctorId, setDoctorId] = useState("");
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -70,6 +89,14 @@ function Row(props) {
   };
 
   const maxWidth = useCustomMediaQuery();
+
+  const handleRemoveDoctorDepartment = async () => {
+    const response = await removeDoctorDepartment(departmentId, doctorId);
+    if (response.success) {
+      enqueueSnackbar("Xóa bác sĩ khỏi khoa thành công", { variant: "success" });
+      navigate(0);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }
 
   return (
     <React.Fragment>
@@ -162,15 +189,30 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                    // onClick={(e) => {
-                    //   navigate(`/admin/product-management/${row.productId}`, {
-                    //     state: {
-                    //       id: row.productId,
-                    //     },
-                    //   });
-                    // }}
+                      onClick={(e) => {
+                        navigate(`/admin/department-management/${departmentId}/staff/${row.staffId}`, {
+                          state: {
+                            departmentName: departmentName
+                          }
+                        });
+                      }}
                     >
                       Xem
+                    </Button>
+                    <Button
+                      variant="text"
+                      size="medium"
+                      sx={{
+                        paddingX: 2,
+                        paddingY: 1,
+                        textAlign: "left",
+                      }}
+                      onClick={(e) => {
+                        setDoctorId(row.staffId);
+                        setDeleteDialog(true);
+                      }}
+                    >
+                      Xóa
                     </Button>
                   </Stack>
                 </Popover>
@@ -180,27 +222,46 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                // onClick={(e) => {
-                //   navigate(`/admin/product-management/${row.productId}`, {
-                //     state: {
-                //       id: row.productId,
-                //     },
-                //   });
-                // }}
+                  onClick={(e) => {
+                    navigate(`/admin/department-management/${departmentId}/staff/${row.staffId}`, {
+                      state: {
+                        departmentName: departmentName,
+                      }
+                    });
+                  }}
                 >
                   <InfoOutlinedIcon color="black" />
+                </IconButton>
+                <IconButton
+                  color="black"
+                  onClick={(e) => {
+                    setDoctorId(row.staffId);
+                    setDeleteDialog(true);
+                  }}
+                >
+                  <DeleteIcon color="black" />
                 </IconButton>
               </>
             )}
           </>
         </TableCell>
       </TableRow>
+      <DialogConfirm
+        open={deleteDialog}
+        title={"Xóa bác sĩ"}
+        content={"Bạn có chắc chắn muốn xóa bác sĩ này khỏi khoa?"}
+        okText={"Xóa"}
+        cancelText={"Hủy"}
+        onOk={handleRemoveDoctorDepartment}
+        onCancel={() => setDeleteDialog(false)}
+        onClose={() => setDeleteDialog(false)}
+      />
     </React.Fragment>
   );
 }
 
 function DoctorTable(props) {
-  const { items } = props;
+  const { items, setOpenPopup, handleGetAllDoctorNotInDepartment, departmentId, departmentName } = props;
 
   return (
     <>
@@ -211,7 +272,22 @@ function DoctorTable(props) {
         }}
       >
         <BoxStyle>
-          <TieuDe>Danh sách bác sĩ</TieuDe>
+          <Stack direction={"row"}>
+            <TieuDe>Danh sách bác sĩ</TieuDe>
+            <CustomButton
+              color="normal2"
+              variant="contained"
+              size="medium"
+              sx={{ width: "10%" }}
+              onClick={() => {
+                handleGetAllDoctorNotInDepartment();
+                setOpenPopup(true);
+              }}
+            >
+              Thêm
+            </CustomButton>
+          </Stack>
+
         </BoxStyle>
         <Box paddingX={0} sx={{ width: "100%" }}>
           <Box sx={{ width: "100%" }}>
@@ -244,7 +320,7 @@ function DoctorTable(props) {
                       Số điện thoại
                     </CustomText>
                   </TableCell>
-                  <TableCell style={{ width: "20%" }}>
+                  <TableCell style={{ width: "15%" }}>
                     <CustomText
                       style={{ fontWeight: "500" }}
                       color={"#101828"}
@@ -260,7 +336,7 @@ function DoctorTable(props) {
                       Trạng thái
                     </CustomText>
                   </TableCell>
-                  <TableCell align="center" style={{ width: "10%" }}>
+                  <TableCell align="center" style={{ width: "15%" }}>
                     <CustomText
                       style={{ fontWeight: "500" }}
                       color={"#101828"}
@@ -272,7 +348,7 @@ function DoctorTable(props) {
               </TableHead>
               <TableBody>
                 {items?.map((row, index) => (
-                  <Row key={index} row={row} />
+                  <Row key={index} row={row} departmentId={departmentId} departmentName={departmentName} />
                 ))}
               </TableBody>
             </Table>

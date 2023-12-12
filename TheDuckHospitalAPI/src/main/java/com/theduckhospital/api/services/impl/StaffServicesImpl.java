@@ -2,24 +2,34 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
+import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
+import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.*;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
+import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.StaffRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.Map;
-import java.util.UUID;
+import javax.print.Doc;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StaffServicesImpl implements IStaffServices {
     private final StaffRepository staffRepository;
     private final AccountRepository accountRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
     private final IDepartmentServices departmentServices;
     private final PasswordEncoder passwordEncoder;
     private final IMSGraphServices graphServices;
@@ -29,13 +39,15 @@ public class StaffServicesImpl implements IStaffServices {
             IMSGraphServices graphServices,
             IDepartmentServices departmentServices,
             PasswordEncoder passwordEncoder,
-            AccountRepository accountRepository
+            AccountRepository accountRepository,
+            DoctorScheduleRepository doctorScheduleRepository
     ) {
         this.staffRepository = staffRepository;
         this.graphServices = graphServices;
         this.departmentServices = departmentServices;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
+        this.doctorScheduleRepository = doctorScheduleRepository;
     }
     @Override
     @Transactional
@@ -101,5 +113,99 @@ public class StaffServicesImpl implements IStaffServices {
 
     private String generatePassword() {
         return UUID.randomUUID().toString().substring(0, 8) + "@UTE";
+    }
+
+    @Override
+    public List<StaffResponse> getAllStaffs() {
+        List<Staff> staffs = staffRepository.findAll();
+
+        return staffs.stream()
+                .map(StaffResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteStaff(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty() || optional.get().isDeleted()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+        staff.setDeleted(true);
+
+        if (staff instanceof  Doctor) {
+            List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+            if(!schedules.isEmpty()) {
+                schedules.forEach(schedule -> {
+                    schedule.setDeleted(true);
+                    doctorScheduleRepository.save(schedule);
+                });
+            }
+        }
+
+        Account account = staff.getAccount();
+        account.setDeleted(true);
+
+        accountRepository.save(account);
+        staffRepository.save(staff);
+
+        return true;
+    }
+
+    @Override
+    public StaffResponse restoreStaff(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty() || !optional.get().isDeleted()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+        staff.setDeleted(false);
+
+        if (staff instanceof  Doctor) {
+            List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
+            if(!schedules.isEmpty()) {
+                schedules.forEach(schedule -> {
+                    schedule.setDeleted(false);
+                    doctorScheduleRepository.save(schedule);
+                });
+            }
+        }
+
+        Account account = staff.getAccount();
+        account.setDeleted(false);
+
+        accountRepository.save(account);
+
+        return new StaffResponse(staffRepository.save(staff));
+    }
+
+    @Override
+    public StaffResponse getStaffById(UUID staffId) {
+        Optional<Staff> optional = staffRepository.findById(staffId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Staff not found");
+        }
+
+        Staff staff = optional.get();
+
+        return new StaffResponse(staff);
+    }
+
+    @Override
+    public FilteredStaffsResponse getPaginationStaffsDeleted(int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Staff> staffPage = staffRepository.findPaginationByOrderByDeleted(pageable);
+
+        List<StaffResponse> filteredStaffs = new ArrayList<>();
+
+        for (Staff staff : staffPage.getContent()) {
+            filteredStaffs.add(new StaffResponse(staff));
+        }
+
+        List<Staff> staff = staffRepository.findAll();
+
+        return new FilteredStaffsResponse(filteredStaffs, staff.size(), page, limit);
     }
 }

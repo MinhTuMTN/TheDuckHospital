@@ -18,7 +18,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import CloseIcon from "@mui/icons-material/Close";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
@@ -28,7 +28,6 @@ import {
   restoreRoom,
   updateRoom,
 } from "../../../services/admin/RoomServices";
-import { useNavigate } from "react-router-dom";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -87,25 +86,21 @@ const MultilineText = styled(TextField)(({ theme }) => ({
 }));
 
 function RoomDetail(props) {
-  const navigate = useNavigate();
-  const { room } = props;
-  let status = room.deleted;
-  const [statusRoom, setStatusRoom] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
+  const { room, handleGetRoom, handleGetSchedules } = props;
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [roomEdit, setRoomEdit] = useState({});
   const [departments, setDepartments] = useState([]);
+  const [statusSelected, setStatusSelected] = useState(false);
 
   useEffect(() => {
-    setEditStatus(status);
-    setStatusRoom(status);
-  }, [status]);
+    setStatusSelected(typeof room.deleted !== "undefined" ? room.deleted : false);
+  }, [room]);
 
   const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusRoom !== event.target.value) {
+    setStatusSelected(event.target.value);
+    if (room.deleted !== event.target.value) {
       setDisabledButton(false);
     } else {
       setDisabledButton(true);
@@ -116,37 +111,34 @@ function RoomDetail(props) {
 
   const handleUpdateButtonClick = async () => {
     let response;
-    if (statusRoom) {
+    if (room.deleted) {
       response = await restoreRoom(room.roomId);
-      console.log(response);
       if (response.success) {
         enqueueSnackbar("Mở khóa phòng thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusRoom(editStatus);
+        handleGetRoom();
+        handleGetSchedules();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
     } else {
       response = await deleteRoom(room.roomId);
-      console.log(response);
       if (response.success) {
         enqueueSnackbar("Khóa phòng thành công!", { variant: "success" });
         setDisabledButton(true);
-        setStatusRoom(editStatus);
+        handleGetRoom();
+        handleGetSchedules();
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
     }
   };
 
-  useEffect(() => {
-    const handleGetDepartment = async () => {
-      const response = await getAllDepartments();
-      if (response.success) {
-        setDepartments(response.data.data);
-      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    };
-    handleGetDepartment();
+  const handleGetDepartment = useCallback(async () => {
+    const response = await getAllDepartments();
+    if (response.success) {
+      setDepartments(response.data.data);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, []);
 
   const handleUpdateRoom = async () => {
@@ -170,11 +162,13 @@ function RoomDetail(props) {
         variant: "success",
       });
       setOpenPopup(false);
-      navigate(0);
+      handleGetRoom();
+      // handleGetSchedules();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
 
   const handleEditButtonClick = () => {
+    handleGetDepartment();
     setOpenPopup(true);
     setRoomEdit({
       roomName: room.roomName,
@@ -261,7 +255,7 @@ function RoomDetail(props) {
             <FormControl fullWidth size="small">
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
+                value={statusSelected}
                 label="Trạng thái"
                 onChange={handleStatusChange}
                 className="custom-select"
@@ -305,13 +299,13 @@ function RoomDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusRoom ? "Mở khóa phòng" : "Khóa phòng"}
+              title={room.deleted ? "Mở khóa phòng" : "Khóa phòng"}
               content={
-                statusRoom
+                room.deleted
                   ? "Bạn có chắc chắn muốn mở khóa phòng này?"
                   : "Bạn có chắc chắn muốn khóa phòng này?"
               }
-              okText={statusRoom ? "Khôi phục" : "Khóa"}
+              okText={room.deleted ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
               onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}

@@ -13,13 +13,13 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TablePagination,
   TableRow,
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import React, { useMemo, useState } from "react";
+import FormatDate from "../../General/FormatDate";
+import { useNavigate } from "react-router-dom";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -56,7 +56,8 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row } = props;
+  const { row, patientId, patientName, userId, userName } = props;
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
@@ -115,7 +116,7 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.createdAt}
+            <FormatDate dateTime={row.createdAt} />
           </CustomText>
         </TableCell>
         <TableCell align="right">
@@ -164,13 +165,19 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                    // onClick={(e) => {
-                    //   navigate(`/admin/product-management/${row.productId}`, {
-                    //     state: {
-                    //       id: row.productId,
-                    //     },
-                    //   });
-                    // }}
+                      onClick={(e) => {
+                        patientId ?
+                          navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
+                            state: {
+                              patientName: patientName,
+                            }
+                          }) :
+                          navigate(`/admin/account-management/${userId}/patient-profile/${row.patientProfileId}`, {
+                            state: {
+                              userName: userName,
+                            }
+                          })
+                      }}
                     >
                       Xem
                     </Button>
@@ -182,13 +189,19 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                // onClick={(e) => {
-                //   navigate(`/admin/product-management/${row.productId}`, {
-                //     state: {
-                //       id: row.productId,
-                //     },
-                //   });
-                // }}
+                  onClick={(e) => {
+                    patientId ?
+                      navigate(`/admin/patient-management/${patientId}/patient-profile/${row.patientProfileId}`, {
+                        state: {
+                          patientName: patientName,
+                        }
+                      }) :
+                      navigate(`/admin/account-management/${userId}/patient-profile/${row.patientProfileId}`, {
+                        state: {
+                          userName: userName,
+                        }
+                      })
+                  }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>
@@ -202,8 +215,7 @@ function Row(props) {
 }
 
 function PatientProfileTable(props) {
-  const { count, onPageChange, onRowsPerPageChange, page, rowsPerPage, items } =
-    props;
+  const { items, patientId, patientName, userId, userName } = props;
 
   return (
     <>
@@ -274,36 +286,24 @@ function PatientProfileTable(props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items?.slice(0, rowsPerPage).map((row, index) => (
-                  <Row key={index} row={row} />
+                {items?.map((row, index) => (
+                  <Row
+                    key={index}
+                    row={row}
+                    patientId={patientId}
+                    patientName={patientName}
+                    userId={userId}
+                    userName={userName}
+                  />
                 ))}
               </TableBody>
             </Table>
           </Box>
         </Box>
-        <TablePagination
-          component="div"
-          count={count}
-          onPageChange={onPageChange}
-          onRowsPerPageChange={onRowsPerPageChange}
-          page={page - 1}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[1, 5, 10, 25]}
-        />
       </Stack>
 
     </>
   );
 }
-
-PatientProfileTable.propTypes = {
-  count: PropTypes.number,
-  items: PropTypes.array,
-  onPageChange: PropTypes.func,
-  onRowsPerPageChange: PropTypes.func,
-  page: PropTypes.number,
-  rowsPerPage: PropTypes.number,
-  selected: PropTypes.array,
-};
 
 export default PatientProfileTable;

@@ -57,6 +57,10 @@ public class DoctorServicesImpl implements IDoctorServices {
     }
 
     @Override
+    public List<Doctor> getDoctorNotInDepartment() {
+        return doctorRepository.findByDepartmentIsNull();
+    }
+    
     public Doctor getDoctorByToken(String token) {
         // Remove "Bearer " from token
         token = token.substring(7);

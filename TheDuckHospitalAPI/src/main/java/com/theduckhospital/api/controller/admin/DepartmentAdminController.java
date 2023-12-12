@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/admin/departments")
 //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -75,6 +77,17 @@ public class DepartmentAdminController {
         );
     }
 
+    @GetMapping("/without-services")
+    public ResponseEntity<?> getDepartmentsWithoutServices() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get departments without services successfully")
+                        .data(departmentServices.getDepartmentsWithoutServices())
+                        .build()
+        );
+    }
+
     @DeleteMapping("/{departmentId}")
     public ResponseEntity<?> deleteDepartment(@PathVariable int departmentId) {
         return ResponseEntity.ok(
@@ -82,6 +95,17 @@ public class DepartmentAdminController {
                         .success(true)
                         .message("Department deleted successfully")
                         .data(departmentServices.deleteDepartment(departmentId))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{departmentId}/doctors/{doctorId}")
+    public ResponseEntity<?> deleteDoctorDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Delete doctor from department successfully")
+                        .data(departmentServices.removeDoctorDepartment(departmentId, doctorId))
                         .build()
         );
     }
@@ -106,6 +130,17 @@ public class DepartmentAdminController {
                         .success(true)
                         .message("Department restored successfully")
                         .data(departmentServices.restoreDepartment(departmentId))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{departmentId}/doctors/{doctorId}")
+    public ResponseEntity<?> addDoctorDepartment(@PathVariable int departmentId, @PathVariable UUID doctorId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Add doctor to department successfully")
+                        .data(departmentServices.addDoctorDepartment(departmentId, doctorId))
                         .build()
         );
     }

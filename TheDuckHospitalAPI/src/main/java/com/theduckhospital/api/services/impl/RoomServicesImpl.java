@@ -27,15 +27,18 @@ import java.util.Optional;
 @Service
 public class RoomServicesImpl implements IRoomServices {
     private final RoomRepository roomRepository;
-    private final IDepartmentServices departmentServices;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final IDepartmentServices departmentServices;
     @Value("${settings.date}")
     private String appToday;
 
-    public RoomServicesImpl(RoomRepository roomRepository, IDepartmentServices departmentServices, DoctorScheduleRepository doctorScheduleRepository) {
+    public RoomServicesImpl(RoomRepository roomRepository,
+                            IDepartmentServices departmentServices,
+                            DoctorScheduleRepository doctorScheduleRepository
+    ) {
         this.roomRepository = roomRepository;
-        this.departmentServices = departmentServices;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.departmentServices = departmentServices;
     }
     @Override
     public RoomResponse createRoom(CreateRoomRequest request) {
@@ -86,6 +89,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(true);
+
         roomRepository.save(room);
 
         return true;
@@ -100,6 +104,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(false);
+
         return new RoomResponse(roomRepository.save(room));
     }
 

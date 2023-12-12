@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StaffDetail from "../../../components/Admin/StaffManagement/StaffDetail";
+import { getStaffById } from "../../../services/admin/StaffServices";
+import { useCallback, useEffect, useState } from "react";
 
 const StaffId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -24,29 +26,21 @@ const StaffId = styled(Typography)(({ theme }) => ({
 
 function StaffDetailPage() {
   const navigate = useNavigate();
-  // const [customer, setCustomer] = useState({});
+  const { staffId, departmentId } = useParams();
+  const { state } = useLocation();
+  const [staff, setStaff] = useState({});
 
-  // const handleGetCustomer = useCallback(async () => {
-  //   const response = await getCustomerById(state.id);
-  //   if (response.success) {
-  //     setCustomer(response.data.data);
-  //   }
-  // }, [state.id]);
+    const handleGetStaff = useCallback(async () => {
+      const response = await getStaffById(staffId);
+      if (response.success) {
+        setStaff(response.data.data);
+      }
+  }, [staffId]);
 
-  // useEffect(() => {
-  //   handleGetCustomer();
-  // }, [handleGetCustomer]);
+  useEffect(() => {
+    handleGetStaff();
+  }, [handleGetStaff]);
 
-  const staff = {
-    staffId: "1234-5678-9101-1121",
-    fullName: "Nguyễn Quốc Staff",
-    role: "Bác sĩ",
-    phoneNumber: "0123456789",
-    identityNumber: "123456789012",
-    dateOfBirth: "27/01/2002",
-    departmentName: "Khoa nhi",
-    deleted: false,
-  };
   return (
     <Box
       sx={{
@@ -72,6 +66,8 @@ function StaffDetailPage() {
               margin="0"
               color="#111927"
               onClick={() => {
+                state ?
+                navigate(`/admin/department-management/${departmentId}`) :
                 navigate("/admin/staff-management");
               }}
             >
@@ -85,7 +81,7 @@ function StaffDetailPage() {
                 color: "#111927",
               }}
             >
-              Danh sách nhân viên
+              {state ? `Thông tin khoa ${state?.departmentName}` : "Danh sách nhân viên"}
             </Typography>
           </Stack>
           <Grid container>
@@ -127,7 +123,7 @@ function StaffDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <StaffDetail staff={staff} />
+                <StaffDetail staff={staff} handleGetStaff={handleGetStaff} />
               </Stack>
             </Grid>
           </Grid>

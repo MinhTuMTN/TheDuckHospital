@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RoomDetail from "../../../components/Admin/RoomManagement/RoomDetail";
 import ScheduleTable from "../../../components/Admin/RoomManagement/ScheduleTable";
@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { getRoomById } from "../../../services/admin/RoomServices";
+import { getSchedules } from "../../../services/admin/DoctorScheduleServices";
 
 // const room = {
 //   roomName: "TDH1-01",
@@ -83,19 +84,6 @@ const TieuDe1 = styled(Typography)(({ theme }) => ({
   width: "12%",
 }));
 
-const BoxStyle2 = styled(Box)(({ theme }) => ({
-  paddingLeft: "40px !important",
-  paddingRight: "24px !important",
-  paddingTop: "12px !important",
-  paddingBottom: "12px !important",
-}));
-
-const TieuDe2 = styled(Typography)(({ theme }) => ({
-  fontSize: "1.1rem !important",
-  fontWeight: "500 !important",
-  width: "100%",
-}));
-
 const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
   width: "15%",
   "& input": {
@@ -106,19 +94,43 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
 function RoomDetailPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [date, setDate] = useState(dayjs);
+  const [dateSelected, setDateSelected] = useState(dayjs());
   const [room, setRoom] = useState({});
+  const [schedules, setSchedules] = useState([]);
 
-  useEffect(() => {
-    const handleGetRoom = async () => {
-      const response = await getRoomById(roomId);
-      if (response.success) {
-        setRoom(response.data.data);
-      }
+  const handleGetRoom = useCallback(async () => {
+    const response = await getRoomById(roomId);
+    if (response.success) {
+      setRoom(response.data.data);
     }
-    handleGetRoom();
   }, [roomId]);
 
+  useEffect(() => {
+    handleGetRoom();
+  }, [handleGetRoom]);
+
+  const handleGetSchedules = useCallback(async () => {
+    let date = dateSelected.format("YYYY/MM/DD")
+    const response = await getSchedules(roomId, { date });
+    if (response.success) {
+      setSchedules(response.data.data);
+    }
+  }, [roomId, dateSelected]);
+
+  useEffect(() => {
+    handleGetSchedules();
+  }, [handleGetSchedules, dateSelected]);
+
+  useEffect(() => {
+    if (schedules.length > 0) {
+      const interval = setInterval(() => {
+        handleGetSchedules();
+      }, 10000);
+
+      // Cleanup interval on component unmount
+      return () => clearInterval(interval);
+    }
+  }, [handleGetSchedules, schedules]);
 
   return (
     <Box
@@ -186,7 +198,11 @@ function RoomDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <RoomDetail room={room} />
+                <RoomDetail
+                  room={room}
+                  handleGetRoom={handleGetRoom}
+                  handleGetSchedules={handleGetSchedules}
+                />
               </Stack>
             </Grid>
           </Grid>
@@ -206,7 +222,6 @@ function RoomDetailPage() {
                   sx={{
                     borderRadius: "15px",
                     paddingTop: 1,
-                    paddingBottom: 4,
                   }}
                 >
                   <BoxStyle1>
@@ -218,36 +233,16 @@ function RoomDetailPage() {
                       >
                         <CustomDatePicker
                           label="Ngày làm việc"
-                          value={dayjs(date)}
+                          value={dayjs(dateSelected)}
                           onChange={(newDate) => {
-                            setDate(newDate);
+                            setDateSelected(newDate);
                           }}
                         />
                       </LocalizationProvider>
                     </Stack>
                   </BoxStyle1>
-                  {room.schedule?.morning &&
-                    <>
-                      <BoxStyle2 sx={{ mt: 1.5 }}>
-                        <TieuDe2>Buổi sáng</TieuDe2>
-                      </BoxStyle2>
-                      <ScheduleTable items={room.schedule?.morning} />
-                    </>
-                  }
-                  {room.schedule?.afternoon &&
-                    <>
-                      <BoxStyle2 sx={{ mt: 1.5 }}>
-                        <TieuDe2>Buổi chiều</TieuDe2>
-                      </BoxStyle2>
-                      <ScheduleTable items={room.schedule?.afternoon} />
-                    </>}
-                  {room.schedule?.evening &&
-                    <>
-                      <BoxStyle2 sx={{ mt: 1.5 }}>
-                        <TieuDe2>Buổi tối</TieuDe2>
-                      </BoxStyle2>
-                      <ScheduleTable items={room.schedule?.evening} />
-                    </>
+                  {schedules &&
+                    <ScheduleTable items={schedules} />
                   }
                 </Stack>
               </Stack>
