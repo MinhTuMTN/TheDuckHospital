@@ -13,6 +13,7 @@ public class DoctorScheduleRoomResponse {
     private UUID doctorScheduleId;
     private ScheduleType scheduleType;
     private String doctorName;
+    private String departmentName;
     private String phoneNumber;
     private int queueNumber;
     private long numberOfBookings;
@@ -22,6 +23,7 @@ public class DoctorScheduleRoomResponse {
         this.doctorScheduleId = schedule.getDoctorScheduleId();
         this.scheduleType = schedule.getScheduleType();
         this.doctorName = schedule.getDoctor().getFullName();
+        this.departmentName = schedule.getDoctor().getDepartment().getDepartmentName();
         this.phoneNumber = schedule.getDoctor().getPhoneNumber();
         this.queueNumber = schedule.getQueueNumber();
         this.date = schedule.getDate();

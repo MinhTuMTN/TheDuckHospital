@@ -34,6 +34,9 @@ import MedicalServiceDetailPage from "../pages/Admin/MedicalServiceManagement/Me
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
+import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
+import MedicineListPage from "../pages/Admin/MedicineManagement/MedicineListPage";
+import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetailPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -221,8 +224,16 @@ function Router(props) {
           element: <MedicalServiceDetailPage />,
         },
         {
-          path: "payment-management",
-          element: null,
+          path: "transaction-management",
+          element: <TransactionListPage />,
+        },
+        {
+          path: "medicine-management",
+          element: <MedicineListPage />,
+        },
+        {
+          path: "medicine-management/:medicineId",
+          element: <MedicineDetailPage />,
         },
       ],
     },

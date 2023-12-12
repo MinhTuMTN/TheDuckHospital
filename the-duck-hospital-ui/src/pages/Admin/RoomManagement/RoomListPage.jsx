@@ -25,14 +25,13 @@ import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  backgroundColor: "#FF6969",
+  color: "white",
   borderRadius: "6px",
   fontWeight: "600",
   fontSize: "15px",
   height: "42px",
   "&:hover": {
-    backgroundColor: "#ea4545 !important",
+    background: "#00a0ff",
   },
 }));
 
@@ -178,6 +177,7 @@ function RoomListPage(props) {
                 Danh sách phòng
               </Typography>
               <CustomButton
+                color="normal2"
                 variant="contained"
                 startIcon={<AddOutlinedIcon />}
                 onClick={() => {

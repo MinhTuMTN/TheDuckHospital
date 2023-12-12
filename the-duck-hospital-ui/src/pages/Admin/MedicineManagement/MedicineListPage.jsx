@@ -9,14 +9,11 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
-import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
+import SearchMedicineList from "../../../components/Admin/MedicineManagement/SearchMedicineList";
+import MedicineTable from "../../../components/Admin/MedicineManagement/MedicineTable";
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
-import DepartmentTable from "../../../components/Admin/DepartmentManagement/DepartmentTable";
-import {
-  addDepartment,
-  getPaginationDepartments,
-} from "../../../services/admin/DepartmentServices";
+import { createMedicine, getPaginationMedicines, updateMedicine } from "../../../services/admin/MedicineServices";
 import { enqueueSnackbar } from "notistack";
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -30,18 +27,19 @@ const CustomButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function DepartmentListPage(props) {
+function MedicineListPage(props) {
   const [search, setSearch] = useState("");
-  // const [buttonClicked, setButtonClicked] = useState(true);
-  const [departments, setDepartments] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
   const [openDialogForm, setOpenDialogForm] = useState(false);
+  const [medicines, setMedicines] = useState([]);
+  const [addNew, setAddNew] = useState(false);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
-  const [department, setDepartment] = useState({
-    departmentName: "",
-    description: "",
+  const [medicine, setMedicine] = useState({
+    medicineName: "",
+    price: 1000,
+    quantity: 1,
   });
 
   const handlePageChange = (event, newPage) => {
@@ -51,6 +49,71 @@ function DepartmentListPage(props) {
     setLimit(event.target.value);
     setPage(1);
   };
+
+  const handleGetMedicines = useCallback(async () => {
+    // if (!buttonClicked) return;
+    const response = await getPaginationMedicines({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setMedicines(response.data.data.medicines);
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    // setButtonClicked(false);
+  }, [page, limit]);
+
+  useEffect(() => {
+    handleGetMedicines();
+  }, [handleGetMedicines]);
+
+  const handleCreateUpdateMedicine = async () => {
+    setAddButtonClicked(true);
+
+    if (medicine.medicineName?.trim() === "" ||
+      medicine.price === null ||
+      medicine.quantity === null
+    ) {
+      enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
+      return;
+    }
+
+    if (medicine.price === 0) {
+      enqueueSnackbar("Giá thuốc phải lớn hơn 0", { variant: "error" });
+      return;
+    }
+
+    if (medicine.quantity === 0) {
+      enqueueSnackbar("Số lượng thuốc phải lớn hơn 0", { variant: "error" });
+      return;
+    }
+
+    if (addNew) {
+      const response = await createMedicine({
+        medicineName: medicine.medicineName,
+        price: medicine.price,
+        quantity: medicine.quantity,
+      });
+      if (response.success) {
+        enqueueSnackbar("Thêm thuốc thành công", { variant: "success" });
+        setOpenDialogForm(false);
+        handleGetMedicines();
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    } else {
+      const response = await updateMedicine(medicine.medicineId, {
+        medicineName: medicine.medicineName,
+        price: medicine.price,
+        quantity: medicine.quantity,
+      });
+      if (response.success) {
+        enqueueSnackbar("Chỉnh sửa thuốc thành công", { variant: "success" });
+        setOpenDialogForm(false);
+        handleGetMedicines();
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    }
+  }
 
   // const handleGetFilteredProduct = useCallback(async () => {
   //   if (!buttonClicked) return;
@@ -92,45 +155,11 @@ function DepartmentListPage(props) {
   //   handleGetFilteredProduct();
   // }, [handleGetFilteredProduct]);
 
-  const handleGetDepartments = useCallback(async () => {
-    // if (!buttonClicked) return;
-    const response = await getPaginationDepartments({
-      page: page - 1,
-      limit: limit,
-    });
-    if (response.success) {
-      setDepartments(response.data.data.departments);
-      setTotalItems(response.data.data.total);
-      setPage(response.data.data.page + 1);
-      setLimit(response.data.data.limit);
-    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-  }, [page, limit]);
-
-  useEffect(() => {
-    handleGetDepartments();
-  }, [handleGetDepartments]);
-
-  const handleAddDepartment = async () => {
-    setAddButtonClicked(true);
-    if (department.departmentName?.trim() === "") {
-      enqueueSnackbar("Tên khoa không được để trống", { variant: "error" });
-      return;
-    }
-
-    const response = await addDepartment({
-      departmentName: department.departmentName,
-      description: department.description,
-    });
-    if (response.success) {
-      enqueueSnackbar("Thêm khoa thành công!", { variant: "success" });
-      setOpenDialogForm(false);
-      handleGetDepartments();
-    } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
-  };
-
   return (
     <>
+      {/* {isLoading ? (
+        <Loading />
+      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -142,19 +171,20 @@ function DepartmentListPage(props) {
                   fontSize: "32px",
                 }}
               >
-                Danh sách khoa
+                Danh sách nhân viên
               </Typography>
               <CustomButton
-                color="normal2"
+                color="normal1"
                 variant="contained"
                 startIcon={<AddOutlinedIcon />}
                 onClick={() => {
-                  setDepartment({
-                    departmentName: "",
-                    description: "",
+                  setAddNew(true);
+                  setMedicine({
+                    medicineName: "",
+                    price: 1000,
+                    quantity: 1,
                   });
                   setOpenDialogForm(true);
-                  setAddButtonClicked(false);
                 }}
               >
                 Thêm
@@ -169,7 +199,7 @@ function DepartmentListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchDepartmentList
+              <SearchMedicineList
                 value={search}
                 onChange={setSearch}
               // onApply={() => {
@@ -271,78 +301,106 @@ function DepartmentListPage(props) {
                   page={page}
                   rowsPerPage={rowsPerPage}
                 /> */}
-              <DepartmentTable
+              <MedicineTable
                 count={totalItems ? totalItems : 0}
-                items={departments}
+                items={medicines}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
                 rowsPerPage={limit}
+                handleGetMedicines={handleGetMedicines}
+                setMedicine={setMedicine}
+                setAddNew={setAddNew}
+                setOpenDialogForm={setOpenDialogForm}
               />
             </Stack>
           </Stack>
         </Container>
       </Box>
+      {/* )} */}
 
       <DialogForm
         cancelText={"Hủy"}
-        okText={"Thêm"}
+        okText={addNew ? "Thêm" : "Cập nhật"}
         onCancel={() => {
           setOpenDialogForm(false);
-          setDepartment({
-            departmentName: "",
-            description: "",
-          });
           setAddButtonClicked(false);
+          setMedicine({
+            medicineName: "",
+            price: 1000,
+            quantity: 1,
+          });
         }}
-        onOk={handleAddDepartment}
+        onOk={handleCreateUpdateMedicine}
         open={openDialogForm}
-        title={"Thêm khoa"}
+        title={addNew ? "Thêm thuốc" : "Chỉnh sửa thông tin thuốc"}
         onClose={() => {
           setOpenDialogForm(false);
-          setDepartment({
-            departmentName: "",
-            description: "",
-          });
           setAddButtonClicked(false);
         }}
       >
-        <Stack width={"30rem"} mt={3} spacing={4}>
+        <Stack width={"30rem"} mt={1} spacing={3}>
           <MuiTextFeild
-            label={"Tên khoa"}
+            label={"Tên thuốc"}
             autoFocus
             autoComplete="off"
-            value={department.departmentName}
+            value={medicine.medicineName}
             onChange={(e) => {
-              setDepartment((prev) => ({
+              setMedicine((prev) => ({
                 ...prev,
-                departmentName: e.target.value,
+                medicineName: e.target.value,
               }));
             }}
             required
-            error={department.departmentName?.trim() === "" && addButtonClicked}
+            error={medicine.medicineName?.trim() === "" && addButtonClicked}
             helperText={
-              department.departmentName?.trim() === "" && addButtonClicked &&
-              "Tên khoa không được để trống"
+              medicine.medicineName?.trim() === "" && addButtonClicked && "Tên thuốc không được để trống"
             }
           />
           <MuiTextFeild
-            label="Mô tả"
-            value={department.description}
+            type="number"
+            label="Giá thuốc"
+            autoFocus
             autoComplete="off"
-            multiline
-            rows={4}
+            InputProps={{ inputProps: { min: 1000 } }}
+            value={medicine.price ? medicine.price.toString() : "0"}
             onChange={(e) => {
-              setDepartment((prev) => ({
+              setMedicine((prev) => ({
                 ...prev,
-                description: e.target.value,
+                price: e.target.value ? parseInt(e.target.value) : 0,
               }));
             }}
+            required
+            error={medicine.price === 0 && addButtonClicked}
+            helperText={
+              medicine.price === 0 && addButtonClicked &&
+              "Giá thuốc phải lớn hơn 0"
+            }
           />
-        </Stack>
-      </DialogForm>
+          <MuiTextFeild
+            type="number"
+            label="Số lượng"
+            autoFocus
+            autoComplete="off"
+            InputProps={{ inputProps: { min: 1000 } }}
+            value={medicine.quantity ? medicine.quantity.toString() : "0"}
+            onChange={(e) => {
+              setMedicine((prev) => ({
+                ...prev,
+                quantity: e.target.value ? parseInt(e.target.value) : 0,
+              }));
+            }}
+            required
+            error={medicine.quantity === 0 && addButtonClicked}
+            helperText={
+              medicine.quantity === 0 && addButtonClicked &&
+              "Số lượng thuốc phải lớn hơn 0"
+            }
+          />
+        </Stack >
+      </DialogForm >
     </>
   );
 }
 
-export default DepartmentListPage;
+export default MedicineListPage;

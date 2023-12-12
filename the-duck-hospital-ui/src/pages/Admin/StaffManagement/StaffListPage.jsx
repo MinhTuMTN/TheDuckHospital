@@ -51,14 +51,13 @@ const roles = [
 const degrees = ["BS", "ThS", "TS", "PGS", "GS"];
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  backgroundColor: "#FF6969",
+  color: "white",
   borderRadius: "6px",
   fontWeight: "600",
   fontSize: "15px",
   height: "42px",
   "&:hover": {
-    backgroundColor: "#ea4545 !important",
+    background: "#00a0ff",
   },
 }));
 
@@ -243,6 +242,7 @@ function StaffListPage(props) {
                 Danh sách nhân viên
               </Typography>
               <CustomButton
+                color="normal1"
                 variant="contained"
                 startIcon={<AddOutlinedIcon />}
                 onClick={() => {

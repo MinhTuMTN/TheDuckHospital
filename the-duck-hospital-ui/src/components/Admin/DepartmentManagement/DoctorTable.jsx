@@ -44,12 +44,13 @@ const TieuDe = styled(Typography)(({ theme }) => ({
 }));
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  backgroundColor: "#FF6969",
-  borderRadius: "15px",
-  height: "2.5rem",
+  color: "white",
+  borderRadius: "6px",
+  fontWeight: "600",
+  fontSize: "15px",
+  height: "42px",
   "&:hover": {
-    backgroundColor: "#ea4545 !important",
+    background: "#00a0ff",
   },
 }));
 
@@ -274,6 +275,7 @@ function DoctorTable(props) {
           <Stack direction={"row"}>
             <TieuDe>Danh sách bác sĩ</TieuDe>
             <CustomButton
+              color="normal2"
               variant="contained"
               size="medium"
               sx={{ width: "10%" }}

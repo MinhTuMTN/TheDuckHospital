@@ -22,14 +22,13 @@ import { getDepartmentsWithoutServices } from "../../../services/admin/Departmen
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  color: "#fff",
-  backgroundColor: "#FF6969",
+  color: "white",
   borderRadius: "6px",
   fontWeight: "600",
   fontSize: "15px",
   height: "42px",
   "&:hover": {
-    backgroundColor: "#ea4545 !important",
+    background: "#00a0ff",
   },
 }));
 
@@ -196,6 +195,7 @@ function MedicalServiceListPage(props) {
                 Danh sách dịch vụ
               </Typography>
               <CustomButton
+                color="normal2"
                 variant="contained"
                 startIcon={<AddOutlinedIcon />}
                 onClick={() => {
