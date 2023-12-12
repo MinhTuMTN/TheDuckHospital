@@ -30,9 +30,11 @@ function ReceivingPatients(props) {
         px: isFullScreen ? 5 : 3,
         backgroundColor: "#f4fbff",
         height: "calc(100vh - 64px)",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Grid item xs={12}>
+      <Grid item flex={1}>
         <Stack
           direction={"row"}
           justifyContent={"space-between"}
@@ -66,17 +68,22 @@ function ReceivingPatients(props) {
           />
         </Stack>
       </Grid>
-      <Grid item xs={12} md={12}>
+      <Grid item flex={3}>
         <Stack
           component={Paper}
           elevation={3}
           sx={{
             borderRadius: "10px",
+            width: "50%",
+            justifyContent: "center",
+            display: "flex",
+            margin: "0 auto",
           }}
         >
           <Box
             sx={{
-              paddingX: 4,
+              paddingLeft: 4,
+              paddingRight: 3,
               paddingY: 2,
               borderRadius: "10px 10px 0 0 ",
               borderBottom: "1px solid #e0e0e0",
