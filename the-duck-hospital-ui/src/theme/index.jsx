@@ -62,6 +62,9 @@ function CustomThemeProvider(props) {
       white: {
         main: "#fff",
       },
+      red: {
+        main: "#d21818",
+      },
     },
     typography: {
       fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`,

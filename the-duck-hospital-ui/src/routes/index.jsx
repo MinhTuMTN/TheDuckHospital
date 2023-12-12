@@ -145,16 +145,26 @@ function Router(props) {
       ],
     },
     {
-      path: "/nurse-room",
-      element: <NurseRoomLayout />,
+      path: "/",
+      element: <ProtectedLayout forRole={["Nurse"]} />,
       children: [
         {
-          path: "receiving-patients",
-          element: <ReceivingPatients />,
-        },
-        {
-          path: "queue-number",
-          element: <QueueNumberPage />,
+          path: "/nurse-room",
+          element: <NurseRoomLayout />,
+          children: [
+            {
+              index: true,
+              element: <ReceivingPatients />,
+            },
+            {
+              path: "receiving-patients",
+              element: <ReceivingPatients />,
+            },
+            {
+              path: "queue-number",
+              element: <QueueNumberPage />,
+            },
+          ],
         },
       ],
     },

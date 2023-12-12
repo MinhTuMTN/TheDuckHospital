@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { Button, Grid, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 const StyledQueueItemContainer = styled(Grid)(({ theme }) => ({
@@ -54,7 +54,13 @@ const FlexCenterGrid = styled(Grid)(({ theme }) => ({
 
 function QueueNumberPage(props) {
   const handle = useFullScreenHandle();
-  const number = 5;
+  const [number, setNumber] = useState(0);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setNumber((prev) => prev + 5);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
   return (
     <Grid
       container
@@ -114,7 +120,7 @@ function QueueNumberPage(props) {
                   Số thứ tự hiện tại
                 </Typography>
                 <Typography color={"template.normal1"} fontSize={150}>
-                  150
+                  {number}
                 </Typography>
               </FlexCenterGrid>
             </Grid>

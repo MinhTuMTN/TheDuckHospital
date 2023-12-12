@@ -9,10 +9,12 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
+
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
+
 function TopNavBar(props) {
-  const { onDrawerClick } = props;
+  const { onDrawerClick, roomName, departmentName } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg")); // Sử dụng useMediaQuery để lấy ra giá trị của màn hình hiện tại
 
   return (
@@ -71,8 +73,10 @@ function TopNavBar(props) {
                 fontWeight: "500",
               }}
             >
-              Phòng 75 - Chuyên khoa{" "}
-              <span style={{ color: "#17abfb" }}>Tâm thần kinh</span>
+              Phòng {roomName} - Chuyên khoa{" "}
+              <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
+                {departmentName.toLowerCase().replace("khoa", "").trim()}
+              </span>
             </Typography>
           </Stack>
         </Stack>

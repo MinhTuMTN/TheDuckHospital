@@ -5,7 +5,8 @@ import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.Patient;
-import com.theduckhospital.api.error.BadRequestException;
+import com.theduckhospital.api.error.StatusCodeException;
+import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
 import com.theduckhospital.api.services.IBookingServices;
 import com.theduckhospital.api.services.IMedicalExamServices;
@@ -17,14 +18,16 @@ import java.util.Optional;
 @Service
 public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final IBookingServices bookingServices;
+    private final BookingRepository bookingRepository;
     private final MedicalExaminationRepository medicalExaminationRepository;
     private final IPatientServices patientServices;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
-            MedicalExaminationRepository medicalExaminationRepository,
+            BookingRepository bookingRepository, MedicalExaminationRepository medicalExaminationRepository,
             IPatientServices patientServices) {
         this.bookingServices = bookingServices;
+        this.bookingRepository = bookingRepository;
         this.medicalExaminationRepository = medicalExaminationRepository;
         this.patientServices = patientServices;
     }
@@ -39,10 +42,13 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         );
 
         if (booking.getPatientProfile().getPatient() != null)
-            throw new BadRequestException("Patient is registered");
+            throw new StatusCodeException("Patient is registered", 411);
 
         Optional<MedicalExaminationRecord> medicalExaminationRecordOptional =
-                medicalExaminationRepository.findByBookingAndDeletedIsFalse(booking);
+                medicalExaminationRepository
+                        .findByBooking_BookingCodeAndDeletedIsFalse(
+                                booking.getBookingCode()
+                        );
         if (medicalExaminationRecordOptional.isPresent())
             return medicalExaminationRecordOptional.get();
 
@@ -64,10 +70,13 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         );
 
         if (booking.getPatientProfile().getPatient() == null)
-            throw new BadRequestException("Patient is not registered");
+            throw new StatusCodeException("Patient is not registered", 411);
 
         Optional<MedicalExaminationRecord> medicalExaminationRecordOptional =
-                medicalExaminationRepository.findByBookingAndDeletedIsFalse(booking);
+                medicalExaminationRepository
+                        .findByBooking_BookingCodeAndDeletedIsFalse(
+                                booking.getBookingCode()
+                        );
         return medicalExaminationRecordOptional
                 .orElseGet(
                         () -> createMedicalExamRecord(
@@ -85,6 +94,11 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         medicalExaminationRecord.setPatientProfile(booking.getPatientProfile());
         medicalExaminationRecord.setDoctorSchedule(booking.getDoctorSchedule());
 
-        return medicalExaminationRepository.save(medicalExaminationRecord);
+        medicalExaminationRepository.save(medicalExaminationRecord);
+
+        booking.setMedicalExaminationRecord(medicalExaminationRecord);
+        bookingRepository.save(booking);
+
+        return medicalExaminationRecord;
     }
 }

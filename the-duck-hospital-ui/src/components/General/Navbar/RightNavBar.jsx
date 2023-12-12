@@ -2,6 +2,8 @@ import styled from "@emotion/styled";
 import {
   BookmarkBorderOutlined,
   Close,
+  LocalHospitalOutlined,
+  LocalPharmacyOutlined,
   LogoutOutlined,
 } from "@mui/icons-material";
 import AttachEmailOutlinedIcon from "@mui/icons-material/AttachEmailOutlined";
@@ -25,10 +27,11 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
-import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
 
-const mainItems = [
+const userMainItems = [
   {
     display: "Đặt khám ngay",
     icon: <BookmarkBorderOutlined />,
@@ -43,6 +46,19 @@ const mainItems = [
     display: "Phiếu khám bệnh",
     icon: <PostAddIcon />,
     to: "/user/medical-bills",
+  },
+];
+
+const nurseMainItems = [
+  {
+    display: "Quầy dịch vụ",
+    icon: <LocalPharmacyOutlined />,
+    onClick: () => {},
+  },
+  {
+    display: "Phòng khám",
+    icon: <LocalHospitalOutlined />,
+    to: "/user",
   },
 ];
 
@@ -108,9 +124,11 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
 
 function RightNavBar(props) {
   const { open, onOpenClose } = props;
-  const { token, setToken, fullName } = useAuth();
+  const { token, setToken, fullName, role } = useAuth();
   const navigate = useNavigate();
 
+  const mainItems = role === "User" ? userMainItems : nurseMainItems;
+  const [nurseDialogOpen, setNurseDialogOpen] = React.useState(false);
   const content = (
     <Box
       sx={{
@@ -226,8 +244,12 @@ function RightNavBar(props) {
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  navigate(item.to);
-                  onOpenClose(false);
+                  if (item.onClick) {
+                    setNurseDialogOpen(true);
+                  } else {
+                    navigate(item.to);
+                    onOpenClose(false);
+                  }
                 }}
               >
                 <CustomListItemIcon>{item.icon}</CustomListItemIcon>
@@ -372,6 +394,12 @@ function RightNavBar(props) {
           </Stack>
         )}
       </Stack>
+
+      <DialogSearchRoom
+        open={nurseDialogOpen}
+        setOpen={setNurseDialogOpen}
+        onClose={() => onOpenClose(false)}
+      />
     </Box>
   );
 

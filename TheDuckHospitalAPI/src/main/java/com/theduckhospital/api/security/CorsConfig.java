@@ -1,5 +1,6 @@
 package com.theduckhospital.api.security;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,7 +15,7 @@ public class CorsConfig {
 
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NotNull CorsRegistry registry) {
                 registry
                         .addMapping("/**")
                         .allowedMethods(CorsConfiguration.ALL)

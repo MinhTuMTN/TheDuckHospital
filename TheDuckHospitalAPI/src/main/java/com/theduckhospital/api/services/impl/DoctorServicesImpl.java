@@ -111,7 +111,9 @@ public class DoctorServicesImpl implements IDoctorServices {
         AtomicInteger remove = new AtomicInteger();
         doctors.forEach(doctor -> {
             List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
-            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted() || doctorSchedule.getDate().before(new Date()));
+            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
+                    || doctorSchedule.getDate().before(new Date())
+            );
             if (doctorSchedules.isEmpty()) {
                 remove.getAndIncrement();
                 return;

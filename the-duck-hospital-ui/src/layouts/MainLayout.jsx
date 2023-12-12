@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import RightNavBar from "../components/Customer/RightNavBar";
+import RightNavBar from "../components/General/Navbar/RightNavBar";
 import Footer from "../components/General/Footer";
 import NavBar from "../components/General/Navbar/NavBar";
 

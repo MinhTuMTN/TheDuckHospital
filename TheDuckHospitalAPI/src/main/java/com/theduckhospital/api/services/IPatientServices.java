@@ -5,4 +5,5 @@ import com.theduckhospital.api.entity.PatientProfile;
 
 public interface IPatientServices {
     Patient createPatient(String identityNumber, PatientProfile patientProfile);
+    Patient findPatientByIdentityNumber(String identityNumber);
 }

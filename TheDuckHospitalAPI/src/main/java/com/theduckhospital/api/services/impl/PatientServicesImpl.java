@@ -52,4 +52,11 @@ public class PatientServicesImpl implements IPatientServices {
 
         return patient;
     }
+
+    @Override
+    public Patient findPatientByIdentityNumber(String identityNumber) {
+        return patientRepository
+                .findByIdentityNumberAndDeletedIsFalse(identityNumber)
+                .orElse(null);
+    }
 }

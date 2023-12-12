@@ -4,10 +4,9 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IRoomServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/nurse/rooms")
@@ -28,6 +27,19 @@ public class NurseRoomController {
                         .success(true)
                         .message("Success")
                         .data(roomServices.findRoomByRoomName(roomName))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{roomId}/doctor-schedules")
+    public ResponseEntity<?> getTodayDoctorSchedules(
+            @PathVariable("roomId") int roomId
+    ) throws ParseException {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(roomServices.getTodayDoctorSchedules(roomId))
                         .build()
         );
     }
