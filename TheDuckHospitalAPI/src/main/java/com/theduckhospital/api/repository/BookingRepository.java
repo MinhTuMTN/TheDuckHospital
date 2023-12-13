@@ -2,6 +2,8 @@ package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.DoctorSchedule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,10 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             int queueNumber
     );
     Optional<Booking> findByBookingCodeAndDeletedIsFalse(String bookingCode);
+    Page<Booking> findBookingsByDoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
+            DoctorSchedule doctorSchedule,
+            int queueNumber,
+            Pageable pageable
+
+    );
 }
