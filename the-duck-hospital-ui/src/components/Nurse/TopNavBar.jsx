@@ -75,7 +75,7 @@ function TopNavBar(props) {
             >
               Phòng {roomName} - Chuyên khoa{" "}
               <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
-                {departmentName.toLowerCase().replace("khoa", "").trim()}
+                {departmentName?.toLowerCase().replace("khoa", "").trim()}
               </span>
             </Typography>
           </Stack>
