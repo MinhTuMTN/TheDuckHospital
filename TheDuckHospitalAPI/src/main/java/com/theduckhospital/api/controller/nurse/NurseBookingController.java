@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/nurse/bookings")
 @PreAuthorize("hasRole('ROLE_NURSE')")
@@ -32,6 +34,21 @@ public class NurseBookingController {
                 .success(true)
                 .message("Check booking successfully")
                 .data(booking)
+                .build()
+        );
+    }
+
+    @GetMapping("/check-patient-code")
+    public ResponseEntity<?> checkPatientCode(
+            @RequestParam(name = "identityNumber") String identityNumber
+    ) {
+        Map<String, String> data = bookingServices
+                .checkPatientCode(identityNumber);
+
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Check patient code successfully")
+                .data(data)
                 .build()
         );
     }

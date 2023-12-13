@@ -20,18 +20,19 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthProvider";
 const sidebarItems = [
   {
     display: "Tiếp nhận bệnh nhân",
     icon: <PersonIcon />,
-    //to: "/store/products",
+    to: "/nurse-room/receiving-patients",
   },
 
   {
     display: "Số thứ tự",
     icon: <Filter9PlusIcon />,
-    //to: "/store/orders",
+    to: "/nurse-room/queue-number",
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
@@ -61,7 +62,9 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 function LeftNavbar(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const { fullName, setToken } = useAuth();
   const theme = useTheme();
+  const navigate = useNavigate();
   const content = (
     <Box
       sx={{
@@ -79,7 +82,9 @@ function LeftNavbar(props) {
             display: "flex",
             width: "100%",
             justifyContent: "center",
+            cursor: "pointer",
           }}
+          onClick={() => navigate("/")}
         >
           <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
         </Box>
@@ -180,7 +185,7 @@ function LeftNavbar(props) {
                 fontWeight: "500",
               }}
             >
-              Nguyễn Thị Hồng Nhung
+              {fullName}
             </Typography>
           </Stack>
         </Stack>
@@ -197,6 +202,10 @@ function LeftNavbar(props) {
             ":hover": {
               backgroundColor: "error.main",
             },
+          }}
+          onClick={() => {
+            setToken(null);
+            window.location.href = "/";
           }}
         >
           <Typography

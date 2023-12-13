@@ -15,8 +15,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import dayjs from "dayjs";
+import { enqueueSnackbar } from "notistack";
+import React, { useContext } from "react";
+import { NurseContext } from "../../auth/NurseProvider";
 import CustomLi from "../../components/Customer/BookingItemPage/CustomLi";
+import { searchPatient } from "../../services/nurse/BookingServices";
+import {
+  accepcNonPatientBooking,
+  accepctPatientBooking,
+} from "../../services/nurse/MedicalExamServices";
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -34,18 +43,77 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
     padding: "11px 8px",
   },
 }));
-const medicalBill = {
-  queueNumber: 1,
-  patientName: "Nguyễn Ngọc Tuyết Vi",
-  patientDob: "12/11/2002",
-  patientAddress: "210 Lê Văn Thịnh, phường Cát Lái, quận 2, tp HCM",
-  patientId: "Đang cập nhật",
-};
+
 function ReceivingPatientsItem(props) {
+  const { booking } = props;
   const [open, setOpen] = React.useState(false);
-  const [searchString, setSearchString] = React.useState("....");
+  const [patient, setPatient] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [identityNumber, setIdentityNumber] = React.useState(
+    booking.patientProfile?.identityNumber || ""
+  );
+  const { roomId } = useContext(NurseContext);
   const handlePopupClose = () => {
     setOpen(false);
+  };
+  const handleAcceptPatient = async () => {
+    const response = await accepctPatientBooking(booking.bookingCode, roomId);
+    if (response.success) {
+      enqueueSnackbar("Tiếp nhận bệnh nhân thành công", { variant: "success" });
+      setOpen(false);
+    } else {
+      let message = "Đã có lỗi xảy ra";
+      if (response.statusCode === 404) {
+        message = "Không tìm thấy thông tin đặt trước";
+      } else if (response.statusCode === 410) {
+        message = "Phòng khám không hợp lệ";
+      } else if (response.statusCode === 409) {
+        message = "Ngày đặt khám không hợp lệ";
+      } else if (response.statusCode === 411) {
+        message = "Mã bệnh nhân không hợp lệ";
+      }
+      enqueueSnackbar(message, { variant: "error" });
+    }
+  };
+
+  const handleAcceptNonPatient = async () => {
+    if (identityNumber.trim().length === 0) {
+      enqueueSnackbar("Vui lòng nhập số CCCD/CMND", { variant: "error" });
+      return;
+    }
+    const response = await accepcNonPatientBooking(
+      booking.bookingCode,
+      identityNumber,
+      roomId
+    );
+    if (response.success) {
+      enqueueSnackbar("Tiếp nhận bệnh nhân thành công", { variant: "success" });
+      setOpen(false);
+    } else {
+      let message = "Đã có lỗi xảy ra";
+      if (response.statusCode === 404) {
+        message = "Không tìm thấy thông tin đặt trước";
+      } else if (response.statusCode === 410) {
+        message = "Phòng khám không hợp lệ";
+      } else if (response.statusCode === 409) {
+        message = "Ngày đặt khám không hợp lệ";
+      } else if (response.statusCode === 411) {
+        message = "Mã bệnh nhân không hợp lệ";
+      }
+      enqueueSnackbar(message, { variant: "error" });
+    }
+  };
+  const handleSearchPatientCode = async () => {
+    if (identityNumber.trim().length === 0) return;
+
+    setIsLoading(true);
+    const response = await searchPatient(identityNumber);
+    if (response.success) {
+      setPatient(response.data.data);
+    } else {
+      setPatient(null);
+    }
+    setIsLoading(false);
   };
   return (
     <Stack direction={"row"} alignItems={"center"}>
@@ -61,9 +129,9 @@ function ReceivingPatientsItem(props) {
           paddingRight: 2,
         }}
       >
-        {medicalBill.queueNumber < 10
-          ? "0" + medicalBill.queueNumber
-          : medicalBill.queueNumber}
+        {booking.queueNumber < 10
+          ? "0" + booking.queueNumber
+          : booking.queueNumber}
       </Typography>
       <Stack
         direction={"column"}
@@ -78,15 +146,25 @@ function ReceivingPatientsItem(props) {
             paddingLeft: "20px",
           }}
         >
-          <CustomLi lableName="Họ tên:" value="Nguyễn Ngọc Tuyết Vi" />
-          <CustomLi lableName="Ngày sinh:" value="12/11/2002" />
+          <CustomLi
+            lableName="Họ tên:"
+            value={booking.patientProfile?.fullName}
+          />
+          <CustomLi
+            lableName="Ngày sinh:"
+            value={dayjs(booking.patientProfile?.dateOfBirth).format(
+              "DD/MM/YYYY"
+            )}
+          />
           <CustomLi
             lableName="Địa chỉ:"
-            value="210 Lê Văn Thịnh, phường Cát Lái, quận 2, tp HCM"
+            value={`
+            ${booking.patientProfile?.district?.districtName}, 
+            ${booking.patientProfile?.province?.provinceName}`}
           />
           <CustomLi
             lableName="Mã bệnh nhân:"
-            value="Đang cập nhật"
+            value={booking.patientProfile?.patientCode || "Đang cập nhật"}
             color="red"
           />
           <li
@@ -111,14 +189,16 @@ function ReceivingPatientsItem(props) {
                     "linear-gradient(to right, #42a5f5, #6fccea)",
                 },
               }}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+              }}
             >
               Tiếp nhận
             </Button>
           </li>
         </ul>
       </Stack>
-      {medicalBill.patientId === "Đang cập nhật" ? (
+      {!booking.patientProfile?.patientCode ? (
         <>
           <BootstrapDialog
             open={open}
@@ -182,11 +262,11 @@ function ReceivingPatientsItem(props) {
                   fullWidth
                   required
                   placeholder="Nhập số CCCD/CMND"
-                  onChange={(e) => e.target.value}
+                  value={identityNumber}
+                  onChange={(e) => setIdentityNumber(e.target.value)}
                   sx={{
                     minWidth: "250px",
                     "& input": {
-                      // Sửa cú pháp CSS cho InputBase-input
                       fontSize: "14px",
                       padding: "10px 8px",
                     },
@@ -207,36 +287,49 @@ function ReceivingPatientsItem(props) {
                     padding: "8px 0",
                     fontSize: "14px",
                   }}
+                  onClick={handleSearchPatientCode}
                 >
                   Tìm
                 </Button>
               </Stack>
-              <Box sx={{ height: 1, mt: 1.5 }}>
-                {searchString !== "" ? (
-                  <>
-                    <Typography>Mã bệnh nhân cần tìm là: </Typography>
-                    <span style={{ color: "#f81f1f", fontWeight: "bold" }}>
-                      BN2039183 - Nguyễn Ngọc Tuyết Vi
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Typography>
-                      Không tìm thấy mã bệnh nhân tương ứng.
-                    </Typography>
-                    <Typography>
-                      Nhấp vào nút{" "}
-                      <span style={{ color: "#02b10d", fontWeight: "bold" }}>
-                        "Tiếp nhận"
-                      </span>{" "}
-                      để tiếp nhận bệnh nhân.
-                    </Typography>
-                  </>
-                )}
-              </Box>
+              {!isLoading && (
+                <Box sx={{ height: 1, mt: 1.5 }}>
+                  {patient ? (
+                    <>
+                      <Typography>Mã bệnh nhân cần tìm là: </Typography>
+                      <span style={{ color: "#f81f1f", fontWeight: "bold" }}>
+                        {patient.patientCode} - {patient.fullName}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Typography>
+                        Không tìm thấy mã bệnh nhân tương ứng.
+                      </Typography>
+                      <Typography>
+                        Nhấp vào nút{" "}
+                        <span style={{ color: "#02b10d", fontWeight: "bold" }}>
+                          "Tiếp nhận"
+                        </span>{" "}
+                        để tiếp nhận bệnh nhân.
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+              )}
+
+              {isLoading && (
+                <Box sx={{ height: 1, mt: 1.5 }}>
+                  <Typography>Đang tìm kiếm mã bệnh nhân...</Typography>
+                </Box>
+              )}
             </DialogContent>
             <DialogActions>
-              <Button autoFocus sx={{ color: "#5aafff" }}>
+              <Button
+                autoFocus
+                sx={{ color: "#5aafff" }}
+                onClick={handleAcceptNonPatient}
+              >
                 Tiếp nhận
               </Button>
             </DialogActions>
@@ -257,6 +350,7 @@ function ReceivingPatientsItem(props) {
                 display: "flex",
                 alignItems: "center",
               }}
+              component={"div"}
             >
               <HelpOutlineIcon
                 sx={{
@@ -295,13 +389,17 @@ function ReceivingPatientsItem(props) {
                     fontWeight: "bold",
                   }}
                 >
-                  BN2039183
+                  {booking.patientProfile?.patientCode}
                 </span>{" "}
                 này không?
               </Typography>
             </DialogContent>
             <DialogActions>
-              <Button autoFocus sx={{ color: "#5aafff" }}>
+              <Button
+                autoFocus
+                sx={{ color: "#5aafff" }}
+                onClick={handleAcceptPatient}
+              >
                 Tiếp nhận
               </Button>
             </DialogActions>

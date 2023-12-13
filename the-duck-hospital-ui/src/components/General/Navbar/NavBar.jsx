@@ -16,9 +16,9 @@ import {
 import React, { useEffect } from "react";
 import { usePopover } from "../../../hooks/use-popover";
 import AccountPopover from "./AccountPopover";
-import { useAuth } from "../../../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { checkInfo } from "../../../services/customer/AuthServices";
+import { useAuth } from "../../../auth/AuthProvider";
 
 const TOP_NAV_HEIGHT = 64;
 

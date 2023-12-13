@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.entity.Room;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface IRoomServices {
@@ -17,4 +18,6 @@ public interface IRoomServices {
     RoomResponse getRoomById(int roomId);
     Room findRoomById(int roomId);
     List<RoomResponse> findRoomByRoomName(String roomName);
+
+    Object getTodayDoctorSchedules(int roomId) throws ParseException;
 }

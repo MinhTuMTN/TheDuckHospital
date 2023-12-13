@@ -158,11 +158,7 @@ function Row(props) {
                       // }}
 
                       onClick={(e) => {
-                        navigate(`/admin/staff-management/detail`, {
-                          state: {
-                            id: row.staffId,
-                          },
-                        });
+                        navigate(`/admin/staff-management/${row.staffId}`);
                       }}
                     >
                       Xem
@@ -183,11 +179,7 @@ function Row(props) {
                   //   });
                   // }}
                   onClick={(e) => {
-                    navigate(`/admin/staff-management/detail`, {
-                      state: {
-                        id: row.staffId,
-                      },
-                    });
+                    navigate(`/admin/staff-management/${row.staffId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />

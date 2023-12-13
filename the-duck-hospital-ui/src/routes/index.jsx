@@ -28,9 +28,15 @@ import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
+import PatientProfileDetailPage from "../pages/Admin/PatientManagement/PatientProfileDetailPage";
+import MedicalServiceListPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceListPage";
+import MedicalServiceDetailPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceDetailPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/PaymentFailedPage";
 import BookingItemPage from "../pages/customer/BookingItemPage";
+import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
+import MedicineListPage from "../pages/Admin/MedicineManagement/MedicineListPage";
+import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetailPage";
 import NurseRoomLayout from "../layouts/NurseRoomLayout";
 import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
@@ -147,16 +153,26 @@ function Router(props) {
       ],
     },
     {
-      path: "/nurse-room",
-      element: <NurseRoomLayout />,
+      path: "/",
+      element: <ProtectedLayout forRole={["Nurse"]} />,
       children: [
         {
-          path: "receiving-patients",
-          element: <ReceivingPatients />,
-        },
-        {
-          path: "queue-number",
-          element: <QueueNumberPage />,
+          path: "/nurse-room",
+          element: <NurseRoomLayout />,
+          children: [
+            {
+              index: true,
+              element: <ReceivingPatients />,
+            },
+            {
+              path: "receiving-patients",
+              element: <ReceivingPatients />,
+            },
+            {
+              path: "queue-number",
+              element: <QueueNumberPage />,
+            },
+          ],
         },
       ],
     },
@@ -192,15 +208,19 @@ function Router(props) {
           element: <AccountListPage />,
         },
         {
-          path: "account-management/detail",
+          path: "account-management/:userId",
           element: <AccountDetailPage />,
+        },
+        {
+          path: "account-management/:userId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
         },
         {
           path: "staff-management",
           element: <StaffListPage />,
         },
         {
-          path: "staff-management/detail",
+          path: "staff-management/:staffId",
           element: <StaffDetailPage />,
         },
         {
@@ -220,16 +240,40 @@ function Router(props) {
           element: <DepartmentDetailPage />,
         },
         {
+          path: "department-management/:departmentId/staff/:staffId",
+          element: <StaffDetailPage />,
+        },
+        {
           path: "patient-management",
           element: <PatientListPage />,
         },
         {
-          path: "patient-management/detail",
+          path: "patient-management/:patientId",
           element: <PatientDetailPage />,
         },
         {
-          path: "payment-management",
-          element: null,
+          path: "patient-management/:patientId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
+        },
+        {
+          path: "service-management",
+          element: <MedicalServiceListPage />,
+        },
+        {
+          path: "service-management/:serviceId",
+          element: <MedicalServiceDetailPage />,
+        },
+        {
+          path: "transaction-management",
+          element: <TransactionListPage />,
+        },
+        {
+          path: "medicine-management",
+          element: <MedicineListPage />,
+        },
+        {
+          path: "medicine-management/:medicineId",
+          element: <MedicineDetailPage />,
         },
       ],
     },

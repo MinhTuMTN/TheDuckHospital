@@ -11,7 +11,7 @@ public class DateCommon {
         return calendar1.compareTo(calendar2);
     }
 
-    private static Calendar getCalendar(Date date) {
+    public static Calendar getCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
 

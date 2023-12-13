@@ -21,9 +21,9 @@ export const updateRoom = (roomId, data) => {
 };
 
 export const deleteRoom = (roomId) => {
-    return del(`/admin/rooms/${roomId}`, null, { Authorization: "" });
-  };
-  
-  export const restoreRoom = (roomId) => {
-    return put(`/admin/rooms/${roomId}/restore`, null, { Authorization: "" });
-  };
+  return del(`/admin/rooms/${roomId}`, null, { Authorization: "" });
+};
+
+export const restoreRoom = (roomId) => {
+  return put(`/admin/rooms/${roomId}/restore`, null, { Authorization: "" });
+};

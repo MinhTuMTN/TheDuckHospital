@@ -20,4 +20,5 @@ public interface IBookingServices {
 
     NurseBookingItemResponse checkBooking(String bookingCode, int roomId);
     Booking bookingIsValid(String bookingCode, int roomId);
+    Map<String, String> checkPatientCode(String identityNumber);
 }

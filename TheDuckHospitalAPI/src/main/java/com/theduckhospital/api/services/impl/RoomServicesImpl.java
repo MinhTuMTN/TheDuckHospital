@@ -3,28 +3,41 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
+import com.theduckhospital.api.dto.response.nurse.NurseDoctorScheduleItemResponse;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IRoomServices;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class RoomServicesImpl implements IRoomServices {
     private final RoomRepository roomRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
     private final IDepartmentServices departmentServices;
+    @Value("${settings.date}")
+    private String appToday;
 
-    public RoomServicesImpl(RoomRepository roomRepository, IDepartmentServices departmentServices) {
+    public RoomServicesImpl(RoomRepository roomRepository,
+                            IDepartmentServices departmentServices,
+                            DoctorScheduleRepository doctorScheduleRepository
+    ) {
         this.roomRepository = roomRepository;
+        this.doctorScheduleRepository = doctorScheduleRepository;
         this.departmentServices = departmentServices;
     }
     @Override
@@ -76,6 +89,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(true);
+
         roomRepository.save(room);
 
         return true;
@@ -90,6 +104,7 @@ public class RoomServicesImpl implements IRoomServices {
 
         Room room = optional.get();
         room.setDeleted(false);
+
         return new RoomResponse(roomRepository.save(room));
     }
 
@@ -146,5 +161,18 @@ public class RoomServicesImpl implements IRoomServices {
                 .stream()
                 .map(RoomResponse::new)
                 .toList();
+    }
+
+    @Override
+    public List<NurseDoctorScheduleItemResponse> getTodayDoctorSchedules(int roomId) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date today = format.parse(appToday);
+
+        Room room = findRoomById(roomId);
+
+        return doctorScheduleRepository.findByRoomAndDateAndDeletedIsFalse(
+                room,
+                today
+        ).stream().map(NurseDoctorScheduleItemResponse::new).toList();
     }
 }

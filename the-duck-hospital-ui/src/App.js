@@ -2,6 +2,7 @@ import { SnackbarProvider } from "notistack";
 import AuthProvider from "./auth/AuthProvider";
 import Router from "./routes";
 import CustomThemeProvider from "./theme";
+import { NurseProvider } from "./auth/NurseProvider";
 
 function App() {
   return (
@@ -12,7 +13,9 @@ function App() {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <AuthProvider>
-          <Router />
+          <NurseProvider>
+            <Router />
+          </NurseProvider>
         </AuthProvider>
       </SnackbarProvider>
     </CustomThemeProvider>

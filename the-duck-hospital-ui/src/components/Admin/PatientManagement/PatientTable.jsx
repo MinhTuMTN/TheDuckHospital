@@ -149,20 +149,8 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                      // onClick={(e) => {
-                      //   navigate(`/admin/product-management/${row.productId}`, {
-                      //     state: {
-                      //       id: row.productId,
-                      //     },
-                      //   });
-                      // }}
-
                       onClick={(e) => {
-                        navigate(`/admin/patient-management/detail`, {
-                          state: {
-                            id: row.patientId,
-                          },
-                        });
+                        navigate(`/admin/patient-management/${row.patientId}`);
                       }}
                     >
                       Xem
@@ -175,19 +163,8 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                  // onClick={(e) => {
-                  //   navigate(`/admin/product-management/${row.productId}`, {
-                  //     state: {
-                  //       id: row.productId,
-                  //     },
-                  //   });
-                  // }}
                   onClick={(e) => {
-                    navigate(`/admin/patient-management/detail`, {
-                      state: {
-                        id: row.patientId,
-                      },
-                    });
+                    navigate(`/admin/patient-management/${row.patientId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />

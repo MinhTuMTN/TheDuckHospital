@@ -27,14 +27,16 @@ public class BookingServicesImpl implements IBookingServices {
     private final BookingRepository bookingRepository;
     private final TransactionRepository transactionRepository;
     private final IPatientProfileServices patientProfileServices;
+    private final IPatientServices patientServices;
     private final IScheduleDoctorServices doctorScheduleServices;
     private final IVNPayServices vnPayServices;
     private final IAccountServices accountServices;
 
-    public BookingServicesImpl(BookingRepository bookingRepository, TransactionRepository transactionRepository, IPatientProfileServices patientProfileServices, IScheduleDoctorServices doctorScheduleServices, IVNPayServices vnPayServices, IAccountServices accountServices) {
+    public BookingServicesImpl(BookingRepository bookingRepository, TransactionRepository transactionRepository, IPatientProfileServices patientProfileServices, IPatientServices patientServices, IScheduleDoctorServices doctorScheduleServices, IVNPayServices vnPayServices, IAccountServices accountServices) {
         this.bookingRepository = bookingRepository;
         this.transactionRepository = transactionRepository;
         this.patientProfileServices = patientProfileServices;
+        this.patientServices = patientServices;
         this.doctorScheduleServices = doctorScheduleServices;
         this.vnPayServices = vnPayServices;
         this.accountServices = accountServices;
@@ -200,6 +202,19 @@ public class BookingServicesImpl implements IBookingServices {
             throw new StatusCodeException("Room not valid", 410);
 
         return booking;
+    }
+
+    @Override
+    public Map<String, String> checkPatientCode(String identityNumber) {
+        Patient patient = patientServices.findPatientByIdentityNumber(identityNumber);
+        if (patient == null)
+            throw new NotFoundException("Patient not found");
+
+        Map<String, String> data = new HashMap<>();
+        data.put("patientCode", patient.getPatientCode());
+        data.put("fullName", patient.getFullName());
+
+        return data;
     }
 
     private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {

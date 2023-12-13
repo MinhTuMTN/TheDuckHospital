@@ -84,7 +84,7 @@ function PatientMenuList(props) {
 
       <CustomMenuItemLogOut
         sx={{
-          color: "red",
+          color: "red !important",
         }}
         onClick={(e) => {
           setToken(null);

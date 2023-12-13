@@ -57,6 +57,10 @@ public class DoctorServicesImpl implements IDoctorServices {
     }
 
     @Override
+    public List<Doctor> getDoctorNotInDepartment() {
+        return doctorRepository.findByDepartmentIsNull();
+    }
+    
     public Doctor getDoctorByToken(String token) {
         // Remove "Bearer " from token
         token = token.substring(7);
@@ -111,7 +115,9 @@ public class DoctorServicesImpl implements IDoctorServices {
         AtomicInteger remove = new AtomicInteger();
         doctors.forEach(doctor -> {
             List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
-            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted() || doctorSchedule.getDate().before(new Date()));
+            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
+                    || doctorSchedule.getDate().before(new Date())
+            );
             if (doctorSchedules.isEmpty()) {
                 remove.getAndIncrement();
                 return;

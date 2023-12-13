@@ -1,19 +1,17 @@
 package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.dto.request.admin.CreateServicesRequest;
+import com.theduckhospital.api.dto.request.admin.UpdateServiceRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/services")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class MedicalServiceAdminController {
     private final IMedicalServiceServices serviceServices;
 
@@ -28,6 +26,66 @@ public class MedicalServiceAdminController {
                         .success(true)
                         .message("Service created successfully")
                         .data(serviceServices.createService(request))
+                        .build()
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> getPaginationServices(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get services pagination successfully")
+                        .data(serviceServices.getPaginationMedicalServicesDeleted(page, limit))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{serviceId}")
+    public ResponseEntity<?> getServiceById(@PathVariable int serviceId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all medical service pagination successfully")
+                        .data(serviceServices.getMedicalServiceById(serviceId))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{serviceId}")
+    public ResponseEntity<?> deleteService(@PathVariable int serviceId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Service deleted successfully")
+                        .data(serviceServices.deleteService(serviceId))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{serviceId}/restore")
+    public ResponseEntity<?> restoreService(@PathVariable int serviceId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Service restored successfully")
+                        .data(serviceServices.restoreService(serviceId))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{serviceId}")
+    public ResponseEntity<?> updateService(
+            @PathVariable int serviceId,
+            @RequestBody UpdateServiceRequest request) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Service updated successfully")
+                        .data(serviceServices.updateMedicalService(serviceId, request))
                         .build()
         );
     }

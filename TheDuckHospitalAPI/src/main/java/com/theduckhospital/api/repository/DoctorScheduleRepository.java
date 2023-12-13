@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,9 +20,19 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             ScheduleType scheduleType
     );
 
+    List<DoctorSchedule> findByRoomAndDateOrderByScheduleType(
+            Room room,
+            Date date
+    );
+
     Optional<DoctorSchedule> findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
             Doctor doctor,
             Date date,
             ScheduleType scheduleType
+    );
+
+    List<DoctorSchedule> findByRoomAndDateAndDeletedIsFalse(
+            Room room,
+            Date date
     );
 }

@@ -1,7 +1,13 @@
 import styled from "@emotion/styled";
 import { Button, Grid, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import { NurseContext } from "../../auth/NurseProvider";
+import {
+  getQueueNumber,
+  increaseQueueNumber,
+} from "../../services/nurse/QueueNumberServices";
+import { enqueueSnackbar } from "notistack";
 
 const StyledQueueItemContainer = styled(Grid)(({ theme }) => ({
   display: "flex",
@@ -20,6 +26,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 }));
 
 function QueueNumberItem(props) {
+  const { item } = props;
   return (
     <StyledQueueItemContainer container>
       <Grid item xs={2}>
@@ -29,7 +36,7 @@ function QueueNumberItem(props) {
           color={"template.main"}
           fontSize={"50px !important"}
         >
-          999
+          {(item?.queueNumber < 10 ? "0" : "") + item?.queueNumber}
         </StyledTypography>
       </Grid>
       <Grid item xs={9}>
@@ -38,8 +45,7 @@ function QueueNumberItem(props) {
           textAlign={"left"}
           color={"template.teal"}
         >
-          Lê Hoàng Hiếu Nghĩa Đệ Nhất Thương Tâm Nhân - Đào Thị Long Lanh Kim
-          Ánh Dương
+          {item?.fullName}
         </StyledTypography>
       </Grid>
     </StyledQueueItemContainer>
@@ -54,7 +60,32 @@ const FlexCenterGrid = styled(Grid)(({ theme }) => ({
 
 function QueueNumberPage(props) {
   const handle = useFullScreenHandle();
-  const number = 5;
+  const [data, setData] = useState([]);
+  const { doctorScheduleId } = useContext(NurseContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleIncreseNumber = async () => {
+    setIsLoading(true);
+    const response = await increaseQueueNumber(doctorScheduleId);
+    if (response.success) setData(response.data.data);
+    else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    const handleGetQueueNumber = async () => {
+      const response = await getQueueNumber(doctorScheduleId);
+      if (response.success) setData(response.data.data);
+      else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+
+    handleGetQueueNumber();
+    const intervalId = setInterval(() => {
+      handleGetQueueNumber();
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [doctorScheduleId]);
+
   return (
     <Grid
       container
@@ -73,8 +104,21 @@ function QueueNumberPage(props) {
         }}
       >
         <Stack direction={"row"} alignItems={"center"}>
-          <Typography>Số thứ tự hiện tại: 01</Typography>
-          <Button variant="contained" color="primary">
+          <Typography fontSize={30} fontWeight={500}>
+            Số thứ tự hiện tại:{" "}
+            {(data?.currentQueueNumber < 10 ? "0" : "") +
+              data?.currentQueueNumber}
+          </Typography>
+          <Button
+            variant="contained"
+            color="normal1"
+            sx={{
+              marginLeft: 5,
+              color: "#fff",
+            }}
+            onClick={handleIncreseNumber}
+            disabled={isLoading}
+          >
             Tiếp theo
           </Button>
         </Stack>
@@ -99,22 +143,23 @@ function QueueNumberPage(props) {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: number === 5 ? "space-between" : "flex-start",
+                  justifyContent:
+                    data?.queueBookingItems?.length === 5
+                      ? "space-between"
+                      : "flex-start",
                   alignItems: "center",
                 }}
               >
-                <QueueNumberItem />
-                <QueueNumberItem />
-                <QueueNumberItem />
-                <QueueNumberItem />
-                <QueueNumberItem />
+                {data?.queueBookingItems?.map((item, index) => (
+                  <QueueNumberItem key={`booking-item-${index}`} item={item} />
+                ))}
               </Grid>
               <FlexCenterGrid item flexDirection={"column"} flex={4}>
                 <Typography variant="h6" fontSize={40}>
                   Số thứ tự hiện tại
                 </Typography>
                 <Typography color={"template.normal1"} fontSize={150}>
-                  150
+                  {data?.currentQueueNumber}
                 </Typography>
               </FlexCenterGrid>
             </Grid>
@@ -133,10 +178,10 @@ function QueueNumberPage(props) {
                 THE DUCK HOSPITAL
               </Typography>
               <Typography variant="h6" fontSize={40} color="template.darker">
-                Khoa ngoại
+                {data?.departmentName}
               </Typography>
               <Typography variant="h6" fontSize={40} color="template.darker">
-                Phòng khám A1-101
+                Phòng khám {data?.roomName}
               </Typography>
             </Grid>
           </Grid>

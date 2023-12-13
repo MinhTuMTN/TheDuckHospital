@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
+import { deleteAccount, restoreAccount } from "../../../services/admin/AccountServices";
+import { enqueueSnackbar } from "notistack";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -42,21 +44,18 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 }));
 
 function AccountDetail(props) {
-  const { account } = props;
-  let status = account.deleted;
-  const [statusAccount, setStatusAccount] = useState(false);
-  const [editStatus, setEditStatus] = useState(false);
+  const { account, handleGetAccount } = props;
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [statusSelected, setStatusSelected] = useState(false);
 
   useEffect(() => {
-    setEditStatus(status);
-    setStatusAccount(status);
-  }, [status]);
+    setStatusSelected(typeof account.deleted !== "undefined" ? account.deleted : false);
+  }, [account]);
 
   const handleStatusChange = (event) => {
-    setEditStatus(event.target.value);
-    if (statusAccount !== event.target.value) {
+    setStatusSelected(event.target.value);
+    if (account.deleted !== event.target.value) {
       setDisabledButton(false);
     } else {
       setDisabledButton(true);
@@ -65,28 +64,28 @@ function AccountDetail(props) {
 
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
+  const handleUpdateButtonClick = async () => {
+    let response;
+    if (account.deleted) {
+      response = await restoreAccount(account.userId);
+      if (response.success) {
+        enqueueSnackbar("Mở khóa tài khoản thành công!", { variant: "success" });
+        setDisabledButton(true);
+        handleGetAccount();
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    } else {
+      response = await deleteAccount(account.userId);
+      if (response.success) {
+        enqueueSnackbar("Khóa tài khoản thành công!", { variant: "success" });
+        setDisabledButton(true);
+        handleGetAccount();
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
+      }
+    }
+  };
 
   return (
     <Stack
@@ -118,33 +117,43 @@ function AccountDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{account.role}</NoiDung>
+              <NoiDung>{account.role} {account.headOfDepartment ? "(Trưởng khoa)" : ""}</NoiDung>
             </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
+      {account.departmentName &&
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Khoa</TieuDeCot>
+          </Grid>
+          <Grid item xs={8} md={9}>
+            <NoiDung>{account.departmentName}</NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Số điện thoại</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
             <NoiDung>{account.phoneNumber}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
+      {account.email &&
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Địa chỉ email</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
             <NoiDung>{account.email}</NoiDung>
           </Grid>
         </Grid>
-      </BoxStyle>
+      </BoxStyle>}
       <BoxStyle>
         <Grid container alignItems={"center"} paddingBottom={1}>
           <Grid item xs={4} md={3}>
@@ -155,7 +164,7 @@ function AccountDetail(props) {
             <FormControl fullWidth size="small">
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
-                value={typeof editStatus === "undefined" ? false : editStatus}
+                value={statusSelected}
                 label="Trạng thái"
                 onChange={handleStatusChange}
                 className="custom-select"
@@ -199,15 +208,15 @@ function AccountDetail(props) {
             </Button>
             <DialogConfirm
               open={deleteDialog}
-              title={statusAccount ? "Mở khóa tài khoản" : "Khóa tài khoản"}
+              title={account.deleted ? "Mở khóa tài khoản" : "Khóa tài khoản"}
               content={
-                statusAccount
+                account.deleted
                   ? "Bạn có chắc chắn muốn mở khóa tài khoản này?"
                   : "Bạn có chắc chắn muốn khóa tài khoản này?"
               }
-              okText={statusAccount ? "Khôi phục" : "Khóa"}
+              okText={account.deleted ? "Khôi phục" : "Khóa"}
               cancelText={"Hủy"}
-              // onOk={handleUpdateButtonClick}
+              onOk={handleUpdateButtonClick}
               onCancel={() => setDeleteDialog(false)}
               onClose={() => setDeleteDialog(false)}
             />

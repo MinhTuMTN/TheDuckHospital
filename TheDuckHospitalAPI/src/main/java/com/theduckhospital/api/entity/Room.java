@@ -39,4 +39,15 @@ public class Room {
 
     private Date createdDate;
     private Date updatedDate;
+
+    @PrePersist
+    private void onCreate() {
+        this.createdDate = new Date();
+        this.updatedDate = new Date();
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        this.updatedDate = new Date();
+    }
 }

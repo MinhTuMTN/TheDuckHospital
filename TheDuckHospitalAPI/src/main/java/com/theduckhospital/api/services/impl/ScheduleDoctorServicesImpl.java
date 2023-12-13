@@ -2,19 +2,27 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.request.headdoctor.DoctorScheduleItemRequest;
+import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
+import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
+import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import com.theduckhospital.api.services.IRoomServices;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
@@ -22,15 +30,21 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final IRoomServices roomServices;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final BookingRepository bookingRepository;
+    @Value("${settings.date}")
+    private String todayDate;
 
     public ScheduleDoctorServicesImpl(
             IDoctorServices doctorServices,
             IMedicalServiceServices medicalServiceServices,
-            IRoomServices roomServices, DoctorScheduleRepository doctorScheduleRepository) {
+            IRoomServices roomServices,
+            DoctorScheduleRepository doctorScheduleRepository,
+            BookingRepository bookingRepository) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
         this.roomServices = roomServices;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.bookingRepository = bookingRepository;
     }
     @Override
     public List<DoctorSchedule> createDoctorSchedule(
@@ -90,6 +104,90 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         return doctorSchedule;
+    }
+
+    @Override
+    public List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date) {
+        if(date == null) {
+            date =  new Date();
+        }
+
+        Room room = roomServices.findRoomById(roomId);
+
+        List<DoctorSchedule> schedules = doctorScheduleRepository.findByRoomAndDateOrderByScheduleType(room, date);
+
+        return schedules.stream()
+                .map(schedule -> new DoctorScheduleRoomResponse(schedule, calculateNumberOfBookings(schedule)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException {
+        DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
+
+        long maxQueueNumber = bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                doctorSchedule,
+                -1
+        );
+        int newQueueNumber = Math.min(doctorSchedule.getQueueNumber() + 5, (int) maxQueueNumber );
+        doctorSchedule.setQueueNumber(newQueueNumber);
+        doctorScheduleRepository.save(doctorSchedule);
+
+        return getQueueBookingResponse(doctorSchedule);
+    }
+
+    @Override
+    public QueueBookingResponse getQueueNumber(UUID doctorScheduleId) throws ParseException {
+        DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
+
+        return getQueueBookingResponse(doctorSchedule);
+    }
+
+    private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {
+        DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
+                .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
+
+        if (doctorSchedule.isDeleted()) {
+            throw new BadRequestException("Doctor schedule not found");
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = formatter.parse(todayDate);
+        if (doctorSchedule.getDate().before(date)) {
+            throw new BadRequestException("Doctor schedule is not available");
+        }
+
+        return doctorSchedule;
+    }
+
+    private QueueBookingResponse getQueueBookingResponse(DoctorSchedule doctorSchedule) {
+        int limit = 5;
+        if (doctorSchedule.getQueueNumber() % 5 != 0) {
+            limit = doctorSchedule.getQueueNumber() % 5;
+        }
+
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Booking> bookings = bookingRepository
+                .findBookingsByDoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
+                        doctorSchedule,
+                        doctorSchedule.getQueueNumber(),
+                        pageable
+                );
+        long maxQueueNumber = bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                doctorSchedule,
+                -1
+        );
+
+        return new QueueBookingResponse(
+                doctorSchedule,
+                maxQueueNumber,
+                bookings.getContent().stream()
+                        .sorted(Comparator.comparingInt(Booking::getQueueNumber))
+                        .toList()
+        );
+    }
+    public long calculateNumberOfBookings(DoctorSchedule schedule) {
+        return bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(schedule, -1);
     }
 
     private List<DoctorSchedule> createDoctorScheduleRange(

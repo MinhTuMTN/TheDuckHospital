@@ -2,10 +2,10 @@ package com.theduckhospital.api.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.CheckAccountExistRequest;
-import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.dto.request.LoginRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
+import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
@@ -111,12 +111,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request) {
         Account account = accountServices.register(request);
-        return ResponseEntity.ok(GeneralResponse.builder()
-                .success(true)
-                .message("Register success")
-                .data(account)
-                .build()
-        );
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmailOrPhoneNumber(request.getPhoneNumber());
+        loginRequest.setPasswordOrOTP(request.getPassword());
+        return authenticate(loginRequest);
     }
 
     @PostMapping("/send-otp")

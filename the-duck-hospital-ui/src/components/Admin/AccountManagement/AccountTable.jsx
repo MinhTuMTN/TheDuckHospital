@@ -158,11 +158,7 @@ function Row(props) {
                       // }}
 
                       onClick={(e) => {
-                        navigate(`/admin/account-management/detail`, {
-                          state: {
-                            id: row.userId,
-                          },
-                        });
+                        navigate(`/admin/account-management/${row.userId}`);
                       }}
                     >
                       Xem
@@ -183,11 +179,7 @@ function Row(props) {
                   //   });
                   // }}
                   onClick={(e) => {
-                    navigate(`/admin/account-management/detail`, {
-                      state: {
-                        id: row.userId,
-                      },
-                    });
+                    navigate(`/admin/account-management/${row.userId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />
