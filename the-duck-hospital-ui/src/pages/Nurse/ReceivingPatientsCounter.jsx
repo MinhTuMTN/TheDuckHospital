@@ -10,7 +10,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import AddNewProfile from "./AddNewProfile";
+import AddNewProfile from "../../components/Nurse/AddNewProfile";
 import InfoItem from "./InfoItem";
 function ReceivingPatientsCounter(props) {
   const theme = useTheme();

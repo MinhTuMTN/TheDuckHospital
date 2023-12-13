@@ -42,6 +42,7 @@ import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
 import NurseCounterLayout from "../layouts/NurseCounterLayout";
 import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
+import ChooseDocterAndTime from "../pages/Nurse/ChooseDocterAndTime";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -168,6 +169,7 @@ function Router(props) {
               path: "receiving-patients",
               element: <ReceivingPatients />,
             },
+
             {
               path: "queue-number",
               element: <QueueNumberPage />,
@@ -185,6 +187,10 @@ function Router(props) {
             {
               index: true,
               element: <ReceivingPatientsCounter />,
+            },
+            {
+              path: "choose-doctor-and-time",
+              element: <ChooseDocterAndTime />,
             },
           ],
         },
