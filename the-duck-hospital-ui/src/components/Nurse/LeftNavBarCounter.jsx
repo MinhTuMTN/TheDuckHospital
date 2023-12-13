@@ -20,11 +20,12 @@ import {
 import PropTypes from "prop-types";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../auth/AuthProvider";
 const sidebarItems = [
   {
     display: "Tiếp nhận bệnh nhân",
     icon: <PersonIcon />,
-    //to: "/store/products",
+    to: "/nurse-counter/receiving-patients",
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
@@ -54,6 +55,7 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 function LeftNavBarCounter(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const { fullName, setToken } = useAuth();
   const theme = useTheme();
   const content = (
     <Box
@@ -173,7 +175,7 @@ function LeftNavBarCounter(props) {
                 fontWeight: "500",
               }}
             >
-              Nguyễn Thị Hồng Nhung
+              {fullName}
             </Typography>
           </Stack>
         </Stack>
@@ -190,6 +192,10 @@ function LeftNavBarCounter(props) {
             ":hover": {
               backgroundColor: "error.main",
             },
+          }}
+          onClick={() => {
+            setToken(null);
+            window.location.href = "/";
           }}
         >
           <Typography

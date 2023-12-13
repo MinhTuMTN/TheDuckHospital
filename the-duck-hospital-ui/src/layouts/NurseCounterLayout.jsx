@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useContext } from "react";
 import { Outlet } from "react-router-dom";
 import LeftNavBarCounter from "../components/Nurse/LeftNavBarCounter";
 import TopNavBar from "../components/Nurse/TopNavBar";
+import { NurseContext } from "../auth/NurseProvider";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
@@ -22,9 +23,10 @@ const LayoutContainer = styled("div")({
 });
 function NurseCounterLayout(props) {
   const [open, setOpen] = React.useState(false);
+  const { roomName } = useContext(NurseContext);
   return (
     <>
-      <TopNavBar onDrawerClick={setOpen} />
+      <TopNavBar onDrawerClick={setOpen} roomName={roomName} />
       <LeftNavBarCounter open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>

@@ -66,18 +66,30 @@ function TopNavBar(props) {
                 width: "30px",
               }}
             />
-            <Typography
-              variant={"body1"}
-              style={{
-                fontSize: "20px",
-                fontWeight: "500",
-              }}
-            >
-              Phòng {roomName} - Chuyên khoa{" "}
-              <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
-                {departmentName.toLowerCase().replace("khoa", "").trim()}
-              </span>
-            </Typography>
+            {roomName === "counter" ? (
+              <Typography
+                variant={"body1"}
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "500",
+                }}
+              >
+                Quầy dịch vụ
+              </Typography>
+            ) : (
+              <Typography
+                variant={"body1"}
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "500",
+                }}
+              >
+                Phòng {roomName} - Chuyên khoa {roomName}
+                <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
+                  {departmentName?.toLowerCase()?.replace("khoa", "").trim()}
+                </span>
+              </Typography>
+            )}
           </Stack>
         </Stack>
       </Box>

@@ -174,19 +174,22 @@ function Router(props) {
             },
           ],
         },
-      ],
-    },
-    {
-      path: "/nurse-counter",
-      element: <NurseCounterLayout />,
-      children: [
         {
-          path: "receiving-patients",
-          element: <ReceivingPatientsCounter />,
+          path: "/nurse-counter",
+          element: <NurseCounterLayout />,
+          children: [
+            {
+              path: "receiving-patients",
+              element: <ReceivingPatientsCounter />,
+            },
+            {
+              index: true,
+              element: <ReceivingPatientsCounter />,
+            },
+          ],
         },
       ],
     },
-
     {
       path: "/admin",
       element: <AdminLayout />,

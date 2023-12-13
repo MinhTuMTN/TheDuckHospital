@@ -1,14 +1,16 @@
 import { LocalHospitalOutlined } from "@mui/icons-material";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { CardMedia, MenuList } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
 import { CustomMenuItem, CustomMenuItemLogOut } from "./PatientMenuList";
+import { NurseContext } from "../../../auth/NurseProvider";
 
 function NurseMenuList(props) {
   const { onClose, setToken } = props;
   const [open, setOpen] = React.useState(false);
+  const { updateRoomName } = useContext(NurseContext);
   const navigate = useNavigate();
   return (
     <>
@@ -23,7 +25,8 @@ function NurseMenuList(props) {
       >
         <CustomMenuItem
           onClick={() => {
-            navigate("/nurse/counter");
+            updateRoomName("counter");
+            navigate("/nurse-counter");
             onClose();
           }}
         >
