@@ -1,3 +1,7 @@
+import styled from "@emotion/styled";
+import { Search } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import {
   Box,
   Button,
@@ -11,20 +15,17 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useContext } from "react";
-import CustomLi from "../../components/Customer/BookingItemPage/CustomLi";
-import styled from "@emotion/styled";
-import CloseIcon from "@mui/icons-material/Close";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { Search } from "@mui/icons-material";
 import dayjs from "dayjs";
+import { enqueueSnackbar } from "notistack";
+import React, { useContext } from "react";
+import { NurseContext } from "../../auth/NurseProvider";
+import CustomLi from "../../components/Customer/BookingItemPage/CustomLi";
+import { searchPatient } from "../../services/nurse/BookingServices";
 import {
   accepcNonPatientBooking,
   accepctPatientBooking,
 } from "../../services/nurse/MedicalExamServices";
-import { NurseContext } from "../../auth/NurseProvider";
-import { enqueueSnackbar } from "notistack";
-import { searchPatient } from "../../services/nurse/BookingServices";
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),

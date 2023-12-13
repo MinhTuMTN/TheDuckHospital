@@ -40,6 +40,8 @@ import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetail
 import NurseRoomLayout from "../layouts/NurseRoomLayout";
 import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
+import NurseCounterLayout from "../layouts/NurseCounterLayout";
+import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -174,6 +176,17 @@ function Router(props) {
         },
       ],
     },
+    {
+      path: "/nurse-counter",
+      element: <NurseCounterLayout />,
+      children: [
+        {
+          path: "receiving-patients",
+          element: <ReceivingPatientsCounter />,
+        },
+      ],
+    },
+
     {
       path: "/admin",
       element: <AdminLayout />,
