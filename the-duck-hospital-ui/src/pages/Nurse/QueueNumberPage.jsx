@@ -108,6 +108,14 @@ function QueueNumberPage(props) {
             Số thứ tự hiện tại:{" "}
             {(data?.currentQueueNumber < 10 ? "0" : "") +
               data?.currentQueueNumber}
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: "normal",
+              }}
+            >{` (${
+              data?.maxQueueNumber - data?.currentQueueNumber
+            } người còn lại)`}</span>
           </Typography>
           <Button
             variant="contained"
@@ -117,7 +125,9 @@ function QueueNumberPage(props) {
               color: "#fff",
             }}
             onClick={handleIncreseNumber}
-            disabled={isLoading}
+            disabled={
+              isLoading || data?.currentQueueNumber === data?.maxQueueNumber
+            }
           >
             Tiếp theo
           </Button>
@@ -159,7 +169,8 @@ function QueueNumberPage(props) {
                   Số thứ tự hiện tại
                 </Typography>
                 <Typography color={"template.normal1"} fontSize={150}>
-                  {data?.currentQueueNumber}
+                  {(data?.currentQueueNumber < 10 ? "0" : "") +
+                    data?.currentQueueNumber}
                 </Typography>
               </FlexCenterGrid>
             </Grid>
