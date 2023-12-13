@@ -13,7 +13,7 @@ function ProtectedLayout(props) {
   useEffect(() => {
     const handleCheckToken = async () => {
       const response = await checkToken();
-      if (response.success && forRole.includes(response.data.data.role)) {
+      if (response.success) {
         setRole(response.data.data.role);
       } else {
         setRole(null);
@@ -21,7 +21,7 @@ function ProtectedLayout(props) {
       }
     };
     handleCheckToken();
-  }, [forRole]);
+  }, []);
 
   if (!token) {
     console.log("Missing token");
