@@ -10,8 +10,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
+import AddNewProfile from "./AddNewProfile";
 import InfoItem from "./InfoItem";
-import Add from "@mui/icons-material/Add";
 function ReceivingPatientsCounter(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -35,23 +35,7 @@ function ReceivingPatientsCounter(props) {
         >
           Tiếp nhận bệnh nhân
         </Typography>
-        <Button
-          variant="contained"
-          sx={{
-            textTransform: "none",
-            padding: "0px 10px",
-            lineHeight: "1",
-            fontSize: "14px",
-            color: "#fff",
-            bgcolor: "rgb(0, 148, 212)",
-            ":hover": {
-              bgcolor: "rgba(0, 117, 167, 0.81)",
-            },
-          }}
-        >
-          <Add sx={{ mr: "4px" }} />
-          Tạo hồ sơ
-        </Button>
+        <AddNewProfile />
       </Stack>
       <Stack
         direction="row"
@@ -145,9 +129,6 @@ function ReceivingPatientsCounter(props) {
         spacing={3}
         sx={{ mt: 3, justifyContent: "space-between" }}
       >
-        <Grid item xs={12} md={6}>
-          <InfoItem />
-        </Grid>
         <Grid item xs={12} md={6}>
           <InfoItem />
         </Grid>
