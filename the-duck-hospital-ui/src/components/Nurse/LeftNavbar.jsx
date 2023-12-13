@@ -26,13 +26,13 @@ const sidebarItems = [
   {
     display: "Tiếp nhận bệnh nhân",
     icon: <PersonIcon />,
-    //to: "/store/products",
+    to: "/nurse-room/receiving-patients",
   },
 
   {
     display: "Số thứ tự",
     icon: <Filter9PlusIcon />,
-    //to: "/store/orders",
+    to: "/nurse-room/queue-number",
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({

@@ -142,6 +142,7 @@ function Register(props) {
 
     enqueueSnackbar("Đăng ký thành công", { variant: "success" });
     setToken(response.data.data);
+    window.location.href = "/";
   };
 
   return (
