@@ -6,4 +6,4 @@ export const deleteHeadOfDepartment = (staffId) => {
 
 export const getDoctorsNotInDepartment = () => {
     return get("/admin/doctors/not-in-department", null, { Authorization: "" });
-  };
+};

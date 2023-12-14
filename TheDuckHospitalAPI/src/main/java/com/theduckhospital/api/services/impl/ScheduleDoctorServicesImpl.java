@@ -1,7 +1,8 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
-import com.theduckhospital.api.dto.request.headdoctor.DoctorScheduleItemRequest;
+import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
@@ -23,6 +24,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.theduckhospital.api.constant.ScheduleType.AFTERNOON;
+import static com.theduckhospital.api.constant.ScheduleType.MORNING;
 
 @Service
 public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
@@ -46,6 +51,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.doctorScheduleRepository = doctorScheduleRepository;
         this.bookingRepository = bookingRepository;
     }
+
     @Override
     public List<DoctorSchedule> createDoctorSchedule(
             String authorization,
@@ -65,23 +71,27 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Medical service is not in your department");
         }
 
-        Calendar startTime = getCalendar(request.getStartTime());
-        Calendar endTime = getCalendar(request.getEndTime());
-        if (!checkDateIsValid(startTime, endTime)) {
-            throw new BadRequestException("Start time or end time is invalid");
-        }
-
         List<DoctorSchedule> doctorSchedules = new ArrayList<>();
-        for (DoctorScheduleItemRequest scheduleItemRequest : request.getScheduleItems()) {
-            Calendar startTime1 = getCalendar(request.getStartTime());
-            Calendar endTime1 = getCalendar(request.getEndTime());
+        for (Date date : request.getMorningDates()) {
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
-                    startTime1,
-                    endTime1,
                     medicalService,
                     department,
                     doctor,
-                    scheduleItemRequest
+                    date,
+                    MORNING,
+                    request
+            );
+
+            doctorSchedules.addAll(doctorScheduleRange);
+        }
+        for (Date date : request.getAfternoonDates()) {
+            List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
+                    medicalService,
+                    department,
+                    doctor,
+                    date,
+                    AFTERNOON,
+                    request
             );
 
             doctorSchedules.addAll(doctorScheduleRange);
@@ -191,31 +201,26 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     private List<DoctorSchedule> createDoctorScheduleRange(
-            Calendar startTime,
-            Calendar endTime,
             MedicalService medicalService,
             Department department,
             Doctor doctor,
-            DoctorScheduleItemRequest scheduleItemRequest
-    ) {
+            Date date,
+            ScheduleType scheduleType,
+            CreateDoctorScheduleRequest request
+    ) throws ParseException {
         List<DoctorSchedule> doctorSchedules = new ArrayList<>();
 
         // Check room is available
-        Room room = roomServices.findRoomById(scheduleItemRequest.getRoomId());
+        Room room = roomServices.findRoomById(request.getRoomId());
         if (room.getDepartment().getDepartmentId() != department.getDepartmentId()) {
             throw new BadRequestException("Room is not in your department");
         }
 
-        for (; startTime.before(endTime); startTime.add(Calendar.DATE, 1)) {
-            if (startTime.get(Calendar.DAY_OF_WEEK) - scheduleItemRequest.getDayOfWeek() != 0) {
-                continue;
-            }
-
             Optional<DoctorSchedule> doctorScheduleOptional = doctorScheduleRepository
                     .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
                             room,
-                            startTime.getTime(),
-                            scheduleItemRequest.getScheduleType()
+                            date,
+                            scheduleType
                     );
             if (doctorScheduleOptional.isPresent()) {
                 throw new BadRequestException("Room is not available");
@@ -225,25 +230,26 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Optional<DoctorSchedule> optional = doctorScheduleRepository
                     .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
                             doctor,
-                            startTime.getTime(),
-                            scheduleItemRequest.getScheduleType()
+                            date,
+                            scheduleType
                     );
             if (optional.isPresent()) {
                 throw new BadRequestException("Doctor is not available");
             }
 
+            Calendar time = getCalendar(date);
+
             DoctorSchedule doctorSchedule = new DoctorSchedule();
             doctorSchedule.setDoctor(doctor);
             doctorSchedule.setRoom(room);
             doctorSchedule.setMedicalService(medicalService);
-            doctorSchedule.setSlot(scheduleItemRequest.getSlot());
-            doctorSchedule.setDayOfWeek(scheduleItemRequest.getDayOfWeek());
-            doctorSchedule.setDate(startTime.getTime());
-            doctorSchedule.setScheduleType(scheduleItemRequest.getScheduleType());
+            doctorSchedule.setSlot(request.getSlot());
+            doctorSchedule.setDayOfWeek(time.get(Calendar.DAY_OF_WEEK));
+            doctorSchedule.setDate(date);
+            doctorSchedule.setScheduleType(scheduleType);
             doctorSchedule.setDeleted(false);
 
             doctorSchedules.add(doctorSchedule);
-        }
 
         return doctorSchedules;
     }
@@ -272,5 +278,56 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         return doctor;
+    }
+
+    @Override
+    public InvalidDateResponse getInvalidDateSchedule(
+            String authorization,
+            int roomId,
+            UUID doctorId
+    ){
+        Doctor headDoctor = getHeadDoctor(authorization);
+
+        Department department = headDoctor.getDepartment();
+        Doctor doctor = doctorServices.getDoctorById(doctorId);
+        if (doctor.getDepartment().getDepartmentId() != (department.getDepartmentId())) {
+            throw new BadRequestException("Doctor is not in your department");
+        }
+
+        Room room = roomServices.findRoomById(roomId);
+        if (room.getDepartment().getDepartmentId() != department.getDepartmentId()) {
+            throw new BadRequestException("Room is not in your department");
+        }
+
+        List<Date> morningSchedule = getInvalidDate(room, doctor, MORNING);
+        List<Date> afternoonSchedule = getInvalidDate(room, doctor, AFTERNOON);
+
+        return new InvalidDateResponse(morningSchedule, afternoonSchedule);
+    }
+
+    private List<Date> getInvalidDate(
+            Room room,
+            Doctor doctor,
+            ScheduleType scheduleType
+            ) {
+        List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+                doctor,
+                scheduleType
+        );
+
+        List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+                room,
+                scheduleType
+        );
+
+        List<DoctorSchedule> mergedList = Stream.concat(doctorSchedules1.stream(), doctorSchedules2.stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<Date> dateList = mergedList.stream()
+                .map(DoctorSchedule::getDate)
+                .collect(Collectors.toList());
+
+        return dateList;
     }
 }

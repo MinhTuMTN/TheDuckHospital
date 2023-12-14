@@ -2,34 +2,44 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
-import com.theduckhospital.api.entity.Booking;
-import com.theduckhospital.api.entity.MedicalExaminationRecord;
-import com.theduckhospital.api.entity.Patient;
+import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
+import com.theduckhospital.api.dto.response.admin.PrescriptionItemResponse;
+import com.theduckhospital.api.entity.*;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
+import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.services.IBookingServices;
 import com.theduckhospital.api.services.IMedicalExamServices;
 import com.theduckhospital.api.services.IPatientServices;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final IBookingServices bookingServices;
     private final BookingRepository bookingRepository;
+    private final PatientProfileRepository patientProfileRepository;
     private final MedicalExaminationRepository medicalExaminationRepository;
     private final IPatientServices patientServices;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
-            BookingRepository bookingRepository, MedicalExaminationRepository medicalExaminationRepository,
-            IPatientServices patientServices) {
+            BookingRepository bookingRepository,
+            MedicalExaminationRepository medicalExaminationRepository,
+            IPatientServices patientServices,
+            PatientProfileRepository patientProfileRepository
+            ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
         this.medicalExaminationRepository = medicalExaminationRepository;
         this.patientServices = patientServices;
+        this.patientProfileRepository = patientProfileRepository;
     }
 
     @Override
@@ -100,5 +110,35 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         bookingRepository.save(booking);
 
         return medicalExaminationRecord;
+    }
+
+    @Override
+    public List<MedicalRecordResponse> getMedicalRecordsByPatientProfile(UUID patientProfileId) {
+        Optional<PatientProfile> optional = patientProfileRepository.findById(patientProfileId);
+        if(optional.isEmpty()) {
+            throw new NotFoundException("Patient Profile not found");
+        }
+
+        PatientProfile patientProfile = optional.get();
+
+        List<MedicalExaminationRecord> medicalExaminationRecords = patientProfile.getMedicalExaminationRecords();
+        List<MedicalRecordResponse> medicalRecordResponses = new ArrayList<>();
+
+        for (MedicalExaminationRecord medicalExaminationRecord : medicalExaminationRecords) {
+            Prescription prescription = medicalExaminationRecord.getPrescription();
+            List<PrescriptionItem> prescriptionItems;
+            List<PrescriptionItemResponse> prescriptionItemResponses = new ArrayList<>();
+            if(prescription != null) {
+                prescriptionItems = medicalExaminationRecord.getPrescription().getPrescriptionItems();
+                for (PrescriptionItem prescriptionItem : prescriptionItems) {
+                    prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                }
+            }
+
+            medicalRecordResponses.add(new MedicalRecordResponse(medicalExaminationRecord, prescriptionItemResponses));
+
+        }
+
+        return medicalRecordResponses;
     }
 }

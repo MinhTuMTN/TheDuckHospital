@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
-import SearchDepartmentList from "../../../components/Admin/DepartmentManagement/SearchDepartmentList";
+import SearchRoomList from "../../../components/Admin/RoomManagement/SearchRoomList";
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
@@ -202,7 +202,7 @@ function RoomListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchDepartmentList
+              <SearchRoomList
                 value={search}
                 onChange={setSearch}
               // onApply={() => {

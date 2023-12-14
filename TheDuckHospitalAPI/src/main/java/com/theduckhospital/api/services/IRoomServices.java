@@ -20,4 +20,6 @@ public interface IRoomServices {
     List<RoomResponse> findRoomByRoomName(String roomName);
 
     Object getTodayDoctorSchedules(int roomId) throws ParseException;
+
+    List<Room> getRoomsDepartment(String authorization);
 }

@@ -11,3 +11,7 @@ export const deletePatientProfile = (patientProfileId) => {
 export const restorePatientProfile = (patientProfileId) => {
   return put(`/admin/patient-profiles/${patientProfileId}/restore`, null, { Authorization: "" });
 };
+
+export const getMedicalRecordsByPatientProfileId = (patientProfileId) => {
+  return get(`admin/patient-profiles/${patientProfileId}/medical-records`, null, { Authorization: "" });
+};

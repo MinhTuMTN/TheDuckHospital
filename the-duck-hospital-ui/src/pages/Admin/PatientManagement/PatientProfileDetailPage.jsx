@@ -12,7 +12,8 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import PatientProfileDetail from "../../../components/Admin/PatientManagement/PatientProfileDetail";
-import { getPatientProfileById } from "../../../services/admin/PatientProfileServices";
+import { getMedicalRecordsByPatientProfileId, getPatientProfileById } from "../../../services/admin/PatientProfileServices";
+import MedicalExamRecordTable from "../../../components/Admin/PatientManagement/MedicalExamRecordTable";
 
 const PatientProfileId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -30,6 +31,7 @@ function PatientProfileDetailPage() {
   const { state } = useLocation();
 
   const [patientProfile, setPatientProfile] = useState({});
+  const [medicalRecords, setMedicalRecords] = useState([]);
 
   const handleGetPatientProfile = useCallback(async () => {
     const response = await getPatientProfileById(patientProfileId);
@@ -38,9 +40,17 @@ function PatientProfileDetailPage() {
     }
   }, [patientProfileId]);
 
+  const handleGetMedicalRecords = useCallback(async () => {
+    const response = await getMedicalRecordsByPatientProfileId(patientProfileId);
+    if (response.success) {
+      setMedicalRecords(response.data.data);
+    }
+  }, [patientProfileId]);
+
   useEffect(() => {
     handleGetPatientProfile();
-  }, [handleGetPatientProfile]);
+    handleGetMedicalRecords();
+  }, [handleGetPatientProfile, handleGetMedicalRecords]);
 
   return (
     <Box
@@ -134,7 +144,8 @@ function PatientProfileDetailPage() {
               </Stack>
             </Grid>
           </Grid>
-          {/* {patientProfile.medicalExaminationRecords?.length > 0 && <Grid container>
+          {medicalRecords?.length > 0 &&
+          <Grid container>
             <Grid item xs={12}>
               <Stack
                 component={Paper}
@@ -145,10 +156,11 @@ function PatientProfileDetailPage() {
                 }}
                 spacing={"2px"}
               >
-                <MedicalExamRecordTable items={patientProfile.medicalExaminationRecords} />
+                <MedicalExamRecordTable items={medicalRecords} />
               </Stack>
             </Grid>
-          </Grid>} */}
+          </Grid>
+          }
         </Stack>
       </Stack>
     </Box>

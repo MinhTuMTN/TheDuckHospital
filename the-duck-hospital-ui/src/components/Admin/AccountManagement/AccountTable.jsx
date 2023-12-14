@@ -199,7 +199,7 @@ function AccountTable(props) {
 
   return (
     <>
-      <Box paddingX={0} sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <Box sx={{ width: "100%" }}>
           <Table
             sx={{

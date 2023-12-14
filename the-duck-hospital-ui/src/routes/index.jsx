@@ -42,13 +42,16 @@ import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
 import NurseCounterLayout from "../layouts/NurseCounterLayout";
 import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
+import DoctorLayout from "../layouts/DoctorLayout";
+import ScheduleListPage from "../pages/Doctor/HeadDoctor/ScheduleListPage";
+import CreateSchedulePage from "../pages/Doctor/HeadDoctor/CreateSchedulePage";
 
 const LoadComponent = (Component) => (props) =>
-  (
-    <React.Suspense fallback={<Loading />}>
-      <Component {...props} />
-    </React.Suspense>
-  );
+(
+  <React.Suspense fallback={<Loading />}>
+    <Component {...props} />
+  </React.Suspense>
+);
 
 const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 
@@ -280,6 +283,22 @@ function Router(props) {
         },
       ],
     },
+
+    {
+      path: "/head-doctor",
+      element: <DoctorLayout />,
+      children: [
+        {
+          path: "schedule-management",
+          element: <ScheduleListPage />,
+        },
+        {
+          path: "schedule-management/create",
+          element: <CreateSchedulePage />,
+        },
+      ],
+    },
+
   ]);
 }
 

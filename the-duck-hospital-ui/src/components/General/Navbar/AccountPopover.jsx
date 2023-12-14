@@ -51,6 +51,9 @@ function AccountPopover(props) {
         {role === "Nurse" && (
           <NurseMenuList onClose={onClose} setToken={setToken} />
         )}
+        {/* {role === "Doctor" && (
+          <DoctorMenuList onClose={onClose} setToken={setToken} />
+        )} */}
       </Stack>
     </Popover>
   );
