@@ -9,12 +9,50 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import AddNewProfile from "./AddNewProfile";
 import InfoItem from "./InfoItem";
+import styled from "@emotion/styled";
+import { searchPatientProfiles } from "../../services/nurse/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
+import Loading from "../../components/General/Loading";
+import LoadingCute from "../../components/General/LoadingCute";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
+
+const StyledInputNumber = styled(TextField)(({ theme }) => ({
+  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+    display: "none",
+  },
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+}));
+
 function ReceivingPatientsCounter(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
+  const [search, setSearch] = useState({ name: "", indentityNumber: "" });
+  const [patientProfiles, setPatientProfiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSearch = async () => {
+    if (search.name.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập họ và tên", {
+        variant: "error",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    const response = await searchPatientProfiles(search);
+    if (response.success) {
+      setPatientProfiles(response.data.data);
+    } else
+      enqueueSnackbar("Đã xảy ra lỗi khi tìm kiếm", {
+        variant: "error",
+      });
+    setIsLoading(false);
+  };
   return (
     <Stack
       direction="column"
@@ -51,12 +89,18 @@ function ReceivingPatientsCounter(props) {
           id="outlined-basic"
           variant="outlined"
           placeholder="Nhập họ và tên"
+          autoFocus
           sx={{
             width: "100%",
             flex: isFullScreen ? 3 : 1,
             backgroundColor: "#fff",
             borderTopLeftRadius: "8px",
             borderBottomLeftRadius: "8px",
+          }}
+          value={search.name}
+          onChange={(e) => setSearch({ ...search, name: e.target.value })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
           }}
           InputProps={{
             startAdornment: (
@@ -78,14 +122,23 @@ function ReceivingPatientsCounter(props) {
             },
           }}
         />
-        <TextField
+        <StyledInputNumber
           size="medium"
           variant="outlined"
-          placeholder="Nhập CCCD/CMND"
+          placeholder="Nhập CCCD/Số điện thoại"
+          autoComplete="off"
+          type="number"
           sx={{
             width: "100%",
             backgroundColor: "#fff",
             flex: isFullScreen ? 2 : 1,
+          }}
+          value={search.indentityNumber}
+          onChange={(e) =>
+            setSearch({ ...search, indentityNumber: e.target.value })
+          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
           }}
           InputProps={{
             startAdornment: (
@@ -96,7 +149,7 @@ function ReceivingPatientsCounter(props) {
                   paddingRight: "6px",
                 }}
               >
-                CCCD
+                CCCD/ Số điện thoại
               </InputAdornment>
             ),
             sx: {
@@ -120,6 +173,7 @@ function ReceivingPatientsCounter(props) {
               bgcolor: "#003c9df5",
             },
           }}
+          onClick={handleSearch}
         >
           Tìm kiếm
         </Button>
@@ -129,12 +183,15 @@ function ReceivingPatientsCounter(props) {
         spacing={3}
         sx={{ mt: 3, justifyContent: "space-between" }}
       >
-        <Grid item xs={12} md={6}>
-          <InfoItem />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <InfoItem />
-        </Grid>
+        {isLoading && <LoadingCute />}
+        {!isLoading &&
+          patientProfiles.map((patientProfile) => (
+            <Grid item xs={12} md={6} key={patientProfile.patientProfileId}>
+              <InfoItem patientProfile={patientProfile} />
+            </Grid>
+          ))}
+
+        {!isLoading && patientProfiles.length === 0 && <SearchNotFound />}
       </Grid>
     </Stack>
   );

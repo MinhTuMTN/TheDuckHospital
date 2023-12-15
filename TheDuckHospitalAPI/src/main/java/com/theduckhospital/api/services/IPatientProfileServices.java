@@ -3,6 +3,7 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
 import com.theduckhospital.api.dto.response.admin.PatientProfileResponse;
+import com.theduckhospital.api.dto.response.nurse.NursePatientProfileItemResponse;
 import com.theduckhospital.api.entity.PatientProfile;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface IPatientProfileServices {
 
     PatientProfileResponse getPatientProfileByIdAdmin(UUID patientProfileId);
     PatientProfile getPatientProfileById(String token, UUID patientProfileId);
+
+    List<NursePatientProfileItemResponse> searchPatientProfiles(String patientName, String identityNumber);
 }

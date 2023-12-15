@@ -4,6 +4,7 @@ import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
 import com.theduckhospital.api.dto.response.admin.PatientProfileResponse;
+import com.theduckhospital.api.dto.response.nurse.NursePatientProfileItemResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Nation;
 import com.theduckhospital.api.entity.PatientProfile;
@@ -172,6 +173,17 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
     }
     public PatientProfile getPatientProfileById(String token, UUID patientProfileId) {
         return getPatientProfileByTokenAndPatientProfileId(token, patientProfileId);
+    }
+
+    @Override
+    public List<NursePatientProfileItemResponse> searchPatientProfiles(String patientName, String identityNumber) {
+        return patientProfileRepository
+                .findPatientProfiles(
+                        patientName.trim(),
+                        identityNumber.trim()
+                ).stream()
+                .map(NursePatientProfileItemResponse::new)
+                .toList();
     }
 
 
