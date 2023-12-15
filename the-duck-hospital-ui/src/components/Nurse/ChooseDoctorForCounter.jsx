@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Button,
   CardMedia,
@@ -11,16 +12,6 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import FormatCurrency from "../General/FormatCurrency";
-import styled from "@emotion/styled";
-import CloseIcon from "@mui/icons-material/Close";
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-  },
-  "& .MuiDialogActions-root": {
-    padding: theme.spacing(1),
-  },
-}));
 
 function ChooseDocterForCounter(props) {
   const [openDialog, setOpenDialog] = useState(false);
