@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import React, { useEffect } from "react";
-import ChooseDocterForCounter from "../../components/Nurse/ChooseDocterForCounter";
+import ChooseDoctorForCounter from "../../components/Nurse/ChooseDoctorForCounter";
 import { getAllDepartments } from "../../services/customer/DepartmentServices";
 
 const Header = styled(Box)(({ theme }) => ({
@@ -256,7 +256,7 @@ function ChooseDocterAndTime(props) {
               </FormControl>
             </Filter>
             <ListDocter spacing={1.5}>
-              <ChooseDocterForCounter />
+              <ChooseDoctorForCounter />
             </ListDocter>
             <Box
               sx={{

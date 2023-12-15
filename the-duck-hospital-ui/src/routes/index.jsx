@@ -42,7 +42,10 @@ import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
 import NurseCounterLayout from "../layouts/NurseCounterLayout";
 import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
-import ChooseDocterAndTime from "../pages/Nurse/ChooseDocterAndTime";
+import ChooseDoctorAndTime from "../pages/Nurse/ChooseDocterAndTime";
+import DoctorLayout from "../layouts/DoctorLayout";
+import BookingsPage from "../pages/Doctor/BookingsPage";
+import SchedulePage from "../pages/Doctor/SchedulePage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -190,9 +193,23 @@ function Router(props) {
             },
             {
               path: "choose-doctor-and-time",
-              element: <ChooseDocterAndTime />,
+              element: <ChooseDoctorAndTime />,
             },
           ],
+        },
+      ],
+    },
+    {
+      path: "/doctor",
+      element: <DoctorLayout />,
+      children: [
+        {
+          path: "doctor-bookings",
+          element: <BookingsPage />,
+        },
+        {
+          path: "doctor-schedules",
+          element: <SchedulePage />,
         },
       ],
     },
