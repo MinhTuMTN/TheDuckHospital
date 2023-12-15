@@ -213,6 +213,7 @@ function AddNewProfile(props) {
               }}
             />
             <CustomTextField
+              label="Nhập số CCCD/CMND"
               size="medium"
               variant="outlined"
               id="outlined-basic"

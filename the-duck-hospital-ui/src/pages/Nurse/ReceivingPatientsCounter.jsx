@@ -1,4 +1,5 @@
 import { useTheme } from "@emotion/react";
+import styled from "@emotion/styled";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
@@ -9,15 +10,13 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React, { useState } from "react";
-import AddNewProfile from "./AddNewProfile";
-import InfoItem from "./InfoItem";
-import styled from "@emotion/styled";
-import { searchPatientProfiles } from "../../services/nurse/PatientProfileServices";
 import { enqueueSnackbar } from "notistack";
-import Loading from "../../components/General/Loading";
+import React, { useState } from "react";
 import LoadingCute from "../../components/General/LoadingCute";
+import AddNewProfile from "../../components/Nurse/AddNewProfile";
 import SearchNotFound from "../../components/Nurse/SearchNotFound";
+import { searchPatientProfiles } from "../../services/nurse/PatientProfileServices";
+import InfoItem from "./InfoItem";
 
 const StyledInputNumber = styled(TextField)(({ theme }) => ({
   "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
