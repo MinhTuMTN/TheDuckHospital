@@ -1,8 +1,7 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import TodayIcon from "@mui/icons-material/Today";
 import LogoutIcon from "@mui/icons-material/Logout";
-import GroupsIcon from "@mui/icons-material/Groups";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Button,
@@ -20,21 +19,32 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
-const sidebarItems = [
-  {
-    display: "Bệnh nhân",
-    icon: <GroupsIcon />,
-    to: "/doctor/doctor-bookings",
-  },
 
+const doctorSidebarItems = [
   {
-    display: "Lịch trực",
-    icon: <TodayIcon />,
-    to: "/doctor/doctor-schedules",
+    display: "Các công việc của bác sĩ",
+    icon: <PersonIcon />,
+    to: null,
   },
 ];
+
+const headDoctorSidebarItems = [
+  {
+    display: "Danh sách ca trực",
+    icon: <PersonIcon />,
+    to: "/head-doctor/schedule-management",
+    label: "Quản lý ca trực",
+  },
+  {
+    display: "Tạo ca trực",
+    icon: <PersonIcon />,
+    to: "/head-doctor/schedule-management/create",
+    label: "Quản lý ca trực",
+  },
+];
+
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
   display: "flex",
   width: "220px",
@@ -59,12 +69,11 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
 }));
 
-function LeftNavbarDoctor(props) {
+function LeftNavBarDoctor(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { fullName, setToken } = useAuth();
   const theme = useTheme();
-  const navigate = useNavigate();
   const content = (
     <Box
       sx={{
@@ -82,12 +91,11 @@ function LeftNavbarDoctor(props) {
             display: "flex",
             width: "100%",
             justifyContent: "center",
-            cursor: "pointer",
           }}
-          onClick={() => navigate("/")}
         >
           <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
         </Box>
+        
         <Box
           sx={{
             justifyContent: "flex-start",
@@ -105,15 +113,57 @@ function LeftNavbarDoctor(props) {
               fontSize: "18px",
             }}
           >
-            Quản lý
+            Bác sĩ
           </Typography>
         </Box>
         <List>
-          {sidebarItems.map((item, index) => (
+          {doctorSidebarItems.map((item, index) => (
             <NavLink
               key={`nav-bar-store-${index}`}
               style={{ textDecoration: "none" }}
               to={item.to}
+            >
+              <ListItem disablePadding key={item.section}>
+                <CustomListItemButton>
+                  <CustomListItemIcon>{item.icon}</CustomListItemIcon>
+                  <ListItemText
+                    disableTypography
+                    style={{ fontSize: "16px" }}
+                    primary={item.display}
+                  />
+                </CustomListItemButton>
+              </ListItem>
+            </NavLink>
+          ))}
+        </List>
+
+        <Box
+          sx={{
+            justifyContent: "flex-start",
+            width: "100%",
+            paddingX: 2,
+            marginTop: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              textTransform: "uppercase",
+              fontWeight: "bold",
+              color: "#020222",
+              fontSize: "18px",
+            }}
+          >
+            Trưởng khoa
+          </Typography>
+        </Box>
+        <List>
+          {headDoctorSidebarItems.map((item, index) => (
+            <NavLink
+              key={`nav-bar-store-${index}`}
+              style={{ textDecoration: "none" }}
+              to={item.to}
+              state={{ label: item.label }}
             >
               <ListItem disablePadding key={item.section}>
                 <CustomListItemButton>
@@ -150,7 +200,7 @@ function LeftNavbarDoctor(props) {
         >
           <CardMedia
             component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702618618/dog_brrvzm.png"
+            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702377250/camel_ckn4py.png"
             sx={{
               width: "50px",
               height: "50px",
@@ -175,7 +225,7 @@ function LeftNavbarDoctor(props) {
                 textAlign: "left",
               }}
             >
-              Bác sĩ:
+              Bác sĩ
             </Typography>
             <Typography
               sx={{
@@ -242,7 +292,6 @@ function LeftNavbarDoctor(props) {
       </Drawer>
     );
   }
-
   return (
     <SwipeableDrawer
       anchor="left"
@@ -263,8 +312,9 @@ function LeftNavbarDoctor(props) {
     </SwipeableDrawer>
   );
 }
-LeftNavbarDoctor.propTypes = {
+LeftNavBarDoctor.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
 };
-export default LeftNavbarDoctor;
+
+export default LeftNavBarDoctor;
