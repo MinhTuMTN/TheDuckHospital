@@ -1,7 +1,7 @@
 import React from "react";
 
 function BookingsPage(props) {
-  return <div>Đây là trang lịch khám</div>;
+  return <div></div>;
 }
 
 export default BookingsPage;
