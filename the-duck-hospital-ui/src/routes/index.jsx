@@ -202,16 +202,36 @@ function Router(props) {
       ],
     },
     {
-      path: "/doctor",
-      element: <DoctorLayout />,
+      path: "/",
+      element: <ProtectedLayout forRole={["Doctor", "HeadDoctor"]} />,
       children: [
         {
-          path: "doctor-bookings",
-          element: <BookingsPage />,
-        },
-        {
-          path: "doctor-schedules",
-          element: <SchedulePage />,
+          path: "/doctor",
+          element: <DoctorLayout />,
+          children: [
+            {
+              path: "doctor-bookings",
+              element: <BookingsPage />,
+            },
+            {
+              path: "doctor-schedules",
+              element: <SchedulePage />,
+            },
+            {
+              path: "head-doctor",
+              element: <ProtectedLayout forRole={["HeadDoctor"]} />,
+              children: [
+                {
+                  path: "schedule-management",
+                  element: <ScheduleListPage />,
+                },
+                {
+                  path: "schedule-management/create",
+                  element: <CreateSchedulePage />,
+                },
+              ],
+            },
+          ],
         },
       ],
     },
@@ -302,21 +322,6 @@ function Router(props) {
         {
           path: "medicine-management/:medicineId",
           element: <MedicineDetailPage />,
-        },
-      ],
-    },
-
-    {
-      path: "/head-doctor",
-      element: <DoctorLayout />,
-      children: [
-        {
-          path: "schedule-management",
-          element: <ScheduleListPage />,
-        },
-        {
-          path: "schedule-management/create",
-          element: <CreateSchedulePage />,
         },
       ],
     },

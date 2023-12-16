@@ -279,6 +279,12 @@ public class AccountServicesImpl implements IAccountServices {
         if (account.getStaff() != null) {
             String[] roleNames = account.getStaff().getClass().getName().split("\\.");
             role = roleNames[roleNames.length - 1];
+
+            if (Objects.equals(role, "Doctor")) {
+                if (((Doctor)account.getStaff()).isHeadOfDepartment()) {
+                    role = "HeadDoctor";
+                }
+            }
         }
 
         return role;

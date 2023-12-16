@@ -1,10 +1,5 @@
 import { useTheme } from "@emotion/react";
-import {
-  Paper,
-  Stack,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Paper, Stack, Typography, useMediaQuery } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 import DoctorTable from "../../../components/Doctor/HeadDoctor/DoctorTable";
 import SearchDoctorList from "./SearchDoctorList";
@@ -75,10 +70,7 @@ function CreateSchedulePage(props) {
         }}
         spacing={"2px"}
       >
-        <SearchDoctorList
-        value={search}
-        onChange={setSearch}
-        />
+        <SearchDoctorList value={search} onChange={setSearch} />
         {/* <Box py={2} px={3}>
                   {selectedCategory.length === 0 &&
                     selectedQuantity.length === 0 &&

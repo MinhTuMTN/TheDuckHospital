@@ -12,7 +12,7 @@ SearchDoctorList.prototype = {
 };
 
 SearchDoctorList.defaultProps = {
-  onApply: () => { },
+  onApply: () => {},
 };
 
 function SearchDoctorList(props) {
@@ -51,6 +51,7 @@ function SearchDoctorList(props) {
             </InputAdornment>
           ),
         }}
+        autoComplete="off"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Tìm kiếm bác sĩ"

@@ -19,14 +19,22 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
+import TodayIcon from "@mui/icons-material/Today";
+import GroupsIcon from "@mui/icons-material/Groups";
 
-const doctorSidebarItems = [
+const sidebarItems = [
   {
-    display: "Các công việc của bác sĩ",
-    icon: <PersonIcon />,
-    to: null,
+    display: "Bệnh nhân",
+    icon: <GroupsIcon />,
+    to: "/doctor/doctor-bookings",
+  },
+
+  {
+    display: "Lịch trực",
+    icon: <TodayIcon />,
+    to: "/doctor/doctor-schedules",
   },
 ];
 
@@ -34,13 +42,13 @@ const headDoctorSidebarItems = [
   {
     display: "Danh sách ca trực",
     icon: <PersonIcon />,
-    to: "/head-doctor/schedule-management",
+    to: "/doctor/head-doctor/schedule-management",
     label: "Quản lý ca trực",
   },
   {
     display: "Tạo ca trực",
     icon: <PersonIcon />,
-    to: "/head-doctor/schedule-management/create",
+    to: "/doctor/head-doctor/schedule-management/create",
     label: "Quản lý ca trực",
   },
 ];
@@ -74,6 +82,8 @@ function LeftNavBarDoctor(props) {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { fullName, setToken } = useAuth();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const { role } = useAuth();
   const content = (
     <Box
       sx={{
@@ -91,11 +101,13 @@ function LeftNavBarDoctor(props) {
             display: "flex",
             width: "100%",
             justifyContent: "center",
+            cursor: "pointer",
           }}
+          onClick={() => navigate("/")}
         >
           <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
         </Box>
-        
+
         <Box
           sx={{
             justifyContent: "flex-start",
@@ -117,7 +129,7 @@ function LeftNavBarDoctor(props) {
           </Typography>
         </Box>
         <List>
-          {doctorSidebarItems.map((item, index) => (
+          {sidebarItems.map((item, index) => (
             <NavLink
               key={`nav-bar-store-${index}`}
               style={{ textDecoration: "none" }}
@@ -137,47 +149,51 @@ function LeftNavBarDoctor(props) {
           ))}
         </List>
 
-        <Box
-          sx={{
-            justifyContent: "flex-start",
-            width: "100%",
-            paddingX: 2,
-            marginTop: 2,
-          }}
-        >
-          <Typography
-            sx={{
-              textAlign: "left",
-              textTransform: "uppercase",
-              fontWeight: "bold",
-              color: "#020222",
-              fontSize: "18px",
-            }}
-          >
-            Trưởng khoa
-          </Typography>
-        </Box>
-        <List>
-          {headDoctorSidebarItems.map((item, index) => (
-            <NavLink
-              key={`nav-bar-store-${index}`}
-              style={{ textDecoration: "none" }}
-              to={item.to}
-              state={{ label: item.label }}
+        {role === "HeadDoctor" && (
+          <>
+            <Box
+              sx={{
+                justifyContent: "flex-start",
+                width: "100%",
+                paddingX: 2,
+                marginTop: 2,
+              }}
             >
-              <ListItem disablePadding key={item.section}>
-                <CustomListItemButton>
-                  <CustomListItemIcon>{item.icon}</CustomListItemIcon>
-                  <ListItemText
-                    disableTypography
-                    style={{ fontSize: "16px" }}
-                    primary={item.display}
-                  />
-                </CustomListItemButton>
-              </ListItem>
-            </NavLink>
-          ))}
-        </List>
+              <Typography
+                sx={{
+                  textAlign: "left",
+                  textTransform: "uppercase",
+                  fontWeight: "bold",
+                  color: "#020222",
+                  fontSize: "18px",
+                }}
+              >
+                Trưởng khoa
+              </Typography>
+            </Box>
+            <List>
+              {headDoctorSidebarItems.map((item, index) => (
+                <NavLink
+                  key={`nav-bar-store-${index}`}
+                  style={{ textDecoration: "none" }}
+                  to={item.to}
+                  state={{ label: item.label }}
+                >
+                  <ListItem disablePadding key={item.section}>
+                    <CustomListItemButton>
+                      <CustomListItemIcon>{item.icon}</CustomListItemIcon>
+                      <ListItemText
+                        disableTypography
+                        style={{ fontSize: "16px" }}
+                        primary={item.display}
+                      />
+                    </CustomListItemButton>
+                  </ListItem>
+                </NavLink>
+              ))}
+            </List>
+          </>
+        )}
       </Box>
 
       <Stack

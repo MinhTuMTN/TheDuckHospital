@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import LeftNavBarDoctor from "../components/Doctor/LeftNavBarDoctor";
 import TopNavBarDoctor from "../components/Doctor/TopNavBarDoctor";
+import LeftNavBarDoctor from "../components/Doctor/LeftNavbarDoctor";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
