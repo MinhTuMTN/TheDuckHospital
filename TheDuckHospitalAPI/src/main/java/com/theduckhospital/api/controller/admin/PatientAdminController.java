@@ -19,16 +19,17 @@ public class PatientAdminController {
         this.patientServices = patientServices;
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> getAllPatients(
+    @GetMapping("/filtered")
+    public ResponseEntity<?> getFilteredPatientsPagination(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get all patients pagination successfully")
-                        .data(patientServices.getPaginationPatientsDeleted(page, limit))
+                        .message("Get filtered patients pagination successfully")
+                        .data(patientServices.getPaginationFilteredPatients(search, page, limit))
                         .build()
         );
     }

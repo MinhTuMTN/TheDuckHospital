@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
 import com.theduckhospital.api.dto.response.admin.StaffResponse;
@@ -20,5 +21,11 @@ public interface IStaffServices {
 
     StaffResponse getStaffById(UUID staffId);
 
-    FilteredStaffsResponse getPaginationStaffsDeleted(int page, int limit);
+    FilteredStaffsResponse getPaginationFilteredStaffs(
+            String search,
+            int page,
+            int limit,
+            List<Role> staffRole,
+            List<Boolean> staffStatus
+    );
 }

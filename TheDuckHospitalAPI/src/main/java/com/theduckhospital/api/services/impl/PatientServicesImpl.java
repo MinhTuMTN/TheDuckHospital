@@ -2,8 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.response.admin.FilteredPatientsResponse;
 import com.theduckhospital.api.dto.response.admin.PatientResponse;
-import com.theduckhospital.api.entity.Patient;
-import com.theduckhospital.api.entity.PatientProfile;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.PatientRepository;
@@ -69,20 +68,43 @@ public class PatientServicesImpl implements IPatientServices {
                 .orElse(null);
     }
 
+//    @Override
+//    public FilteredPatientsResponse getPaginationPatientsDeleted(int page, int limit) {
+//        Pageable pageable = PageRequest.of(page, limit);
+//        Page<Patient> patientPage = patientRepository.findPaginationByOrderByDeleted(pageable);
+//
+//        List<PatientResponse> filteredPatients = new ArrayList<>();
+//
+//        for (Patient patient : patientPage.getContent()) {
+//            filteredPatients.add(new PatientResponse(patient));
+//        }
+//
+//        List<Patient> patients = patientRepository.findAll();
+//
+//        return new FilteredPatientsResponse(filteredPatients, patients.size(), page, limit);
+//    }
+
     @Override
-    public FilteredPatientsResponse getPaginationPatientsDeleted(int page, int limit) {
+    public FilteredPatientsResponse getPaginationFilteredPatients(
+            String search,
+            int page,
+            int limit
+    ) {
+        List<Patient> patients = patientRepository.
+                findByFullNameContainingOrPhoneNumberContainingOrIdentityNumberContaining(search, search, search);
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Patient> patientPage = patientRepository.findPaginationByOrderByDeleted(pageable);
 
-        List<PatientResponse> filteredPatients = new ArrayList<>();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), patients.size());
+        List<Patient> pageContent = patients.subList(start, end);
 
-        for (Patient patient : patientPage.getContent()) {
-            filteredPatients.add(new PatientResponse(patient));
+        List<PatientResponse> response = new ArrayList<>();
+        for (Patient patient : pageContent) {
+            response.add(new PatientResponse(patient));
         }
 
-        List<Patient> patients = patientRepository.findAll();
-
-        return new FilteredPatientsResponse(filteredPatients, patients.size(), page, limit);
+        return new FilteredPatientsResponse(response, patients.size(), page, limit);
     }
 
     @Override

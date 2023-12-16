@@ -62,7 +62,12 @@ public class TransactionServicesImpl implements ITransactionServices {
             List<BookingResponse> bookingResponses = new ArrayList<>();
             if(!bookings.isEmpty()) {
                 for (Booking booking : bookings) {
-                    userName = booking.getPatientProfile().getAccount().getFullName();
+                    Account account = booking.getPatientProfile().getAccount();
+                    if (account == null) {
+                        userName = booking.getPatientProfile().getPatient().getFullName();
+                    } else {
+                        userName = booking.getPatientProfile().getAccount().getFullName();
+                    }
 
                     PatientProfileResponse patientProfileResponse = new PatientProfileResponse(booking.getPatientProfile());
                     long numberOfBooking = bookingRepository.

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
@@ -16,13 +17,15 @@ import com.theduckhospital.api.services.IFirebaseServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IOTPServices;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.theduckhospital.api.constant.Role.*;
 
 @Service
 public class AccountServicesImpl implements IAccountServices {
@@ -291,19 +294,40 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public FilteredAccountsResponse getPaginationAccounts(int page, int limit) {
-        Pageable pageable = PageRequest.of(page, limit);
-        Page<Account> accountPage = accountRepository.findPaginationByOrderByDeleted(pageable);
+    public FilteredAccountsResponse getPaginationFilteredAccounts(
+            String search,
+            int page,
+            int limit,
+            List<Role> accountRole,
+            List<Boolean> accountStatus
+    ) {
+        List<Account> accounts = accountRepository.findByFullNameContainingAndDeletedIn(search, accountStatus);
 
-        List<AccountResponse> filteredAccounts = new ArrayList<>();
+        List<Account> filteredAccounts = accounts.stream()
+                .filter(account -> (accountRole.contains(PATIENT) && account.getStaff() == null)
+                        || (accountRole.contains(DOCTOR) && account.getStaff() instanceof Doctor)
+                        || (accountRole.contains(NURSE) && account.getStaff() instanceof Nurse)
+                        || (accountRole.contains(CASHIER) && account.getStaff() instanceof Cashier)
+                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist))
+                .distinct()
+                .collect(Collectors.toList());
 
-        for (Account account : accountPage.getContent()) {
-            filteredAccounts.add(new AccountResponse(account));
+        if(filteredAccounts.isEmpty()){
+            filteredAccounts = accounts;
         }
 
-        List<Account> accounts = accountRepository.findAll();
+        Pageable pageable = PageRequest.of(page, limit);
 
-        return new FilteredAccountsResponse(filteredAccounts, accounts.size(), page, limit);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredAccounts.size());
+        List<Account> pageContent = filteredAccounts.subList(start, end);
+
+        List<AccountResponse> response = new ArrayList<>();
+        for (Account account : pageContent) {
+            response.add(new AccountResponse(account));
+        }
+
+        return new FilteredAccountsResponse(response, filteredAccounts.size(), page, limit);
     }
 
     @Override
