@@ -1,7 +1,8 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import TodayIcon from "@mui/icons-material/Today";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
+import GroupsIcon from "@mui/icons-material/Groups";
 import {
   Box,
   Button,
@@ -23,9 +24,15 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
 const sidebarItems = [
   {
-    display: "Tiếp nhận bệnh nhân",
-    icon: <PersonIcon />,
-    to: "/nurse-counter/receiving-patients",
+    display: "Bệnh nhân",
+    icon: <GroupsIcon />,
+    to: "/doctor/doctor-bookings",
+  },
+
+  {
+    display: "Lịch trực",
+    icon: <TodayIcon />,
+    to: "/doctor/doctor-schedules",
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
@@ -52,13 +59,12 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
 }));
 
-function LeftNavBarCounter(props) {
+function LeftNavbarDoctor(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { fullName, setToken } = useAuth();
   const theme = useTheme();
   const navigate = useNavigate();
-
   const content = (
     <Box
       sx={{
@@ -144,7 +150,7 @@ function LeftNavBarCounter(props) {
         >
           <CardMedia
             component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702377250/camel_ckn4py.png"
+            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702618618/dog_brrvzm.png"
             sx={{
               width: "50px",
               height: "50px",
@@ -169,7 +175,7 @@ function LeftNavBarCounter(props) {
                 textAlign: "left",
               }}
             >
-              Điều dưỡng
+              Bác sĩ:
             </Typography>
             <Typography
               sx={{
@@ -236,6 +242,7 @@ function LeftNavBarCounter(props) {
       </Drawer>
     );
   }
+
   return (
     <SwipeableDrawer
       anchor="left"
@@ -256,9 +263,8 @@ function LeftNavBarCounter(props) {
     </SwipeableDrawer>
   );
 }
-LeftNavBarCounter.propTypes = {
+LeftNavbarDoctor.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
 };
-
-export default LeftNavBarCounter;
+export default LeftNavbarDoctor;

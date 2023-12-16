@@ -33,11 +33,13 @@ public class PatientServicesImpl implements IPatientServices {
 
     @Override
     public Patient createPatient(String identityNumber, PatientProfile patientProfile) {
-        Optional<Patient> optional = patientRepository
-                .findByIdentityNumberAndDeletedIsFalse(identityNumber);
+        if (identityNumber != null && !identityNumber.isEmpty()) {
+            Optional<Patient> optional = patientRepository
+                    .findByIdentityNumberAndDeletedIsFalse(identityNumber);
 
-        if (optional.isPresent())
-            return optional.get();
+            if (optional.isPresent())
+                return optional.get();
+        }
 
         Patient patient = new Patient();
         patient.setIdentityNumber(identityNumber);

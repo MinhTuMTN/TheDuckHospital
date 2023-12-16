@@ -24,6 +24,9 @@ import {
   getAllWards,
 } from "../../services/common/AddressesServices";
 import { getAllNations } from "../../services/common/NationServices";
+import { createPatientProfile } from "../../services/nurse/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
+import { useNavigate } from "react-router-dom";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -58,7 +61,7 @@ function AddNewProfile(props) {
   const [fullName, setFullName] = React.useState("");
   const [dateOfBirth, setDateOfBirth] = React.useState(dayjs());
   const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [gender, setGender] = React.useState("-1");
+  const [gender, setGender] = React.useState("MALE");
   const [identityNumber, setIdentityNumber] = React.useState("");
   const [streetName, setStreetName] = React.useState("");
   // Nations
@@ -125,6 +128,53 @@ function AddNewProfile(props) {
     handleGetAllWards();
   }, [handleGetAllWards]);
 
+  const navigate = useNavigate();
+  const handleCreatePatientProfile = async () => {
+    let message = "";
+    if (fullName.trim() === "") {
+      message = "Vui lòng nhập họ và tên";
+    }
+    if (phoneNumber.trim() === "") {
+      message = "Vui lòng nhập số điện thoại";
+    }
+    if (streetName.trim() === "") {
+      message = "Vui lòng nhập địa chỉ";
+    }
+
+    if (dayjs(dateOfBirth).isAfter(dayjs())) {
+      message = "Ngày sinh không hợp lệ";
+    }
+    if (message !== "") {
+      enqueueSnackbar(message, {
+        variant: "error",
+      });
+      return;
+    }
+
+    const response = await createPatientProfile({
+      fullName,
+      dateOfBirth,
+      phoneNumber,
+      identityNumber,
+      nationId: selectedNationId,
+      gender,
+      streetName,
+      wardId: selectedWardId,
+    });
+    if (response.success) {
+      setOpen(false);
+      enqueueSnackbar("Tạo hồ sơ thành công", {
+        variant: "success",
+      });
+      navigate("/nurse-counter/choose-doctor-and-time", {
+        state: { patientProfile: response.data.data },
+      });
+    } else
+      enqueueSnackbar("Đã xảy ra lỗi khi tạo hồ sơ", {
+        variant: "error",
+      });
+  };
+
   return (
     <>
       <button type="button" class="button" onClick={handleClickOpen}>
@@ -178,6 +228,7 @@ function AddNewProfile(props) {
               label="Họ và tên"
               placeholder="Nguyễn Gia Văn"
               value={fullName}
+              autoComplete="off"
               onChange={(e) => setFullName(e.target.value)}
             />
           </Stack>
@@ -189,8 +240,9 @@ function AddNewProfile(props) {
               }}
               format="DD/MM/YYYY"
               value={dateOfBirth}
-              onChange={(newValue) => setDateOfBirth(newValue)}
+              onChange={(newValue) => setDateOfBirth(dayjs(newValue))}
               defaultValue={dayjs()}
+              shouldDisableDate={(day) => dayjs(day).isAfter(dayjs())}
             />
           </LocalizationProvider>
           <Stack
@@ -213,6 +265,7 @@ function AddNewProfile(props) {
               }}
             />
             <CustomTextField
+              label="Nhập số CCCD/CMND"
               size="medium"
               variant="outlined"
               id="outlined-basic"
@@ -269,8 +322,8 @@ function AddNewProfile(props) {
                 <MenuItem value={-1} disabled>
                   Chọn giới tính
                 </MenuItem>
-                <MenuItem value={0}>Nam</MenuItem>
-                <MenuItem value={1}>Nữ</MenuItem>
+                <MenuItem value={"MALE"}>Nam</MenuItem>
+                <MenuItem value={"FEMALE"}>Nữ</MenuItem>
               </Select>
             </FormControl>
           </Stack>
@@ -346,13 +399,14 @@ function AddNewProfile(props) {
               fullWidth
               required
               placeholder="Nhập địa chỉ"
+              autoComplete="off"
               value={streetName}
               onChange={(e) => setStreetName(e.target.value)}
             />
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button autoFocus onClick={handleCreatePatientProfile}>
             Tạo
           </Button>
         </DialogActions>

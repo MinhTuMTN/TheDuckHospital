@@ -1,8 +1,10 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
+import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 
 import java.util.List;
@@ -18,4 +20,7 @@ public interface IMedicalExamServices {
     );
 
     List<MedicalRecordResponse> getMedicalRecordsByPatientProfile(UUID patientProfileId);
+    MedicalRecordItemResponse nurseCreateMedicalExamRecord(
+            NurseCreateBookingRequest request
+    );
 }

@@ -25,4 +25,6 @@ public interface IScheduleDoctorServices {
             int roomId,
             UUID doctorId
     );
+
+    List<DoctorScheduleRoomResponse> getDoctorSchedulesByDepartmentId(Integer departmentId) throws ParseException;
 }

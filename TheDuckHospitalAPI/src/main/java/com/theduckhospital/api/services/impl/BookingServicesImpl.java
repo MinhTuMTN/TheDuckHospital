@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.request.BookingRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.BookingItemResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
@@ -12,6 +13,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
+import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,26 @@ public class BookingServicesImpl implements IBookingServices {
     private final BookingRepository bookingRepository;
     private final TransactionRepository transactionRepository;
     private final IPatientProfileServices patientProfileServices;
+    private final PatientProfileRepository patientProfileRepository;
     private final IPatientServices patientServices;
     private final IScheduleDoctorServices doctorScheduleServices;
     private final IVNPayServices vnPayServices;
     private final IAccountServices accountServices;
 
-    public BookingServicesImpl(BookingRepository bookingRepository, TransactionRepository transactionRepository, IPatientProfileServices patientProfileServices, IPatientServices patientServices, IScheduleDoctorServices doctorScheduleServices, IVNPayServices vnPayServices, IAccountServices accountServices) {
+    public BookingServicesImpl(
+            BookingRepository bookingRepository,
+            TransactionRepository transactionRepository,
+            IPatientProfileServices patientProfileServices,
+            PatientProfileRepository patientProfileRepository,
+            IPatientServices patientServices,
+            IScheduleDoctorServices doctorScheduleServices,
+            IVNPayServices vnPayServices,
+            IAccountServices accountServices
+    ) {
         this.bookingRepository = bookingRepository;
         this.transactionRepository = transactionRepository;
         this.patientProfileServices = patientProfileServices;
+        this.patientProfileRepository = patientProfileRepository;
         this.patientServices = patientServices;
         this.doctorScheduleServices = doctorScheduleServices;
         this.vnPayServices = vnPayServices;
@@ -215,6 +228,41 @@ public class BookingServicesImpl implements IBookingServices {
         data.put("fullName", patient.getFullName());
 
         return data;
+    }
+
+    @Override
+    public Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) {
+        PatientProfile patientProfile = patientProfileRepository.findById(
+                request.getPatientProfileId()
+        ).orElseThrow(() -> new NotFoundException("Patient profile not found"));
+
+        if (patientProfile.isDeleted() || patientProfile.getPatient() == null)
+            throw new BadRequestException("Patient profile not valid");
+
+        DoctorSchedule doctorSchedule = doctorScheduleServices
+                .getDoctorScheduleByIdForBooking(request.getDoctorScheduleId());
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(doctorSchedule.getMedicalService().getPrice());
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setBankCode(null);
+        transaction.setPaymentMethod("CASH");
+        transactionRepository.save(transaction);
+
+        long maxQueueNumber = bookingRepository
+                .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                        doctorSchedule,
+                        -1
+                );
+        Booking booking = new Booking();
+        booking.setPatientProfile(patientProfile);
+        booking.setDoctorSchedule(doctorSchedule);
+        booking.setTransaction(transaction);
+        booking.setQueueNumber((int) maxQueueNumber + 1);
+        booking.setDeleted(false);
+        bookingRepository.save(booking);
+
+        return booking;
     }
 
     private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
