@@ -20,8 +20,16 @@ import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import DialogForm from "../../General/DialogForm";
 import { enqueueSnackbar } from "notistack";
-import { createDoctorSchedule, getInvalidDate, getRoomsDepartment } from "../../../services/doctor/headDoctor/ScheduleServices";
-import { DateCalendar, LocalizationProvider, PickersDay } from "@mui/x-date-pickers";
+import {
+  createDoctorSchedule,
+  getInvalidDate,
+  getRoomsDepartment,
+} from "../../../services/doctor/headDoctor/ScheduleServices";
+import {
+  DateCalendar,
+  LocalizationProvider,
+  PickersDay,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
@@ -29,12 +37,14 @@ import "dayjs/locale/en-gb";
 const CustomDoctorBox = styled(Box)(({ theme }) => ({
   cursor: "pointer",
   padding: theme.spacing(2.5),
-  margin: `${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)}`,
+  margin: `${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(
+    2
+  )} ${theme.spacing(2)}`,
   border: `1.5px solid #000000`,
   borderRadius: "1rem",
   boxShadow: `0px 1px 3px #000000`,
   background: "#fafafa",
-  transition: 'background 2s',
+  transition: "background 2s",
   "&:hover": {
     border: `1.5px solid ${theme.palette.template.normal2}`,
     color: theme.palette.template.darker,
@@ -42,7 +52,6 @@ const CustomDoctorBox = styled(Box)(({ theme }) => ({
     boxShadow: `0px 4px 5px ${theme.palette.template.darker}`,
     transform: "scale(1.05)",
   },
-
 }));
 
 const Label = styled(Typography)(({ theme }) => ({
@@ -71,16 +80,17 @@ const HighlightedDay = styled(PickersDay)(({ theme }) => ({
     backgroundColor: theme.palette.template.main,
     color: "white",
   },
-  '&.Mui-selected.Mui-current': {
+  "&.Mui-selected.Mui-current": {
     // Màu sắc khi là ngày hiện tại đang chọn
-    backgroundColor: 'red', // Thay đổi màu sắc tùy thuộc vào yêu cầu của bạn
+    backgroundColor: "red", // Thay đổi màu sắc tùy thuộc vào yêu cầu của bạn
   },
 }));
 
 const ServerMorningDay = (props) => {
   const { highlightedMorningDays, day, outsideCurrentMonth, ...other } = props;
 
-  const isSelected = !props.outsideCurrentMonth &&
+  const isSelected =
+    !props.outsideCurrentMonth &&
     highlightedMorningDays.includes(day.format("YYYY/MM/DD"));
 
   return (
@@ -96,15 +106,11 @@ const ServerMorningDay = (props) => {
 const ServerAfternoonDay = (props) => {
   const { highlightedAfternoonDays, day, ...other } = props;
 
-  const isSelected = highlightedAfternoonDays.includes(day.format("YYYY/MM/DD"));
-
-  return (
-    <HighlightedDay
-      {...other}
-      day={day}
-      selected={isSelected}
-    />
+  const isSelected = highlightedAfternoonDays.includes(
+    day.format("YYYY/MM/DD")
   );
+
+  return <HighlightedDay {...other} day={day} selected={isSelected} />;
 };
 
 function DoctorTable(props) {
@@ -122,11 +128,11 @@ function DoctorTable(props) {
   const [scheduleSelected, setScheduleSelected] = useState({
     morning: {
       checked: true,
-      dates: []
+      dates: [],
     },
     afternoon: {
       checked: false,
-      dates: []
+      dates: [],
     },
   });
   const [rooms, setRooms] = useState([]);
@@ -164,13 +170,23 @@ function DoctorTable(props) {
       return;
     }
 
-    if(!scheduleSelected.morning.checked && !scheduleSelected.afternoon.checked){
-      enqueueSnackbar("Cần chọn ít nhất 1 buổi để tạo ca trực", { variant: "error" });
+    if (
+      !scheduleSelected.morning.checked &&
+      !scheduleSelected.afternoon.checked
+    ) {
+      enqueueSnackbar("Cần chọn ít nhất 1 buổi để tạo ca trực", {
+        variant: "error",
+      });
       return;
     }
 
-    if(highlightedMorningDays.length <= 0 && highlightedAfternoonDays.length <= 0){
-      enqueueSnackbar("Cần chọn ít nhất 1 ngày để tạo ca trực", { variant: "error" });
+    if (
+      highlightedMorningDays.length <= 0 &&
+      highlightedAfternoonDays.length <= 0
+    ) {
+      enqueueSnackbar("Cần chọn ít nhất 1 ngày để tạo ca trực", {
+        variant: "error",
+      });
       return;
     }
 
@@ -179,8 +195,8 @@ function DoctorTable(props) {
       medicalServiceId: doctorSchedule.medicalServiceId,
       roomId: doctorSchedule.roomId,
       slot: doctorSchedule.slot,
-      morningDates: highlightedMorningDays.map(date => dayjs(date)),
-      afternoonDates: highlightedAfternoonDays.map(date => dayjs(date)),
+      morningDates: highlightedMorningDays.map((date) => dayjs(date)),
+      afternoonDates: highlightedAfternoonDays.map((date) => dayjs(date)),
     });
     if (response.success) {
       enqueueSnackbar("Tạo ca trực thành công!", { variant: "success" });
@@ -193,7 +209,8 @@ function DoctorTable(props) {
     const response = await getRoomsDepartment();
     if (response.success) {
       setRooms(response.data.data);
-    } else enqueueSnackbar("Lấy danh sách phòng thấy bại", { variant: "error" });
+    } else
+      enqueueSnackbar("Lấy danh sách phòng thấy bại", { variant: "error" });
   }, []);
 
   useEffect(() => {
@@ -206,28 +223,32 @@ function DoctorTable(props) {
       [event.target.name]: {
         checked: event.target.checked,
         dates: [],
-      }
+      },
     });
   };
 
   const handleGetInvalidDate = useCallback(async () => {
     const response = await getInvalidDate({
       roomId: doctorSchedule.roomId,
-      doctorId: doctorSchedule.doctorId
+      doctorId: doctorSchedule.doctorId,
     });
     if (response.success) {
       setInvalidDate((prev) => {
         return {
           ...prev,
-          mornings: response.data.data.mornings.map(date => dayjs(date).format('YYYY/MM/DD'))
-        }
+          mornings: response.data.data.mornings.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
       });
 
       setInvalidDate((prev) => {
         return {
           ...prev,
-          afternoons: response.data.data.afternoons.map(date => dayjs(date).format('YYYY/MM/DD'))
-        }
+          afternoons: response.data.data.afternoons.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
       });
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, [doctorSchedule.roomId, doctorSchedule.doctorId]);
@@ -240,18 +261,18 @@ function DoctorTable(props) {
 
   useEffect(() => {
     setHighlightedMorningDays([]);
-  }, [doctorSchedule.roomId, scheduleSelected.morning.checked])
+  }, [doctorSchedule.roomId, scheduleSelected.morning.checked]);
 
   useEffect(() => {
     setHighlightedAfternoonDays([]);
-  }, [doctorSchedule.roomId, scheduleSelected.afternoon.checked])
+  }, [doctorSchedule.roomId, scheduleSelected.afternoon.checked]);
 
   function disableInvalidMorningDate(date) {
-    return invalidDate.mornings?.includes(date.format('YYYY/MM/DD'));
+    return invalidDate.mornings?.includes(date.format("YYYY/MM/DD"));
   }
 
   function disableInvalidAfternoonDate(date) {
-    return invalidDate.afternoons?.includes(date.format('YYYY/MM/DD'));
+    return invalidDate.afternoons?.includes(date.format("YYYY/MM/DD"));
   }
 
   return (
@@ -277,42 +298,49 @@ function DoctorTable(props) {
                     setHighlightedAfternoonDays([]);
                   }}
                 >
-                  <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Label>
-                      Bác sĩ:
-                    </Label>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Label>Bác sĩ:</Label>
+                    <Content>{item.fullName}</Content>
+                  </Stack>
+
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Label>Chuyên khoa:</Label>
                     <Content>
-                      {item.fullName}
+                      {item.department
+                        ? item.department.departmentName
+                            .charAt(5)
+                            .toUpperCase() +
+                          item.department.departmentName.slice(6)
+                        : "Chưa cập nhật"}
                     </Content>
                   </Stack>
 
-                  <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Label>
-                      Chuyên khoa:
-                    </Label>
-                    <Content>
-                      {item.department ?
-                        item.department.departmentName.charAt(5).toUpperCase() +
-                        item.department.departmentName.slice(6) :
-                        "Chưa cập nhật"}
-                    </Content>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Label>Số điện thoại:</Label>
+                    <Content>{item.phoneNumber}</Content>
                   </Stack>
-
-                  <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Label>
-                      Số điện thoại:
-                    </Label>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Label>Email:</Label>
                     <Content>
-                      {item.phoneNumber}
-                    </Content>
-                  </Stack>
-                  <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Label>
-                      Email:
-                    </Label>
-                    <Content>
-                      {isSmallScreen ? item.email?.slice(0, 10) + "..." :
-                        item.email}
+                      {isSmallScreen
+                        ? item.email?.slice(0, 10) + "..."
+                        : item.email}
                     </Content>
                   </Stack>
                 </CustomDoctorBox>
@@ -347,7 +375,7 @@ function DoctorTable(props) {
                 disabled
                 required
                 style={{
-                  width: "60%"
+                  width: "60%",
                 }}
               />
 
@@ -358,7 +386,9 @@ function DoctorTable(props) {
                 autoComplete="off"
                 style={{ width: "40%" }}
                 InputProps={{ inputProps: { min: 1 } }}
-                value={doctorSchedule.slot ? doctorSchedule.slot.toString() : "1"}
+                value={
+                  doctorSchedule.slot ? doctorSchedule.slot.toString() : "1"
+                }
                 onChange={(e) => {
                   setDoctorSchedule((prev) => ({
                     ...prev,
@@ -368,7 +398,8 @@ function DoctorTable(props) {
                 required
                 error={doctorSchedule.slot === 0 && addButtonClicked}
                 helperText={
-                  doctorSchedule.slot === 0 && addButtonClicked &&
+                  doctorSchedule.slot === 0 &&
+                  addButtonClicked &&
                   "Số lượng chỗ phải lớn hơn 0"
                 }
               />
@@ -378,13 +409,21 @@ function DoctorTable(props) {
                 <CustomTypography
                   variant="body1"
                   style={{
-                    color: doctorSchedule.medicalServiceId === "" && addButtonClicked ? "red" : "",
+                    color:
+                      doctorSchedule.medicalServiceId === "" && addButtonClicked
+                        ? "red"
+                        : "",
                   }}
                 >
                   Dịch vụ *
                 </CustomTypography>
 
-                <FormControl fullWidth error={doctorSchedule.medicalServiceId === "" && addButtonClicked}>
+                <FormControl
+                  fullWidth
+                  error={
+                    doctorSchedule.medicalServiceId === "" && addButtonClicked
+                  }
+                >
                   <Select
                     value={doctorSchedule.medicalServiceId}
                     onChange={(e) =>
@@ -410,9 +449,12 @@ function DoctorTable(props) {
                       </MenuItem>
                     ))}
                   </Select>
-                  {doctorSchedule.medicalServiceId === "" && addButtonClicked && (
-                    <FormHelperText>Dịch vụ không được để trống</FormHelperText>
-                  )}
+                  {doctorSchedule.medicalServiceId === "" &&
+                    addButtonClicked && (
+                      <FormHelperText>
+                        Dịch vụ không được để trống
+                      </FormHelperText>
+                    )}
                 </FormControl>
               </Box>
 
@@ -420,13 +462,19 @@ function DoctorTable(props) {
                 <CustomTypography
                   variant="body1"
                   style={{
-                    color: doctorSchedule.roomId === "" && addButtonClicked ? "red" : "",
+                    color:
+                      doctorSchedule.roomId === "" && addButtonClicked
+                        ? "red"
+                        : "",
                   }}
                 >
                   Phòng *
                 </CustomTypography>
 
-                <FormControl fullWidth error={doctorSchedule.roomId === "" && addButtonClicked}>
+                <FormControl
+                  fullWidth
+                  error={doctorSchedule.roomId === "" && addButtonClicked}
+                >
                   <Select
                     value={doctorSchedule.roomId}
                     onChange={(e) => {
@@ -457,15 +505,20 @@ function DoctorTable(props) {
               </Box>
             </Stack>
 
-            <Box width="50%">
-              <FormControl component="fieldset" variant="standard">
+            <Box width="100%">
+              <FormControl
+                component="fieldset"
+                variant="standard"
+                style={{ width: "100%" }}
+              >
                 <FormGroup>
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={scheduleSelected.morning.checked}
                         onChange={handleChange}
-                        name="morning" />
+                        name="morning"
+                      />
                     }
                     label={"Buổi sáng"}
                   />
@@ -476,26 +529,40 @@ function DoctorTable(props) {
                     <DateCalendar
                       value={valueDate}
                       minDate={minDate}
-                      disabled={doctorSchedule.roomId === "" || !scheduleSelected.morning.checked}
+                      disabled={
+                        doctorSchedule.roomId === "" ||
+                        !scheduleSelected.morning.checked
+                      }
                       shouldDisableDate={disableInvalidMorningDate}
                       onChange={(newDate) => {
                         setHighlightedMorningDays((prev) => {
                           if (prev.includes(newDate.format("YYYY/MM/DD")))
                             return prev.filter(
-                              (prevDate) => prevDate !== newDate.format("YYYY/MM/DD")
-                            )
+                              (prevDate) =>
+                                prevDate !== newDate.format("YYYY/MM/DD")
+                            );
                           else return [...prev, newDate.format("YYYY/MM/DD")];
-                        })
+                        });
                       }}
                       slots={{
                         day: ServerMorningDay,
                       }}
                       slotProps={{
                         day: {
-                          highlightedMorningDays
+                          highlightedMorningDays,
                         },
                       }}
-
+                      sx={{
+                        display: scheduleSelected.morning.checked
+                          ? ""
+                          : "none",
+                        margin: "0 auto",
+                        width: "100%",
+                        "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
+                          {
+                            justifyContent: "space-around",
+                          },
+                      }}
                     />
                   </LocalizationProvider>
                   <FormControlLabel
@@ -503,7 +570,8 @@ function DoctorTable(props) {
                       <Checkbox
                         checked={scheduleSelected.afternoon.checked}
                         onChange={handleChange}
-                        name="afternoon" />
+                        name="afternoon"
+                      />
                     }
                     label={"Buổi chiều"}
                   />
@@ -514,24 +582,39 @@ function DoctorTable(props) {
                     <DateCalendar
                       value={valueDate}
                       minDate={minDate}
-                      disabled={doctorSchedule.roomId === "" || !scheduleSelected.afternoon.checked}
+                      disabled={
+                        doctorSchedule.roomId === "" ||
+                        !scheduleSelected.afternoon.checked
+                      }
                       shouldDisableDate={disableInvalidAfternoonDate}
                       onChange={(newDate) => {
                         setHighlightedAfternoonDays((prev) => {
                           if (prev.includes(newDate.format("YYYY/MM/DD")))
                             return prev.filter(
-                              (prevDate) => prevDate !== newDate.format("YYYY/MM/DD")
-                            )
+                              (prevDate) =>
+                                prevDate !== newDate.format("YYYY/MM/DD")
+                            );
                           else return [...prev, newDate.format("YYYY/MM/DD")];
-                        })
+                        });
                       }}
                       slots={{
                         day: ServerAfternoonDay,
                       }}
                       slotProps={{
                         day: {
-                          highlightedAfternoonDays
+                          highlightedAfternoonDays,
                         },
+                      }}
+                      sx={{
+                        display: scheduleSelected.afternoon.checked
+                          ? ""
+                          : "none",
+                        margin: "0 auto",
+                        width: "100%",
+                        "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
+                          {
+                            justifyContent: "space-around",
+                          },
                       }}
                     />
                   </LocalizationProvider>
