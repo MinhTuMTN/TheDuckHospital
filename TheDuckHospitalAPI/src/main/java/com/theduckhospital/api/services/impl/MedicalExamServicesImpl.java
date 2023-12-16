@@ -1,10 +1,13 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
+import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.Patient;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
@@ -85,6 +88,35 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                         )
                 );
 
+    }
+
+    @Override
+    public MedicalRecordItemResponse nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) {
+        Optional<Booking> bookingOptional = bookingRepository
+                .nurseFindBooking(
+                        request.getPatientProfileId(),
+                        request.getDoctorScheduleId()
+                );
+        if (bookingOptional.isPresent())
+            return new MedicalRecordItemResponse(bookingOptional.get());
+
+        Booking booking = bookingServices.nurseCreateMedicalExamRecord(
+                request
+        );
+        if (booking == null)
+            throw new BadRequestException("Create booking failed");
+
+        MedicalExaminationRecord result = createPatientMedicalExamRecord(
+                new PatientMedicalExamRequest(
+                        booking.getBookingCode(),
+                        booking.getDoctorSchedule().getRoom().getRoomId()
+                )
+        );
+
+        if (result == null)
+            throw new BadRequestException("Create medical examination record failed");
+
+        return new MedicalRecordItemResponse(booking);
     }
 
     private MedicalExaminationRecord createMedicalExamRecord(Booking booking, Patient patient) {

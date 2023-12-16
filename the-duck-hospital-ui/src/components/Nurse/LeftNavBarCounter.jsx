@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
 const sidebarItems = [
   {
@@ -57,6 +57,8 @@ function LeftNavBarCounter(props) {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { fullName, setToken } = useAuth();
   const theme = useTheme();
+  const navigate = useNavigate();
+
   const content = (
     <Box
       sx={{
@@ -74,7 +76,9 @@ function LeftNavBarCounter(props) {
             display: "flex",
             width: "100%",
             justifyContent: "center",
+            cursor: "pointer",
           }}
+          onClick={() => navigate("/")}
         >
           <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
         </Box>

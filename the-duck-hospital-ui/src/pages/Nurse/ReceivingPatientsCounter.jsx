@@ -30,7 +30,7 @@ const StyledInputNumber = styled(TextField)(({ theme }) => ({
 function ReceivingPatientsCounter(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [search, setSearch] = useState({ name: "", indentityNumber: "" });
+  const [search, setSearch] = useState({ name: "", identityNumber: "" });
   const [patientProfiles, setPatientProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -89,6 +89,7 @@ function ReceivingPatientsCounter(props) {
           variant="outlined"
           placeholder="Nhập họ và tên"
           autoFocus
+          autoComplete="off"
           sx={{
             width: "100%",
             flex: isFullScreen ? 3 : 1,
@@ -132,9 +133,9 @@ function ReceivingPatientsCounter(props) {
             backgroundColor: "#fff",
             flex: isFullScreen ? 2 : 1,
           }}
-          value={search.indentityNumber}
+          value={search.identityNumber}
           onChange={(e) =>
-            setSearch({ ...search, indentityNumber: e.target.value })
+            setSearch({ ...search, identityNumber: e.target.value })
           }
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();

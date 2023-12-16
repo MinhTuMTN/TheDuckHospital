@@ -1,27 +1,29 @@
+import styled from "@emotion/styled";
+import { PhoneOutlined } from "@mui/icons-material";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
-import CloseIcon from "@mui/icons-material/Close";
 import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 import FingerprintOutlinedIcon from "@mui/icons-material/FingerprintOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
-import React from "react";
-import PatientItemCounter from "../../components/Nurse/PatientItemCounter";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormHelperText,
   IconButton,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { PhoneOutlined } from "@mui/icons-material";
-import styled from "@emotion/styled";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import PatientItemCounter from "../../components/Nurse/PatientItemCounter";
+import { updatePatientProfile } from "../../services/nurse/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -35,6 +37,35 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 function InfoItem(props) {
   const { patientProfile } = props;
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [identityNumber, setIdentityNumber] = React.useState("");
+  const navigate = useNavigate();
+
+  const handleAccept = () => {
+    if (!patientProfile.patientCode) {
+      setOpenDialog(true);
+      return;
+    }
+
+    navigate("/nurse-counter/choose-doctor-and-time", {
+      state: { patientProfile },
+    });
+  };
+
+  const handleUpdateIdentityNumber = async () => {
+    const response = await updatePatientProfile(
+      patientProfile.patientProfileId,
+      identityNumber
+    );
+    if (response.success) {
+      setOpenDialog(false);
+      navigate("/nurse-counter/choose-doctor-and-time", {
+        state: { patientProfile: response.data.data },
+      });
+    } else
+      enqueueSnackbar("Đã xảy ra lỗi khi cập nhật CCCD/CMND", {
+        variant: "error",
+      });
+  };
 
   return (
     <>
@@ -100,7 +131,7 @@ function InfoItem(props) {
               <LocationOnOutlinedIcon sx={{ fontSize: "18px", mr: "5px" }} />
             }
           />
-          <Button class="btn" onClick={() => setOpenDialog(true)}>
+          <Button class="btn" onClick={handleAccept}>
             Tiếp nhận
           </Button>
         </div>
@@ -136,6 +167,9 @@ function InfoItem(props) {
               id="outlined-basic"
               variant="outlined"
               placeholder="Nhập CCCD/CMND"
+              autoComplete="off"
+              value={identityNumber}
+              onChange={(e) => setIdentityNumber(e.target.value)}
               helperText="Trong trường hợp bệnh nhân là trẻ em, có thể bỏ qua bước này."
               autoFocus
               sx={{
@@ -146,8 +180,8 @@ function InfoItem(props) {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={() => setOpenDialog(false)}>
-            Lưu
+          <Button autoFocus onClick={handleUpdateIdentityNumber}>
+            Cập nhật
           </Button>
         </DialogActions>
       </BootstrapDialog>

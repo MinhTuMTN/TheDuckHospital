@@ -4,10 +4,11 @@ import React from "react";
 import Barcode from "react-barcode";
 import CustomLi from "./CustomLi";
 
-function BookingItem(props) {
+function BookingItem(props, ref) {
   const { medicalBill } = props;
   return (
     <Box
+      ref={ref}
       sx={{
         padding: "20px 0px",
         backgroundColor: "#e8f2f7",
@@ -346,4 +347,4 @@ function BookingItem(props) {
   );
 }
 
-export default BookingItem;
+export default React.forwardRef(BookingItem);

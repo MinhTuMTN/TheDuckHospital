@@ -1,12 +1,11 @@
 package com.theduckhospital.api.controller.nurse;
 
+import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/nurse/patient-profiles")
@@ -39,6 +38,40 @@ public class NursePatientProfileController {
                                 patientProfileServices.searchPatientProfiles(
                                         patientName,
                                         identityNumber
+                                )
+                        )
+                        .build()
+        );
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updatePatientProfile(
+            @RequestBody NurseUpdatePatientProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Update patient profile successfully")
+                        .data(
+                                patientProfileServices.nurseUpdatePatientProfile(
+                                        request
+                                )
+                        )
+                        .build()
+        );
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createPatientProfile(
+            @RequestBody NurseCreatePatientProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Create patient profile successfully")
+                        .data(
+                                patientProfileServices.nurseCreatePatientProfile(
+                                        request
                                 )
                         )
                         .build()

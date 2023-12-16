@@ -23,4 +23,6 @@ public interface IScheduleDoctorServices {
 
     QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException;
     QueueBookingResponse getQueueNumber(UUID doctorScheduleId) throws ParseException;
+
+    List<DoctorScheduleRoomResponse> getDoctorSchedulesByDepartmentId(Integer departmentId) throws ParseException;
 }

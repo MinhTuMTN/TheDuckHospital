@@ -84,7 +84,7 @@ function TopNavBar(props) {
                   fontWeight: "500",
                 }}
               >
-                Phòng {roomName} - Chuyên khoa {roomName}
+                Phòng {roomName} - Chuyên khoa{" "}
                 <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
                   {departmentName?.toLowerCase()?.replace("khoa", "").trim()}
                 </span>

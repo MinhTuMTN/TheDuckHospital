@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.request.headdoctor.DoctorScheduleItemRequest;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
@@ -117,7 +118,10 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         List<DoctorSchedule> schedules = doctorScheduleRepository.findByRoomAndDateOrderByScheduleType(room, date);
 
         return schedules.stream()
-                .map(schedule -> new DoctorScheduleRoomResponse(schedule, calculateNumberOfBookings(schedule)))
+                .map(schedule -> new DoctorScheduleRoomResponse(
+                        schedule,
+                        calculateNumberOfBookings(schedule)
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -141,6 +145,21 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
 
         return getQueueBookingResponse(doctorSchedule);
+    }
+
+    @Override
+    public List<DoctorScheduleRoomResponse> getDoctorSchedulesByDepartmentId(Integer departmentId) throws ParseException {
+        Date today = DateCommon.getToday();
+
+        List<DoctorSchedule> schedules = doctorScheduleRepository
+                .findByMedicalService_Department_DepartmentIdAndDateAndDeletedIsFalse(
+                        departmentId,
+                        today
+                );
+
+        return schedules.stream()
+                .map(schedule -> new DoctorScheduleRoomResponse(schedule, calculateNumberOfBookings(schedule)))
+                .collect(Collectors.toList());
     }
 
     private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {

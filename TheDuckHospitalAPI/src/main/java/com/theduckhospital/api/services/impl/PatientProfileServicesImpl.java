@@ -2,13 +2,12 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
 import com.theduckhospital.api.dto.response.admin.PatientProfileResponse;
 import com.theduckhospital.api.dto.response.nurse.NursePatientProfileItemResponse;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Nation;
-import com.theduckhospital.api.entity.PatientProfile;
-import com.theduckhospital.api.entity.Ward;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.error.StatusCodeException;
@@ -17,6 +16,7 @@ import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.WardRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPatientProfileServices;
+import com.theduckhospital.api.services.IPatientServices;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,15 +29,17 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
     private final NationRepository nationRepository;
     private final WardRepository wardRepository;
     private final PatientProfileRepository patientProfileRepository;
+    private final IPatientServices patientServices;
 
     public PatientProfileServicesImpl(
             IAccountServices accountServices,
             NationRepository nationRepository,
-            WardRepository wardRepository, PatientProfileRepository patientProfileRepository) {
+            WardRepository wardRepository, PatientProfileRepository patientProfileRepository, IPatientServices patientServices) {
         this.accountServices = accountServices;
         this.nationRepository = nationRepository;
         this.wardRepository = wardRepository;
         this.patientProfileRepository = patientProfileRepository;
+        this.patientServices = patientServices;
     }
 
     @Override
@@ -171,6 +173,7 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
         patientProfile.setDeleted(false);
         return patientProfileRepository.save(patientProfile);
     }
+
     public PatientProfile getPatientProfileById(String token, UUID patientProfileId) {
         return getPatientProfileByTokenAndPatientProfileId(token, patientProfileId);
     }
@@ -184,6 +187,69 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
                 ).stream()
                 .map(NursePatientProfileItemResponse::new)
                 .toList();
+    }
+
+    @Override
+    public NursePatientProfileItemResponse nurseUpdatePatientProfile(NurseUpdatePatientProfileRequest request) {
+        PatientProfile patientProfile = patientProfileRepository
+                .findById(request.getPatientProfileId()).orElseThrow(
+                        () -> new NotFoundException("Patient profile not found")
+                );
+
+        if (patientProfile.isDeleted())
+            throw new NotFoundException("Patient profile not found");
+
+        patientProfile.setIdentityNumber(request.getIdentityNumber());
+        patientProfileRepository.save(patientProfile);
+
+        Patient patient = patientServices.createPatient(
+                request.getIdentityNumber(),
+                patientProfile
+        );
+        patientProfile.setPatient(patient);
+        patientProfileRepository.save(patientProfile);
+
+        return new NursePatientProfileItemResponse(patientProfile);
+    }
+
+    @Override
+    public NursePatientProfileItemResponse nurseCreatePatientProfile(NurseCreatePatientProfileRequest request) {
+        Nation nation = null;
+        if (request.getNationId() != null) {
+            nation = nationRepository.findById(request.getNationId())
+                    .orElseThrow(() -> new NotFoundException("Nation not found"));
+        }
+
+        Ward ward = wardRepository.findById(request.getWardId())
+                .orElseThrow(() -> new NotFoundException("Ward not found"));
+
+        if (request.getGender() != Gender.MALE && request.getGender() != Gender.FEMALE)
+            throw new BadRequestException("Gender not valid");
+        Gender gender = request.getGender();
+
+        PatientProfile patientProfile = PatientProfile.builder()
+                .dateOfBirth(request.getDateOfBirth())
+                .fullName(request.getFullName())
+                .account(null)
+                .identityNumber(request.getIdentityNumber())
+                .phoneNumber(request.getPhoneNumber())
+                .gender(gender)
+                .streetName(request.getStreetName())
+                .ward(ward)
+                .nation(nation)
+                .build();
+
+        patientProfileRepository.save(patientProfile);
+
+        Patient patient = patientServices.createPatient(
+                request.getIdentityNumber(),
+                patientProfile
+        );
+
+        patientProfile.setPatient(patient);
+        patientProfileRepository.save(patientProfile);
+
+        return new NursePatientProfileItemResponse(patientProfile);
     }
 
 

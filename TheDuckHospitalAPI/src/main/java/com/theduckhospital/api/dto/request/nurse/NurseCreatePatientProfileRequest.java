@@ -13,10 +13,15 @@ public class NurseCreatePatientProfileRequest {
     private String fullName;
     @NotNull(message = "dateOfBirth is required")
     private Date dateOfBirth;
+    @NotBlank(message = "phoneNumber is required")
     private String phoneNumber;
     private String identityNumber;
-    private int nationId;
+    @NotNull(message = "nationId is required")
+    private Integer nationId;
+    @NotNull(message = "gender is required")
     private Gender gender;
+    @NotBlank(message = "streetName is required")
     private String streetName;
-    private String wardId;
+    @NotNull(message = "wardId is required")
+    private Integer wardId;
 }
