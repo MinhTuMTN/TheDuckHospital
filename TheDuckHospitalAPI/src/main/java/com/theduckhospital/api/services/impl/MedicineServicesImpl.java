@@ -62,39 +62,21 @@ public class MedicineServicesImpl implements IMedicineServices {
     }
 
     @Override
-    public FilteredMedicinesResponse getPaginationMedicinesDeleted(int page, int limit) {
+    public FilteredMedicinesResponse getPaginationFilteredMedicines(
+            String search,
+            int page,
+            int limit
+    ) {
+        List<Medicine> medicines = medicineRepository.findByMedicineNameContaining(search);
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Medicine> medicinePage = medicineRepository.findPaginationByOrderByMedicineNameAscDeletedAsc(pageable);
 
-        List<Medicine> medicines = new ArrayList<>(medicinePage.getContent());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), medicines.size());
+        List<Medicine> response = medicines.subList(start, end);
 
-        long numberOfMedicine = medicineRepository.count();
-
-        return new FilteredMedicinesResponse(medicines, numberOfMedicine, page, limit);
+        return new FilteredMedicinesResponse(response, medicines.size(), page, limit);
     }
-
-//    @Override
-//    public List<RoomResponse> getAllRoomsDeleted() {
-//        List<RoomResponse> responses = new ArrayList<>();
-//
-//        for (Room room : roomRepository.findAllByOrderByDeleted()) {
-//            responses.add(new RoomResponse(room));
-//        }
-//
-//        return responses;
-//    }
-//
-//    @Override
-//    public RoomResponse getRoomById(int roomId) {
-//        Optional<Room> optional = roomRepository.findById(roomId);
-//        if (optional.isEmpty()) {
-//            throw new NotFoundException("Room not found");
-//        }
-//
-//        Room room = optional.get();
-//
-//        return new RoomResponse(room);
-//    }
 
     @Override
     public Medicine findMedicineById(int medicineId) {

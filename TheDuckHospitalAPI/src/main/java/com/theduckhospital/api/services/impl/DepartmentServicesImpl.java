@@ -4,10 +4,7 @@ import com.theduckhospital.api.dto.request.admin.CreateDepartmentRequest;
 import com.theduckhospital.api.dto.request.admin.UpdateDepartmentRequest;
 import com.theduckhospital.api.dto.response.admin.DepartmentResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredDepartmentsResponse;
-import com.theduckhospital.api.entity.Department;
-import com.theduckhospital.api.entity.Doctor;
-import com.theduckhospital.api.entity.MedicalService;
-import com.theduckhospital.api.entity.Room;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.DepartmentRepository;
 import com.theduckhospital.api.repository.DoctorRepository;
@@ -151,23 +148,29 @@ public class DepartmentServicesImpl implements IDepartmentServices {
     }
 
     @Override
-    public FilteredDepartmentsResponse getPaginationDepartmentsDeleted(int page, int limit) {
+    public FilteredDepartmentsResponse getPaginationFilteredDepartments(
+            String search,
+            int page,
+            int limit
+    ) {
+        List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Department> departmentPage = departmentRepository.findPaginationByOrderByDeleted(pageable);
 
-        List<DepartmentResponse> filteredDepartments = new ArrayList<>();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), departments.size());
+        List<Department> pageContent = departments.subList(start, end);
 
-        for (Department department : departmentPage.getContent()) {
+        List<DepartmentResponse> response = new ArrayList<>();
+        for (Department department : pageContent) {
             Doctor headDoctor = department.getDoctors().stream()
                     .filter(Doctor::isHeadOfDepartment)
                     .findFirst()
                     .orElse(null);
-            filteredDepartments.add(new DepartmentResponse(department, headDoctor));
+            response.add(new DepartmentResponse(department, headDoctor));
         }
 
-        List<Department> departments = getAllDepartmentsDeleted();
-
-        return new FilteredDepartmentsResponse(filteredDepartments, departments.size(), page, limit);
+        return new FilteredDepartmentsResponse(response, departments.size(), page, limit);
     }
 
     @Override

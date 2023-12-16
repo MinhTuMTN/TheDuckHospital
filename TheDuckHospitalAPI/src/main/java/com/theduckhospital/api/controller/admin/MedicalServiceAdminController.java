@@ -30,16 +30,17 @@ public class MedicalServiceAdminController {
         );
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/filtered")
     public ResponseEntity<?> getPaginationServices(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get services pagination successfully")
-                        .data(serviceServices.getPaginationMedicalServicesDeleted(page, limit))
+                        .message("Get filtered services pagination successfully")
+                        .data(serviceServices.getPaginationFilteredServices(search, page, limit))
                         .build()
         );
     }

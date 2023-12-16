@@ -145,10 +145,8 @@ function StaffListPage(props) {
   const [selectedRole, setSelectedRole] = useState([]);
   const handleChangeRoleFilter = (event) => {
     if (event.target.checked) {
-      console.log(event.target.value);
       setSelectedRole((prev) => [...prev, event.target.value]);
     } else {
-      console.log(event.target.value);
       setSelectedRole((prev) =>
         prev.filter((item) => item !== event.target.value)
       );

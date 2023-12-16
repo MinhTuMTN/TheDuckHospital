@@ -20,55 +20,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { getRoomById } from "../../../services/admin/RoomServices";
 import { getSchedules } from "../../../services/admin/DoctorScheduleServices";
 
-// const room = {
-//   roomName: "TDH1-01",
-//   departmentName: "Khoa nhi",
-//   description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
-//   schedule: {
-//     morning: [
-//       {
-//         fullName: "Nguyễn Văn Doctor 1",
-//         phoneNumber: "0123456789",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "7h - 11h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 2",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "7h - 11h",
-//       },
-//     ],
-//     afternoon: [
-//       {
-//         fullName: "Nguyễn Văn Doctor 1",
-//         phoneNumber: "0123456789",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 2",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: true,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 3",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//     ],
-//   },
-//   deleted: false
-// }
-
-
 const BoxStyle1 = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",

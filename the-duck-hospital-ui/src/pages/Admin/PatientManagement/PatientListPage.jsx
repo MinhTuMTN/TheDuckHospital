@@ -13,7 +13,8 @@ import { enqueueSnackbar } from "notistack";
 
 function PatientListPage(props) {
   const [search, setSearch] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [enterPressed, setEnterPressed] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [patients, setPatients] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -21,22 +22,22 @@ function PatientListPage(props) {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setEnterPressed(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setEnterPressed(true);
   };
 
-  const handleGetPatients = useCallback(async () => {
+  const handleGetPatients = useCallback(async (event) => {
+    if (!enterPressed) return;
     const response = await getPaginationPatients({
       search: search.trim(),
-      page: isSearching ? 0 : page - 1,
+      page: pageChange ? page - 1 : 0,
       limit: limit,
     });
-
-    if (isSearching) {
-      setIsSearching(false);
-    }
 
     if (response.success) {
       setPatients(response.data.data.patients);
@@ -44,11 +45,19 @@ function PatientListPage(props) {
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  }, [search, page, limit, isSearching]);
+    setEnterPressed(false);
+    setPageChange(false);
+  }, [search, page, limit, enterPressed, pageChange]);
 
   useEffect(() => {
     handleGetPatients();
   }, [handleGetPatients]);
+
+  const handleEnterKeyPressed = (event) => {
+    if (event.key === "Enter" && event.target === document.activeElement) {
+      setEnterPressed(true);
+    }
+  }
 
   return (
     <>
@@ -78,8 +87,7 @@ function PatientListPage(props) {
               <SearchPatientList
                 value={search}
                 onChange={setSearch}
-                handleGetPatients={handleGetPatients}
-                setIsSearching={setIsSearching}
+                handleEnterKeyPressed={handleEnterKeyPressed}
               />
               <PatientTable
                 count={totalItems ? totalItems : 0}

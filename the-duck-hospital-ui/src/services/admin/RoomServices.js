@@ -1,7 +1,7 @@
 import { del, get, post, put } from "../AxiosInstance";
 
 export const getPaginationRooms = (params) => {
-  return get("/admin/rooms/filter", params, { Authorization: "" });
+  return get("/admin/rooms/filtered", params, { Authorization: "" });
 };
 
 export const getAllRooms = () => {

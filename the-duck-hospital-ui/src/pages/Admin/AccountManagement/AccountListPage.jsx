@@ -50,8 +50,8 @@ const roleOptions = [
 
 function AccountListPage(props) {
   const [search, setSearch] = useState("");
-  const [buttonClicked, setButtonClicked] = useState(true);
-  const [filterButtonClicked, setFilterButtonClicked] = useState(false);
+  const [filterButtonClicked, setFilterButtonClicked] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -59,19 +59,20 @@ function AccountListPage(props) {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setFilterButtonClicked(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setFilterButtonClicked(true);
   };
 
   const [selectedRole, setSelectedRole] = useState([]);
   const handleChangeRoleFilter = (event) => {
     if (event.target.checked) {
-      console.log(event.target.value);
       setSelectedRole((prev) => [...prev, event.target.value]);
     } else {
-      console.log(event.target.value);
       setSelectedRole((prev) =>
         prev.filter((item) => item !== event.target.value)
       );
@@ -90,33 +91,35 @@ function AccountListPage(props) {
   };
 
   const handleGetAccounts = useCallback(async () => {
-    if (!buttonClicked) return;
+    if (!filterButtonClicked) return;
     const response = await getPaginationAccounts({
       search: search.trim(),
-      page: filterButtonClicked ? 0 : page - 1,
+      page: pageChange ? page - 1 : 0,
       limit: limit,
       accountRole: selectedRole,
       accountStatus: selectedStatus,
     });
-    if(filterButtonClicked) {
-      setFilterButtonClicked(false);
-    }
     if (response.success) {
       setAccounts(response.data.data.accounts);
       setTotalItems(response.data.data.total);
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    setButtonClicked(false);
-  }, [search, page, limit, selectedStatus, selectedRole, buttonClicked, filterButtonClicked]);
+    setFilterButtonClicked(false);
+    setPageChange(false);
+  }, [
+    search,
+    page,
+    limit,
+    selectedStatus,
+    selectedRole,
+    filterButtonClicked,
+    pageChange,
+  ]);
 
   useEffect(() => {
     handleGetAccounts();
   }, [handleGetAccounts]);
-
-  useEffect(() => {
-    setButtonClicked(true);
-  }, [page, limit]);
 
   return (
     <>
@@ -147,7 +150,6 @@ function AccountListPage(props) {
                 value={search}
                 onChange={setSearch}
                 onApply={() => {
-                  setButtonClicked(true);
                   setFilterButtonClicked(true);
                 }}
               />

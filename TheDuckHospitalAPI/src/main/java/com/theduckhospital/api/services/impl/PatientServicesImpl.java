@@ -68,22 +68,6 @@ public class PatientServicesImpl implements IPatientServices {
                 .orElse(null);
     }
 
-//    @Override
-//    public FilteredPatientsResponse getPaginationPatientsDeleted(int page, int limit) {
-//        Pageable pageable = PageRequest.of(page, limit);
-//        Page<Patient> patientPage = patientRepository.findPaginationByOrderByDeleted(pageable);
-//
-//        List<PatientResponse> filteredPatients = new ArrayList<>();
-//
-//        for (Patient patient : patientPage.getContent()) {
-//            filteredPatients.add(new PatientResponse(patient));
-//        }
-//
-//        List<Patient> patients = patientRepository.findAll();
-//
-//        return new FilteredPatientsResponse(filteredPatients, patients.size(), page, limit);
-//    }
-
     @Override
     public FilteredPatientsResponse getPaginationFilteredPatients(
             String search,

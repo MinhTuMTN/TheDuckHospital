@@ -41,16 +41,17 @@ public class DepartmentAdminController {
         );
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> getAllDepartments(
+    @GetMapping("/filtered")
+    public ResponseEntity<?> getFilteredDepartmentsPagination(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get departments pagination successfully")
-                        .data(departmentServices.getPaginationDepartmentsDeleted(page, limit))
+                        .message("Get filtered departments pagination successfully")
+                        .data(departmentServices.getPaginationFilteredDepartments(search, page, limit))
                         .build()
         );
     }

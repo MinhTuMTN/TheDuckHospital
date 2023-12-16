@@ -1,7 +1,7 @@
 import { del, get, post, put } from "../AxiosInstance";
 
 export const getPaginationMedicines = (params) => {
-    return get("/admin/medicines/filter", params, { Authorization: "" });
+    return get("/admin/medicines/filtered", params, { Authorization: "" });
   };
 
 export const createMedicine = (data) => {

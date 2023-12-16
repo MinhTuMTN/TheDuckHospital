@@ -18,8 +18,7 @@ function SearchPatientList(props) {
     borderTopRightRadius,
     value,
     onChange,
-    handleGetPatients,
-    setIsSearching,
+    handleEnterKeyPressed,
   } = props;
   return (
     <Box
@@ -35,6 +34,7 @@ function SearchPatientList(props) {
     >
       <TextField
         variant="standard"
+        autoComplete="off"
         fullWidth
         size="medium"
         sx={{
@@ -51,8 +51,9 @@ function SearchPatientList(props) {
         value={value}
         onChange={(e) => {
           onChange(e.target.value);
-          setIsSearching(true);
-          handleGetPatients();
+        }}
+        onKeyDown={(e) => {
+          handleEnterKeyPressed(e);
         }}
         placeholder="Tìm kiếm bệnh nhân"
       />
