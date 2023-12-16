@@ -1,51 +1,53 @@
 import React from "react";
 import { useRoutes } from "react-router-dom";
 import Loading from "../components/General/Loading";
-import MainLayout from "../layouts/MainLayout";
-import LoginPage from "../pages/auth/LoginPage";
-import Home from "../pages/customer/Home";
-import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
-import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
-import ProtectedLayout from "../layouts/ProtectedLayout";
+import DoctorLayout from "../layouts/DoctorLayout";
 import LogoLayout from "../layouts/LogoLayout";
-import CreateProfile from "../pages/customer/CreateProfile";
-import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentListPage";
-import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
-import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
-import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
-import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
-import ChooseDayPage from "../pages/customer/ChooseDayPage";
-import ConfirmBookingInformation from "../pages/customer/ConfirmBookingInformation";
-import PaymentOrders from "../pages/customer/PaymentOrders";
-import PatientListPage from "../pages/Admin/PatientManagement/PatientListPage";
-import PatientDetailPage from "../pages/Admin/PatientManagement/PatientDetailPage";
-import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
+import MainLayout from "../layouts/MainLayout";
+import NurseCounterLayout from "../layouts/NurseCounterLayout";
+import NurseRoomLayout from "../layouts/NurseRoomLayout";
+import ProtectedLayout from "../layouts/ProtectedLayout";
+import UserLayout from "../layouts/UserLayout";
 import AccountDetailPage from "../pages/Admin/AccountManagement/AccountDetailPage";
-import RoomListPage from "../pages/Admin/RoomManagement/RoomListPage";
+import AccountListPage from "../pages/Admin/AccountManagement/AccountListPage";
+import DepartmentDetailPage from "../pages/Admin/DepartmentManagement/DepartmentDetailPage";
+import DepartmentListPage from "../pages/Admin/DepartmentManagement/DepartmentListPage";
+import MedicalServiceDetailPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceDetailPage";
+import MedicalServiceListPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceListPage";
+import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetailPage";
+import MedicineListPage from "../pages/Admin/MedicineManagement/MedicineListPage";
+import PatientDetailPage from "../pages/Admin/PatientManagement/PatientDetailPage";
+import PatientListPage from "../pages/Admin/PatientManagement/PatientListPage";
+import PatientProfileDetailPage from "../pages/Admin/PatientManagement/PatientProfileDetailPage";
 import RoomDetailPage from "../pages/Admin/RoomManagement/RoomDetailPage";
-import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
+import RoomListPage from "../pages/Admin/RoomManagement/RoomListPage";
+import StaffDetailPage from "../pages/Admin/StaffManagement/StaffDetailPage";
+import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
+import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
+import BookingsPage from "../pages/Doctor/BookingsPage";
+import CreateSchedulePage from "../pages/Doctor/HeadDoctor/CreateSchedulePage";
+import ScheduleListPage from "../pages/Doctor/HeadDoctor/ScheduleListPage";
+import SchedulePage from "../pages/Doctor/SchedulePage";
+import ChooseDoctorAndTime from "../pages/Nurse/ChooseDocterAndTime";
+import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
+import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
+import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
+import PaymentFailedPage from "../pages/PaymentFailedPage";
+import PaymentSuccessPage from "../pages/PaymentSuccessPage";
+import LoginPage from "../pages/auth/LoginPage";
+import BookingItemPage from "../pages/customer/BookingItemPage";
+import ChooseDayPage from "../pages/customer/ChooseDayPage";
+import ChooseDoctorPage from "../pages/customer/ChooseDoctorPage";
+import ChoosePatientProfiles from "../pages/customer/ChoosePatientProfiles";
+import ConfirmBookingInformation from "../pages/customer/ConfirmBookingInformation";
+import CreateProfile from "../pages/customer/CreateProfile";
+import Home from "../pages/customer/Home";
 import MedicalBillsPage from "../pages/customer/MedicalBillsPage";
 import NotificationPage from "../pages/customer/NotificationPage";
+import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
-import PatientProfileDetailPage from "../pages/Admin/PatientManagement/PatientProfileDetailPage";
-import MedicalServiceListPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceListPage";
-import MedicalServiceDetailPage from "../pages/Admin/MedicalServiceManagement/MedicalServiceDetailPage";
-import PaymentSuccessPage from "../pages/PaymentSuccessPage";
-import PaymentFailedPage from "../pages/PaymentFailedPage";
-import BookingItemPage from "../pages/customer/BookingItemPage";
-import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
-import MedicineListPage from "../pages/Admin/MedicineManagement/MedicineListPage";
-import MedicineDetailPage from "../pages/Admin/MedicineManagement/MedicineDetailPage";
-import NurseRoomLayout from "../layouts/NurseRoomLayout";
-import ReceivingPatients from "../pages/Nurse/ReceivingPatients";
-import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
-import NurseCounterLayout from "../layouts/NurseCounterLayout";
-import ReceivingPatientsCounter from "../pages/Nurse/ReceivingPatientsCounter";
-import ChooseDoctorAndTime from "../pages/Nurse/ChooseDocterAndTime";
-import DoctorLayout from "../layouts/DoctorLayout";
-import BookingsPage from "../pages/Doctor/BookingsPage";
-import SchedulePage from "../pages/Doctor/SchedulePage";
+import PaymentOrders from "../pages/customer/PaymentOrders";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -200,16 +202,36 @@ function Router(props) {
       ],
     },
     {
-      path: "/doctor",
-      element: <DoctorLayout />,
+      path: "/",
+      element: <ProtectedLayout forRole={["Doctor", "HeadDoctor"]} />,
       children: [
         {
-          path: "doctor-bookings",
-          element: <BookingsPage />,
-        },
-        {
-          path: "doctor-schedules",
-          element: <SchedulePage />,
+          path: "/doctor",
+          element: <DoctorLayout />,
+          children: [
+            {
+              path: "doctor-bookings",
+              element: <BookingsPage />,
+            },
+            {
+              path: "doctor-schedules",
+              element: <SchedulePage />,
+            },
+            {
+              path: "head-doctor",
+              element: <ProtectedLayout forRole={["HeadDoctor"]} />,
+              children: [
+                {
+                  path: "schedule-management",
+                  element: <ScheduleListPage />,
+                },
+                {
+                  path: "schedule-management/create",
+                  element: <CreateSchedulePage />,
+                },
+              ],
+            },
+          ],
         },
       ],
     },

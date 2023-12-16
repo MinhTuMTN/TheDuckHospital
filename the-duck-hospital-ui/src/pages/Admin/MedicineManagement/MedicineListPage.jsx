@@ -92,7 +92,7 @@ function MedicineListPage(props) {
 
     if (addNew) {
       const response = await createMedicine({
-        medicineName: medicine.medicineName,
+        medicineName: medicine.medicineName.trim(),
         price: medicine.price,
         quantity: medicine.quantity,
       });
@@ -103,7 +103,7 @@ function MedicineListPage(props) {
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     } else {
       const response = await updateMedicine(medicine.medicineId, {
-        medicineName: medicine.medicineName,
+        medicineName: medicine.medicineName.trim(),
         price: medicine.price,
         quantity: medicine.quantity,
       });
@@ -113,6 +113,7 @@ function MedicineListPage(props) {
         handleGetMedicines();
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     }
+    setAddButtonClicked(false);
   }
 
   // const handleGetFilteredProduct = useCallback(async () => {
@@ -171,7 +172,7 @@ function MedicineListPage(props) {
                   fontSize: "32px",
                 }}
               >
-                Danh sách nhân viên
+                Danh sách thuốc
               </Typography>
               <CustomButton
                 color="normal1"
@@ -383,11 +384,11 @@ function MedicineListPage(props) {
             autoFocus
             autoComplete="off"
             InputProps={{ inputProps: { min: 1000 } }}
-            value={medicine.quantity ? medicine.quantity.toString() : "0"}
+            value={medicine.quantity ? medicine.quantity.toString() : "1000"}
             onChange={(e) => {
               setMedicine((prev) => ({
                 ...prev,
-                quantity: e.target.value ? parseInt(e.target.value) : 0,
+                quantity: e.target.value ? parseInt(e.target.value) : 1000,
               }));
             }}
             required

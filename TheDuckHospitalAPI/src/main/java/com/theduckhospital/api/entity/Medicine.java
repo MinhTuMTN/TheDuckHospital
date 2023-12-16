@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -20,6 +20,7 @@ public class Medicine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int medicineId;
 
+    @Nationalized
     private String medicineName;
     private double price;
     private int quantity;

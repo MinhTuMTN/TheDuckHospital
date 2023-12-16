@@ -3,6 +3,8 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.dto.response.admin.ActiveDoctorResponse;
+import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
@@ -14,6 +16,7 @@ import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +33,9 @@ public class DoctorServicesImpl implements IDoctorServices {
     public DoctorServicesImpl(
             DoctorRepository doctorRepository,
             JwtTokenProvider jwtTokenProvider,
-            AccountRepository accountRepository, IDepartmentServices departmentServices) {
+            AccountRepository accountRepository,
+            IDepartmentServices departmentServices
+    ) {
         this.doctorRepository = doctorRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
@@ -79,6 +84,31 @@ public class DoctorServicesImpl implements IDoctorServices {
             throw new NotFoundException("Doctor not found");
 
         return doctor;
+    }
+
+    @Override
+    public FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(String authorization, int page, int limit) {
+        Doctor headDoctor = getDoctorByToken(authorization);
+        if (!headDoctor.isHeadOfDepartment()) {
+            throw new RuntimeException("You are not head of department");
+        }
+
+        Department department = headDoctor.getDepartment();
+
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Doctor> doctorPage = doctorRepository.findByDeletedFalseAndDepartment(pageable, department);
+
+        List<ActiveDoctorResponse> filteredDoctors = new ArrayList<>();
+
+        for (Doctor doctor : doctorPage.getContent()) {
+            filteredDoctors.add(new ActiveDoctorResponse(doctor));
+        }
+
+        return new FilteredActiveDoctorsResponse(
+                filteredDoctors,
+                doctorRepository.countByDeletedFalseAndDepartment(department),
+                page,
+                limit);
     }
 
     @Override

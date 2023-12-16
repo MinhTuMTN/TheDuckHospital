@@ -19,7 +19,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     Page<Doctor> findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, Degree degree, String department_departmentName, Pageable pageable
     );
-
+    Page<Doctor> findByDeletedFalseAndDepartment(Pageable pageable, Department department);
+    long countByDeletedFalseAndDepartment(Department department);
     Page<Doctor> findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, String department_departmentName, Pageable pageable
     );

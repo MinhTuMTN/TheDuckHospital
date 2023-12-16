@@ -2,6 +2,7 @@ package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.entity.Doctor;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface IDoctorServices {
 
     List<Doctor> getDoctorNotInDepartment();
     Doctor getDoctorByToken(String token);
+
+    FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(String authorization, int page, int limit);
 
     PaginationResponse getMedicalExaminationDoctors(
             String fullName,

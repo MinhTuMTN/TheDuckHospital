@@ -228,7 +228,7 @@ function PatientProfileTable(props) {
         <BoxStyle>
           <TieuDe>Danh sách hồ sơ bệnh nhân</TieuDe>
         </BoxStyle>
-        <Box paddingX={0} sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%" }}>
           <Box sx={{ width: "100%" }}>
             <Table
               sx={{

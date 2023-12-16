@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.BookingRequest;
+import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
@@ -21,4 +22,5 @@ public interface IBookingServices {
     NurseBookingItemResponse checkBooking(String bookingCode, int roomId);
     Booking bookingIsValid(String bookingCode, int roomId);
     Map<String, String> checkPatientCode(String identityNumber);
+    Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request);
 }

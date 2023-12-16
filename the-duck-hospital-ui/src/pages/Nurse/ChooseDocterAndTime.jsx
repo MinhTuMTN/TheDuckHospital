@@ -7,7 +7,6 @@ import {
   FormControl,
   Grid,
   MenuItem,
-  Pagination,
   Paper,
   Select,
   Stack,
@@ -15,9 +14,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import LoadingCute from "../../components/General/LoadingCute";
 import ChooseDoctorForCounter from "../../components/Nurse/ChooseDoctorForCounter";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
 import { getAllDepartments } from "../../services/customer/DepartmentServices";
+import { getDoctorSchedules } from "../../services/nurse/DoctorScheduleServices";
 
 const Header = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, #5ab2f7, #12cff3)`,
@@ -92,9 +95,8 @@ const ListDocter = styled(Stack)(({ theme }) => ({
 function ChooseDocterAndTime(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [page, setPage] = React.useState(1);
-  const [totalPages, setTotalPages] = React.useState(1);
   const [deparmments, setDeparmments] = React.useState([]);
+  const navigate = useNavigate();
   const [selectedDepartmentId, setSelectedDepartmentId] = React.useState("ALL");
   const handleDepartmentChange = async () => {
     const respone = await getAllDepartments();
@@ -110,6 +112,38 @@ function ChooseDocterAndTime(props) {
   useEffect(() => {
     handleDepartmentChange();
   }, []);
+
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [doctorSchedules, setDoctorSchedules] = React.useState([]);
+  const handleGetDoctorSchedules = useCallback(async () => {
+    if (!selectedDepartmentId || selectedDepartmentId === "ALL") return;
+
+    setIsLoading(true);
+    const response = await getDoctorSchedules(selectedDepartmentId);
+    if (response.success) {
+      setDoctorSchedules(response.data.data);
+    } else
+      enqueueSnackbar("Đã xảy ra lỗi khi lấy danh sách bác sĩ", {
+        variant: "error",
+      });
+    setIsLoading(false);
+  }, [selectedDepartmentId]);
+
+  useEffect(() => {
+    handleGetDoctorSchedules();
+  }, [handleGetDoctorSchedules]);
+
+  const patientProfile = useLocation().state?.patientProfile;
+
+  useEffect(() => {
+    console.log(patientProfile);
+    if (!patientProfile) {
+      enqueueSnackbar("Vui lòng chọn bệnh nhân", {
+        variant: "error",
+      });
+      navigate("/nurse-counter");
+    }
+  }, [patientProfile, navigate]);
 
   return (
     <Stack
@@ -139,6 +173,7 @@ function ChooseDocterAndTime(props) {
             },
           },
         }}
+        onClick={() => navigate(-1)}
       >
         <KeyboardBackspaceIcon
           className="icon"
@@ -229,7 +264,6 @@ function ChooseDocterAndTime(props) {
                   value={selectedDepartmentId}
                   onChange={(e) => {
                     setSelectedDepartmentId(e.target.value);
-                    setPage(1);
                   }}
                   sx={{
                     textAlign: "left",
@@ -256,25 +290,17 @@ function ChooseDocterAndTime(props) {
               </FormControl>
             </Filter>
             <ListDocter spacing={1.5}>
-              <ChooseDoctorForCounter />
+              {isLoading && <LoadingCute />}
+              {!isLoading &&
+                doctorSchedules.map((doctorSchedule) => (
+                  <ChooseDoctorForCounter
+                    key={doctorSchedule.doctorScheduleId}
+                    doctorSchedule={doctorSchedule}
+                  />
+                ))}
+
+              {!isLoading && doctorSchedules.length === 0 && <SearchNotFound />}
             </ListDocter>
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}
-            >
-              <Pagination
-                sx={{
-                  marginTop: 2,
-                }}
-                count={totalPages}
-                page={page}
-                onChange={(e, value) => setPage(value)}
-              />
-            </Box>
           </Body>
         </Grid>
       </Grid>

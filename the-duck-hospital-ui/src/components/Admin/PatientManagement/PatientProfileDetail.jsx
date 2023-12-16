@@ -149,7 +149,7 @@ function PatientProfileDetail(props) {
             <TieuDeCot>Email</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
-            <NoiDung>{patientProfile.email}</NoiDung>
+            <NoiDung>{patientProfile.email ? patientProfile.email : "Chưa cập nhật"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
