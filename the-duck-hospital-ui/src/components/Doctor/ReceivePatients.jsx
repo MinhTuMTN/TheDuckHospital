@@ -19,6 +19,7 @@ import {
 import React from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 ReceivePatients.propTypes = {
   status: PropTypes.number,
@@ -43,6 +44,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 function ReceivePatients(props) {
   const [searchString, setSearchString] = React.useState("");
   const { listPatients } = props;
+  const navigate = useNavigate();
   return (
     <Grid item xs={12}>
       <Stack spacing={2}>
@@ -149,6 +151,11 @@ function ReceivePatients(props) {
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
                     cursor: props.status === 0 ? "default" : "pointer",
+                  }}
+                  onClick={() => {
+                    navigate(
+                      `/doctor/medical-examination-record/${row.patientId}`
+                    );
                   }}
                 >
                   <TableCell align="center">{index + 1}</TableCell>

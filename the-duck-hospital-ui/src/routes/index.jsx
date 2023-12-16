@@ -48,6 +48,7 @@ import NotificationPage from "../pages/customer/NotificationPage";
 import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
+import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -214,9 +215,14 @@ function Router(props) {
               element: <BookingsPage />,
             },
             {
+              path: "medical-examination-record/:patientId",
+              element: <MedicalExaminationRecord />,
+            },
+            {
               path: "doctor-schedules",
               element: <SchedulePage />,
             },
+
             {
               path: "head-doctor",
               element: <ProtectedLayout forRole={["HeadDoctor"]} />,
