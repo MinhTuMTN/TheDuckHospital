@@ -50,4 +50,6 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             int medicalService_department_departmentId,
             Date date
     );
+
+    List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalse(Doctor doctor, Date date);
 }
