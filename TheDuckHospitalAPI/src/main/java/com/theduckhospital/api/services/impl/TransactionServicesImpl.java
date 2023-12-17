@@ -4,6 +4,7 @@ import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.Transaction;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.IAccountServices;
@@ -55,39 +56,47 @@ public class TransactionServicesImpl implements ITransactionServices {
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
 
-        String userName = "";
-
         for (Transaction transaction : transactionPage.getContent()) {
             List<Booking> bookings = transaction.getBookings();
-            List<BookingResponse> bookingResponses = new ArrayList<>();
-            if(!bookings.isEmpty()) {
-                for (Booking booking : bookings) {
-                    Account account = booking.getPatientProfile().getAccount();
-                    if (account == null) {
-                        userName = booking.getPatientProfile().getPatient().getFullName();
-                    } else {
-                        userName = booking.getPatientProfile().getAccount().getFullName();
-                    }
+            List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
 
-                    PatientProfileResponse patientProfileResponse = new PatientProfileResponse(booking.getPatientProfile());
-                    long numberOfBooking = bookingRepository.
-                            countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                                    booking.getDoctorSchedule(),
-                                    -1
-                            );
-                    DoctorScheduleRoomResponse doctorScheduleRoomResponse = new DoctorScheduleRoomResponse(
-                            booking.getDoctorSchedule(),
-                            numberOfBooking
-                    );
-                    bookingResponses.add(new BookingResponse(booking, patientProfileResponse, doctorScheduleRoomResponse));
-                }
-            }
-
-            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses, userName));
+            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses));
         }
 
         List<Transaction> transaction = transactionRepository.findAll();
 
         return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
+    }
+
+    private List<BookingResponse> getBookingResponseList(List<Booking> bookings) {
+        List<BookingResponse> bookingResponses = new ArrayList<>();
+        if(!bookings.isEmpty()) {
+            for (Booking booking : bookings) {
+                PatientProfileResponse patientProfileResponse = new PatientProfileResponse(booking.getPatientProfile());
+                long numberOfBooking = bookingRepository.
+                        countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                                booking.getDoctorSchedule(),
+                                -1
+                        );
+                DoctorScheduleRoomResponse doctorScheduleRoomResponse = new DoctorScheduleRoomResponse(
+                        booking.getDoctorSchedule(),
+                        numberOfBooking
+                );
+                bookingResponses.add(new BookingResponse(booking, patientProfileResponse, doctorScheduleRoomResponse));
+            }
+        }
+        return bookingResponses;
+    }
+
+    @Override
+    public TransactionResponse getTransactionByIdAdmin(UUID transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
+        if (transaction == null)
+            throw new NotFoundException("Transaction not found");
+
+        List<Booking> bookings = transaction.getBookings();
+        List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
+
+        return new TransactionResponse(transaction, bookingResponses);
     }
 }

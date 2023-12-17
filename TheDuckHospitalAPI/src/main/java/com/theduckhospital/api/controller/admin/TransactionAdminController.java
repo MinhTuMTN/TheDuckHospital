@@ -35,14 +35,14 @@ public class TransactionAdminController {
         );
     }
 
-//    @GetMapping("/{staffId}")
-//    public  ResponseEntity<?> getStaffById(@PathVariable UUID staffId) {
-//        return ResponseEntity.ok(
-//                GeneralResponse.builder()
-//                        .success(true)
-//                        .message("Get staff by id successfully")
-//                        .data(staffServices.getStaffById(staffId))
-//                        .build()
-//        );
-//    }
+    @GetMapping("/{transactionId}")
+    public  ResponseEntity<?> getTransactionByIdAdmin(@PathVariable UUID transactionId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get transaction by id successfully")
+                        .data(transactionServices.getTransactionByIdAdmin(transactionId))
+                        .build()
+        );
+    }
 }

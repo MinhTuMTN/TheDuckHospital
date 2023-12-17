@@ -1,32 +1,13 @@
 import styled from "@emotion/styled";
 import {
   Box,
-  Chip,
   Grid,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import React from "react";
 import FormatDate from "../../General/FormatDate";
-import FormatCurrency from "../../General/FormatCurrency";
-
-const transactionStatus = [
-  {
-    status: "PENDING",
-    label: "Chờ xử lý",
-    color: "info"
-  },
-  {
-    status: "SUCCESS",
-    label: "Thành công",
-    color: "success"
-  },
-  {
-    status: "FAILED",
-    label: "Thất bại",
-    color: "error"
-  },
-];
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -55,66 +36,86 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
 }));
 
-function TransactionDetail(props) {
-  const { transaction } = props;
-  const statusColor = transactionStatus.find(s => s.status === transaction.status)?.color;
-  const statusLabel = transactionStatus.find(s => s.status === transaction.status)?.label;
+function PatientDetail(props) {
+  const { patient } = props;
 
   return (
     <Stack
+      component={Paper}
       sx={{
         borderRadius: "15px",
         paddingTop: 1,
+        width: "50%",
       }}
     >
       <BoxStyle>
-        <TieuDe>Thông tin giao dịch</TieuDe>
+        <TieuDe>Thông tin bệnh nhân</TieuDe>
       </BoxStyle>
 
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Phương thức</TieuDeCot>
+            <TieuDeCot>Bệnh nhân</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{transaction.paymentMethod}</NoiDung>
+              <TieuDeCot>{patient.fullName}</TieuDeCot>
             </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
-      {transaction.bankCode &&
-        <BoxStyle>
-          <Grid container>
-            <Grid item xs={4} md={3}>
-              <TieuDeCot>Thẻ</TieuDeCot>
-            </Grid>
-            <Grid item xs={8} md={9}>
-              <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-                <NoiDung>{transaction.bankCode}</NoiDung>
-              </Stack>
-            </Grid>
-          </Grid>
-        </BoxStyle>}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Tổng tiền</TieuDeCot>
+            <TieuDeCot>Số điện thoại</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatCurrency amount={transaction.amount} /></NoiDung>
+            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+              <NoiDung>{patient.phoneNumber}</NoiDung>
+            </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Ngày tạo</TieuDeCot>
+            <TieuDeCot>CCCD</TieuDeCot>
+          </Grid>
+          <Grid item xs={8} md={9}>
+            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+              <NoiDung>{patient.identityNumber}</NoiDung>
+            </Stack>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Giới tính</TieuDeCot>
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={transaction.createdAt} /></NoiDung>
+            <NoiDung>{patient.gender === "MALE" ? "Nam" : "Nữ"}</NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Địa chỉ</TieuDeCot>
+          </Grid>
+          <Grid item xs={8} md={9}>
+            <NoiDung>{patient.address}</NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Dân tộc</TieuDeCot>
+          </Grid>
+          <Grid item xs={8} md={9}>
+            <NoiDung>{patient.nation}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -125,17 +126,10 @@ function TransactionDetail(props) {
       >
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Trạng thái</TieuDeCot>
+            <TieuDeCot>Ngày sinh</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
-              <Chip
-                color={statusColor}
-                label={statusLabel}
-                sx={{
-                  fontSize: "14px"
-                }}
-              />
+            <NoiDung><FormatDate dateTime={patient.dateOfBirth} /></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -143,4 +137,4 @@ function TransactionDetail(props) {
   );
 }
 
-export default TransactionDetail;
+export default PatientDetail;

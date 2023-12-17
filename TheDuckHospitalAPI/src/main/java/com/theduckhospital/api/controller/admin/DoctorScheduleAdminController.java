@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/doctor-schedules")
@@ -19,13 +20,24 @@ public class DoctorScheduleAdminController {
         this.scheduleDoctorServices = scheduleDoctorServices;
     }
 
-    @GetMapping("/{roomId}")
-    public ResponseEntity<?> getDoctorSchedule(@PathVariable int roomId, @RequestParam Date date) {
+    @GetMapping("/room")
+    public ResponseEntity<?> getDoctorScheduleByRoomAndDate(@RequestParam int roomId, @RequestParam Date date) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get schedule successfully")
                         .data(scheduleDoctorServices.getDoctorSchedulesByRoomAndDateAdmin(roomId, date))
+                        .build()
+        );
+    }
+
+    @GetMapping("/doctor")
+    public ResponseEntity<?> getDoctorScheduleByDoctorAndDate(@RequestParam UUID staffId, @RequestParam Date date) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedule successfully")
+                        .data(scheduleDoctorServices.getDoctorSchedulesByDoctorAndDateAdmin(staffId, date))
                         .build()
         );
     }

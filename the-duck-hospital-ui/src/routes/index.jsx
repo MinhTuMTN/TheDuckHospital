@@ -48,6 +48,7 @@ import NotificationPage from "../pages/customer/NotificationPage";
 import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
+import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -314,6 +315,10 @@ function Router(props) {
         {
           path: "transaction-management",
           element: <TransactionListPage />,
+        },
+        {
+          path: "transaction-management/:transactionId",
+          element: <TransactionDetailPage />,
         },
         {
           path: "medicine-management",

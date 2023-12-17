@@ -36,6 +36,11 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             ScheduleType scheduleType
     );
 
+    List<DoctorSchedule> findByDoctorAndDateOrderByScheduleType(
+            Doctor doctor,
+            Date date
+    );
+
     List<DoctorSchedule> findByRoomAndScheduleTypeAndDeletedIsFalse(
             Room room,
             ScheduleType scheduleType

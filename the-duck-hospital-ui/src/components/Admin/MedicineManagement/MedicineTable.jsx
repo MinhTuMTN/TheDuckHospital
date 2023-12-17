@@ -294,7 +294,7 @@ function MedicineTable(props) {
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
                   >
-                    Tên
+                    Tên thuốc
                   </CustomText>
                 </TableCell>
                 <TableCell align="right" style={{ width: "20%" }}>

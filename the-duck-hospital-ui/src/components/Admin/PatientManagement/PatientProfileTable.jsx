@@ -130,7 +130,12 @@ function Row(props) {
             <CustomText>{row.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</CustomText>
           </Stack>
         </TableCell>
-        <TableCell align="center">
+        <TableCell
+          align="center"
+          sx={{
+            borderBottom: "none !important",
+          }}
+        >
           <>
             {isSmallScreen ? (
               // Hiển thị cho màn hình nhỏ

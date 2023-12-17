@@ -2,11 +2,12 @@ import styled from "@emotion/styled";
 import {
   Box,
   Grid,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import React from "react";
-import FormatDate from "../../General/FormatDate";
+import dayjs from "dayjs";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -35,28 +36,37 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
 }));
 
-function PatientDetail(props) {
-  const { patient } = props;
+function DoctorScheduleDetail(props) {
+  const { doctorSchedule, queueNumber } = props;
 
   return (
     <Stack
+      component={Paper}
       sx={{
         borderRadius: "15px",
         paddingTop: 1,
       }}
     >
       <BoxStyle>
-        <TieuDe>Thông tin cơ bản</TieuDe>
+        <TieuDe>Thông tin buổi khám</TieuDe>
       </BoxStyle>
 
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Họ tên</TieuDeCot>
+            <TieuDeCot>Thời gian</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <TieuDeCot>{patient.fullName}</TieuDeCot>
+              <Stack direction="row" spacing={0.5}>
+                <TieuDeCot>
+                  {doctorSchedule.scheduleType === "MORNING" ?
+                    "Buổi sáng - " : "Buổi chiều - "}
+                </TieuDeCot>
+                <TieuDeCot>
+                  {dayjs(doctorSchedule?.date).format("DD/MM/YYYY")}
+                </TieuDeCot>
+              </Stack>
             </Stack>
           </Grid>
         </Grid>
@@ -64,34 +74,12 @@ function PatientDetail(props) {
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>CCCD</TieuDeCot>
+            <TieuDeCot>Tại</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{patient.identityNumber}</NoiDung>
+              <NoiDung>Phòng {doctorSchedule.roomName}</NoiDung>
             </Stack>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Số điện thoại</TieuDeCot>
-          </Grid>
-
-          <Grid item xs={8} md={9}>
-            <NoiDung>{patient.phoneNumber}</NoiDung>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Ngày sinh</TieuDeCot>
-          </Grid>
-
-          <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={patient.dateOfBirth} /></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -102,10 +90,11 @@ function PatientDetail(props) {
       >
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Trạng thái</TieuDeCot>
+            <TieuDeCot>Số thứ tự</TieuDeCot>
           </Grid>
+
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</NoiDung>
+            <NoiDung>{queueNumber}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -113,4 +102,4 @@ function PatientDetail(props) {
   );
 }
 
-export default PatientDetail;
+export default DoctorScheduleDetail;

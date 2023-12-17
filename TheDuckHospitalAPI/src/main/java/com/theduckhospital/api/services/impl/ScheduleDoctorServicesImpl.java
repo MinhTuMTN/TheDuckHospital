@@ -136,6 +136,24 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     @Override
+    public List<DoctorScheduleRoomResponse> getDoctorSchedulesByDoctorAndDateAdmin(UUID staffId, Date date) {
+        if(date == null) {
+            date =  new Date();
+        }
+
+        Doctor doctor = doctorServices.getDoctorById(staffId);
+
+        List<DoctorSchedule> schedules = doctorScheduleRepository.findByDoctorAndDateOrderByScheduleType(doctor, date);
+
+        return schedules.stream()
+                .map(schedule -> new DoctorScheduleRoomResponse(
+                        schedule,
+                        calculateNumberOfBookings(schedule)
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException {
         DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
 

@@ -28,7 +28,6 @@ const PatientId = styled(Typography)(({ theme }) => ({
 function PatientDetailPage() {
   const navigate = useNavigate();
   const { patientId } = useParams();
-
   const [patient, setPatient] = useState({});
 
   const handleGetPatient = useCallback(async () => {
