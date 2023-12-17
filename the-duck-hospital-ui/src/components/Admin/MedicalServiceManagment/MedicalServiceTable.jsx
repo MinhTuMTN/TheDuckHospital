@@ -106,7 +106,7 @@ function Row(props) {
             {serviceTypes.find(service => service.value === row.serviceType).label}
           </CustomText>
         </TableCell>
-        <TableCell align="center">
+        <TableCell align="right">
           <CustomText
             variant="body1"
             style={{
@@ -120,7 +120,7 @@ function Row(props) {
           </CustomText>
         </TableCell>
         <TableCell align="right">
-          <Stack direction={"row"} spacing={1} alignItems={"center"}>
+          <Stack direction={"row"} spacing={1} alignItems={"center"} justifyContent={"center"}>
             <CircleIcon
               sx={{
                 fontSize: 10,
@@ -221,10 +221,10 @@ function MedicalServiceTable(props) {
                 <TableCell style={{ width: "20%" }}>
                   <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Loại dịch vụ</CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }} align="center">
+                <TableCell style={{ width: "20%" }} align="right">
                   <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Giá</CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }}>
+                <TableCell align="center" style={{ width: "20%" }}>
                   <CustomText color={"#101828"} style={{ fontWeight: "500" }}>Trạng thái</CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "10%" }}>

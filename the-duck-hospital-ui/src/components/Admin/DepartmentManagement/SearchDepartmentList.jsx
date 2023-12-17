@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, InputAdornment, TextField, Button } from "@mui/material";
+import { Box, InputAdornment, TextField } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PropTypes from "prop-types";
 
@@ -11,18 +11,14 @@ SearchDepartmentList.prototype = {
   borderBottomRightRadius: PropTypes.number,
 };
 
-SearchDepartmentList.defaultProps = {
-  onApply: () => { },
-};
-
 function SearchDepartmentList(props) {
   const {
     borderRadius,
     borderTopLeftRadius,
     borderTopRightRadius,
-    onApply,
     value,
     onChange,
+    handleEnterKeyPressed,
   } = props;
   return (
     <Box
@@ -38,6 +34,7 @@ function SearchDepartmentList(props) {
     >
       <TextField
         variant="standard"
+        autoComplete="off"
         fullWidth
         size="medium"
         sx={{
@@ -53,12 +50,11 @@ function SearchDepartmentList(props) {
         }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          handleEnterKeyPressed(e);
+        }}
         placeholder="Tìm kiếm khoa"
       />
-
-      <Button onClick={onApply} sx={{ flexBasis: "15%" }}>
-        Áp dụng
-      </Button>
     </Box>
   );
 }

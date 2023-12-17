@@ -22,6 +22,9 @@ public interface IScheduleDoctorServices {
     ) throws ParseException;
     DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId);
     List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date);
+
+    List<DoctorScheduleRoomResponse> getDoctorSchedulesByDoctorAndDateAdmin(UUID staffId, Date date);
+
     QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException;
     QueueBookingResponse getQueueNumber(UUID doctorScheduleId) throws ParseException;
     InvalidDateResponse getInvalidDateSchedule(

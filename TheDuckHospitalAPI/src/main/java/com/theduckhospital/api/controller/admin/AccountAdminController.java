@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IAccountServices;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,16 +23,19 @@ public class AccountAdminController {
         this.accountServices = accountServices;
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> getAllAccountsPagination(
+    @GetMapping("/filtered")
+    public ResponseEntity<?> getFilteredAccountsPagination(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") List<Role> accountRole,
+            @RequestParam(defaultValue = "false, true") List<Boolean> accountStatus
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get accounts pagination successfully")
-                        .data(accountServices.getPaginationAccounts(page, limit))
+                        .message("Get filtered accounts pagination successfully")
+                        .data(accountServices.getPaginationFilteredAccounts(search, page, limit, accountRole, accountStatus))
                         .build()
         );
     }

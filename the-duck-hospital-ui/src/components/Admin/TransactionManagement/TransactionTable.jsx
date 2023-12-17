@@ -184,7 +184,7 @@ function Row(props) {
                         textAlign: "left",
                       }}
                       onClick={(e) => {
-                        navigate(`/admin/patient-management/${row.patientId}`);
+                        navigate(`/admin/transaction-management/${row.transactionId}`);
                       }}
                     >
                       Xem
@@ -198,7 +198,7 @@ function Row(props) {
                 <IconButton
                   color="black"
                   onClick={(e) => {
-                    navigate(`/admin/patient-management/${row.patientId}`);
+                    navigate(`/admin/transaction-management/${row.transactionId}`);
                   }}
                 >
                   <InfoOutlinedIcon color="black" />

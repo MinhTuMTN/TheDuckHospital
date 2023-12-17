@@ -29,6 +29,8 @@ const CustomButton = styled(Button)(({ theme }) => ({
 
 function MedicineListPage(props) {
   const [search, setSearch] = useState("");
+  const [enterPressed, setEnterPressed] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
@@ -44,16 +46,20 @@ function MedicineListPage(props) {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setEnterPressed(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setEnterPressed(true);
   };
 
   const handleGetMedicines = useCallback(async () => {
-    // if (!buttonClicked) return;
+    if (!enterPressed) return;
     const response = await getPaginationMedicines({
-      page: page - 1,
+      search: search.trim(),
+      page: pageChange ? page - 1 : 0,
       limit: limit,
     });
     if (response.success) {
@@ -62,8 +68,9 @@ function MedicineListPage(props) {
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-  }, [page, limit]);
+    setEnterPressed(false);
+    setPageChange(false);
+  }, [search, page, limit, enterPressed, pageChange]);
 
   useEffect(() => {
     handleGetMedicines();
@@ -116,51 +123,14 @@ function MedicineListPage(props) {
     setAddButtonClicked(false);
   }
 
-  // const handleGetFilteredProduct = useCallback(async () => {
-  //   if (!buttonClicked) return;
-  //   setIsLoading(true);
-  //   const response = await GetFilteredProducts({
-  //     search: search,
-  //     page: page - 1,
-  //     limit: limit,
-  //     catalogIds: selectedCategory,
-  //     productStatus: selectedStatus,
-  //     productQuantity: selectedQuantity,
-  //   });
-  //   if (response.success) {
-  //     setProductItems(response.data.data.objects);
-  //     setPage(parseInt(response.data.data.page) + 1);
-  //     setTotalItems(response.data.data.totalObjects);
-  //     setLimit(response.data.data.limit);
-  //   } else
-  //     enqueueSnackbar("Đã có lỗi xảy ra khi lấy thông tin sản phẩm", {
-  //       variant: "error",
-  //     });
-  //   setIsLoading(false);
-  //   setButtonClicked(false);
-  // }, [
-  //   limit,
-  //   page,
-  //   search,
-  //   selectedCategory,
-  //   selectedQuantity,
-  //   selectedStatus,
-  //   buttonClicked,
-  // ]);
-
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
-
-  // useEffect(() => {
-  //   handleGetFilteredProduct();
-  // }, [handleGetFilteredProduct]);
+  const handleEnterKeyPressed = (event) => {
+    if (event.key === "Enter" && event.target === document.activeElement) {
+      setEnterPressed(true);
+    }
+  }
 
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -203,105 +173,8 @@ function MedicineListPage(props) {
               <SearchMedicineList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                handleEnterKeyPressed={handleEnterKeyPressed}
               />
-              {/* <Box py={2} px={3}>
-                  {selectedCategory.length === 0 &&
-                    selectedQuantity.length === 0 &&
-                    selectedStatus.length === 0 && (
-                      <TextField
-                        disabled
-                        variant="standard"
-                        fullWidth
-                        size="medium"
-                        InputProps={{
-                          disableUnderline: true,
-                          fontSize: "14px",
-                        }}
-                        placeholder="Không có bộ lọc nào được chọn"
-                      />
-                    )}
-                  {selectedCategory.map((item, index) => (
-                    <Chip
-                      color="primary"
-                      label={
-                        catalogs.find((c) => c.catalogId === item)?.catalogName
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedCategory((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedStatus.map((item, index) => (
-                    <Chip
-                      color="secondary"
-                      label={statusOptions.find((i) => i.value === item)?.name}
-                      key={index}
-                      onDelete={() =>
-                        setSelectedStatus((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedQuantity.map((item, index) => (
-                    <Chip
-                      color="warning"
-                      label={
-                        quantityOptions.find((i) => i.value === item)?.name
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedQuantity((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-                </Box> */}
-              {/* <Stack
-                  direction={"row"}
-                  spacing={1}
-                  paddingLeft={2}
-                  paddingBottom={1}
-                  sx={{
-                    borderBottom: "1px solid #e0e0e0",
-                  }}
-                >
-                  <ProductFilter
-                    label={"Danh mục"}
-                    options={catalogs}
-                    selectedValues={selectedCategory}
-                    onChange={handleChangeCategoryFilter}
-                  />
-                  <ProductFilter
-                    label={"Trạng thái"}
-                    options={statusOptions}
-                    selectedValues={selectedStatus}
-                    onChange={handleChangeStatusFilter}
-                  />
-                  <ProductFilter
-                    label={"Số lượng"}
-                    options={quantityOptions}
-                    selectedValues={selectedQuantity}
-                    onChange={handleChangeQuantityFilter}
-                  />
-                </Stack> */}
-              {/* <ProductsTableBasis
-                  count={dataFetched.length}
-                  items={dataFetched}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                /> */}
               <MedicineTable
                 count={totalItems ? totalItems : 0}
                 items={medicines}
@@ -318,7 +191,6 @@ function MedicineListPage(props) {
           </Stack>
         </Container>
       </Box>
-      {/* )} */}
 
       <DialogForm
         cancelText={"Hủy"}

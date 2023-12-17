@@ -20,9 +20,9 @@ public class TransactionResponse {
     private String bankCode;
     private List<BookingResponse> bookings;
 
-    public TransactionResponse(Transaction transaction, List<BookingResponse> bookings, String userName) {
+    public TransactionResponse(Transaction transaction, List<BookingResponse> bookings) {
         this.transactionId = transaction.getTransactionId();
-        this.userName = userName;
+        this.userName = !bookings.isEmpty() ? bookings.get(0).getPatientProfile().getFullName() : "";
         this.amount = transaction.getAmount();
         this.status = transaction.getStatus();
         this.createdAt = transaction.getCreatedAt();

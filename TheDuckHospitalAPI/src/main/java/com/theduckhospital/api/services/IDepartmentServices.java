@@ -17,7 +17,13 @@ public interface IDepartmentServices {
     Department restoreDepartment(int departmentId);
     List<DepartmentResponse> getAllDepartments();
     List<Doctor> getActiveDoctorsDepartment(int departmentId);
-    FilteredDepartmentsResponse getPaginationDepartmentsDeleted(int page, int limit);
+
+    FilteredDepartmentsResponse getPaginationFilteredDepartments(
+            String search,
+            int page,
+            int limit
+    );
+
     List<Department> getAllDepartmentsDeleted();
     DepartmentResponse getDepartmentResponseById(int departmentId);
     Department getDepartmentById(int departmentId);

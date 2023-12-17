@@ -38,6 +38,7 @@ function SearchAccountList(props) {
     >
       <TextField
         variant="standard"
+        autoComplete="off"
         fullWidth
         size="medium"
         sx={{

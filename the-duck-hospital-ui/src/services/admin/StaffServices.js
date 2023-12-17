@@ -5,8 +5,8 @@ export const getAllStaffs = () => {
 };
 
 export const getPaginationStaffs = (params) => {
-    return get("/admin/staffs/filter", params, { Authorization: "" });
-  };
+    return get("/admin/staffs/filtered", params, { Authorization: "" });
+};
 
 export const createStaff = (data) => {
     return post("/admin/staffs", data, { Authorization: "" });

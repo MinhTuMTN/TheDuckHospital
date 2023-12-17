@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IStaffServices;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,16 +55,19 @@ public class StaffAdminController {
         );
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> getAllStaffsPagination(
+    @GetMapping("/filtered")
+    public ResponseEntity<?> getFilteredStaffsPagination(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "") List<Role> staffRole,
+            @RequestParam(defaultValue = "false, true") List<Boolean> staffStatus
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get staffs pagination successfully")
-                        .data(staffServices.getPaginationStaffsDeleted(page, limit))
+                        .message("Get filtered staffs pagination successfully")
+                        .data(staffServices.getPaginationFilteredStaffs(search, page, limit, staffRole, staffStatus))
                         .build()
         );
     }

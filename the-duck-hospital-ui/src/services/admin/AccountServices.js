@@ -1,7 +1,7 @@
 import { del, get, put } from "../AxiosInstance";
 
 export const getPaginationAccounts = (params) => {
-  return get("/admin/accounts/filter", params, { Authorization: "" });
+  return get("/admin/accounts/filtered", params, { Authorization: "" });
 };
 
 export const getAccountById = (userId) => {

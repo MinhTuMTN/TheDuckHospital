@@ -2,11 +2,11 @@ import styled from "@emotion/styled";
 import {
   Box,
   Grid,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
-import React from "react";
-import FormatDate from "../../General/FormatDate";
+import React, { useEffect, useState } from "react";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -35,40 +35,36 @@ const NoiDung = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
 }));
 
-function PatientDetail(props) {
-  const { patient } = props;
+function DoctorDetail(props) {
+  const { doctorSchedule } = props;
+  const [doctorDepartment, setDoctorDepartment] = useState("");
+
+  useEffect(() => {
+    const words = doctorSchedule.departmentName.split(" ");
+    const name = words.slice(1).join(" ");
+    setDoctorDepartment(name.charAt(0).toUpperCase() + name.slice(1));
+  }, [doctorSchedule]);
 
   return (
     <Stack
+      component={Paper}
       sx={{
         borderRadius: "15px",
         paddingTop: 1,
       }}
     >
       <BoxStyle>
-        <TieuDe>Thông tin cơ bản</TieuDe>
+        <TieuDe>Thông tin bác sĩ</TieuDe>
       </BoxStyle>
 
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Họ tên</TieuDeCot>
+            <TieuDeCot>Bác sĩ</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <TieuDeCot>{patient.fullName}</TieuDeCot>
-            </Stack>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>CCCD</TieuDeCot>
-          </Grid>
-          <Grid item xs={8} md={9}>
-            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{patient.identityNumber}</NoiDung>
+              <TieuDeCot>{doctorSchedule.doctorDegree}. {doctorSchedule.doctorName}</TieuDeCot>
             </Stack>
           </Grid>
         </Grid>
@@ -78,20 +74,10 @@ function PatientDetail(props) {
           <Grid item xs={4} md={3}>
             <TieuDeCot>Số điện thoại</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.phoneNumber}</NoiDung>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Ngày sinh</TieuDeCot>
-          </Grid>
-
-          <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={patient.dateOfBirth} /></NoiDung>
+            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+              <NoiDung>{doctorSchedule.phoneNumber}</NoiDung>
+            </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -102,15 +88,18 @@ function PatientDetail(props) {
       >
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Trạng thái</TieuDeCot>
+            <TieuDeCot>Khoa</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</NoiDung>
+            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+              <NoiDung>{doctorDepartment}</NoiDung>
+            </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
+
     </Stack>
   );
 }
 
-export default PatientDetail;
+export default DoctorDetail;

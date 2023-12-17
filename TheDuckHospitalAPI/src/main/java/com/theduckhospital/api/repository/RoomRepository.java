@@ -1,5 +1,6 @@
 package com.theduckhospital.api.repository;
 
+import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,5 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     List<Room> findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
             String roomName
     );
+    List<Room> findByRoomNameContainingOrDepartmentIn(String roomName, List<Department> departments);
 }

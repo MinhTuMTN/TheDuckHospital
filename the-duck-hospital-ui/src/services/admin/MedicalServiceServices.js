@@ -1,7 +1,7 @@
 import { del, get, post, put } from "../AxiosInstance";
 
 export const getPaginationServices = (params) => {
-  return get("/admin/services/filter", params, { Authorization: "" });
+  return get("/admin/services/filtered", params, { Authorization: "" });
 };
 
 export const getAllServices = () => {

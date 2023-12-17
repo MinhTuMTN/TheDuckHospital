@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react";
 import { Paper, Stack, Typography, useMediaQuery } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import DoctorTable from "../../../components/Doctor/HeadDoctor/DoctorTable";
-import SearchDoctorList from "./SearchDoctorList";
+import DoctorTable from "../../../components/Doctor/HeadDoctor/CreateDoctorSchedule/DoctorTable";
+import SearchDoctorList from "../../../components/Doctor/HeadDoctor/CreateDoctorSchedule/SearchDoctorList";
 import { enqueueSnackbar } from "notistack";
 import { getPaginationActiveDoctors } from "../../../services/doctor/headDoctor/ScheduleServices";
 function CreateSchedulePage(props) {

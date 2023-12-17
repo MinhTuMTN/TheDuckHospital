@@ -3,7 +3,6 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import AssistWalkerIcon from "@mui/icons-material/AssistWalker";
 import BabyChangingStationIcon from "@mui/icons-material/BabyChangingStation";
-import HealingIcon from "@mui/icons-material/Healing";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
@@ -46,12 +45,6 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 }));
 
 const sidebarItems = [
-  {
-    display: "Buổi Khám",
-    icon: <HealingIcon />,
-    to: "/admin/appointment-management",
-    section: "appointment-management",
-  },
   {
     display: "Tài Khoản",
     icon: <AccountCircleIcon />,

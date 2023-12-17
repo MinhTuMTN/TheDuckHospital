@@ -1,7 +1,7 @@
 import { del, get, post, put } from "../AxiosInstance";
 
 export const getPaginationDepartments = (params) => {
-  return get("/admin/departments/filter", params, { Authorization: "" });
+  return get("/admin/departments/filtered", params, { Authorization: "" });
 };
 
 export const getAllDepartments = () => {

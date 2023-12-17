@@ -12,64 +12,15 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RoomDetail from "../../../components/Admin/RoomManagement/RoomDetail";
-import ScheduleTable from "../../../components/Admin/RoomManagement/ScheduleTable";
+import ScheduleTable from "../../../components/Admin/ScheduleTable";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { getRoomById } from "../../../services/admin/RoomServices";
-import { getSchedules } from "../../../services/admin/DoctorScheduleServices";
+import { getSchedulesByRoomIdAndDate } from "../../../services/admin/DoctorScheduleServices";
 
-// const room = {
-//   roomName: "TDH1-01",
-//   departmentName: "Khoa nhi",
-//   description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio dolore enim, nemo nihil non omnis temporibus? Blanditiis culpa labore veli",
-//   schedule: {
-//     morning: [
-//       {
-//         fullName: "Nguyễn Văn Doctor 1",
-//         phoneNumber: "0123456789",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "7h - 11h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 2",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "7h - 11h",
-//       },
-//     ],
-//     afternoon: [
-//       {
-//         fullName: "Nguyễn Văn Doctor 1",
-//         phoneNumber: "0123456789",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 2",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: true,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//       {
-//         fullName: "Nguyễn Văn Doctor 3",
-//         phoneNumber: "0123456788",
-//         headOfDepartment: false,
-//         role: "Bác sĩ",
-//         time: "13h - 17h",
-//       },
-//     ],
-//   },
-//   deleted: false
-// }
-
-
-const BoxStyle1 = styled(Box)(({ theme }) => ({
+const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
   paddingLeft: "24px !important",
   paddingRight: "24px !important",
@@ -77,7 +28,7 @@ const BoxStyle1 = styled(Box)(({ theme }) => ({
   paddingBottom: "12px !important",
 }));
 
-const TieuDe1 = styled(Typography)(({ theme }) => ({
+const TieuDe = styled(Typography)(({ theme }) => ({
   fontSize: "1.3rem !important",
   variant: "subtitle1",
   fontWeight: "720 !important",
@@ -111,7 +62,10 @@ function RoomDetailPage() {
 
   const handleGetSchedules = useCallback(async () => {
     let date = dateSelected.format("YYYY/MM/DD")
-    const response = await getSchedules(roomId, { date });
+    const response = await getSchedulesByRoomIdAndDate({
+      roomId: roomId,
+      date: date,
+    });
     if (response.success) {
       setSchedules(response.data.data);
     }
@@ -224,9 +178,9 @@ function RoomDetailPage() {
                     paddingTop: 1,
                   }}
                 >
-                  <BoxStyle1>
+                  <BoxStyle>
                     <Stack direction={"row"}>
-                      <TieuDe1 sx={{ mt: 1 }}>Lịch làm việc</TieuDe1>
+                      <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
                       <LocalizationProvider
                         dateAdapter={AdapterDayjs}
                         adapterLocale="en-gb"
@@ -240,7 +194,7 @@ function RoomDetailPage() {
                         />
                       </LocalizationProvider>
                     </Stack>
-                  </BoxStyle1>
+                  </BoxStyle>
                   {schedules &&
                     <ScheduleTable items={schedules} />
                   }

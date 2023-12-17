@@ -27,7 +27,7 @@ import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
 import BookingsPage from "../pages/Doctor/BookingsPage";
 import CreateSchedulePage from "../pages/Doctor/HeadDoctor/CreateSchedulePage";
-import ScheduleListPage from "../pages/Doctor/HeadDoctor/ScheduleListPage";
+import ScheduleListPage from "../pages/Doctor/HeadDoctor/ShiftListPage";
 import SchedulePage from "../pages/Doctor/SchedulePage";
 import ChooseDoctorAndTime from "../pages/Nurse/ChooseDocterAndTime";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
@@ -48,6 +48,7 @@ import NotificationPage from "../pages/customer/NotificationPage";
 import PatientRecordsPage from "../pages/customer/PatientRecordsPage";
 import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
+import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
 
 const LoadComponent = (Component) => (props) =>
@@ -257,10 +258,6 @@ function Router(props) {
         //   index: true,
         // },
         {
-          path: "appointment-management",
-          element: null,
-        },
-        {
           path: "account-management",
           element: <AccountListPage />,
         },
@@ -323,6 +320,10 @@ function Router(props) {
         {
           path: "transaction-management",
           element: <TransactionListPage />,
+        },
+        {
+          path: "transaction-management/:transactionId",
+          element: <TransactionDetailPage />,
         },
         {
           path: "medicine-management",
