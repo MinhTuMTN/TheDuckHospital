@@ -8,10 +8,9 @@ import lombok.Data;
 @Data
 public class CreateServicesRequest {
     private String serviceName;
-
     @Min(value = 0, message = "Price must be greater than 0")
     private double price;
+    @NotNull(message = "Service type must not be null")
     private ServiceType serviceType;
-    @NotNull(message = "Department ID must not be null")
     private Integer departmentId;
 }

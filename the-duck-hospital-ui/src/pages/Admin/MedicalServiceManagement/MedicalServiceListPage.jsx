@@ -123,8 +123,10 @@ function MedicalServiceListPage(props) {
       return;
     }
 
-    if (medicalService.serviceType !== "MedicalExamination") {
-      enqueueSnackbar("Chưa hỗ trợ", { variant: "error" });
+    if (medicalService.serviceType === "MedicalTest" &&
+    medicalService.serviceName === ""
+    ) {
+      enqueueSnackbar("Tên dịch vụ không được để trống", { variant: "error" });
       return;
     }
 
@@ -133,7 +135,9 @@ function MedicalServiceListPage(props) {
       return;
     }
 
-    if (medicalService.departmentId === null) {
+    if (medicalService.serviceType === "MedicalExamination" &&
+    medicalService.departmentId === null
+    ) {
       enqueueSnackbar("Khoa không được để trống", { variant: "error" });
       return;
     }
@@ -344,7 +348,47 @@ function MedicalServiceListPage(props) {
                   )}
                 </FormControl>
               </Box>
-            </> : <Typography>Nope</Typography>
+            </> :
+            <>
+            <MuiTextFeild
+                label="Tên dịch vụ"
+                autoFocus
+                autoComplete="off"
+                value={medicalService.serviceName}
+                onChange={(e) => {
+                  setMedicalService((prev) => ({
+                    ...prev,
+                    serviceName: e.target.value,
+                  }));
+                }}
+                required
+                error={medicalService.serviceName === "" && addButtonClicked}
+                helperText={
+                  medicalService.serviceName === "" && addButtonClicked &&
+                  "Tên dịch vụ không được để trống"
+                }
+              />
+              <MuiTextFeild
+                type="number"
+                label="Giá dịch vụ"
+                autoFocus
+                autoComplete="off"
+                InputProps={{ inputProps: { min: 1000 } }}
+                value={medicalService.price ? medicalService.price.toString() : "0"}
+                onChange={(e) => {
+                  setMedicalService((prev) => ({
+                    ...prev,
+                    price: e.target.value ? parseInt(e.target.value) : 0,
+                  }));
+                }}
+                required
+                error={medicalService.price === 0 && addButtonClicked}
+                helperText={
+                  medicalService.price === 0 && addButtonClicked &&
+                  "Giá dịch vụ phải lớn hơn 0"
+                }
+              />
+            </>
           }
         </Stack>
       </DialogForm>

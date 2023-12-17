@@ -38,7 +38,10 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
 
     @Override
     public MedicalService createService(CreateServicesRequest request) {
-        Department department = departmentServices.getDepartmentById(request.getDepartmentId());
+        Department department = new Department();
+        if(request.getServiceType() == ServiceType.MedicalExamination) {
+            department = departmentServices.getDepartmentById(request.getDepartmentId());
+        }
         
         if (request.getServiceType() == ServiceType.MedicalExamination
                 && department.getMedicalServices().stream().anyMatch(
@@ -100,8 +103,10 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     private static MedicalService getMedicalService(CreateServicesRequest request, Department department) {
         MedicalService medicalService = new MedicalService();
         medicalService.setPrice(request.getPrice());
-        medicalService.setDepartment(department);
-        medicalService.setDescription(department.getDescription());
+        if (request.getServiceType() == ServiceType.MedicalExamination) {
+            medicalService.setDepartment(department);
+            medicalService.setDescription(department.getDescription());
+        }
         medicalService.setServiceType(request.getServiceType());
 
         String serviceName = request.getServiceName().trim();

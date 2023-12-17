@@ -109,7 +109,7 @@ function BookingTransactionItem(props) {
         >
           <Stack
             direction={"row"}
-            spacing={5}
+            spacing={3}
             sx={{ margin: 2 }}
           >
             <PatientDetail patient={item.patientProfile} />

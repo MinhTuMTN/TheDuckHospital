@@ -52,7 +52,7 @@ public class TransactionServicesImpl implements ITransactionServices {
     @Override
     public FilteredTransactionsResponse getTransactionsPagination(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Transaction> transactionPage = transactionRepository.findPaginationBy(pageable);
+        Page<Transaction> transactionPage = transactionRepository.findPaginationByOrderByCreatedAtDesc(pageable);
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
 

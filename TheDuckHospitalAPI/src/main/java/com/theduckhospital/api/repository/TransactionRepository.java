@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    Page<Transaction> findPaginationBy(Pageable pageable);
+    Page<Transaction> findPaginationByOrderByCreatedAtDesc(Pageable pageable);
 }

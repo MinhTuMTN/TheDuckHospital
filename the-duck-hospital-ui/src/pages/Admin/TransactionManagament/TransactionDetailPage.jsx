@@ -187,7 +187,6 @@ function TransactionDetailPage() {
               </Stack>
             </Grid>
           </Grid>
-
           <Grid container>
             <Grid item xs={12}>
               <Stack

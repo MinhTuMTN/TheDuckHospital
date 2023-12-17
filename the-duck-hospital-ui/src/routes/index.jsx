@@ -27,7 +27,7 @@ import StaffListPage from "../pages/Admin/StaffManagement/StaffListPage";
 import TransactionListPage from "../pages/Admin/TransactionManagament/TransactionListPage";
 import BookingsPage from "../pages/Doctor/BookingsPage";
 import CreateSchedulePage from "../pages/Doctor/HeadDoctor/CreateSchedulePage";
-import ScheduleListPage from "../pages/Doctor/HeadDoctor/ScheduleListPage";
+import ScheduleListPage from "../pages/Doctor/HeadDoctor/ShiftListPage";
 import SchedulePage from "../pages/Doctor/SchedulePage";
 import ChooseDoctorAndTime from "../pages/Nurse/ChooseDocterAndTime";
 import QueueNumberPage from "../pages/Nurse/QueueNumberPage";
@@ -254,10 +254,6 @@ function Router(props) {
         //   element: <Analytics />,
         //   index: true,
         // },
-        {
-          path: "appointment-management",
-          element: null,
-        },
         {
           path: "account-management",
           element: <AccountListPage />,
