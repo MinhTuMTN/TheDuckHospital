@@ -218,7 +218,7 @@ function Router(props) {
               element: <BookingsPage />,
             },
             {
-              path: "medical-examination-record/:patientId",
+              path: "medical-examination-record/:medicalRecordId",
               element: <MedicalExaminationRecord />,
             },
             {

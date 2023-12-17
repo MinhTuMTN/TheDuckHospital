@@ -17,12 +17,14 @@ import {
 import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import InfoPatient from "../../components/Doctor/InfoPatient";
 import ListTestToDo from "../../components/Doctor/ListTestToDo";
 import Prescription from "../../components/Doctor/Prescription";
 import FormatDateTime from "../../components/General/FormatDateTime";
+import { getMedicalRecord } from "../../services/doctor/MedicalExamServices";
+import dayjs from "dayjs";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -60,31 +62,26 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-const mainInfo = {
-  name: "Nguyễn Thị Thanh Huyền",
-  gender: "Nữ",
+const handleBasicsInfo = (patient) => {
+  return [
+    {
+      label: "Ngày sinh:",
+      value: dayjs(patient?.dateOfBirth)?.format("DD/MM/YYYY"),
+      icon: <CakeOutlinedIcon fontSize="18px" />,
+    },
+
+    {
+      label: "Địa chỉ:",
+      value: patient?.address,
+      icon: <LocationOnOutlinedIcon fontSize="18px" />,
+    },
+    {
+      label: "Số điện thoại:",
+      value: patient?.phoneNumber,
+      icon: <LocalPhoneIcon fontSize="18px" />,
+    },
+  ];
 };
-
-const info = [
-  {
-    label: "Ngày sinh:",
-    value: "10/1/1999",
-    icon: <CakeOutlinedIcon fontSize="18px" />,
-  },
-
-  {
-    label: "Địa chỉ:",
-    value: "Hà Nội",
-    icon: <LocationOnOutlinedIcon fontSize="18px" />,
-  },
-  {
-    label: "Số điện thoại:",
-    value: "0123456789",
-    icon: <LocalPhoneIcon fontSize="18px" />,
-  },
-];
-
-const history = null;
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -94,6 +91,9 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 
 function MedicalExaminationRecord(props) {
   const navigate = useNavigate();
+  const { medicalRecordId } = useParams();
+  const [info, setInfo] = React.useState({});
+  const [basicsInfo, setBasicsInfo] = React.useState([]);
   const [symptom, setSymptom] = React.useState("");
   const [diagnostic, setDiagnostic] = React.useState("");
   const [expanded, setExpanded] = React.useState("panel1");
@@ -101,6 +101,20 @@ function MedicalExaminationRecord(props) {
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
+
+  useEffect(() => {
+    const handleGetMedicalRecord = async () => {
+      const response = await getMedicalRecord(medicalRecordId);
+      if (response.success) {
+        const data = response.data.data;
+        setInfo(data);
+        setBasicsInfo(handleBasicsInfo(data.patient));
+        setSymptom(data.symptom || "");
+        setDiagnostic(data.diagnostic || "");
+      }
+    };
+    handleGetMedicalRecord();
+  }, [medicalRecordId]);
 
   return (
     <Box
@@ -160,7 +174,7 @@ function MedicalExaminationRecord(props) {
               fontSize: "2rem",
             }}
           >
-            BN-1033856633
+            {info?.patient?.patientCode}
           </Typography>
 
           <Stack
@@ -192,7 +206,7 @@ function MedicalExaminationRecord(props) {
                 fontSize: "14px",
               }}
             >
-              <FormatDateTime dateTime={"12/1/1999"} />
+              <FormatDateTime dateTime={info?.createdAt} />
             </Typography>
           </Stack>
         </Stack>
@@ -206,7 +220,11 @@ function MedicalExaminationRecord(props) {
         }}
       >
         <Grid item xs={12} md={3.5}>
-          <InfoPatient mainInfo={mainInfo} history={history} info={info} />
+          <InfoPatient
+            mainInfo={info?.patient}
+            history={null}
+            info={basicsInfo}
+          />
         </Grid>
 
         <Grid

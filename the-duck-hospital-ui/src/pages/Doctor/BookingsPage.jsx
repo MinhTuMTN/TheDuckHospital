@@ -16,41 +16,6 @@ import ReceivePatients from "../../components/Doctor/ReceivePatients";
 import styled from "@emotion/styled";
 import { DoctorContext } from "../../auth/DoctorProvider";
 import { getCounterMedicalRecord } from "../../services/doctor/DoctorScheduleServices";
-function createData(patientId, patientName, birth, gender, province) {
-  return { patientId, patientName, birth, gender, province };
-}
-
-const listPatient = [
-  createData("BN12345678", "Nguyễn Ánh Tuyết", "1/1/2002", "Nữ", "Hà Nội"),
-  createData(
-    "BN12342418",
-    "Trần Minh Tuấn",
-    "20/11/1992",
-    "Nam",
-    "Tp Hồ Chí Minh"
-  ),
-  createData(
-    "BN09875678",
-    "Tạ Thông Minh",
-    "22/8/2002",
-    "Nam",
-    "Tỉnh Đồng Nai"
-  ),
-  createData(
-    "BN14344669",
-    "Dư Nguyễn Sanh Sanh",
-    "10/2/2004",
-    "Nữ",
-    "Tỉnh Bình Dương"
-  ),
-  createData(
-    "BN14344669",
-    "Dư Nguyễn Sanh Sanh",
-    "10/2/2004",
-    "Nữ",
-    "Tỉnh Bình Dương"
-  ),
-];
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 

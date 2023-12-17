@@ -6,6 +6,7 @@ import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.admin.PrescriptionItemResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
@@ -144,6 +145,19 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 medicalExaminationId,
                 MedicalExamState.PROCESSING
         );
+    }
+
+    @Override
+    public DoctorMedicalRecordResponse doctorGetMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        return new DoctorMedicalRecordResponse(medicalExaminationRecord);
     }
 
     private MedicalExaminationRecord updateStateMedicalExamRecord(
