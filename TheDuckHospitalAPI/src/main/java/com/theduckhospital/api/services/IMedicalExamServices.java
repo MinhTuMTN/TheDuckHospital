@@ -23,4 +23,6 @@ public interface IMedicalExamServices {
     MedicalRecordItemResponse nurseCreateMedicalExamRecord(
             NurseCreateBookingRequest request
     );
+
+    MedicalExaminationRecord acceptMedicalExamination(String authorization, UUID medicalExaminationId);
 }

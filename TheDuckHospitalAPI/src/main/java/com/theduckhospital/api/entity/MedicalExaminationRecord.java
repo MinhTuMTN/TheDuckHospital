@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.MedicalExamState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -56,6 +57,8 @@ public class MedicalExaminationRecord {
     @Nationalized
     private String diagnosis; // chẩn đoán
     private Date reExaminationDate; // ngày tái khám (nếu có)
+
+    private MedicalExamState state = MedicalExamState.WAITING;
 
     private boolean deleted;
     private Date createdDate;

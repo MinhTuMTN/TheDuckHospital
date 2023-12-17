@@ -60,16 +60,16 @@ function LoginPage(props) {
   const [emailOrPhoneNumber, setEmailOrPhoneNumber] = React.useState("");
   const [loginType, setLoginType] = React.useState("password");
   const [step, setStep] = React.useState(1);
-  const { token } = useAuth();
+  const { token, fullName } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token) {
+    if (token && fullName) {
       setTimeout(() => {
         window.location.href = "/";
       }, 200);
     }
-  }, [token, navigate]);
+  }, [token, navigate, fullName]);
   return (
     <RootPageLogin title="Đăng nhập">
       <Left>

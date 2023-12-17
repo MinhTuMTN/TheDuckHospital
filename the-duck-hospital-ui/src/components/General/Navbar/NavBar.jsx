@@ -156,7 +156,7 @@ function NavBar(props) {
               <CustomMenuItem>Liên hệ</CustomMenuItem>
             </Toolbar>
             <Box>
-              {!token ? (
+              {!token || !fullName ? (
                 <Button
                   variant="contained"
                   sx={{
