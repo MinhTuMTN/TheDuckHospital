@@ -20,7 +20,7 @@ public class MedicalTest {
     @Id
     private UUID medicalTestId;
 
-    private String resultFileUrl;
+    private String resultFileUrl; // Bên lab (xét nghiệm) sẽ upload file kết quả lên đây
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

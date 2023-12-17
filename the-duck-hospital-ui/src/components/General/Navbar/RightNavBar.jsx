@@ -20,6 +20,10 @@ import {
   Box,
   Button,
   CardMedia,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
   IconButton,
   ListItemIcon,
   Stack,
@@ -31,6 +35,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
 import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
+import { getTodaySchedule } from "../../../services/doctor/DoctorScheduleServices";
+import { DoctorScheduleItem } from "./DoctorMenuList";
 
 const userMainItems = [
   {
@@ -63,7 +69,7 @@ const doctorMainItems = [
         </svg>
       </SvgIcon>
     ),
-    to: "/doctor/doctor-bookings",
+    onClick: "doctor",
   },
   {
     display: "Lịch trực",
@@ -98,7 +104,7 @@ const nurseMainItems = [
   {
     display: "Phòng khám",
     icon: <LocalHospitalOutlined />,
-    onClick: () => {},
+    onClick: "nurse",
   },
 ];
 
@@ -166,6 +172,22 @@ function RightNavBar(props) {
   const { open, onOpenClose } = props;
   const { token, setToken, fullName, role } = useAuth();
   const navigate = useNavigate();
+
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [schedule, setSchedule] = React.useState([]);
+  useEffect(() => {
+    const handleGetTodaySchedule = async () => {
+      setIsLoading(true);
+      const response = await getTodaySchedule();
+      if (response.success) setSchedule(response.data.data);
+      setIsLoading(false);
+    };
+
+    if (!openDialog) return;
+
+    handleGetTodaySchedule();
+  }, [openDialog]);
 
   let mainItems = [];
   switch (role) {
@@ -301,7 +323,11 @@ function RightNavBar(props) {
                 }}
                 onClick={() => {
                   if (item.onClick) {
-                    setNurseDialogOpen(true);
+                    if (item.onClick === "nurse") {
+                      setNurseDialogOpen(true);
+                    } else if (item.onClick === "doctor") {
+                      setOpenDialog(true);
+                    }
                   } else {
                     navigate(item.to);
                     onOpenClose(false);
@@ -456,6 +482,31 @@ function RightNavBar(props) {
         setOpen={setNurseDialogOpen}
         onClose={() => onOpenClose(false)}
       />
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Chọn ca trực</DialogTitle>
+        <Divider variant="middle" />
+        <DialogContent>
+          <Typography>
+            Vui lòng chọn ca trực hôm nay để có thể tiếp tục
+          </Typography>
+
+          <Stack mt={1} direction={"row"} spacing={1}>
+            {isLoading && <Typography>Đang tải...</Typography>}
+            {!isLoading &&
+              schedule.map((item, index) => (
+                <DoctorScheduleItem
+                  key={`schedule-doctor-today-${index}`}
+                  schedule={item}
+                />
+              ))}
+
+            {!isLoading && schedule.length === 0 && (
+              <Typography>Không có ca trực nào</Typography>
+            )}
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 

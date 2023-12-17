@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
@@ -190,6 +191,20 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DoctorScheduleResponse> getTodayDoctorSchedules(String authorization) throws ParseException {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+        Date today = DateCommon.getToday();
+        return doctorScheduleRepository
+                .findByDoctorAndDateAndDeletedIsFalse(
+                        doctor,
+                        today
+                )
+                .stream()
+                .map(DoctorScheduleResponse::new)
+                .toList();
+    }
+
     private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {
         DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
                 .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
@@ -359,12 +374,10 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         List<DoctorSchedule> mergedList = Stream.concat(doctorSchedules1.stream(), doctorSchedules2.stream())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
-        List<Date> dateList = mergedList.stream()
+        return mergedList.stream()
                 .map(DoctorSchedule::getDate)
                 .collect(Collectors.toList());
-
-        return dateList;
     }
 }

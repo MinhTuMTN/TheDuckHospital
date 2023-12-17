@@ -48,14 +48,14 @@ public class MedicalExaminationRecord {
     @OneToOne(mappedBy = "medicalExaminationRecord", fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private Prescription prescription;
+    private Prescription prescription;  // đơn thuốc
 
     @Nationalized
-    private String symptom;
+    private String symptom;  // triệu chứng
 
     @Nationalized
-    private String diagnosis;
-    private Date reExaminationDate;
+    private String diagnosis; // chẩn đoán
+    private Date reExaminationDate; // ngày tái khám (nếu có)
 
     private boolean deleted;
     private Date createdDate;

@@ -3,6 +3,7 @@ import AuthProvider from "./auth/AuthProvider";
 import Router from "./routes";
 import CustomThemeProvider from "./theme";
 import { NurseProvider } from "./auth/NurseProvider";
+import { DoctorProvider } from "./auth/DoctorProvider";
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
       >
         <AuthProvider>
           <NurseProvider>
-            <Router />
+            <DoctorProvider>
+              <Router />
+            </DoctorProvider>
           </NurseProvider>
         </AuthProvider>
       </SnackbarProvider>
