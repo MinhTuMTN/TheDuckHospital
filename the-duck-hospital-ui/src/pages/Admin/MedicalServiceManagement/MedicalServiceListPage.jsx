@@ -124,7 +124,7 @@ function MedicalServiceListPage(props) {
     }
 
     if (medicalService.serviceType === "MedicalTest" &&
-    medicalService.serviceName === ""
+      medicalService.serviceName === ""
     ) {
       enqueueSnackbar("Tên dịch vụ không được để trống", { variant: "error" });
       return;
@@ -136,17 +136,17 @@ function MedicalServiceListPage(props) {
     }
 
     if (medicalService.serviceType === "MedicalExamination" &&
-    medicalService.departmentId === null
+      (medicalService.departmentId === "" || medicalService.departmentId === null)
     ) {
       enqueueSnackbar("Khoa không được để trống", { variant: "error" });
       return;
     }
 
     const response = await addService({
-      serviceName: medicalService.serviceName,
+      serviceName: medicalService.serviceType === "MedicalTest" ? medicalService.serviceName : "",
       serviceType: medicalService.serviceType,
       price: medicalService.price,
-      departmentId: medicalService.departmentId,
+      departmentId: medicalService.serviceType === "MedicalExamination" ? medicalService.departmentId : null,
     });
     if (response.success) {
       enqueueSnackbar("Thêm dịch vụ thành công!", { variant: "success" });
@@ -350,7 +350,7 @@ function MedicalServiceListPage(props) {
               </Box>
             </> :
             <>
-            <MuiTextFeild
+              <MuiTextFeild
                 label="Tên dịch vụ"
                 autoFocus
                 autoComplete="off"
