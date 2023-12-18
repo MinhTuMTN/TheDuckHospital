@@ -1,15 +1,14 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -20,7 +19,10 @@ public class MedicalTest {
     @Id
     private UUID medicalTestId;
 
-    private String note; // Ghi chú
+    private int queueNumber;
+    @Nationalized
+    private String note;
+    private double price;
 
     private String resultFileUrl; // Bên lab (xét nghiệm) sẽ upload file kết quả lên đây
 
@@ -39,4 +41,11 @@ public class MedicalTest {
     @ToStringExclude
     private LaboratoryTechnician laboratoryTechnician;
 
+    private Date date;
+    private boolean deleted;
+
+    @PrePersist
+    public void prePersist() {
+        this.medicalTestId = UUID.randomUUID();
+    }
 }

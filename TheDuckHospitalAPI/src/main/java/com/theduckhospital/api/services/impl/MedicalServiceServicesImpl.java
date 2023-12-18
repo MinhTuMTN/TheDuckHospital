@@ -12,12 +12,10 @@ import com.theduckhospital.api.repository.MedicalServiceRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -124,5 +122,28 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         service.setPrice(request.getPrice());
 
         return medicalServiceRepository.save(service);
+    }
+
+    @Override
+    public List<MedicalService> doctorGetAllMedicalTests() {
+        return medicalServiceRepository.getByServiceTypeAndDeletedIsFalse(
+                ServiceType.MedicalTest
+        );
+    }
+
+    @Override
+    public MedicalService getMedicalServiceByIdAndServiceType(int serviceId, ServiceType serviceType) {
+        MedicalService medicalService = medicalServiceRepository
+                .findById(serviceId)
+                .orElseThrow(() ->
+                        new StatusCodeException("Medical service not found", 404)
+                );
+
+        if(medicalService.getServiceType() != serviceType || medicalService.isDeleted()) {
+            throw new StatusCodeException("Medical service not found", 404);
+
+        }
+
+        return medicalService;
     }
 }

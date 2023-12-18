@@ -7,3 +7,10 @@ export const acceptMedicalRecord = (medicalRecordId) => {
 export const getMedicalRecord = (medicalRecordId) => {
   return get(`/doctor/medical-records/${medicalRecordId}`);
 };
+
+export const updateMedicalRecord = (medicalRecordId, symptom, diagnosis) => {
+  return put(`/doctor/medical-records/${medicalRecordId}`, {
+    symptom,
+    diagnosis,
+  });
+};

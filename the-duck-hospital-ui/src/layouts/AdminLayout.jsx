@@ -12,7 +12,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/Admin/AdminSidebar";
 import TopNavbar from "../components/Admin/TopNavbar";
 
-
 const SIDE_NAV_WIDTH = 280;
 
 const RootPageUser = styled(Box)(({ theme }) => ({
@@ -46,7 +45,6 @@ function AdminLayout(props) {
 
     switch (editedPath) {
       case "/admin/customer-management":
-
         break;
       case "/admin":
       case "/admin/analytics":
