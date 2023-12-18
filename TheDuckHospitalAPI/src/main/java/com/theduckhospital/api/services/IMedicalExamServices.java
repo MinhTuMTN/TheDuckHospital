@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface IMedicalExamServices {
     MedicalRecordItemResponse nurseCreateMedicalExamRecord(
             NurseCreateBookingRequest request
     );
+
+    MedicalExaminationRecord acceptMedicalExamination(String authorization, UUID medicalExaminationId);
+
+    DoctorMedicalRecordResponse doctorGetMedicalExamination(String authorization, UUID medicalExaminationId);
 }

@@ -11,44 +11,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import ReceivePatients from "../../components/Doctor/ReceivePatients";
 import styled from "@emotion/styled";
-function createData(patientId, patientName, birth, gender, province) {
-  return { patientId, patientName, birth, gender, province };
-}
-
-const listPatient = [
-  createData("BN12345678", "Nguyễn Ánh Tuyết", "1/1/2002", "Nữ", "Hà Nội"),
-  createData(
-    "BN12342418",
-    "Trần Minh Tuấn",
-    "20/11/1992",
-    "Nam",
-    "Tp Hồ Chí Minh"
-  ),
-  createData(
-    "BN09875678",
-    "Tạ Thông Minh",
-    "22/8/2002",
-    "Nam",
-    "Tỉnh Đồng Nai"
-  ),
-  createData(
-    "BN14344669",
-    "Dư Nguyễn Sanh Sanh",
-    "10/2/2004",
-    "Nữ",
-    "Tỉnh Bình Dương"
-  ),
-  createData(
-    "BN14344669",
-    "Dư Nguyễn Sanh Sanh",
-    "10/2/2004",
-    "Nữ",
-    "Tỉnh Bình Dương"
-  ),
-];
+import { DoctorContext } from "../../auth/DoctorProvider";
+import { getCounterMedicalRecord } from "../../services/doctor/DoctorScheduleServices";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -94,11 +61,34 @@ function BookingsPage(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [value, setValue] = React.useState(0);
+  const { doctorScheduleId } = useContext(DoctorContext);
+  const [counter, setCounter] = React.useState({
+    waiting: 0,
+    processing: 0,
+  });
+  const [refresh, setRefresh] = React.useState(false);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  useEffect(() => {
+    const handleGetCounterMedicalRecord = async () => {
+      const response = await getCounterMedicalRecord(doctorScheduleId);
+      if (response.success) {
+        const data = response.data.data;
+        if (
+          data.waiting !== counter.waiting ||
+          data.processing !== counter.processing
+        ) {
+          setRefresh(!refresh);
+          setCounter(data);
+        }
+      }
+    };
 
+    handleGetCounterMedicalRecord();
+    const intervalId = setInterval(() => {
+      handleGetCounterMedicalRecord();
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [doctorScheduleId, counter, refresh]);
   return (
     <Grid
       container
@@ -138,7 +128,7 @@ function BookingsPage(props) {
         >
           <Box sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={value} onChange={handleChange}>
+              <Tabs value={value} onChange={(e, value) => setValue(value)}>
                 <Tab
                   sx={{
                     "& .MuiTab-wrapper": {
@@ -158,7 +148,10 @@ function BookingsPage(props) {
                       }}
                     >
                       Tiếp nhận
-                      <StyledBadge badgeContent={4} color="error" />
+                      <StyledBadge
+                        badgeContent={counter.waiting}
+                        color="error"
+                      />
                     </div>
                   }
                   {...a11yProps(0)}
@@ -182,7 +175,10 @@ function BookingsPage(props) {
                       }}
                     >
                       Đang khám
-                      <StyledBadge badgeContent={4} color="info" />
+                      <StyledBadge
+                        badgeContent={counter.processing}
+                        color="info"
+                      />
                     </div>
                   }
                   {...a11yProps(1)}
@@ -190,10 +186,10 @@ function BookingsPage(props) {
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
-              <ReceivePatients status={0} listPatients={listPatient} />
+              <ReceivePatients status={"WAITING"} refresh={refresh} />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-              <ReceivePatients status={1} listPatients={listPatient} />
+              <ReceivePatients status={"PROCESSING"} refresh={refresh} />
             </CustomTabPanel>
           </Box>
         </Stack>

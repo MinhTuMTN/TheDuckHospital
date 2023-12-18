@@ -16,10 +16,15 @@ import {
   TextField,
   tableCellClasses,
 } from "@mui/material";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { searchMedicalRecord } from "../../services/doctor/DoctorScheduleServices";
+import { DoctorContext } from "../../auth/DoctorProvider";
+import dayjs from "dayjs";
+import { enqueueSnackbar } from "notistack";
+import { acceptMedicalRecord } from "../../services/doctor/MedicalExamServices";
 
 ReceivePatients.propTypes = {
   status: PropTypes.number,
@@ -42,9 +47,47 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function ReceivePatients(props) {
+  const { status, refresh } = props;
   const [searchString, setSearchString] = React.useState("");
-  const { listPatients } = props;
+  const [page, setPage] = React.useState(0);
+  const [totalPage, setTotalPage] = React.useState(1);
+  const [patients, setPatients] = React.useState([]);
+  const { doctorScheduleId } = useContext(DoctorContext);
   const navigate = useNavigate();
+
+  const acceptPatient = async (medicalExaminationId) => {
+    const response = await acceptMedicalRecord(medicalExaminationId);
+    if (response.success) {
+      enqueueSnackbar("Tiếp nhận bệnh nhân thành công", {
+        variant: "success",
+      });
+      navigate("/doctor/medical-examination-record/" + medicalExaminationId);
+    } else {
+      enqueueSnackbar("Tiếp nhận bệnh nhân thất bại", {
+        variant: "error",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const handleGetPatients = async () => {
+      const response = await searchMedicalRecord(
+        doctorScheduleId,
+        status,
+        page,
+        searchString
+      );
+
+      if (response.success) {
+        const data = response.data.data;
+
+        setPatients(data.items);
+        setTotalPage(data.totalPages);
+        setPage(data.page);
+      }
+    };
+    handleGetPatients();
+  }, [doctorScheduleId, status, page, searchString, refresh]);
   return (
     <Grid item xs={12}>
       <Stack spacing={2}>
@@ -62,7 +105,16 @@ function ReceivePatients(props) {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Button variant="text" color="info">
+                <Button
+                  variant="text"
+                  color="info"
+                  onClick={() => {
+                    window.open(
+                      "http://res.cloudinary.com/dsmvlvfy5/image/upload/v1702821055/v9rbovpcuude0fszx2fz.pdf",
+                      "_blank"
+                    );
+                  }}
+                >
                   Tìm kiếm
                 </Button>
               </InputAdornment>
@@ -145,7 +197,7 @@ function ReceivePatients(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {listPatients.map((row, index) => (
+              {patients.map((row, index) => (
                 <TableRow
                   key={row.name}
                   sx={{
@@ -153,21 +205,26 @@ function ReceivePatients(props) {
                     cursor: props.status === 0 ? "default" : "pointer",
                   }}
                   onClick={() => {
+                    if (row.state === "WAITING") return;
                     navigate(
-                      `/doctor/medical-examination-record/${row.patientId}`
+                      `/doctor/medical-examination-record/${row.medicalExaminationId}`
                     );
                   }}
                 >
                   <TableCell align="center">{index + 1}</TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    {row.patientId}
+                    {row.patientCode}
                   </TableCell>
                   <TableCell align="left">{row.patientName}</TableCell>
-                  <TableCell align="right">{row.birth}</TableCell>
-                  <TableCell align="right">{row.gender}</TableCell>
-                  <TableCell align="right">{row.province}</TableCell>
+                  <TableCell align="right">
+                    {dayjs(row.patientDateOfBirth).format("DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell align="right">
+                    {row.patientGender === "MALE" ? "Nam" : "Nữ"}
+                  </TableCell>
+                  <TableCell align="right">{row.patientAddress}</TableCell>
                   <TableCell align="center">
-                    {props.status === 0 ? (
+                    {row.state === "WAITING" ? (
                       <IconButton
                         size="small"
                         sx={{
@@ -181,6 +238,7 @@ function ReceivePatients(props) {
                             color: "#ffffff",
                           },
                         }}
+                        onClick={() => acceptPatient(row.medicalExaminationId)}
                       >
                         <CheckCircleOutlineIcon
                           sx={{
@@ -222,6 +280,9 @@ function ReceivePatients(props) {
               justifyContent: "flex-end",
               marginTop: "10px",
             }}
+            count={totalPage}
+            page={page + 1}
+            onChange={(event, value) => setPage(value - 1)}
           />
         </TableContainer>
       </Stack>

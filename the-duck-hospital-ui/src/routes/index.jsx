@@ -205,6 +205,9 @@ function Router(props) {
     },
     {
       path: "/",
+    },
+
+    {
       element: <ProtectedLayout forRole={["Doctor", "HeadDoctor"]} />,
       children: [
         {
@@ -216,7 +219,7 @@ function Router(props) {
               element: <BookingsPage />,
             },
             {
-              path: "medical-examination-record/:patientId",
+              path: "medical-examination-record/:medicalRecordId",
               element: <MedicalExaminationRecord />,
             },
             {

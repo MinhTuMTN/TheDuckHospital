@@ -1,16 +1,20 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
+import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
+import com.theduckhospital.api.dto.response.doctor.SearchMedicalExamResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
+import com.theduckhospital.api.repository.MedicalExaminationRepository;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import com.theduckhospital.api.services.IRoomServices;
@@ -37,6 +41,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final IRoomServices roomServices;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final MedicalExaminationRepository examinationRepository;
     private final BookingRepository bookingRepository;
     @Value("${settings.date}")
     private String todayDate;
@@ -46,11 +51,14 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             IMedicalServiceServices medicalServiceServices,
             IRoomServices roomServices,
             DoctorScheduleRepository doctorScheduleRepository,
-            BookingRepository bookingRepository) {
+            MedicalExaminationRepository examinationRepository,
+            BookingRepository bookingRepository
+    ) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
         this.roomServices = roomServices;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.examinationRepository = examinationRepository;
         this.bookingRepository = bookingRepository;
     }
 
@@ -203,6 +211,58 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 .stream()
                 .map(DoctorScheduleResponse::new)
                 .toList();
+    }
+
+    @Override
+    public PaginationResponse searchMedicalExaminationRecord(
+            String authorization,
+            UUID doctorScheduleId,
+            String patientName,
+            MedicalExamState state,
+            int page,
+            int size
+    ) {
+        DoctorSchedule doctorSchedule = doctorGetScheduleById(authorization, doctorScheduleId);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<MedicalExaminationRecord> examinationRecords =
+                examinationRepository
+                        .findByDoctorScheduleAndDeletedIsFalseAndPatientProfile_FullNameContainingIgnoreCaseAndState(
+                        doctorSchedule,
+                        patientName,
+                        state,
+                        pageable
+                );
+
+        return PaginationResponse.builder()
+                .items(examinationRecords.stream()
+                        .map(SearchMedicalExamResponse::new)
+                        .toList())
+                .totalItems((int) examinationRecords.getTotalElements())
+                .totalPages(examinationRecords.getTotalPages())
+                .page(page)
+                .limit(size)
+                .build();
+    }
+
+    @Override
+    public Map<String, String> countMedicalExaminationRecord(String authorization, UUID doctorScheduleId) {
+        DoctorSchedule doctorSchedule = doctorGetScheduleById(authorization, doctorScheduleId);
+
+        long waiting = examinationRepository.countByDoctorScheduleAndStateAndDeletedIsFalse(
+                doctorSchedule,
+                MedicalExamState.WAITING
+        );
+
+        long processing = examinationRepository.countByDoctorScheduleAndStateAndDeletedIsFalse(
+                doctorSchedule,
+                MedicalExamState.PROCESSING
+        );
+
+        return Map.of(
+                "waiting", String.valueOf(waiting),
+                "processing", String.valueOf(processing)
+        );
     }
 
     private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {
@@ -379,5 +439,22 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         return mergedList.stream()
                 .map(DoctorSchedule::getDate)
                 .collect(Collectors.toList());
+    }
+
+    private DoctorSchedule doctorGetScheduleById(String authorization, UUID doctorScheduleId) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+        DoctorSchedule doctorSchedule = doctorScheduleRepository
+                .findById(doctorScheduleId)
+                .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
+
+        if (doctorSchedule.isDeleted()) {
+            throw new BadRequestException("Doctor schedule not found");
+        }
+
+        if (doctorSchedule.getDoctor().getStaffId() != doctor.getStaffId()) {
+            throw new BadRequestException("Doctor schedule is not yours");
+        }
+
+        return doctorSchedule;
     }
 }
