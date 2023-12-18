@@ -294,10 +294,10 @@ function MedicineTable(props) {
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
                   >
-                    Tên
+                    Tên thuốc
                   </CustomText>
                 </TableCell>
-                <TableCell align="right" style={{ width: "15%" }}>
+                <TableCell align="right" style={{ width: "20%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
@@ -305,7 +305,7 @@ function MedicineTable(props) {
                     Giá
                   </CustomText>
                 </TableCell>
-                <TableCell align="right" style={{ width: "15%" }}>
+                <TableCell align="right" style={{ width: "20%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
@@ -313,7 +313,7 @@ function MedicineTable(props) {
                     Số lượng
                   </CustomText>
                 </TableCell>
-                <TableCell align="center" style={{ width: "30%" }}>
+                <TableCell align="center" style={{ width: "25%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
@@ -321,7 +321,7 @@ function MedicineTable(props) {
                     Trạng thái
                   </CustomText>
                 </TableCell>
-                <TableCell align="center" style={{ width: "20%" }}>
+                <TableCell align="center" style={{ width: "15%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}

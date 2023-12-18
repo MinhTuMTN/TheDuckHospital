@@ -13,6 +13,12 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StaffDetail from "../../../components/Admin/StaffManagement/StaffDetail";
 import { getStaffById } from "../../../services/admin/StaffServices";
 import { useCallback, useEffect, useState } from "react";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/en-gb";
+import ScheduleTable from "../../../components/Admin/ScheduleTable";
+import { getSchedulesByStaffIdAndDate } from "../../../services/admin/DoctorScheduleServices";
 
 const StaffId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -24,17 +30,62 @@ const StaffId = styled(Typography)(({ theme }) => ({
   width: "fit-content",
 }));
 
+
+const BoxStyle = styled(Box)(({ theme }) => ({
+  borderBottom: "1px solid #E0E0E0",
+  paddingLeft: "24px !important",
+  paddingRight: "24px !important",
+  paddingTop: "12px !important",
+  paddingBottom: "12px !important",
+}));
+
+const TieuDe = styled(Typography)(({ theme }) => ({
+  fontSize: "1.3rem !important",
+  variant: "subtitle1",
+  fontWeight: "720 !important",
+  width: "12%",
+}));
+
+const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
+  width: "15%",
+  "& input": {
+    height: "55px",
+  },
+}));
+
 function StaffDetailPage() {
   const navigate = useNavigate();
   const { staffId, departmentId } = useParams();
   const { state } = useLocation();
   const [staff, setStaff] = useState({});
+  const [isDoctor, setIsDoctor] = useState(false);
+  const [dateSelected, setDateSelected] = useState(dayjs());
+  const [schedules, setSchedules] = useState([]);
 
-    const handleGetStaff = useCallback(async () => {
-      const response = await getStaffById(staffId);
-      if (response.success) {
-        setStaff(response.data.data);
+  const handleGetSchedules = useCallback(async () => {
+    if(!isDoctor) return;
+    let date = dateSelected.format("YYYY/MM/DD")
+    const response = await getSchedulesByStaffIdAndDate({
+      staffId: staffId,
+      date: date,
+    });
+    if (response.success) {
+      setSchedules(response.data.data);
+    }
+  }, [staffId, dateSelected, isDoctor]);
+
+  useEffect(() => {
+    handleGetSchedules();
+  }, [handleGetSchedules, dateSelected]);
+
+  const handleGetStaff = useCallback(async () => {
+    const response = await getStaffById(staffId);
+    if (response.success) {
+      setStaff(response.data.data);
+      if(response.data.data.role === "Bác sĩ") {
+        setIsDoctor(true);
       }
+    }
   }, [staffId]);
 
   useEffect(() => {
@@ -67,8 +118,8 @@ function StaffDetailPage() {
               color="#111927"
               onClick={() => {
                 state ?
-                navigate(`/admin/department-management/${departmentId}`) :
-                navigate("/admin/staff-management");
+                  navigate(`/admin/department-management/${departmentId}`) :
+                  navigate("/admin/staff-management");
               }}
             >
               <ArrowBackIosIcon />
@@ -127,6 +178,49 @@ function StaffDetailPage() {
               </Stack>
             </Grid>
           </Grid>
+
+          {isDoctor &&
+          <Grid container>
+            <Grid item xs={12}>
+              <Stack
+                component={Paper}
+                elevation={3}
+                sx={{
+                  marginTop: 4,
+                  borderRadius: "15px",
+                }}
+                spacing={"2px"}
+              >
+                <Stack
+                  sx={{
+                    borderRadius: "15px",
+                    paddingTop: 1,
+                  }}
+                >
+                  <BoxStyle>
+                    <Stack direction={"row"}>
+                      <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
+                      <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        adapterLocale="en-gb"
+                      >
+                        <CustomDatePicker
+                          label="Ngày làm việc"
+                          value={dayjs(dateSelected)}
+                          onChange={(newDate) => {
+                            setDateSelected(newDate);
+                          }}
+                        />
+                      </LocalizationProvider>
+                    </Stack>
+                  </BoxStyle>
+                  {schedules &&
+                    <ScheduleTable items={schedules} />
+                  }
+                </Stack>
+              </Stack>
+            </Grid>
+          </Grid>}
         </Stack>
       </Stack>
     </Box>

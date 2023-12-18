@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.MedicalExamState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,14 +49,16 @@ public class MedicalExaminationRecord {
     @OneToOne(mappedBy = "medicalExaminationRecord", fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private Prescription prescription;
+    private Prescription prescription;  // đơn thuốc
 
     @Nationalized
-    private String symptom;
+    private String symptom;  // triệu chứng
 
     @Nationalized
-    private String diagnosis;
-    private Date reExaminationDate;
+    private String diagnosis; // chẩn đoán
+    private Date reExaminationDate; // ngày tái khám (nếu có)
+
+    private MedicalExamState state = MedicalExamState.WAITING;
 
     private boolean deleted;
     private Date createdDate;

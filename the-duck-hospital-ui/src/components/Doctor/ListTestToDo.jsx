@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Box,
   Button,
   IconButton,
   Stack,
@@ -12,18 +13,22 @@ import {
   TextField,
   tableCellClasses,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import styled from "@emotion/styled";
-const medicalExaminationService = [
-  { label: "Siêu âm tim", value: "Siêu âm tim" },
-  { label: "Siêu âm", value: "Siêu âm bụng" },
-  { label: "Xét nghiệm máu", value: "Xét nghiệm máu" },
-  { label: "Xét nghiệm nước tiểu", value: "Xét nghiệm nước tiểu" },
-  { label: "Chụp X-quang", value: "Chụp X-quang" },
-];
+import {
+  createMedicalTest,
+  deleteMedicalTest,
+  getAllMedicalTests,
+  getMedicalTestByMedicalRecordId,
+} from "../../services/doctor/MedicalTestServices";
+import { useParams } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
+import { useReactToPrint } from "react-to-print";
+import Invoice from "./Invoice";
+import { useAuth } from "../../auth/AuthProvider";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -42,18 +47,161 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+function Row(props) {
+  const { row, index, handleDeleteTest } = props;
+  const { fullName } = useAuth();
+  const componentRef = React.useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+  return (
+    <>
+      <TableRow key={row.medicalTestId}>
+        <TableCell align="center" width={"10%"}>
+          {index + 1}
+        </TableCell>
+        <TableCell align="left" width={"30%"}>
+          {row.serviceName}
+        </TableCell>
+        <TableCell align="left" width={"35%"}>
+          {row.note}
+        </TableCell>
+        <TableCell align="center" width={"25%"}>
+          <Stack direction={"row"} justifyContent={"space-between"}>
+            <IconButton
+              size="small"
+              disabled={!row.result}
+              sx={{
+                width: "34px",
+                height: "34px",
+                color: "#396cf0",
+                backgroundColor: "rgba(57,108,240,.1)",
+                border: "1px solid rgba(57,108,240,.1)",
+                padding: "10px",
+                boxShadow: "0 3px 5px 0 rgba(57,108,240,.3)",
+                "&:hover": {
+                  backgroundColor: "rgba(57,108,240,.1)",
+                  color: "#396cf0",
+                },
+              }}
+              onClick={() => {
+                window.open(row.result, "_blank");
+              }}
+            >
+              <FileDownloadOutlinedIcon
+                sx={{
+                  fontSize: "16px",
+                }}
+              />
+            </IconButton>
+
+            <IconButton
+              size="small"
+              sx={{
+                width: "34px",
+                height: "34px",
+                color: "#53c797",
+                backgroundColor: "rgba(83,199,151,.1)",
+                border: " 1px solid rgba(83,199,151,.1)",
+                padding: "10px",
+                boxShadow: "0 3px 5px 0 rgba(83,199,151,.3)",
+                "&:hover": {
+                  backgroundColor: "rgba(83,199,151,.1)",
+                  color: "#4caf50",
+                },
+              }}
+              onClick={handlePrint}
+            >
+              <PrintOutlinedIcon
+                sx={{
+                  fontSize: "16px",
+                }}
+              />
+            </IconButton>
+            <IconButton
+              size="small"
+              sx={{
+                width: "34px",
+                height: "34px",
+                color: "#f0735a",
+                backgroundColor: "rgba(240,115,90,.1)",
+                border: " 1px solid rgba(240,115,90,.1)",
+                padding: "10px",
+                boxShadow: "0 3px 5px 0 rgba(240,115,90,.3)",
+                "&:hover": {
+                  backgroundColor: "rgba(240,115,90,.1)",
+                  color: "#f0735a",
+                },
+              }}
+              onClick={() => handleDeleteTest(row.medicalTestId)}
+            >
+              <DeleteOutlineOutlinedIcon
+                sx={{
+                  fontSize: "16px",
+                }}
+              />
+            </IconButton>
+          </Stack>
+        </TableCell>
+      </TableRow>
+      <Box sx={{ display: "none" }}>
+        <Invoice
+          ref={componentRef}
+          patientInfo={props.patientInfo}
+          doctorName={fullName}
+          medicalTest={row}
+        />
+      </Box>
+    </>
+  );
+}
+
 function ListTestToDo(props) {
   const [hiddenButtonAdd, setHidden] = React.useState(false);
-  const [service, setService] = React.useState("");
-  const [rows, setRows] = React.useState([
-    { id: 1, name: "Siêu âm", description: "Siêu âm ổ bụng" },
-    { id: 2, name: "Chụp X-quang", description: "Chụp X-quang phổi" },
-    { id: 3, name: "Siêu âm tim", description: "Siêu âm tâm thất và tâm nhĩ" },
-  ]);
+  const { medicalRecordId } = useParams();
+  const [selectedTest, setSelectedTest] = React.useState({
+    service: null,
+    serviceNote: "",
+  });
+  const [testServices, setTestServices] = React.useState([]);
+  const [rows, setRows] = React.useState([]);
 
-  const handleDeleteRow = (id) => {
-    const updatedRows = rows.filter((row) => row.id !== id);
-    setRows(updatedRows);
+  useEffect(() => {
+    const handleGetAllTest = async () => {
+      const response = await getAllMedicalTests();
+      if (response.success) setTestServices(response.data.data);
+    };
+
+    const handleGetMedicalTest = async () => {
+      const response = await getMedicalTestByMedicalRecordId(medicalRecordId);
+      if (response.success) setRows(response.data.data);
+    };
+
+    handleGetMedicalTest();
+    handleGetAllTest();
+  }, [medicalRecordId]);
+
+  const handleAddTest = async () => {
+    const response = await createMedicalTest(medicalRecordId, {
+      serviceId: selectedTest.service.serviceId,
+      note: selectedTest.serviceNote,
+    });
+    if (response.success) {
+      setRows(response.data.data);
+      setSelectedTest({ service: null, serviceNote: "" });
+      setHidden(false);
+    } else {
+      enqueueSnackbar("Thêm xét nghiệm thất bại", { variant: "error" });
+    }
+  };
+
+  const handleDeleteTest = async (medicalTestId) => {
+    const response = await deleteMedicalTest(medicalRecordId, medicalTestId);
+    if (response.success) {
+      setRows(response.data.data);
+    } else {
+      enqueueSnackbar("Xóa xét nghiệm thất bại", { variant: "error" });
+    }
   };
 
   return (
@@ -81,8 +229,16 @@ function ListTestToDo(props) {
                   size="medium"
                   disablePortal
                   id="combo-box-demo"
-                  options={medicalExaminationService}
+                  options={testServices}
+                  getOptionLabel={(option) => option.serviceName}
                   placeholder="Tên dịch vụ"
+                  value={selectedTest.service}
+                  onChange={(event, newValue) => {
+                    setSelectedTest({
+                      ...selectedTest,
+                      service: newValue,
+                    });
+                  }}
                   sx={{ width: "300px" }}
                   renderInput={(params) => (
                     <TextField {...params} placeholder="Xét nghiệm" />
@@ -94,18 +250,20 @@ function ListTestToDo(props) {
                   id="outlined-basic"
                   placeholder="Chỉ định thực hiện"
                   sx={{ width: "320px" }}
-                  value={service}
-                  onChange={(e) => setService(e.target.value)}
+                  value={selectedTest.serviceNote}
+                  onChange={(e) =>
+                    setSelectedTest({
+                      ...selectedTest,
+                      serviceNote: e.target.value,
+                    })
+                  }
                 />
                 <Button
                   variant="outlined"
                   sx={{
                     textTransform: "none",
                   }}
-                  onClick={() => {
-                    setHidden(false);
-                    setService("");
-                  }}
+                  onClick={handleAddTest}
                 >
                   Thêm
                 </Button>
@@ -133,89 +291,12 @@ function ListTestToDo(props) {
         </TableHead>
         <TableBody>
           {rows.map((row, index) => (
-            <TableRow key={row.id}>
-              <TableCell align="center" width={"10%"}>
-                {index + 1}
-              </TableCell>
-              <TableCell align="left" width={"30%"}>
-                {row.name}
-              </TableCell>
-              <TableCell align="left" width={"35%"}>
-                {row.description}
-              </TableCell>
-              <TableCell align="center" width={"25%"}>
-                <Stack direction={"row"} justifyContent={"space-between"}>
-                  <IconButton
-                    size="small"
-                    sx={{
-                      width: "34px",
-                      height: "34px",
-                      color: "#396cf0",
-                      backgroundColor: "rgba(57,108,240,.1)",
-                      border: "1px solid rgba(57,108,240,.1)",
-                      padding: "10px",
-                      boxShadow: "0 3px 5px 0 rgba(57,108,240,.3)",
-                      "&:hover": {
-                        backgroundColor: "rgba(57,108,240,.1)",
-                        color: "#396cf0",
-                      },
-                    }}
-                  >
-                    <FileDownloadOutlinedIcon
-                      sx={{
-                        fontSize: "16px",
-                      }}
-                    />
-                  </IconButton>
-
-                  <IconButton
-                    size="small"
-                    sx={{
-                      width: "34px",
-                      height: "34px",
-                      color: "#53c797",
-                      backgroundColor: "rgba(83,199,151,.1)",
-                      border: " 1px solid rgba(83,199,151,.1)",
-                      padding: "10px",
-                      boxShadow: "0 3px 5px 0 rgba(83,199,151,.3)",
-                      "&:hover": {
-                        backgroundColor: "rgba(83,199,151,.1)",
-                        color: "#4caf50",
-                      },
-                    }}
-                  >
-                    <PrintOutlinedIcon
-                      sx={{
-                        fontSize: "16px",
-                      }}
-                    />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    sx={{
-                      width: "34px",
-                      height: "34px",
-                      color: "#f0735a",
-                      backgroundColor: "rgba(240,115,90,.1)",
-                      border: " 1px solid rgba(240,115,90,.1)",
-                      padding: "10px",
-                      boxShadow: "0 3px 5px 0 rgba(240,115,90,.3)",
-                      "&:hover": {
-                        backgroundColor: "rgba(240,115,90,.1)",
-                        color: "#f0735a",
-                      },
-                    }}
-                    onClick={() => handleDeleteRow(row.id)}
-                  >
-                    <DeleteOutlineOutlinedIcon
-                      sx={{
-                        fontSize: "16px",
-                      }}
-                    />
-                  </IconButton>
-                </Stack>
-              </TableCell>
-            </TableRow>
+            <Row
+              row={row}
+              index={index}
+              handleDeleteTest={handleDeleteTest}
+              patientInfo={props.patientInfo}
+            />
           ))}
         </TableBody>
       </Table>

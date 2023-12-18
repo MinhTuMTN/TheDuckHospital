@@ -1,10 +1,17 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
+import com.theduckhospital.api.constant.MedicalExamState;
+import com.theduckhospital.api.constant.ServiceType;
+import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.admin.PrescriptionItemResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
@@ -15,37 +22,41 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
+import com.theduckhospital.api.repository.MedicalTestRepository;
 import com.theduckhospital.api.repository.PatientProfileRepository;
-import com.theduckhospital.api.services.IBookingServices;
-import com.theduckhospital.api.services.IMedicalExamServices;
-import com.theduckhospital.api.services.IPatientServices;
+import com.theduckhospital.api.services.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.text.ParseException;
+import java.util.*;
 
 @Service
 public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final IBookingServices bookingServices;
     private final BookingRepository bookingRepository;
     private final PatientProfileRepository patientProfileRepository;
+    private final IMedicalServiceServices medicalServiceServices;
+    private final MedicalTestRepository medicalTestRepository;
     private final MedicalExaminationRepository medicalExaminationRepository;
+    private final IDoctorServices doctorServices;
     private final IPatientServices patientServices;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
             BookingRepository bookingRepository,
-            MedicalExaminationRepository medicalExaminationRepository,
+            IMedicalServiceServices medicalServiceServices, MedicalTestRepository medicalTestRepository, MedicalExaminationRepository medicalExaminationRepository,
             IPatientServices patientServices,
-            PatientProfileRepository patientProfileRepository
-            ) {
+            PatientProfileRepository patientProfileRepository,
+            IDoctorServices doctorServices
+    ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
+        this.medicalServiceServices = medicalServiceServices;
+        this.medicalTestRepository = medicalTestRepository;
         this.medicalExaminationRepository = medicalExaminationRepository;
         this.patientServices = patientServices;
         this.patientProfileRepository = patientProfileRepository;
+        this.doctorServices = doctorServices;
     }
 
     @Override
@@ -130,6 +141,176 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             throw new BadRequestException("Create medical examination record failed");
 
         return new MedicalRecordItemResponse(booking);
+    }
+
+    @Override
+    public MedicalExaminationRecord acceptMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        return updateStateMedicalExamRecord(
+                authorization,
+                medicalExaminationId,
+                MedicalExamState.PROCESSING
+        );
+    }
+
+    @Override
+    public DoctorMedicalRecordResponse doctorGetMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        return new DoctorMedicalRecordResponse(medicalExaminationRecord);
+    }
+
+    @Override
+    public List<DoctorMedicalTestResponse> doctorCreateMedicalTest(
+            String authorization,
+            UUID medicalExaminationId,
+            CreateMedicalTest request
+    ) throws ParseException {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        Date today = DateCommon.getToday();
+        MedicalService medicalService = medicalServiceServices
+                .getMedicalServiceByIdAndServiceType(
+                        request.getServiceId(),
+                        ServiceType.MedicalTest
+                );
+
+        MedicalTest medicalTest = new MedicalTest();
+        medicalTest.setMedicalService(medicalService);
+        medicalTest.setMedicalExaminationRecord(medicalExaminationRecord);
+        medicalTest.setNote(
+                request.getNote()
+        );
+        medicalTest.setPrice(
+                medicalService.getPrice()
+        );
+        medicalTest.setQueueNumber(
+                (int) (medicalTestRepository
+                        .countByMedicalServiceAndDateAndDeletedIsFalse(
+                                medicalService,
+                                today
+                        ) + 1
+                )
+        );
+        medicalTest.setDate(today);
+
+        medicalTestRepository.save(medicalTest);
+
+        List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
+        medicalTests.add(medicalTest);
+        medicalExaminationRecord.setMedicalTest(medicalTests);
+        medicalExaminationRepository.save(medicalExaminationRecord);
+
+        return medicalTests.stream()
+                .filter(medicalTest1 -> !medicalTest1.isDeleted())
+                .map(DoctorMedicalTestResponse::new)
+                .toList();
+    }
+
+    @Override
+    public List<DoctorMedicalTestResponse> doctorGetMedicalTests(String authorization, UUID medicalExaminationId) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        return medicalExaminationRecord.getMedicalTest()
+                .stream()
+                .filter(medicalTest -> !medicalTest.isDeleted())
+                .map(DoctorMedicalTestResponse::new)
+                .toList();
+    }
+
+    @Override
+    public List<DoctorMedicalTestResponse> doctorDeleteMedicalTest(String authorization, UUID medicalExaminationId, UUID medicalTestId) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
+        MedicalTest medicalTest = medicalTests
+                .stream()
+                .filter(medicalTest1 -> medicalTest1
+                        .getMedicalTestId()
+                        .equals(medicalTestId)
+                )
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Medical Test not found"));
+
+        medicalTest.setDeleted(true);
+        medicalTestRepository.save(medicalTest);
+
+        return medicalTests
+                .stream()
+                .filter(medicalTest1 -> !medicalTest1.isDeleted())
+                .map(DoctorMedicalTestResponse::new)
+                .toList();
+    }
+
+    @Override
+    public DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        medicalExaminationRecord.setSymptom(request.getSymptom());
+        medicalExaminationRecord.setDiagnosis(request.getDiagnosis());
+        medicalExaminationRepository.save(medicalExaminationRecord);
+
+        return new DoctorMedicalRecordResponse(medicalExaminationRecord);
+    }
+
+    private MedicalExaminationRecord updateStateMedicalExamRecord(
+            String authorization,
+            UUID medicalExaminationId,
+            MedicalExamState state
+    ) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        medicalExaminationRecord.setState(state);
+        medicalExaminationRepository.save(medicalExaminationRecord);
+
+        return medicalExaminationRecord;
+    }
+
+    private MedicalExaminationRecord doctorGetMedicalExamRecord(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+
+        MedicalExaminationRecord medicalExaminationRecord = medicalExaminationRepository
+                .findById(medicalExaminationId)
+                .orElseThrow(() -> new NotFoundException("Medical Examination Record not found"));
+
+        if (medicalExaminationRecord.isDeleted())
+            throw new BadRequestException("Medical Examination Record is deleted");
+
+        if (!medicalExaminationRecord
+                .getDoctorSchedule()
+                .getDoctor()
+                .getStaffId()
+                .equals(doctor.getStaffId())
+        )
+            throw new BadRequestException("You are not the doctor of this medical examination record");
+
+        return medicalExaminationRecord;
     }
 
     private MedicalExaminationRecord createMedicalExamRecord(Booking booking, Patient patient) {

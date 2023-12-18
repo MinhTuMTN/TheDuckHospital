@@ -25,60 +25,6 @@ const UserId = styled(Typography)(({ theme }) => ({
   width: "fit-content",
 }));
 
-// const account = {
-//   userId: "1234-5678-9101-1121",
-//   fullName: "Nguyễn Quốc Patient",
-//   role: "Bệnh nhân",
-//   phoneNumber: "0123456789",
-//   email: "patient-nq@minhtunguyen.onmicrosoft.com",
-//   deleted: false,
-//   patientProfiles: [
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//     {
-//       fullName: "Nguyễn Quốc Patient",
-//       phoneNumber: "0123456789",
-//       createdAt: "27/01/2002",
-//       deleted: false,
-//     },
-//   ]
-// }
-// const totalItems = account.patientProfiles?.length;
-
 function AccountDetailPage() {
   const { userId } = useParams();
   const navigate = useNavigate();

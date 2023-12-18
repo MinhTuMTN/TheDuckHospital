@@ -1,10 +1,9 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
-import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
-import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
-import com.theduckhospital.api.dto.response.admin.StaffResponse;
+import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
@@ -21,9 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import javax.print.Doc;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.theduckhospital.api.constant.Role.*;
 
 @Service
 public class StaffServicesImpl implements IStaffServices {
@@ -194,18 +194,38 @@ public class StaffServicesImpl implements IStaffServices {
     }
 
     @Override
-    public FilteredStaffsResponse getPaginationStaffsDeleted(int page, int limit) {
-        Pageable pageable = PageRequest.of(page, limit);
-        Page<Staff> staffPage = staffRepository.findPaginationByOrderByDeleted(pageable);
+    public FilteredStaffsResponse getPaginationFilteredStaffs(
+            String search,
+            int page,
+            int limit,
+            List<Role> staffRole,
+            List<Boolean> staffStatus
+    ) {
+        List<Staff> staffs = staffRepository.findByFullNameContainingAndDeletedIn(search, staffStatus);
 
-        List<StaffResponse> filteredStaffs = new ArrayList<>();
+        List<Staff> filteredStaffs = staffs.stream()
+                .filter(staff -> (staffRole.contains(DOCTOR) && staff instanceof Doctor)
+                        || (staffRole.contains(NURSE) && staff instanceof Nurse)
+                        || (staffRole.contains(CASHIER) && staff instanceof Cashier)
+                        || (staffRole.contains(PHARMACIST) && staff instanceof Pharmacist))
+                .distinct()
+                .collect(Collectors.toList());
 
-        for (Staff staff : staffPage.getContent()) {
-            filteredStaffs.add(new StaffResponse(staff));
+        if(filteredStaffs.isEmpty()){
+            filteredStaffs = staffs;
         }
 
-        List<Staff> staff = staffRepository.findAll();
+        Pageable pageable = PageRequest.of(page, limit);
 
-        return new FilteredStaffsResponse(filteredStaffs, staff.size(), page, limit);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredStaffs.size());
+        List<Staff> pageContent = filteredStaffs.subList(start, end);
+
+        List<StaffResponse> response = new ArrayList<>();
+        for (Staff staff : pageContent) {
+            response.add(new StaffResponse(staff));
+        }
+
+        return new FilteredStaffsResponse(response, filteredStaffs.size(), page, limit);
     }
 }

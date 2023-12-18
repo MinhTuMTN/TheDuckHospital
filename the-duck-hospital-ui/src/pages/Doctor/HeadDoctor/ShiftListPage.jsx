@@ -6,8 +6,8 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import InfoItem from "../../Nurse/InfoItem";
-function ScheduleListPage(props) {
+
+function ShiftListPage(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   return (
@@ -38,14 +38,10 @@ function ScheduleListPage(props) {
         sx={{ mt: 3, justifyContent: "space-between" }}
       >
         <Grid item xs={12} md={6}>
-          <InfoItem />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <InfoItem />
         </Grid>
       </Grid>
     </Stack>
   );
 }
 
-export default ScheduleListPage;
+export default ShiftListPage;

@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import FormatCurrency from "../General/FormatCurrency";
+import dayjs from "dayjs";
 
 function ContactItem(props) {
   const { title, content, titleMinWidth = 0 } = props;
@@ -34,6 +35,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function Invoice(props, ref) {
+  const { patientInfo, doctorName, medicalTest } = props;
   const contacts = [
     {
       title: "Email",
@@ -94,22 +96,24 @@ function Invoice(props, ref) {
 
         <ContactItem
           title="Mã bệnh nhân"
-          content="BN16729ABCHDF"
+          content={patientInfo?.patient?.patientCode}
           titleMinWidth={"110px"}
         />
         <ContactItem
           title="Họ tên"
-          content="Nguyễn Thị D"
+          content={patientInfo?.patient?.fullName}
           titleMinWidth={"110px"}
         />
         <ContactItem
           title="Ngày sinh"
-          content="30/02/2000"
+          content={dayjs(patientInfo?.patient?.dateOfBirth).format(
+            "DD/MM/YYYY"
+          )}
           titleMinWidth={"110px"}
         />
         <ContactItem
           title="Địa chỉ"
-          content="111 Lê Văn Việt, phường Tăng Nhơn Phú A, Quận 9, TP.HCM"
+          content={patientInfo?.patient?.address}
           titleMinWidth={"110px"}
         />
       </Grid>
@@ -129,17 +133,17 @@ function Invoice(props, ref) {
 
         <ContactItem
           title="Mã hóa đơn"
-          content="HD001"
+          content={medicalTest?.medicalTestId}
           titleMinWidth={"110px"}
         />
         <ContactItem
           title="Ngày tạo"
-          content="16/12/2024 14:14"
+          content={dayjs().format("DD/MM/YYYY HH:mm")}
           titleMinWidth={"110px"}
         />
         <ContactItem
           title="Người tạo"
-          content="BS. Nguyễn Văn A"
+          content={`BS. ${doctorName}`}
           titleMinWidth={"110px"}
         />
       </Grid>
@@ -158,13 +162,16 @@ function Invoice(props, ref) {
           <TableBody>
             <TableRow>
               <StyledTableCell align="left">1</StyledTableCell>
-              <StyledTableCell align="left">Khám bệnh</StyledTableCell>
+              <StyledTableCell align="left">
+                {medicalTest?.serviceName} <br />
+                {medicalTest?.note}
+              </StyledTableCell>
               <StyledTableCell align="center">1</StyledTableCell>
               <StyledTableCell align="right">
-                <FormatCurrency amount={100000} />
+                <FormatCurrency amount={medicalTest?.price} />
               </StyledTableCell>
               <StyledTableCell align="right">
-                <FormatCurrency amount={100000} />
+                <FormatCurrency amount={medicalTest?.price} />
               </StyledTableCell>
             </TableRow>
           </TableBody>
@@ -174,7 +181,7 @@ function Invoice(props, ref) {
           variant="body1"
           sx={{ fontWeight: "500", textAlign: "right" }}
         >
-          Tổng tiền: <FormatCurrency amount={100000} />
+          Tổng tiền: <FormatCurrency amount={medicalTest?.price} />
         </Typography>
       </Grid>
 
@@ -201,7 +208,7 @@ function Invoice(props, ref) {
               s
               align="center"
             >
-              1
+              {medicalTest?.queueNumber}
             </Typography>
           </Box>
         </Stack>

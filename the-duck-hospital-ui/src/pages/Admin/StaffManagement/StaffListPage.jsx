@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Chip,
   Container,
   FormControl,
   FormControlLabel,
@@ -11,6 +12,7 @@ import {
   RadioGroup,
   Select,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
@@ -28,6 +30,7 @@ import { createStaff, getPaginationStaffs } from "../../../services/admin/StaffS
 import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import DialogConfirm from "../../../components/General/DialogConfirm";
+import StaffFilter from "../../../components/Admin/StaffManagement/StaffFilter";
 
 const roles = [
   {
@@ -49,6 +52,36 @@ const roles = [
 ];
 
 const degrees = ["BS", "ThS", "TS", "PGS", "GS"];
+
+const statusOptions = [
+  {
+    value: false,
+    name: "Còn hoạt động",
+  },
+  {
+    value: true,
+    name: "Ngưng hoạt động",
+  },
+];
+
+const roleOptions = [
+  {
+    value: "DOCTOR",
+    name: "Bác sĩ",
+  },
+  {
+    value: "NURSE",
+    name: "Điều dưỡng",
+  },
+  {
+    value: "CASHIER",
+    name: "Thu ngân",
+  },
+  {
+    value: "PHARMACIST",
+    name: "Dược sĩ",
+  },
+];
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "white",
@@ -75,13 +108,11 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 
 function StaffListPage(props) {
   const [search, setSearch] = useState("");
-  // const [buttonClicked, setButtonClicked] = useState(true);
-  // const [catalogs, setCatalogs] = useState([]);
+  const [buttonClicked, setButtonClicked] = useState(true);
+  const [filterButtonClicked, setFilterButtonClicked] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  // const [productItems, setProductItems] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -111,20 +142,50 @@ function StaffListPage(props) {
     setPage(1);
   };
 
+  const [selectedRole, setSelectedRole] = useState([]);
+  const handleChangeRoleFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedRole((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedRole((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const handleChangeStatusFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedStatus((prev) => [...prev, event.target.value === "true"]);
+    } else {
+      setSelectedStatus((prev) =>
+        prev.filter((item) => item !== (event.target.value === "true"))
+      );
+    }
+  };
+
   const handleGetStaffs = useCallback(async () => {
-    // if (!buttonClicked) return;
+    if (!buttonClicked) return;
     const response = await getPaginationStaffs({
-      page: page - 1,
+      search: search.trim(),
+      page: filterButtonClicked ? 0 : page - 1,
       limit: limit,
+      staffRole: selectedRole,
+      staffStatus: selectedStatus,
     });
+
+    if (filterButtonClicked) {
+      setFilterButtonClicked(false);
+    }
+
     if (response.success) {
       setStaffs(response.data.data.staffs);
       setTotalItems(response.data.data.total);
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-  }, [page, limit]);
+    setButtonClicked(false);
+  }, [search, page, limit, selectedStatus, selectedRole, buttonClicked, filterButtonClicked]);
 
   useEffect(() => {
     handleGetStaffs();
@@ -183,51 +244,13 @@ function StaffListPage(props) {
     setPhoneNumber("");
     setEmail("");
   };
-  // const handleGetFilteredProduct = useCallback(async () => {
-  //   if (!buttonClicked) return;
-  //   setIsLoading(true);
-  //   const response = await GetFilteredProducts({
-  //     search: search,
-  //     page: page - 1,
-  //     limit: limit,
-  //     catalogIds: selectedCategory,
-  //     productStatus: selectedStatus,
-  //     productQuantity: selectedQuantity,
-  //   });
-  //   if (response.success) {
-  //     setProductItems(response.data.data.objects);
-  //     setPage(parseInt(response.data.data.page) + 1);
-  //     setTotalItems(response.data.data.totalObjects);
-  //     setLimit(response.data.data.limit);
-  //   } else
-  //     enqueueSnackbar("Đã có lỗi xảy ra khi lấy thông tin sản phẩm", {
-  //       variant: "error",
-  //     });
-  //   setIsLoading(false);
-  //   setButtonClicked(false);
-  // }, [
-  //   limit,
-  //   page,
-  //   search,
-  //   selectedCategory,
-  //   selectedQuantity,
-  //   selectedStatus,
-  //   buttonClicked,
-  // ]);
 
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
-
-  // useEffect(() => {
-  //   handleGetFilteredProduct();
-  // }, [handleGetFilteredProduct]);
+  useEffect(() => {
+    setButtonClicked(true);
+  }, [page, limit]);
 
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -276,44 +299,44 @@ function StaffListPage(props) {
               <SearchStaffList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                onApply={() => {
+                  setButtonClicked(true);
+                  setFilterButtonClicked(true);
+                }}
               />
-              {/* <Box py={2} px={3}>
-                  {selectedCategory.length === 0 &&
-                    selectedQuantity.length === 0 &&
-                    selectedStatus.length === 0 && (
-                      <TextField
-                        disabled
-                        variant="standard"
-                        fullWidth
-                        size="medium"
-                        InputProps={{
-                          disableUnderline: true,
-                          fontSize: "14px",
-                        }}
-                        placeholder="Không có bộ lọc nào được chọn"
-                      />
-                    )}
-                  {selectedCategory.map((item, index) => (
+              <Box py={2} px={3}>
+                {selectedRole.length === 0 &&
+                  selectedStatus.length === 0 && (
+                    <TextField
+                      disabled
+                      variant="standard"
+                      fullWidth
+                      size="medium"
+                      InputProps={{
+                        disableUnderline: true,
+                        fontSize: "14px",
+                      }}
+                      placeholder="Không có bộ lọc nào được chọn"
+                    />
+                  )}
+                <Stack direction="row" spacing={1}>
+                  {selectedRole.map((item, index) => (
                     <Chip
-                      color="primary"
+                      color="info"
                       label={
-                        catalogs.find((c) => c.catalogId === item)?.catalogName
+                        roleOptions.find((i) => i.value === item)?.name
                       }
                       key={index}
                       onDelete={() =>
-                        setSelectedCategory((prev) =>
+                        setSelectedRole((prev) =>
                           prev.filter((i) => i !== item)
                         )
                       }
                     />
                   ))}
-
                   {selectedStatus.map((item, index) => (
                     <Chip
-                      color="secondary"
+                      color="warning"
                       label={statusOptions.find((i) => i.value === item)?.name}
                       key={index}
                       onDelete={() =>
@@ -323,58 +346,30 @@ function StaffListPage(props) {
                       }
                     />
                   ))}
-
-                  {selectedQuantity.map((item, index) => (
-                    <Chip
-                      color="warning"
-                      label={
-                        quantityOptions.find((i) => i.value === item)?.name
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedQuantity((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-                </Box> */}
-              {/* <Stack
-                  direction={"row"}
-                  spacing={1}
-                  paddingLeft={2}
-                  paddingBottom={1}
-                  sx={{
-                    borderBottom: "1px solid #e0e0e0",
-                  }}
-                >
-                  <ProductFilter
-                    label={"Danh mục"}
-                    options={catalogs}
-                    selectedValues={selectedCategory}
-                    onChange={handleChangeCategoryFilter}
-                  />
-                  <ProductFilter
-                    label={"Trạng thái"}
-                    options={statusOptions}
-                    selectedValues={selectedStatus}
-                    onChange={handleChangeStatusFilter}
-                  />
-                  <ProductFilter
-                    label={"Số lượng"}
-                    options={quantityOptions}
-                    selectedValues={selectedQuantity}
-                    onChange={handleChangeQuantityFilter}
-                  />
-                </Stack> */}
-              {/* <ProductsTableBasis
-                  count={dataFetched.length}
-                  items={dataFetched}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                /> */}
+                </Stack>
+              </Box>
+              <Stack
+                direction={"row"}
+                spacing={1}
+                paddingLeft={2}
+                paddingBottom={1}
+                sx={{
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                <StaffFilter
+                  label={"Vai trò"}
+                  options={roleOptions}
+                  selectedValues={selectedRole}
+                  onChange={handleChangeRoleFilter}
+                />
+                <StaffFilter
+                  label={"Trạng thái"}
+                  options={statusOptions}
+                  selectedValues={selectedStatus}
+                  onChange={handleChangeStatusFilter}
+                />
+              </Stack>
               <StaffTable
                 count={totalItems ? totalItems : 0}
                 items={staffs}
@@ -387,7 +382,6 @@ function StaffListPage(props) {
           </Stack>
         </Container>
       </Box>
-      {/* )} */}
 
       <DialogConfirm
         open={openDialogConfirm}

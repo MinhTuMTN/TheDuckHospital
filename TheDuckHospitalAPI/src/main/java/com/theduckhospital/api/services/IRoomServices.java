@@ -13,7 +13,13 @@ public interface IRoomServices {
     RoomResponse updateRoom(int roomId, CreateRoomRequest request);
     boolean deleteRoom(int roomId);
     RoomResponse restoreRoom(int roomId);
-    FilteredRoomsResponse getPaginationRoomsDeleted(int page, int limit);
+
+    FilteredRoomsResponse getPaginationFilteredRooms(
+            String search,
+            int page,
+            int limit
+    );
+
     List<RoomResponse> getAllRoomsDeleted();
     RoomResponse getRoomById(int roomId);
     Room findRoomById(int roomId);

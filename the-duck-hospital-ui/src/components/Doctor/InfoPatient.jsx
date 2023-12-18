@@ -9,6 +9,7 @@ InfoPatient.propTypes = {
 };
 
 const getInitials = (name) => {
+  if (!name) return "";
   const words = name.split(" ");
   if (words.length >= 2) {
     return words[0][0] + words[words.length - 1][0];
@@ -53,7 +54,7 @@ function Row(props) {
 
 function InfoPatient(props) {
   const { mainInfo, info, history } = props;
-  const initials = getInitials(mainInfo.name);
+  const initials = getInitials(mainInfo?.fullName);
   return (
     <Stack
       direction={"column"}
@@ -96,7 +97,7 @@ function InfoPatient(props) {
               fontSize: "16px",
             }}
           >
-            {mainInfo.name}
+            {mainInfo?.fullName}
           </Typography>
           <Typography
             variant="body1"
@@ -105,7 +106,7 @@ function InfoPatient(props) {
               fontSize: "14px",
             }}
           >
-            Giới tính: Nữ
+            Giới tính: {mainInfo?.gender === "MALE" ? "Nam" : "Nữ"}
           </Typography>
         </Stack>
       </Stack>

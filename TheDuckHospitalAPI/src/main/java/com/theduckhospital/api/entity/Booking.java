@@ -22,11 +22,6 @@ public class Booking {
 
     private int queueNumber;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JsonBackReference
-//    @ToStringExclude
-//    private MedicalService medicalService;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude

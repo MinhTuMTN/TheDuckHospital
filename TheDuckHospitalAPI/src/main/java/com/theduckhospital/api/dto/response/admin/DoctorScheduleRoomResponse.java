@@ -18,6 +18,7 @@ public class DoctorScheduleRoomResponse {
     private Degree doctorDegree;
     private double price;
     private String departmentName;
+    private String serviceName;
     private String roomName;
     private String phoneNumber;
     private int queueNumber;
@@ -31,6 +32,7 @@ public class DoctorScheduleRoomResponse {
         this.doctorGender = schedule.getDoctor().getGender();
         this.doctorDegree = schedule.getDoctor().getDegree();
         this.price = schedule.getMedicalService().getPrice();
+        this.serviceName = schedule.getMedicalService().getServiceName();
         this.roomName = schedule.getRoom().getRoomName();
         this.departmentName = schedule.getDoctor().getDepartment().getDepartmentName();
         this.phoneNumber = schedule.getDoctor().getPhoneNumber();

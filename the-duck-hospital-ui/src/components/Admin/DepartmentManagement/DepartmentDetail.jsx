@@ -80,7 +80,6 @@ const InputText = styled(TextField)(({ theme }) => ({
   borderRadius: "4px !important",
   paddingTop: "2px !important",
   "& .MuiInputBase-input": {
-    // Các thuộc tính của .MuiInputBase-input ở đây
     fontSize: "14px !important",
     padding: "18px 12px !important",
   },
@@ -90,7 +89,6 @@ const MultilineText = styled(TextField)(({ theme }) => ({
   borderRadius: "4px !important",
   paddingY: "0px !important",
   "& .MuiInputBase-input": {
-    // Các thuộc tính của .MuiInputBase-input ở đây
     fontSize: "14px !important",
   },
 }));
@@ -288,7 +286,11 @@ function DepartmentDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      <BoxStyle>
+      <BoxStyle
+        sx={{
+          borderBottom: "none !important",
+        }}
+      >
         <Grid container alignItems={"center"} paddingBottom={1}>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Trạng thái</TieuDeCot>

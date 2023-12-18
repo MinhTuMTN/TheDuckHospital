@@ -7,34 +7,39 @@ import com.theduckhospital.api.dto.response.admin.FilteredMedicalServicesRespons
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.error.StatusCodeException;
+import com.theduckhospital.api.repository.DepartmentRepository;
 import com.theduckhospital.api.repository.MedicalServiceRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMedicalServiceServices;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     private final IDepartmentServices departmentServices;
     private final MedicalServiceRepository medicalServiceRepository;
+    private final DepartmentRepository departmentRepository;
 
     public MedicalServiceServicesImpl(
             IDepartmentServices departmentServices,
-            MedicalServiceRepository medicalServiceRepository
+            MedicalServiceRepository medicalServiceRepository,
+            DepartmentRepository departmentRepository
     ) {
         this.departmentServices = departmentServices;
         this.medicalServiceRepository = medicalServiceRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @Override
     public MedicalService createService(CreateServicesRequest request) {
-        Department department = departmentServices.getDepartmentById(request.getDepartmentId());
+        Department department = new Department();
+        if(request.getServiceType() == ServiceType.MedicalExamination) {
+            department = departmentServices.getDepartmentById(request.getDepartmentId());
+        }
         
         if (request.getServiceType() == ServiceType.MedicalExamination
                 && department.getMedicalServices().stream().anyMatch(
@@ -74,27 +79,32 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     }
 
     @Override
-    public FilteredMedicalServicesResponse getPaginationMedicalServicesDeleted(int page, int limit) {
+    public FilteredMedicalServicesResponse getPaginationFilteredServices(
+            String search,
+            int page,
+            int limit
+    ) {
+        List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
+
+        List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingOrDepartmentIn(search, departments);
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<MedicalService> medicalServicePage = medicalServiceRepository.findPaginationByOrderByDeleted(pageable);
 
-        List<MedicalService> filteredMedicalServices = new ArrayList<>();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), services.size());
+        List<MedicalService> medicalServices = services.subList(start, end);
 
-        for (MedicalService medicalService : medicalServicePage.getContent()) {
-            filteredMedicalServices.add(medicalService);
-        }
-
-        List<MedicalService> medicalServices = medicalServiceRepository.findAll();
-
-        return new FilteredMedicalServicesResponse(filteredMedicalServices, medicalServices.size(), page, limit);
+        return new FilteredMedicalServicesResponse(medicalServices, services.size(), page, limit);
     }
 
     @NotNull
     private static MedicalService getMedicalService(CreateServicesRequest request, Department department) {
         MedicalService medicalService = new MedicalService();
         medicalService.setPrice(request.getPrice());
-        medicalService.setDepartment(department);
-        medicalService.setDescription(department.getDescription());
+        if (request.getServiceType() == ServiceType.MedicalExamination) {
+            medicalService.setDepartment(department);
+            medicalService.setDescription(department.getDescription());
+        }
         medicalService.setServiceType(request.getServiceType());
 
         String serviceName = request.getServiceName().trim();
@@ -112,5 +122,28 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         service.setPrice(request.getPrice());
 
         return medicalServiceRepository.save(service);
+    }
+
+    @Override
+    public List<MedicalService> doctorGetAllMedicalTests() {
+        return medicalServiceRepository.getByServiceTypeAndDeletedIsFalse(
+                ServiceType.MedicalTest
+        );
+    }
+
+    @Override
+    public MedicalService getMedicalServiceByIdAndServiceType(int serviceId, ServiceType serviceType) {
+        MedicalService medicalService = medicalServiceRepository
+                .findById(serviceId)
+                .orElseThrow(() ->
+                        new StatusCodeException("Medical service not found", 404)
+                );
+
+        if(medicalService.getServiceType() != serviceType || medicalService.isDeleted()) {
+            throw new StatusCodeException("Medical service not found", 404);
+
+        }
+
+        return medicalService;
     }
 }

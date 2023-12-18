@@ -8,6 +8,7 @@ import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.repository.DepartmentRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
@@ -30,6 +31,7 @@ import java.util.Optional;
 public class RoomServicesImpl implements IRoomServices {
     private final RoomRepository roomRepository;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final DepartmentRepository departmentRepository;
     private final IDepartmentServices departmentServices;
     private final IDoctorServices doctorServices;
     @Value("${settings.date}")
@@ -38,12 +40,14 @@ public class RoomServicesImpl implements IRoomServices {
     public RoomServicesImpl(RoomRepository roomRepository,
                             IDepartmentServices departmentServices,
                             DoctorScheduleRepository doctorScheduleRepository,
-                            IDoctorServices doctorServices
+                            IDoctorServices doctorServices,
+                            DepartmentRepository departmentRepository
     ) {
         this.roomRepository = roomRepository;
         this.doctorScheduleRepository = doctorScheduleRepository;
         this.departmentServices = departmentServices;
         this.doctorServices = doctorServices;
+        this.departmentRepository = departmentRepository;
     }
     @Override
     public RoomResponse createRoom(CreateRoomRequest request) {
@@ -114,19 +118,27 @@ public class RoomServicesImpl implements IRoomServices {
     }
 
     @Override
-    public FilteredRoomsResponse getPaginationRoomsDeleted(int page, int limit) {
+    public FilteredRoomsResponse getPaginationFilteredRooms(
+            String search,
+            int page,
+            int limit
+    ) {
+        List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
+
+        List<Room> rooms = roomRepository.findByRoomNameContainingOrDepartmentIn(search, departments);
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Room> roomPage = roomRepository.findPaginationByOrderByDeleted(pageable);
 
-        List<RoomResponse> filteredRooms = new ArrayList<>();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), rooms.size());
+        List<Room> pageContent = rooms.subList(start, end);
 
-        for (Room room : roomPage.getContent()) {
-            filteredRooms.add(new RoomResponse(room));
+        List<RoomResponse> response = new ArrayList<>();
+        for (Room room : pageContent) {
+            response.add(new RoomResponse(room));
         }
 
-        List<RoomResponse> rooms = getAllRoomsDeleted();
-
-        return new FilteredRoomsResponse(filteredRooms, rooms.size(), page, limit);
+        return new FilteredRoomsResponse(response, rooms.size(), page, limit);
     }
 
     @Override

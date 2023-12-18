@@ -42,7 +42,12 @@ public class AccountResponse {
                 this.role = "Quản lý";
             }
         } else {
-            this.role = "Bệnh nhân";
+            if(account.getPatientProfile().stream()
+                    .anyMatch(profile -> profile.getPatient() != null)) {
+                this.role = "Bệnh nhân";
+            } else {
+                this.role = "Bệnh nhân (chưa từng khám)";
+            }
             this.patientProfiles = account.getPatientProfile();
         }
     }

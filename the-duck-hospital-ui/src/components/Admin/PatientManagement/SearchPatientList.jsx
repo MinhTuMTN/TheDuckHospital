@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, InputAdornment, TextField, Button } from "@mui/material";
+import { Box, InputAdornment, TextField } from "@mui/material";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PropTypes from "prop-types";
 
@@ -11,18 +11,14 @@ SearchPatientList.prototype = {
   borderBottomRightRadius: PropTypes.number,
 };
 
-SearchPatientList.defaultProps = {
-  onApply: () => { },
-};
-
 function SearchPatientList(props) {
   const {
     borderRadius,
     borderTopLeftRadius,
     borderTopRightRadius,
-    onApply,
     value,
     onChange,
+    handleEnterKeyPressed,
   } = props;
   return (
     <Box
@@ -38,6 +34,7 @@ function SearchPatientList(props) {
     >
       <TextField
         variant="standard"
+        autoComplete="off"
         fullWidth
         size="medium"
         sx={{
@@ -52,13 +49,14 @@ function SearchPatientList(props) {
           ),
         }}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
+        onKeyDown={(e) => {
+          handleEnterKeyPressed(e);
+        }}
         placeholder="Tìm kiếm bệnh nhân"
       />
-
-      <Button onClick={onApply} sx={{ flexBasis: "15%" }}>
-        Áp dụng
-      </Button>
     </Box>
   );
 }

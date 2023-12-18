@@ -13,7 +13,11 @@ public interface IMedicineServices {
 
     Medicine restoreMedicine(int medicineId);
 
-    FilteredMedicinesResponse getPaginationMedicinesDeleted(int page, int limit);
+    FilteredMedicinesResponse getPaginationFilteredMedicines(
+            String search,
+            int page,
+            int limit
+    );
 
     Medicine findMedicineById(int medicineId);
 }

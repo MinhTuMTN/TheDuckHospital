@@ -10,6 +10,12 @@ import java.util.UUID;
 public interface IPatientServices {
     Patient createPatient(String identityNumber, PatientProfile patientProfile);
     Patient findPatientByIdentityNumber(String identityNumber);
-    FilteredPatientsResponse getPaginationPatientsDeleted(int page, int limit);
+
+    FilteredPatientsResponse getPaginationFilteredPatients(
+            String search,
+            int page,
+            int limit
+    );
+
     PatientResponse getPatientById(UUID patientId);
 }

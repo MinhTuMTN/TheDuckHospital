@@ -26,7 +26,7 @@ const scheduleTypes = [
 const MuiAccordion = styled(Accordion)(({ theme }) => ({
   borderRadius: theme.spacing(1.2),
   marginBottom: theme.spacing(1),
-  border: "2px solid black",
+  border: "1.5px solid grey",
   "&.Mui-expanded": {
     border: `2px solid ${theme.palette.template.normal2}`,
     borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} ${theme.spacing(1.2)} ${theme.spacing(1.2)}`,
@@ -101,13 +101,14 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{ fontSize: "16px", }}
                 >
-                  {`: ${scheduleTypes.find(type => type.value === item.doctorSchedule?.scheduleType)?.label}`}
+                  {`: ${scheduleTypes.find(type =>
+                    type.value === item.doctorSchedule?.scheduleType)?.label}`}
                 </Typography>
                 <Typography
                   style={{ fontSize: "16px", }}
                 >
-                  {`- Thứ ${item.doctorSchedule?.dayOfWeek} (${dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY")})`}
-
+                  {"- Thứ " + item.doctorSchedule?.dayOfWeek + " (" +
+                    dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY") + ")"}
                 </Typography>
               </Stack>
             </Stack>
@@ -284,170 +285,170 @@ function MedicalExamRecordItem(props) {
           </Stack>
           {item.prescription !== null && item.prescription.length > 0 &&
             <BorderTextBox label="Toa thuốc">
-            <Stack
-              direction="row"
-              spacing={2}
-              style={{
-                borderBottom: "1px solid #dadada"
-              }}
-            >
-              <Typography
+              <Stack
+                direction="row"
+                spacing={2}
                 style={{
-                  fontWeight: 600,
-                  fontSize: "17px",
-                  width: "50%",
+                  borderBottom: "1px solid #dadada"
                 }}
               >
-                Thuốc
-              </Typography>
-              <Typography
-                style={{
-                  fontWeight: 600,
-                  fontSize: "17px",
-                  width: "10%",
-                  textAlign: "center"
+                <Typography
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "17px",
+                    width: "50%",
+                  }}
+                >
+                  Thuốc
+                </Typography>
+                <Typography
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "17px",
+                    width: "10%",
+                    textAlign: "center"
+                  }}
+                >
+                  Số lượng
+                </Typography>
+                <Typography
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "17px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  Đơn giá
+                </Typography>
+                <Typography
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "17px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  Tổng tiền
+                </Typography>
+              </Stack>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  mt: 1
                 }}
               >
-                Số lượng
-              </Typography>
-              <Typography
-                style={{
-                  fontWeight: 600,
-                  fontSize: "17px",
-                  width: "20%",
-                  textAlign: "right"
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "50%"
+                  }}
+                >
+                  Paracetamol
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "10%",
+                    textAlign: "center"
+                  }}
+                >
+                  x10
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  650 VNĐ
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  6.500 VNĐ
+                </Typography>
+              </Stack>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  mt: 0.5
                 }}
               >
-                Đơn giá
-              </Typography>
-              <Typography
-                style={{
-                  fontWeight: 600,
-                  fontSize: "17px",
-                  width: "20%",
-                  textAlign: "right"
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "50%"
+                  }}
+                >
+                  Sensa cools
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "10%",
+                    textAlign: "center"
+                  }}
+                >
+                  x12
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  2.300 VNĐ
+                </Typography>
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    width: "20%",
+                    textAlign: "right"
+                  }}
+                >
+                  46.000 VNĐ
+                </Typography>
+              </Stack>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  mt: 1,
+                  borderTop: "1px solid #dadada"
                 }}
               >
-                Tổng tiền
-              </Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{
-                mt: 1
-              }}
-            >
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "50%"
-                }}
-              >
-                Paracetamol
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "10%",
-                  textAlign: "center"
-                }}
-              >
-                x10
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "20%",
-                  textAlign: "right"
-                }}
-              >
-                650 VNĐ
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "20%",
-                  textAlign: "right"
-                }}
-              >
-                6.500 VNĐ
-              </Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{
-                mt: 0.5
-              }}
-            >
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "50%"
-                }}
-              >
-                Sensa cools
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "10%",
-                  textAlign: "center"
-                }}
-              >
-                x12
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "20%",
-                  textAlign: "right"
-                }}
-              >
-                2.300 VNĐ
-              </Typography>
-              <Typography
-                style={{
-                  fontSize: "16px",
-                  width: "20%",
-                  textAlign: "right"
-                }}
-              >
-                46.000 VNĐ
-              </Typography>
-            </Stack>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{
-                mt: 1,
-                borderTop: "1px solid #dadada"
-              }}
-            >
-              <Typography
-                color="normal1.main"
-                style={{
-                  fontWeight: 800,
-                  fontSize: "17px",
-                  width: "65%"
-                }}
-              >
-                Tổng tiền đơn thuốc
-              </Typography>
-              <Typography
-                color="normal1.main"
-                style={{
-                  fontWeight: 800,
-                  fontSize: "17px",
-                  width: "35%",
-                  textAlign: "right"
-                }}
-              >
-                52.600 VNĐ
-              </Typography>
-            </Stack>
-          </BorderTextBox>}
+                <Typography
+                  color="normal1.main"
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "17px",
+                    width: "65%"
+                  }}
+                >
+                  Tổng tiền đơn thuốc
+                </Typography>
+                <Typography
+                  color="normal1.main"
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "17px",
+                    width: "35%",
+                    textAlign: "right"
+                  }}
+                >
+                  52.600 VNĐ
+                </Typography>
+              </Stack>
+            </BorderTextBox>}
         </Stack>
       </MuiAccordionDetails>
     </MuiAccordion>

@@ -42,7 +42,8 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
 
 function RoomListPage(props) {
   const [search, setSearch] = useState("");
-  // const [buttonClicked, setButtonClicked] = useState(true);
+  const [enterPressed, setEnterPressed] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -58,20 +59,20 @@ function RoomListPage(props) {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setEnterPressed(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setEnterPressed(true);
   };
 
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
-
   const handleGetRooms = useCallback(async () => {
-    // if (!buttonClicked) return;
+    if (!enterPressed) return;
     const response = await getPaginationRooms({
-      page: page - 1,
+      search: search.trim(),
+      page: pageChange ? page - 1 : 0,
       limit: limit,
     });
     if (response.success) {
@@ -80,12 +81,19 @@ function RoomListPage(props) {
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-  }, [page, limit]);
+    setEnterPressed(false);
+    setPageChange(false);
+  }, [search, page, limit, enterPressed, pageChange]);
 
   useEffect(() => {
     handleGetRooms();
   }, [handleGetRooms]);
+
+  const handleEnterKeyPressed = (event) => {
+    if (event.key === "Enter" && event.target === document.activeElement) {
+      setEnterPressed(true);
+    }
+  }
 
   useEffect(() => {
     const handleGetDepartment = async () => {
@@ -120,46 +128,6 @@ function RoomListPage(props) {
       handleGetRooms();
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
-
-  // const handleGetFilteredProduct = useCallback(async () => {
-  //   if (!buttonClicked) return;
-  //   setIsLoading(true);
-  //   const response = await GetFilteredProducts({
-  //     search: search,
-  //     page: page - 1,
-  //     limit: limit,
-  //     catalogIds: selectedCategory,
-  //     productStatus: selectedStatus,
-  //     productQuantity: selectedQuantity,
-  //   });
-  //   if (response.success) {
-  //     setProductItems(response.data.data.objects);
-  //     setPage(parseInt(response.data.data.page) + 1);
-  //     setTotalItems(response.data.data.totalObjects);
-  //     setLimit(response.data.data.limit);
-  //   } else
-  //     enqueueSnackbar("Đã có lỗi xảy ra khi lấy thông tin sản phẩm", {
-  //       variant: "error",
-  //     });
-  //   setIsLoading(false);
-  //   setButtonClicked(false);
-  // }, [
-  //   limit,
-  //   page,
-  //   search,
-  //   selectedCategory,
-  //   selectedQuantity,
-  //   selectedStatus,
-  //   buttonClicked,
-  // ]);
-
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
-
-  // useEffect(() => {
-  //   handleGetFilteredProduct();
-  // }, [handleGetFilteredProduct]);
 
   return (
     <>
@@ -205,105 +173,8 @@ function RoomListPage(props) {
               <SearchRoomList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                handleEnterKeyPressed={handleEnterKeyPressed}
               />
-              {/* <Box py={2} px={3}>
-                  {selectedCategory.length === 0 &&
-                    selectedQuantity.length === 0 &&
-                    selectedStatus.length === 0 && (
-                      <TextField
-                        disabled
-                        variant="standard"
-                        fullWidth
-                        size="medium"
-                        InputProps={{
-                          disableUnderline: true,
-                          fontSize: "14px",
-                        }}
-                        placeholder="Không có bộ lọc nào được chọn"
-                      />
-                    )}
-                  {selectedCategory.map((item, index) => (
-                    <Chip
-                      color="primary"
-                      label={
-                        catalogs.find((c) => c.catalogId === item)?.catalogName
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedCategory((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedStatus.map((item, index) => (
-                    <Chip
-                      color="secondary"
-                      label={statusOptions.find((i) => i.value === item)?.name}
-                      key={index}
-                      onDelete={() =>
-                        setSelectedStatus((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedQuantity.map((item, index) => (
-                    <Chip
-                      color="warning"
-                      label={
-                        quantityOptions.find((i) => i.value === item)?.name
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedQuantity((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-                </Box> */}
-              {/* <Stack
-                  direction={"row"}
-                  spacing={1}
-                  paddingLeft={2}
-                  paddingBottom={1}
-                  sx={{
-                    borderBottom: "1px solid #e0e0e0",
-                  }}
-                >
-                  <ProductFilter
-                    label={"Danh mục"}
-                    options={catalogs}
-                    selectedValues={selectedCategory}
-                    onChange={handleChangeCategoryFilter}
-                  />
-                  <ProductFilter
-                    label={"Trạng thái"}
-                    options={statusOptions}
-                    selectedValues={selectedStatus}
-                    onChange={handleChangeStatusFilter}
-                  />
-                  <ProductFilter
-                    label={"Số lượng"}
-                    options={quantityOptions}
-                    selectedValues={selectedQuantity}
-                    onChange={handleChangeQuantityFilter}
-                  />
-                </Stack> */}
-              {/* <ProductsTableBasis
-                  count={dataFetched.length}
-                  items={dataFetched}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                /> */}
               <RoomTable
                 count={totalItems ? totalItems : 0}
                 items={rooms}

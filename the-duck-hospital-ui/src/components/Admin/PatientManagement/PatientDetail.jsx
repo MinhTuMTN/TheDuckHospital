@@ -38,29 +38,6 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 function PatientDetail(props) {
   const { patient } = props;
 
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
-
   return (
     <Stack
       sx={{
@@ -118,12 +95,15 @@ function PatientDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      <BoxStyle>
+      <BoxStyle
+        sx={{
+          borderBottom: "none !important",
+        }}
+      >
         <Grid container>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Trạng thái</TieuDeCot>
           </Grid>
-
           <Grid item xs={8} md={9}>
             <NoiDung>{patient.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</NoiDung>
           </Grid>

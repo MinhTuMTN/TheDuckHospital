@@ -39,16 +39,17 @@ public class RoomAdminController {
         );
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<?> getAllRooms(
+    @GetMapping("/filtered")
+    public ResponseEntity<?> getFilteredRoomsPagination(
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get all rooms successfully")
-                        .data(roomServices.getPaginationRoomsDeleted(page, limit))
+                        .message("Get filtered rooms pagination successfully")
+                        .data(roomServices.getPaginationFilteredRooms(search, page, limit))
                         .build()
         );
     }

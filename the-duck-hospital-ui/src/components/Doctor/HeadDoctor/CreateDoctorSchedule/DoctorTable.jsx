@@ -18,13 +18,13 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
-import DialogForm from "../../General/DialogForm";
+import DialogForm from "../../../General/DialogForm";
 import { enqueueSnackbar } from "notistack";
 import {
   createDoctorSchedule,
   getInvalidDate,
   getRoomsDepartment,
-} from "../../../services/doctor/headDoctor/ScheduleServices";
+} from "../../../../services/doctor/headDoctor/ScheduleServices";
 import {
   DateCalendar,
   LocalizationProvider,
@@ -312,22 +312,6 @@ function DoctorTable(props) {
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    <Label>Chuyên khoa:</Label>
-                    <Content>
-                      {item.department
-                        ? item.department.departmentName
-                            .charAt(5)
-                            .toUpperCase() +
-                          item.department.departmentName.slice(6)
-                        : "Chưa cập nhật"}
-                    </Content>
-                  </Stack>
-
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
                     <Label>Số điện thoại:</Label>
                     <Content>{item.phoneNumber}</Content>
                   </Stack>
@@ -559,9 +543,9 @@ function DoctorTable(props) {
                         margin: "0 auto",
                         width: "100%",
                         "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
-                          {
-                            justifyContent: "space-around",
-                          },
+                        {
+                          justifyContent: "space-around",
+                        },
                       }}
                     />
                   </LocalizationProvider>
@@ -612,9 +596,9 @@ function DoctorTable(props) {
                         margin: "0 auto",
                         width: "100%",
                         "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
-                          {
-                            justifyContent: "space-around",
-                          },
+                        {
+                          justifyContent: "space-around",
+                        },
                       }}
                     />
                   </LocalizationProvider>

@@ -1,12 +1,32 @@
 import styled from "@emotion/styled";
 import {
   Box,
+  Chip,
   Grid,
   Stack,
   Typography,
 } from "@mui/material";
 import React from "react";
 import FormatDate from "../../General/FormatDate";
+import FormatCurrency from "../../General/FormatCurrency";
+
+const transactionStatus = [
+  {
+    status: "PENDING",
+    label: "Chờ xử lý",
+    color: "info"
+  },
+  {
+    status: "SUCCESS",
+    label: "Thành công",
+    color: "success"
+  },
+  {
+    status: "FAILED",
+    label: "Thất bại",
+    color: "error"
+  },
+];
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -36,30 +56,9 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 }));
 
 function TransactionDetail(props) {
-  const { patient } = props;
-
-  // const handleUpdateButtonClick = async () => {
-  //   let response;
-  //   if (statusCustomer) {
-  //     response = await restoreCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Mở khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Mở khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   } else {
-  //     response = await deleteCustomer(customer.userId);
-  //     if (response.success) {
-  //       enqueueSnackbar("Khóa khách hàng thành công!", { variant: "success" });
-  //       setDisabledButton(true);
-  //       setStatusCustomer(editStatus);
-  //     } else {
-  //       enqueueSnackbar("Khóa khách hàng thất bại!", { variant: "error" });
-  //     }
-  //   }
-  // };
+  const { transaction } = props;
+  const statusColor = transactionStatus.find(s => s.status === transaction.status)?.color;
+  const statusLabel = transactionStatus.find(s => s.status === transaction.status)?.label;
 
   return (
     <Stack
@@ -69,63 +68,74 @@ function TransactionDetail(props) {
       }}
     >
       <BoxStyle>
-        <TieuDe>Thông tin cơ bản</TieuDe>
+        <TieuDe>Thông tin giao dịch</TieuDe>
       </BoxStyle>
 
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Họ tên</TieuDeCot>
+            <TieuDeCot>Phương thức</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <TieuDeCot>{patient.fullName}</TieuDeCot>
+              <NoiDung>{transaction.paymentMethod}</NoiDung>
             </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
+      {transaction.bankCode &&
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Thẻ</TieuDeCot>
+            </Grid>
+            <Grid item xs={8} md={9}>
+              <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+                <NoiDung>{transaction.bankCode}</NoiDung>
+              </Stack>
+            </Grid>
+          </Grid>
+        </BoxStyle>}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>CCCD</TieuDeCot>
-          </Grid>
-          <Grid item xs={8} md={9}>
-            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{patient.identityNumber}</NoiDung>
-            </Stack>
-          </Grid>
-        </Grid>
-      </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Số điện thoại</TieuDeCot>
+            <TieuDeCot>Tổng tiền</TieuDeCot>
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.phoneNumber}</NoiDung>
+            <NoiDung><FormatCurrency amount={transaction.amount} /></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
-            <TieuDeCot>Ngày sinh</TieuDeCot>
+            <TieuDeCot>Ngày tạo</TieuDeCot>
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={patient.dateOfBirth} /></NoiDung>
+            <NoiDung><FormatDate dateTime={transaction.createdAt} /></NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
-      <BoxStyle>
+      <BoxStyle
+        sx={{
+          borderBottom: "none !important",
+        }}
+      >
         <Grid container>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Trạng thái</TieuDeCot>
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{patient.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</NoiDung>
+              <Chip
+                color={statusColor}
+                label={statusLabel}
+                sx={{
+                  fontSize: "14px"
+                }}
+              />
           </Grid>
         </Grid>
       </BoxStyle>

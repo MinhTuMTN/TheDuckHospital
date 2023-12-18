@@ -234,7 +234,11 @@ function MedicalServiceDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      <BoxStyle>
+      <BoxStyle
+        sx={{
+          borderBottom: "none !important",
+        }}
+      >
         <Grid container alignItems={"center"} paddingBottom={1}>
           <Grid item xs={4} md={3}>
             <TieuDeCot>Trạng thái</TieuDeCot>

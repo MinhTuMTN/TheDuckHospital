@@ -1,90 +1,103 @@
 import {
   Box,
+  Chip,
   Container,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
 import AccountTable from "../../../components/Admin/AccountManagement/AccountTable";
 import { getPaginationAccounts } from "../../../services/admin/AccountServices";
 import { enqueueSnackbar } from "notistack";
+import AccountFilter from "../../../components/Admin/AccountManagement/AccountFilter";
+import SearchAccountList from "../../../components/Admin/AccountManagement/SearchAccountList";
 
-// const items = [
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Thu ngân",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Điều dưỡng",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Thu ngân",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bệnh nhân",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Dược sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-//   {
-//     fullName: "Nguyễn Văn Staff",
-//     phoneNumber: "0123456789",
-//     role: "Bác sĩ",
-//     deleted: false,
-//   },
-// ];
+const statusOptions = [
+  {
+    value: false,
+    name: "Còn hoạt động",
+  },
+  {
+    value: true,
+    name: "Ngưng hoạt động",
+  },
+];
+
+const roleOptions = [
+  {
+    value: "PATIENT",
+    name: "Bệnh nhân",
+  },
+  {
+    value: "DOCTOR",
+    name: "Bác sĩ",
+  },
+  {
+    value: "NURSE",
+    name: "Điều dưỡng",
+  },
+  {
+    value: "CASHIER",
+    name: "Thu ngân",
+  },
+  {
+    value: "PHARMACIST",
+    name: "Dược sĩ",
+  },
+];
 
 function AccountListPage(props) {
   const [search, setSearch] = useState("");
-  // const [buttonClicked, setButtonClicked] = useState(true);
+  const [filterButtonClicked, setFilterButtonClicked] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
-  // const [productItems, setProductItems] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setFilterButtonClicked(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setFilterButtonClicked(true);
+  };
+
+  const [selectedRole, setSelectedRole] = useState([]);
+  const handleChangeRoleFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedRole((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedRole((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const handleChangeStatusFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedStatus((prev) => [...prev, event.target.value === "true"]);
+    } else {
+      setSelectedStatus((prev) =>
+        prev.filter((item) => item !== (event.target.value === "true"))
+      );
+    }
   };
 
   const handleGetAccounts = useCallback(async () => {
-    // if (!buttonClicked) return;
+    if (!filterButtonClicked) return;
     const response = await getPaginationAccounts({
-      page: page - 1,
+      search: search.trim(),
+      page: pageChange ? page - 1 : 0,
       limit: limit,
+      accountRole: selectedRole,
+      accountStatus: selectedStatus,
     });
     if (response.success) {
       setAccounts(response.data.data.accounts);
@@ -92,58 +105,24 @@ function AccountListPage(props) {
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-  }, [page, limit]);
+    setFilterButtonClicked(false);
+    setPageChange(false);
+  }, [
+    search,
+    page,
+    limit,
+    selectedStatus,
+    selectedRole,
+    filterButtonClicked,
+    pageChange,
+  ]);
 
   useEffect(() => {
     handleGetAccounts();
   }, [handleGetAccounts]);
 
-  // const handleGetFilteredProduct = useCallback(async () => {
-  //   if (!buttonClicked) return;
-  //   setIsLoading(true);
-  //   const response = await GetFilteredProducts({
-  //     search: search,
-  //     page: page - 1,
-  //     limit: limit,
-  //     catalogIds: selectedCategory,
-  //     productStatus: selectedStatus,
-  //     productQuantity: selectedQuantity,
-  //   });
-  //   if (response.success) {
-  //     setProductItems(response.data.data.objects);
-  //     setPage(parseInt(response.data.data.page) + 1);
-  //     setTotalItems(response.data.data.totalObjects);
-  //     setLimit(response.data.data.limit);
-  //   } else
-  //     enqueueSnackbar("Đã có lỗi xảy ra khi lấy thông tin sản phẩm", {
-  //       variant: "error",
-  //     });
-  //   setIsLoading(false);
-  //   setButtonClicked(false);
-  // }, [
-  //   limit,
-  //   page,
-  //   search,
-  //   selectedCategory,
-  //   selectedQuantity,
-  //   selectedStatus,
-  //   buttonClicked,
-  // ]);
-
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
-
-  // useEffect(() => {
-  //   handleGetFilteredProduct();
-  // }, [handleGetFilteredProduct]);
-
   return (
     <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
       <Box component={"main"} sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth={"lg"}>
           <Stack spacing={4}>
@@ -167,47 +146,46 @@ function AccountListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchStaffList
+              <SearchAccountList
                 value={search}
                 onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
+                onApply={() => {
+                  setFilterButtonClicked(true);
+                }}
               />
-              {/* <Box py={2} px={3}>
-                  {selectedCategory.length === 0 &&
-                    selectedQuantity.length === 0 &&
-                    selectedStatus.length === 0 && (
-                      <TextField
-                        disabled
-                        variant="standard"
-                        fullWidth
-                        size="medium"
-                        InputProps={{
-                          disableUnderline: true,
-                          fontSize: "14px",
-                        }}
-                        placeholder="Không có bộ lọc nào được chọn"
-                      />
-                    )}
-                  {selectedCategory.map((item, index) => (
+              <Box py={2} px={3}>
+                {selectedRole.length === 0 &&
+                  selectedStatus.length === 0 && (
+                    <TextField
+                      disabled
+                      variant="standard"
+                      fullWidth
+                      size="medium"
+                      InputProps={{
+                        disableUnderline: true,
+                        fontSize: "14px",
+                      }}
+                      placeholder="Không có bộ lọc nào được chọn"
+                    />
+                  )}
+                <Stack direction="row" spacing={1}>
+                  {selectedRole.map((item, index) => (
                     <Chip
-                      color="primary"
+                      color="info"
                       label={
-                        catalogs.find((c) => c.catalogId === item)?.catalogName
+                        roleOptions.find((i) => i.value === item)?.name
                       }
                       key={index}
                       onDelete={() =>
-                        setSelectedCategory((prev) =>
+                        setSelectedRole((prev) =>
                           prev.filter((i) => i !== item)
                         )
                       }
                     />
                   ))}
-
                   {selectedStatus.map((item, index) => (
                     <Chip
-                      color="secondary"
+                      color="warning"
                       label={statusOptions.find((i) => i.value === item)?.name}
                       key={index}
                       onDelete={() =>
@@ -217,58 +195,30 @@ function AccountListPage(props) {
                       }
                     />
                   ))}
-
-                  {selectedQuantity.map((item, index) => (
-                    <Chip
-                      color="warning"
-                      label={
-                        quantityOptions.find((i) => i.value === item)?.name
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedQuantity((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-                </Box> */}
-              {/* <Stack
-                  direction={"row"}
-                  spacing={1}
-                  paddingLeft={2}
-                  paddingBottom={1}
-                  sx={{
-                    borderBottom: "1px solid #e0e0e0",
-                  }}
-                >
-                  <ProductFilter
-                    label={"Danh mục"}
-                    options={catalogs}
-                    selectedValues={selectedCategory}
-                    onChange={handleChangeCategoryFilter}
-                  />
-                  <ProductFilter
-                    label={"Trạng thái"}
-                    options={statusOptions}
-                    selectedValues={selectedStatus}
-                    onChange={handleChangeStatusFilter}
-                  />
-                  <ProductFilter
-                    label={"Số lượng"}
-                    options={quantityOptions}
-                    selectedValues={selectedQuantity}
-                    onChange={handleChangeQuantityFilter}
-                  />
-                </Stack> */}
-              {/* <ProductsTableBasis
-                  count={dataFetched.length}
-                  items={dataFetched}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                /> */}
+                </Stack>
+              </Box>
+              <Stack
+                direction={"row"}
+                spacing={1}
+                paddingLeft={2}
+                paddingBottom={1}
+                sx={{
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                <AccountFilter
+                  label={"Vai trò"}
+                  options={roleOptions}
+                  selectedValues={selectedRole}
+                  onChange={handleChangeRoleFilter}
+                />
+                <AccountFilter
+                  label={"Trạng thái"}
+                  options={statusOptions}
+                  selectedValues={selectedStatus}
+                  onChange={handleChangeStatusFilter}
+                />
+              </Stack>
               <AccountTable
                 count={totalItems ? totalItems : 0}
                 items={accounts}
@@ -281,7 +231,6 @@ function AccountListPage(props) {
           </Stack>
         </Container>
       </Box>
-      {/* )} */}
     </>
   );
 }
