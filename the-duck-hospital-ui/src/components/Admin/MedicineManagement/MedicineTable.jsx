@@ -26,6 +26,29 @@ import { enqueueSnackbar } from "notistack";
 import { deleteMedicine, restoreMedicine } from "../../../services/admin/MedicineServices";
 import DialogConfirm from "../../General/DialogConfirm";
 
+const medicineUnit = [
+  {
+    value: "TUBE",
+    label: "Tuýp",
+  },
+  {
+    value: "BOTTLE",
+    label: "Chai",
+  },
+  {
+    value: "BOX",
+    label: "Hộp",
+  },
+  {
+    value: "BAG",
+    label: "Túi",
+  },
+  {
+    value: "CAPSULE",
+    label: "Viên",
+  },
+];
+
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
 }));
@@ -130,6 +153,21 @@ function Row(props) {
           </CustomText>
         </TableCell>
         <TableCell align="center">
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {medicineUnit.find(unit => unit.value === row.unit) ?
+            medicineUnit.find(unit => unit.value === row.unit).label :
+            "Đang cập nhật"}
+          </CustomText>
+        </TableCell>
+        <TableCell align="center">
           <Stack direction={"row"} spacing={1} alignItems={"center"} justifyContent={"center"}>
             <CircleIcon
               sx={{
@@ -180,7 +218,8 @@ function Row(props) {
                           medicineId: row.medicineId,
                           medicineName: row.medicineName,
                           price: row.price,
-                          quantity: row.quantity
+                          quantity: row.quantity,
+                          unit: row.unit ? row.unit : "",
                         });
                         setAddNew(false);
                         setOpenDialogForm(true);
@@ -216,7 +255,8 @@ function Row(props) {
                       medicineId: row.medicineId,
                       medicineName: row.medicineName,
                       price: row.price,
-                      quantity: row.quantity
+                      quantity: row.quantity,
+                      unit: row.unit ? row.unit : "",
                     });
                     setAddNew(false);
                     setOpenDialogForm(true);
@@ -305,7 +345,7 @@ function MedicineTable(props) {
                     Giá
                   </CustomText>
                 </TableCell>
-                <TableCell align="right" style={{ width: "20%" }}>
+                <TableCell align="right" style={{ width: "15%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}
@@ -313,7 +353,15 @@ function MedicineTable(props) {
                     Số lượng
                   </CustomText>
                 </TableCell>
-                <TableCell align="center" style={{ width: "25%" }}>
+                <TableCell align="center" style={{ width: "10%" }}>
+                  <CustomText
+                    style={{ fontWeight: "500" }}
+                    color={"#101828"}
+                  >
+                    Đơn vị
+                  </CustomText>
+                </TableCell>
+                <TableCell align="center" style={{ width: "20%" }}>
                   <CustomText
                     style={{ fontWeight: "500" }}
                     color={"#101828"}

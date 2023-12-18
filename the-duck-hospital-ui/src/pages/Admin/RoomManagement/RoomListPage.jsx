@@ -125,7 +125,7 @@ function RoomListPage(props) {
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      handleGetRooms();
+      setEnterPressed(true);
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 
