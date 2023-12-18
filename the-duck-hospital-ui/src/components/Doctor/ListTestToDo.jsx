@@ -85,7 +85,7 @@ function ListTestToDo(props) {
                   placeholder="Tên dịch vụ"
                   sx={{ width: "300px" }}
                   renderInput={(params) => (
-                    <TextField {...params} placeholder="Favorites" />
+                    <TextField {...params} placeholder="Xét nghiệm" />
                   )}
                 />
                 <CustomTextField
