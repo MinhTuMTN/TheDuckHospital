@@ -4,6 +4,10 @@ export const getTodaySchedule = () => {
   return get("/doctor/doctor-schedules");
 };
 
+export const getTimeTable = () => {
+  return get("/doctor/doctor-schedules/time-table");
+};
+
 export const searchMedicalRecord = (
   doctorScheduleId,
   state,
