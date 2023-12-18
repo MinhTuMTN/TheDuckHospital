@@ -50,6 +50,7 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
 import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
+import Analytics from "../pages/Admin/Analytics";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -251,12 +252,12 @@ function Router(props) {
       children: [
         {
           path: "analytics",
-          element: null,
+          element: <Analytics />,
         },
-        // {
-        //   element: <Analytics />,
-        //   index: true,
-        // },
+        {
+          element: <Analytics />,
+          index: true,
+        },
         {
           path: "account-management",
           element: <AccountListPage />,

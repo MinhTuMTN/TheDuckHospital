@@ -3,6 +3,7 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface IDoctorServices {
             int page,
             int limit
     );
+
+    Doctor findHeadDoctor(Department department);
 }

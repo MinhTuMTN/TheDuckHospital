@@ -1,5 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IStaffServices;
@@ -8,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,17 +24,24 @@ public class TransactionAdminController {
         this.transactionServices = transactionServices;
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/filtered")
     public ResponseEntity<?> getAllTransactionsPagination(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "VNPay, Cash") List<String> transactionPayment,
+            @RequestParam(defaultValue = "PENDING, SUCCESS, FAILED") List<TransactionStatus> transactionStatus
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get transactions pagination successfully")
-                        .data(transactionServices.getTransactionsPagination(page, limit))
-                        .build()
+                        .message("Get filtered transactions pagination successfully")
+                        .data(transactionServices
+                                .getFilteredTransactionsPagination(
+                                        page,
+                                        limit,
+                                        transactionPayment,
+                                        transactionStatus
+                                )).build()
         );
     }
 

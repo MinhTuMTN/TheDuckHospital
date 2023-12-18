@@ -167,4 +167,15 @@ public class DoctorServicesImpl implements IDoctorServices {
                 .items(doctorItemResponses)
                 .build();
     }
+
+    @Override
+    public Doctor findHeadDoctor(Department department) {
+        if (department.getDoctors() != null) {
+            return department.getDoctors().stream()
+                    .filter(Doctor::isHeadOfDepartment)
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
 }

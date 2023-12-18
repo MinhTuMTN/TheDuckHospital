@@ -119,7 +119,7 @@ function MedicalExamRecordItem(props) {
               fontSize: "18px"
             }}
           >
-            <FormatCurrency amount={item.price} />
+            {item.diagnosis ? <FormatCurrency amount={item.price} /> : "Chưa Khám"}
           </Typography>
         </Stack>
       </MuiAccordionSummary>
@@ -260,7 +260,7 @@ function MedicalExamRecordItem(props) {
                     width: "70%"
                   }}
                 >
-                  {item.symptom}
+                  {item.symptom ? item.symptom : "Đang cập nhật"}
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={2}>
@@ -278,7 +278,7 @@ function MedicalExamRecordItem(props) {
                   style={{ fontSize: "16px", width: "70%" }}
                   color="peach.main"
                 >
-                  {item.diagnosis}
+                  {item.diagnosis ? item.diagnosis : "Đang cập nhật"}
                 </Typography>
               </Stack>
             </BorderTextBox>
