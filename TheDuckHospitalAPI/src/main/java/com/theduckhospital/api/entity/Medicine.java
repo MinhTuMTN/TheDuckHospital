@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.MedicineUnit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Medicine {
     private double price;
     private int quantity;
 
+    private MedicineUnit unit;
     private Date createdAt;
     private Date lastModifiedAt;
     private boolean deleted;

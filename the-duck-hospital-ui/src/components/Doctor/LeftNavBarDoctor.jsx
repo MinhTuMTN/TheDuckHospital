@@ -61,6 +61,7 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   height: theme.spacing(8),
   paddingX: "16px",
 }));
+
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
   marginRight: theme.spacing(0.5),
   width: "100%",

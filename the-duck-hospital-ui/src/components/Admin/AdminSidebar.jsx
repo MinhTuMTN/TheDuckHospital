@@ -5,13 +5,14 @@ import AssistWalkerIcon from "@mui/icons-material/AssistWalker";
 import BabyChangingStationIcon from "@mui/icons-material/BabyChangingStation";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import DnsIcon from "@mui/icons-material/Dns";
-import VaccinesIcon from '@mui/icons-material/Vaccines';
+import VaccinesIcon from "@mui/icons-material/Vaccines";
 // import pic from "../assets/logo-removebg-preview.jpg";
 
 import {
   Box,
+  CardMedia,
   Drawer,
   List,
   ListItem,
@@ -24,7 +25,7 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CustomLink from "../General/CustomLink";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
@@ -42,6 +43,15 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
   color: "white",
   transform: "scale(1.1)",
+}));
+
+const StyledLogo = styled(CardMedia)(({ theme }) => ({
+  display: "flex",
+  width: "220px",
+  cover: "no-repeat",
+  backgroundSize: "contain",
+  height: theme.spacing(8),
+  paddingX: "16px",
 }));
 
 const sidebarItems = [
@@ -105,6 +115,7 @@ const sidebarItems = [
 function AdminSidebar(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const navigate = useNavigate();
 
   const location = useLocation();
   let currentSection = location.pathname
@@ -138,25 +149,15 @@ function AdminSidebar(props) {
         >
           <Box
             sx={{
-              paddingTop: 3,
-              paddingX: 1,
-              alignItems: "center",
+              paddingY: 2,
               display: "flex",
+              width: "100%",
+              justifyContent: "center",
+              cursor: "pointer",
             }}
+            onClick={() => navigate("/")}
           >
-            <Box
-              sx={{
-                height: "4.5rem",
-                width: "4.5rem",
-                display: "flex",
-                direction: "row",
-              }}
-            >
-              {/* <img alt="logo" src={pic} /> */}
-            </Box>
-            <Typography variant="h5" sx={{ color: "white" }}>
-              The Duck Hospital
-            </Typography>
+            <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
           </Box>
           <Typography
             variant="h6"
