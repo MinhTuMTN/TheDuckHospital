@@ -6,12 +6,10 @@ import com.theduckhospital.api.entity.Medicine;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.MedicineRepository;
 import com.theduckhospital.api.services.IMedicineServices;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -81,5 +79,17 @@ public class MedicineServicesImpl implements IMedicineServices {
     @Override
     public Medicine findMedicineById(int medicineId) {
         return medicineRepository.findById(medicineId).orElseThrow(() -> new NotFoundException("Medicine not found"));
+    }
+
+    @Override
+    public List<Medicine> getMedicines(String query, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+
+        return medicineRepository
+                .findByMedicineNameContainingIgnoreCaseAndDeletedIsFalse(
+                        query,
+                        pageable
+                )
+                .getContent();
     }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,5 +37,19 @@ public class Prescription {
     @ToStringExclude
     private List<PrescriptionItem> prescriptionItems;
 
-    // Cashier và Payment
+    private Date createdAt;
+    private Date lastModifiedAt;
+    private boolean deleted;
+    @PrePersist
+    public void prePersist() {
+        this.prescriptionId = UUID.randomUUID();
+        this.createdAt = new Date();
+        this.lastModifiedAt = new Date();
+        this.deleted = false;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastModifiedAt = new Date();
+    }
 }

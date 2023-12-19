@@ -1,15 +1,8 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import React from "react";
-import PropTypes from "prop-types";
 import HistoryIcon from "@mui/icons-material/History";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
+import PropTypes from "prop-types";
+import React from "react";
 InfoPatient.propTypes = {
   mainInfo: PropTypes.object,
   info: PropTypes.array,

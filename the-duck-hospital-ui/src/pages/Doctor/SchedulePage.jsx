@@ -2,7 +2,6 @@ import { useTheme } from "@emotion/react";
 import { DarkModeOutlined, WbSunnyOutlined } from "@mui/icons-material";
 import {
   Box,
-  Card,
   Divider,
   Grid,
   Paper,
@@ -12,9 +11,9 @@ import {
 } from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { getTimeTable } from "../../services/doctor/DoctorScheduleServices";
-import dayjs from "dayjs";
 
 function SchedulePage(props) {
   const theme = useTheme();

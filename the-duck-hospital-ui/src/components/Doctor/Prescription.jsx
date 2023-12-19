@@ -19,14 +19,17 @@ import {
   Typography,
   tableCellClasses,
 } from "@mui/material";
-import React, { useCallback, useState } from "react";
-const medicines = [
-  { label: "Paracetamol", value: "Paracetamol" },
-  { label: "Oresol", value: "Oresol" },
-  { label: "Panadol extra", value: "Panadol extra" },
-  { label: "Salonpas", value: "Salonpas" },
-  { label: "NACL 9%", value: "NACL 9%" },
-];
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  addMedicine,
+  deleteMedicine,
+  getMedicineItems,
+  getMedicineUnit,
+  searchMedicine,
+} from "../../services/doctor/MedicineServices";
+import { enqueueSnackbar } from "notistack";
+import { useParams } from "react-router-dom";
+import FormatCurrency from "../General/FormatCurrency";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -46,29 +49,20 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function Prescription(props) {
+  const { medicalRecordId } = useParams();
   const [hiddenButtonAdd, setHidden] = React.useState(false);
-  const [rows, setRows] = React.useState([
-    {
-      id: 1,
-      medicineName: "Eugica",
-      description: "Sáng uống 1 viên, tối uống 1 viên",
-      quantity: 10,
-      unit: "viên",
-      total: 10000,
-    },
-    {
-      id: 2,
-      medicineName: "Sữa tẩy trang cho da nhạy cảm",
-      description: "TẨY TRANG",
-      quantity: 1,
-      unit: "Chai",
-      total: 244000,
-    },
-  ]);
+  const [query, setQuery] = React.useState("");
+  const [medicines, setMedicines] = React.useState([]);
+  const [prescriptionItems, setPrescriptionItems] = React.useState([]);
+  const [selectedMedicineId, setSelectedMedicineId] = React.useState(null);
 
-  const handleDeleteRow = (id) => {
-    const updatedRows = rows.filter((row) => row.id !== id);
-    setRows(updatedRows);
+  const handleDeleteRow = async (id) => {
+    const response = await deleteMedicine(medicalRecordId, id);
+    if (response.success) {
+      setPrescriptionItems(response.data.data);
+    } else {
+      enqueueSnackbar("Xóa thất bại", { variant: "error" });
+    }
   };
 
   const [totalForOneMedicine, setTotalForOneMedicine] = useState(0);
@@ -100,6 +94,69 @@ function Prescription(props) {
   React.useEffect(() => {
     calculateTotal();
   }, [calculateTotal]);
+
+  useEffect(() => {
+    const handleGetMedicine = async () => {
+      const response = await searchMedicine(query);
+      if (response.success) setMedicines(response.data.data);
+    };
+    handleGetMedicine();
+  }, [query]);
+
+  const handleAddMedicine = async () => {
+    let note = "";
+
+    if (noteForOneMedicine) note = `${noteForOneMedicine}`;
+    else {
+      if (selectedBuoi.sang) note += "Sáng " + medicineOneTime + " viên, ";
+      if (selectedBuoi.trua) note += "Trưa " + medicineOneTime + " viên, ";
+      if (selectedBuoi.chieu) note += "Chiều " + medicineOneTime + " viên, ";
+      if (selectedBuoi.toi) note += "Tối " + medicineOneTime + " viên, ";
+
+      note = note.slice(0, -2);
+    }
+
+    if (!selectedMedicineId) {
+      enqueueSnackbar("Vui lòng chọn thuốc", { variant: "error" });
+      return;
+    }
+
+    if (
+      !totalForOneMedicine ||
+      typeof totalForOneMedicine !== "number" ||
+      totalForOneMedicine <= 0
+    ) {
+      console.log(!totalForOneMedicine);
+      enqueueSnackbar("Vui lòng nhập số lượng", { variant: "error" });
+      return;
+    }
+
+    const data = {
+      medicineId: selectedMedicineId,
+      quantity: totalForOneMedicine,
+      note: note,
+    };
+
+    const response = await addMedicine(medicalRecordId, data);
+    if (response.success) {
+      setPrescriptionItems(response.data.data);
+      setHidden(false);
+      setMedicineOneTime("");
+      setSelectedMedicineId(null);
+      setTotalForOneMedicine("");
+      setNoteForOneMedicine("");
+    } else {
+      enqueueSnackbar("Thêm thuốc thất bại", { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    const handleGetPrescription = async () => {
+      const response = await getMedicineItems(medicalRecordId);
+      if (response.success) setPrescriptionItems(response.data.data);
+    };
+    handleGetPrescription();
+  }, [medicalRecordId]);
 
   return (
     <TableContainer
@@ -134,10 +191,22 @@ function Prescription(props) {
                         disablePortal
                         id="combo-box-demo"
                         options={medicines}
+                        getOptionLabel={(option) => option.medicineName}
+                        isOptionEqualToValue={(option, value) =>
+                          option.medicineId === value.medicineId
+                        }
+                        onChange={(event, value) => {
+                          setSelectedMedicineId(value.medicineId);
+                        }}
                         width={"100%"}
-                        placeholder="Tên dịch vụ"
                         renderInput={(params) => (
-                          <TextField {...params} placeholder="Thuốc" />
+                          <TextField
+                            {...params}
+                            placeholder="Thuốc"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onBlur={() => setQuery("")}
+                          />
                         )}
                         sx={{
                           flex: 2,
@@ -152,8 +221,10 @@ function Prescription(props) {
                         variant="outlined"
                         id="outlined-basic"
                         placeholder="Số lượng"
-                        value={totalForOneMedicine}
-                        onChange={(e) => setTotalForOneMedicine(e.target.value)}
+                        value={Number(totalForOneMedicine) || ""}
+                        onChange={(e) =>
+                          setTotalForOneMedicine(Number(e.target.value))
+                        }
                       />
                     </Stack>
                     <CustomTextField
@@ -254,10 +325,7 @@ function Prescription(props) {
                       textTransform: "none",
                     }}
                     onClick={() => {
-                      setHidden(false);
-                      setMedicineOneTime("");
-                      setTotalForOneMedicine("");
-                      setNoteForOneMedicine("");
+                      handleAddMedicine();
                     }}
                   >
                     Thêm
@@ -290,17 +358,19 @@ function Prescription(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
-            <TableRow key={row.id}>
+          {prescriptionItems.map((item, index) => (
+            <TableRow key={item.prescriptionItemId}>
               <TableCell align="center">
                 {index < 9 ? `0${index + 1}` : index + 1}
               </TableCell>
-              <TableCell align="left">{row.medicineName}</TableCell>
-              <TableCell align="left">{row.description}</TableCell>
+              <TableCell align="left">{item.medicine?.medicineName}</TableCell>
+              <TableCell align="left">{item.dosageInstruction}</TableCell>
               <TableCell align="right">
-                x {row.quantity} {row.unit}
+                x {item.quantity} {getMedicineUnit(item.medicine?.unit)}
               </TableCell>
-              <TableCell align="right">{row.total}</TableCell>
+              <TableCell align="right">
+                <FormatCurrency amount={item.price} />
+              </TableCell>
               <TableCell align="center">
                 <Stack direction={"row"} justifyContent={"center"}>
                   <IconButton
@@ -318,7 +388,7 @@ function Prescription(props) {
                         color: "#f0735a",
                       },
                     }}
-                    onClick={() => handleDeleteRow(row.id)}
+                    onClick={() => handleDeleteRow(item.prescriptionItemId)}
                   >
                     <DeleteOutlineOutlinedIcon
                       sx={{
