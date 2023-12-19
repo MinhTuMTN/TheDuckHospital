@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleReques
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
 import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorScheduleItemResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.DoctorSchedule;
@@ -45,4 +46,6 @@ public interface IScheduleDoctorServices {
     );
 
     Map<String, String> countMedicalExaminationRecord(String authorization, UUID doctorScheduleId);
+
+    List<DoctorScheduleItemResponse> getDoctorTimeTable(String authorization);
 }

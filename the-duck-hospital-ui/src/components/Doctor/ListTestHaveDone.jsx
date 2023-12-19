@@ -1,7 +1,9 @@
+import styled from "@emotion/styled";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import {
-  Autocomplete,
   Box,
-  Button,
   IconButton,
   Stack,
   Table,
@@ -10,31 +12,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   tableCellClasses,
 } from "@mui/material";
-import React, { useEffect } from "react";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import styled from "@emotion/styled";
-import {
-  createMedicalTest,
-  deleteMedicalTest,
-  getAllMedicalTests,
-  getMedicalTestByMedicalRecordId,
-} from "../../services/doctor/MedicalTestServices";
-import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import React from "react";
+import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import Invoice from "./Invoice";
 import { useAuth } from "../../auth/AuthProvider";
-
-const CustomTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    padding: "4px 4px",
-  },
-}));
+import { deleteMedicalTest } from "../../services/doctor/MedicalTestServices";
+import Invoice from "./Invoice";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -96,6 +82,7 @@ function Row(props) {
             </IconButton>
 
             <IconButton
+              hidden
               size="small"
               sx={{
                 width: "34px",
@@ -119,6 +106,7 @@ function Row(props) {
               />
             </IconButton>
             <IconButton
+              hidden
               size="small"
               sx={{
                 width: "34px",
@@ -158,44 +146,9 @@ function Row(props) {
   );
 }
 
-function ListTestToDo(props) {
-  const [hiddenButtonAdd, setHidden] = React.useState(false);
+function ListTestHaveDone(props) {
   const { medicalRecordId } = useParams();
-  const [selectedTest, setSelectedTest] = React.useState({
-    service: null,
-    serviceNote: "",
-  });
-  const [testServices, setTestServices] = React.useState([]);
   const [rows, setRows] = React.useState([]);
-
-  useEffect(() => {
-    const handleGetAllTest = async () => {
-      const response = await getAllMedicalTests();
-      if (response.success) setTestServices(response.data.data);
-    };
-
-    const handleGetMedicalTest = async () => {
-      const response = await getMedicalTestByMedicalRecordId(medicalRecordId);
-      if (response.success) setRows(response.data.data);
-    };
-
-    handleGetMedicalTest();
-    handleGetAllTest();
-  }, [medicalRecordId]);
-
-  const handleAddTest = async () => {
-    const response = await createMedicalTest(medicalRecordId, {
-      serviceId: selectedTest.service.serviceId,
-      note: selectedTest.serviceNote,
-    });
-    if (response.success) {
-      setRows(response.data.data);
-      setSelectedTest({ service: null, serviceNote: "" });
-      setHidden(false);
-    } else {
-      enqueueSnackbar("Thêm xét nghiệm thất bại", { variant: "error" });
-    }
-  };
 
   const handleDeleteTest = async (medicalTestId) => {
     const response = await deleteMedicalTest(medicalRecordId, medicalTestId);
@@ -213,67 +166,13 @@ function ListTestToDo(props) {
       }}
     >
       <Table sx={{ minWidth: 650 }} aria-label="caption table">
-        <caption style={{ width: "100%", textAlign: "right" }}>
-          {hiddenButtonAdd === false ? (
-            <Button
-              variant="outlined"
-              sx={{
-                textTransform: "none",
-              }}
-              onClick={() => setHidden(true)}
-            >
-              Thêm xét nghiệm
-            </Button>
-          ) : (
-            <>
-              <Stack direction={"row"} justifyContent={"space-between"}>
-                <Autocomplete
-                  size="medium"
-                  disablePortal
-                  id="combo-box-demo"
-                  options={testServices}
-                  getOptionLabel={(option) => option.serviceName}
-                  placeholder="Tên dịch vụ"
-                  value={selectedTest.service}
-                  onChange={(event, newValue) => {
-                    setSelectedTest({
-                      ...selectedTest,
-                      service: newValue,
-                    });
-                  }}
-                  sx={{ width: "300px" }}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Xét nghiệm" />
-                  )}
-                />
-                <CustomTextField
-                  size="medium"
-                  variant="outlined"
-                  id="outlined-basic"
-                  placeholder="Chỉ định thực hiện"
-                  sx={{ width: "320px" }}
-                  value={selectedTest.serviceNote}
-                  onChange={(e) =>
-                    setSelectedTest({
-                      ...selectedTest,
-                      serviceNote: e.target.value,
-                    })
-                  }
-                />
-                <Button
-                  variant="outlined"
-                  sx={{
-                    textTransform: "none",
-                  }}
-                  onClick={handleAddTest}
-                >
-                  Thêm
-                </Button>
-              </Stack>
-            </>
-          )}
+        <caption
+          style={{
+            textAlign: "right",
+          }}
+        >
+          Danh sách các xét nghiệm đã thực hiện
         </caption>
-
         <TableHead>
           <TableRow>
             <StyledTableCell align="center" width={"10%"}>
@@ -307,4 +206,4 @@ function ListTestToDo(props) {
   );
 }
 
-export default ListTestToDo;
+export default ListTestHaveDone;

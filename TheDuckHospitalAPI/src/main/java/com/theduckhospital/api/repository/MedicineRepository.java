@@ -10,4 +10,8 @@ import java.util.List;
 public interface MedicineRepository extends JpaRepository<Medicine, Integer> {
     Page<Medicine> findPaginationByOrderByMedicineNameAscDeletedAsc(Pageable pageable);
     List<Medicine> findByMedicineNameContaining(String medicineName);
+    Page<Medicine> findByMedicineNameContainingIgnoreCaseAndDeletedIsFalse(
+            String medicineName,
+            Pageable pageable
+    );
 }

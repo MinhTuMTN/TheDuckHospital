@@ -205,7 +205,6 @@ function Invoice(props, ref) {
             <Typography
               variant="body1"
               sx={{ fontWeight: "500", margin: "8px auto", fontSize: "2rem" }}
-              s
               align="center"
             >
               {medicalTest?.queueNumber}

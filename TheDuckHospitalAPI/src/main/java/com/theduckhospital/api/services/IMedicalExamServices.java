@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
@@ -10,6 +11,7 @@ import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
+import com.theduckhospital.api.entity.PrescriptionItem;
 
 import java.text.ParseException;
 import java.util.List;
@@ -40,4 +42,10 @@ public interface IMedicalExamServices {
     List<DoctorMedicalTestResponse> doctorDeleteMedicalTest(String authorization, UUID medicalExaminationId, UUID medicalTestId);
 
     DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request);
+
+    List<PrescriptionItem> doctorAddMedicine(String authorization, UUID medicalExaminationId, AddMedicine request);
+
+    List<PrescriptionItem> doctorGetMedicines(String authorization, UUID medicalExaminationId);
+
+    List<PrescriptionItem> doctorDeleteMedicine(String authorization, UUID medicalExaminationId, UUID prescriptionItemId);
 }

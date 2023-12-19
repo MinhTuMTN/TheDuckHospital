@@ -5,6 +5,8 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import PersonIcon from "@mui/icons-material/Person";
+import TodayIcon from "@mui/icons-material/Today";
 import {
   Box,
   Button,
@@ -18,18 +20,13 @@ import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import dayjs from "dayjs";
-import { enqueueSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import InfoPatient from "../../components/Doctor/InfoPatient";
-import ListTestToDo from "../../components/Doctor/ListTestToDo";
-import Prescription from "../../components/Doctor/Prescription";
-import DialogConfirm from "../../components/General/DialogConfirm";
+import InfoPatientHistory from "../../components/Doctor/InfoPatientHistory";
+import ListTestHaveDone from "../../components/Doctor/ListTestHaveDone";
+import OldPrescription from "../../components/Doctor/OldPrescription";
 import FormatDateTime from "../../components/General/FormatDateTime";
-import {
-  getMedicalRecord,
-  updateMedicalRecord,
-} from "../../services/doctor/MedicalExamServices";
+import { getMedicalRecord } from "../../services/doctor/MedicalExamServices";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -94,7 +91,20 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-function MedicalExaminationRecord(props) {
+const infoDoctor = [
+  {
+    label: "Bác sĩ:",
+    value: "Phùng Thị Ánh Tuyết",
+    icon: <PersonIcon fontSize="18px" />,
+  },
+  {
+    label: "Ngày khám:",
+    value: "20/10/2021",
+    icon: <TodayIcon fontSize="18px" />,
+  },
+];
+
+function History(props) {
   const navigate = useNavigate();
   const { medicalRecordId } = useParams();
   const [info, setInfo] = React.useState({});
@@ -102,7 +112,6 @@ function MedicalExaminationRecord(props) {
   const [symptom, setSymptom] = React.useState("");
   const [diagnostic, setDiagnostic] = React.useState("");
   const [expanded, setExpanded] = React.useState("panel1");
-  const [openComplete, setOpenComplete] = React.useState(false);
 
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
@@ -121,22 +130,6 @@ function MedicalExaminationRecord(props) {
     };
     handleGetMedicalRecord();
   }, [medicalRecordId]);
-
-  const handleUpdateMedicalRecord = async () => {
-    const response = await updateMedicalRecord(
-      medicalRecordId,
-      symptom,
-      diagnostic
-    );
-    if (response.success) {
-      enqueueSnackbar("Cập nhật thành công", { variant: "success" });
-      const data = response.data.data;
-      setInfo(data);
-      setBasicsInfo(handleBasicsInfo(data.patient));
-      setSymptom(data.symptom || "");
-      setDiagnostic(data.diagnosis || "");
-    }
-  };
 
   return (
     <>
@@ -175,7 +168,7 @@ function MedicalExaminationRecord(props) {
                     },
                   },
                 }}
-                onClick={() => navigate("/doctor/doctor-bookings")}
+                onClick={() => navigate(-1)}
               >
                 <KeyboardBackspaceIcon
                   className="icon"
@@ -243,10 +236,10 @@ function MedicalExaminationRecord(props) {
           }}
         >
           <Grid item xs={12} md={3.5}>
-            <InfoPatient
+            <InfoPatientHistory
               mainInfo={info?.patient}
-              history={{}}
               info={basicsInfo}
+              infoDoctor={infoDoctor}
             />
           </Grid>
 
@@ -270,10 +263,21 @@ function MedicalExaminationRecord(props) {
                 paddingBottom: 3,
               }}
             >
-              <Typography variant="h5" fontWeight={500}>
-                Tạo hồ sơ khám bệnh
-              </Typography>
+              <Stack
+                direction={"row"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+              >
+                <Typography variant="h5" fontWeight={500}>
+                  Lịch sử khám bệnh
+                </Typography>
+                <Typography variant="body1" fontWeight={400}>
+                  Tái khám:{" "}
+                  <span style={{ fontWeight: "450" }}>20/10/2021</span>
+                </Typography>
+              </Stack>
               <CustomTextField
+                disabled
                 size="medium"
                 variant="outlined"
                 id="outlined-basic"
@@ -284,6 +288,7 @@ function MedicalExaminationRecord(props) {
                 onChange={(e) => setSymptom(e.target.value)}
               />
               <CustomTextField
+                disabled
                 size="medium"
                 variant="outlined"
                 id="outlined-basic"
@@ -303,10 +308,10 @@ function MedicalExaminationRecord(props) {
                     aria-controls="panel1d-content"
                     id="panel1d-header"
                   >
-                    <Typography>Thực hiện xét nghiệm</Typography>
+                    <Typography>Xét nghiệm đã làm</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <ListTestToDo patientInfo={info} />
+                    <ListTestHaveDone patientInfo={info} />
                   </AccordionDetails>
                 </Accordion>
                 <Accordion
@@ -320,63 +325,31 @@ function MedicalExaminationRecord(props) {
                     <Typography>Toa thuốc</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Prescription />
+                    <OldPrescription />
                   </AccordionDetails>
                 </Accordion>
               </div>
-              <Stack
-                direction={"row"}
-                justifyContent={"flex-end"}
-                alignItems={"center"}
-                spacing={1}
-              >
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderColor: "#00a9dd",
-                    color: "#00a9dd",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "none",
-                      borderColor: "#00a9dd",
-                    },
-                  }}
-                  onClick={handleUpdateMedicalRecord}
-                >
-                  Lưu
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
+
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#4caf50",
+                  color: "#fff",
+                  textTransform: "none",
+                  "&:hover": {
                     backgroundColor: "#4caf50",
-                    color: "#fff",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#4caf50",
-                    },
-                  }}
-                  onClick={() => setOpenComplete(true)}
-                >
-                  Hoàn thành
-                </Button>
-              </Stack>
+                  },
+                }}
+                onClick={() => navigate(-1)}
+              >
+                Hoàn thành xem
+              </Button>
             </Stack>
           </Grid>
         </Grid>
       </Box>
-
-      <DialogConfirm
-        cancelText={"Hủy"}
-        okText={"Xác nhận"}
-        open={openComplete}
-        onClose={() => setOpenComplete(false)}
-        title={"Xác nhận hoàn thành khám bệnh"}
-        content={"Bạn có chắc chắn muốn hoàn thành khám bệnh này?"}
-        onOk={() => console.log("ok")}
-        onCancel={() => setOpenComplete(false)}
-      />
     </>
   );
 }
 
-export default MedicalExaminationRecord;
+export default History;

@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.doctor;
 
+import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.response.GeneralResponse;
@@ -114,6 +115,56 @@ public class MedicalExamController {
                                         authorization,
                                         medicalExaminationId,
                                         medicalTestId
+                                )
+                        )
+                        .build()
+        );
+    }
+
+    @PostMapping("/{medicalExaminationId}/medicines")
+    public ResponseEntity<?> addMedicine(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId,
+            @RequestBody AddMedicine request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalExamServices.doctorAddMedicine(authorization, medicalExaminationId, request))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{medicalExaminationId}/medicines")
+    public ResponseEntity<?> getMedicines(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalExamServices.doctorGetMedicines(authorization, medicalExaminationId))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{medicalExaminationId}/medicines/{prescriptionItemId}")
+    public ResponseEntity<?> deleteMedicine(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId,
+            @PathVariable("prescriptionItemId") UUID prescriptionItemId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalExamServices
+                                .doctorDeleteMedicine(
+                                        authorization,
+                                        medicalExaminationId,
+                                        prescriptionItemId
                                 )
                         )
                         .build()

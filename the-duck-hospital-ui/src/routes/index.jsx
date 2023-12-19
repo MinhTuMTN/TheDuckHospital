@@ -53,6 +53,7 @@ import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
 import Analytics from "../pages/Admin/Analytics";
 import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
 import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
+import History from "../pages/Doctor/History";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -228,6 +229,10 @@ function Router(props) {
             {
               path: "medical-test-record/:medicalTestId",
               element: <MedicalTestRecord />,
+            },
+            {
+              path: "history/:medicalRecordId",
+              element: <History />,
             },
             {
               path: "doctor-schedules",

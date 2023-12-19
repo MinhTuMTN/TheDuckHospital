@@ -1,7 +1,10 @@
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import PropTypes from "prop-types";
 import HistoryIcon from "@mui/icons-material/History";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useNavigate } from "react-router-dom";
+
 InfoPatient.propTypes = {
   mainInfo: PropTypes.object,
   info: PropTypes.array,
@@ -55,6 +58,7 @@ function Row(props) {
 function InfoPatient(props) {
   const { mainInfo, info, history } = props;
   const initials = getInitials(mainInfo?.fullName);
+  const nagivate = useNavigate();
   return (
     <Stack
       direction={"column"}
@@ -128,7 +132,7 @@ function InfoPatient(props) {
         direction={"column"}
         spacing={0.5}
         alignItems={"center"}
-        paddingX={3}
+        paddingX={1.5}
         paddingTop={1.5}
         paddingBottom={2}
         sx={{
@@ -140,6 +144,9 @@ function InfoPatient(props) {
           alignItems={"center"}
           spacing={1}
           width={"100%"}
+          sx={{
+            paddingLeft: 1.5,
+          }}
         >
           <HistoryIcon sx={{ fontSize: "18px", color: "rgb(0, 148, 212)" }} />
           <Typography
@@ -159,6 +166,8 @@ function InfoPatient(props) {
               sx={{
                 width: "100%",
                 textAlign: "center",
+
+                paddingLeft: 1.5,
               }}
             >
               Không có lịch sử khám bệnh
@@ -166,7 +175,179 @@ function InfoPatient(props) {
           </>
         ) : (
           <>
-            <Typography>Có lịch sử khám bệnh</Typography>
+            <Stack direction={"column"} spacing={1} padding={0} width={"100%"}>
+              <Stack
+                component={Paper}
+                elevation={1}
+                spacing={1}
+                direction={"row"}
+                justifyContent={"space-between"}
+                width={"100%"}
+                sx={{
+                  paddingX: "16px",
+                  paddingY: "12px",
+                }}
+              >
+                <Stack direction={"column"} spacing={0.5} width={"100%"}>
+                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={440}
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      Ngày khám:
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={440}
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      20/10/2021
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={400}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      Chuyên khoa:
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={400}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      Nội khoa
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <IconButton
+                  variant="text"
+                  sx={{
+                    alignItems: "center",
+                    width: "40px",
+                    height: "40px",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease-in",
+                    color: "#474747",
+                    ":hover": {
+                      boxShadow:
+                        "9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;",
+                      transform: "translateY(2px)",
+                      "& .icon": {
+                        transform: "translateX(5px)",
+                      },
+                    },
+                  }}
+                >
+                  <NavigateNextIcon
+                    className="icon"
+                    sx={{
+                      fontSize: "18px",
+                      color: "#474747",
+                      transition: "all 0.4s ease-in",
+                    }}
+                    onClick={() => {
+                      nagivate("/doctor/history/:medicalRecordId");
+                    }}
+                  />
+                </IconButton>
+              </Stack>
+              <Stack
+                component={Paper}
+                elevation={1}
+                spacing={1}
+                direction={"row"}
+                justifyContent={"space-between"}
+                width={"100%"}
+                sx={{
+                  paddingX: "16px",
+                  paddingY: "12px",
+                }}
+              >
+                <Stack direction={"column"} spacing={0.5} width={"100%"}>
+                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={440}
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      Ngày khám:
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={440}
+                      style={{
+                        fontSize: "16px",
+                      }}
+                    >
+                      20/10/2021
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={400}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      Chuyên khoa:
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      fontWeight={400}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      Nội khoa
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <IconButton
+                  variant="text"
+                  sx={{
+                    alignItems: "center",
+                    width: "40px",
+                    height: "40px",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease-in",
+                    color: "#474747",
+                    ":hover": {
+                      boxShadow:
+                        "9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;",
+                      transform: "translateY(2px)",
+                      "& .icon": {
+                        transform: "translateX(5px)",
+                      },
+                    },
+                  }}
+                >
+                  <NavigateNextIcon
+                    className="icon"
+                    sx={{
+                      fontSize: "18px",
+                      color: "#474747",
+                      transition: "all 0.4s ease-in",
+                    }}
+                  />
+                </IconButton>
+              </Stack>
+            </Stack>
           </>
         )}
       </Stack>
