@@ -81,6 +81,8 @@ function HistoryDetail(props) {
     prescriptionItems,
     diagnostic,
     departmentName,
+    reExaminationDate,
+    date,
   } = props;
   const contacts = [
     {
@@ -156,25 +158,23 @@ function HistoryDetail(props) {
           <ContactCustomerInfo
             sx={{ width: "100%", textAlign: "flex-start" }}
             title="Mã bệnh nhân"
-            content={patientInfo?.patient[0]?.patientCode}
+            content={patientInfo?.patientCode}
             titleMinWidth={"125px"}
           />
         </Grid>
         <ContactCustomerInfo
           title="Họ tên"
-          content={patientInfo?.patient[0]?.fullName}
+          content={patientInfo?.fullName}
           titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
           title="Ngày sinh"
-          content={dayjs(patientInfo?.patient[0]?.dateOfBirth).format(
-            "DD/MM/YYYY"
-          )}
+          content={dayjs(patientInfo?.dateOfBirth).format("DD/MM/YYYY")}
           titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
           title="Địa chỉ"
-          content={patientInfo?.patient[0]?.address}
+          content={`${patientInfo?.streetName}, ${patientInfo?.ward?.wardName}, ${patientInfo?.district?.districtName}, ${patientInfo?.province?.provinceName}`}
           titleMinWidth={"125px"}
         />
       </Grid>
@@ -198,7 +198,7 @@ function HistoryDetail(props) {
 
         <ContactCustomerInfo
           title="Ngày khám"
-          content={dayjs().format("DD/MM/YYYY HH:mm")}
+          content={dayjs(date).format("DD/MM/YYYY HH:mm")}
           titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
@@ -268,7 +268,7 @@ function HistoryDetail(props) {
         >
           Tổng tiền:{" "}
           <FormatCurrency
-            amount={prescriptionItems.reduce(
+            amount={prescriptionItems?.reduce(
               (sum, item) => sum + item?.totalCost,
               0
             )}
@@ -288,7 +288,10 @@ function HistoryDetail(props) {
             fontSize: "14px",
           }}
         >
-          Tái khám ngày: {dayjs().add(7, "day").format("DD/MM/YYYY")}
+          Tái khám ngày:{" "}
+          {reExaminationDate
+            ? dayjs(reExaminationDate).format("DD/MM/YYYY")
+            : "Không có"}
         </Typography>
         <Typography
           variant="body1"

@@ -1,39 +1,24 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import HistoryRecord from "../../components/Customer/History/HistoryRecord";
-
-const histories = [
-  {
-    fullName: "Nguyễn Văn A",
-    history: [
-      {
-        id: 1,
-        departmentName: "Khoa nội",
-        doctorName: "Nguyễn Văn A",
-        date: `20 / 10 / 2021`,
-      },
-      {
-        id: 2,
-        departmentName: "Khoa tổng quát",
-        doctorName: "Nguyễn Thị Nguyệt",
-        date: "20 / 10 / 2022",
-      },
-    ],
-  },
-  {
-    fullName: "Trần Kiều Ân",
-    history: [
-      {
-        id: 3,
-        departmentName: "Khoa ngoại",
-        doctorName: "Nguyễn Văn B",
-        date: "20/10/2021",
-      },
-    ],
-  },
-];
+import { getHistoryMedicalRecord } from "../../services/customer/MedicalRecordServices";
+import { enqueueSnackbar } from "notistack";
 
 function PaymentHistoryPage(props) {
+  const [historyRecords, setHistoryRecords] = React.useState([]);
+  useEffect(() => {
+    const handleGetHistoryRecords = async () => {
+      const response = await getHistoryMedicalRecord();
+      if (response) {
+        setHistoryRecords(response.data.data);
+      } else {
+        enqueueSnackbar("Lấy dữ liệu lịch sử khám bệnh thất bại", {
+          variant: "error",
+        });
+      }
+    };
+    handleGetHistoryRecords();
+  }, []);
   return (
     <Box
       py={4}
@@ -48,7 +33,7 @@ function PaymentHistoryPage(props) {
       </Typography>
 
       <Box mt={2}>
-        {histories.map((history, index) => (
+        {historyRecords?.map((history, index) => (
           <HistoryRecord
             key={`history-record-${index}`}
             historyRecord={history}

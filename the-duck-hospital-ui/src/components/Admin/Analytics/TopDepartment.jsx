@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import { Box, List, ListItem, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
-import TopProductItem from "./TopDepartmentItem";
 import TopDepartmentItem from "./TopDepartmentItem";
 
 const paperStyle = {

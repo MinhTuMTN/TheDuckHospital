@@ -128,6 +128,8 @@ function MedicalExaminationRecord(props) {
         const data = response.data.data;
         setInfo(data);
         setBasicsInfo(handleBasicsInfo(data.patient));
+        setDateOfReExamination(dayjs(data.dateOfReExamination));
+        setIsCheck(data.dateOfReExamination ? true : false);
         setSymptom(data.symptom || "");
         setDiagnostic(data.diagnosis || "");
       }
@@ -139,7 +141,8 @@ function MedicalExaminationRecord(props) {
     const response = await updateMedicalRecord(
       medicalRecordId,
       symptom,
-      diagnostic
+      diagnostic,
+      isCheck ? dateOfReExamination : null
     );
     if (response.success) {
       enqueueSnackbar("Cập nhật thành công", { variant: "success" });
@@ -335,10 +338,10 @@ function MedicalExaminationRecord(props) {
                     <Checkbox
                       size="small"
                       label="Tái khám"
-                      value={isCheck}
                       onClick={() => setIsCheck(!isCheck)}
                     />
                   }
+                  checked={isCheck}
                   sx={{
                     width: "150px",
                   }}
@@ -348,6 +351,7 @@ function MedicalExaminationRecord(props) {
                   <CustomDatePicker
                     readOnly={!isCheck}
                     format="DD/MM/YYYY"
+                    shouldDisableDate={(day) => dayjs(day).isBefore(dayjs())}
                     value={dateOfReExamination}
                     onChange={(newValue) => setDateOfReExamination(newValue)}
                     defaultValue={dayjs()}
