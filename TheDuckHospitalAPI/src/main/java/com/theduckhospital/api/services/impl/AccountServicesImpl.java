@@ -308,13 +308,9 @@ public class AccountServicesImpl implements IAccountServices {
                         || (accountRole.contains(DOCTOR) && account.getStaff() instanceof Doctor)
                         || (accountRole.contains(NURSE) && account.getStaff() instanceof Nurse)
                         || (accountRole.contains(CASHIER) && account.getStaff() instanceof Cashier)
-                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist))
-                .distinct()
+                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist)
+                        || (accountRole.contains(LABORATORY_TECHNICIAN) && account.getStaff() instanceof LaboratoryTechnician))
                 .collect(Collectors.toList());
-
-        if(filteredAccounts.isEmpty()){
-            filteredAccounts = accounts;
-        }
 
         Pageable pageable = PageRequest.of(page, limit);
 

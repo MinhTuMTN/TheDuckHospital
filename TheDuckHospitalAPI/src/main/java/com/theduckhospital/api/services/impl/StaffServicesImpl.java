@@ -59,6 +59,7 @@ public class StaffServicesImpl implements IStaffServices {
                 case NURSE -> staff = new Nurse();
                 case CASHIER -> staff = new Cashier();
                 case PHARMACIST -> staff = new Pharmacist();
+                case LABORATORY_TECHNICIAN ->  staff = new LaboratoryTechnician();
                 default -> staff = new Staff();
             }
 
@@ -207,13 +208,9 @@ public class StaffServicesImpl implements IStaffServices {
                 .filter(staff -> (staffRole.contains(DOCTOR) && staff instanceof Doctor)
                         || (staffRole.contains(NURSE) && staff instanceof Nurse)
                         || (staffRole.contains(CASHIER) && staff instanceof Cashier)
-                        || (staffRole.contains(PHARMACIST) && staff instanceof Pharmacist))
-                .distinct()
+                        || (staffRole.contains(PHARMACIST) && staff instanceof Pharmacist)
+                        || (staffRole.contains(LABORATORY_TECHNICIAN) && staff instanceof LaboratoryTechnician))
                 .collect(Collectors.toList());
-
-        if(filteredStaffs.isEmpty()){
-            filteredStaffs = staffs;
-        }
 
         Pageable pageable = PageRequest.of(page, limit);
 

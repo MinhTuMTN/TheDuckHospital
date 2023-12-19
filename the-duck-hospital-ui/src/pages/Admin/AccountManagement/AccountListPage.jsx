@@ -46,6 +46,10 @@ const roleOptions = [
     value: "PHARMACIST",
     name: "Dược sĩ",
   },
+  {
+    value: "LABORATORY_TECHNICIAN",
+    name: "Bác sĩ xét nghiệm",
+  },
 ];
 
 function AccountListPage(props) {
