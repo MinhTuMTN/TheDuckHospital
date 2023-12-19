@@ -27,6 +27,7 @@ import Prescription from "../../components/Doctor/Prescription";
 import DialogConfirm from "../../components/General/DialogConfirm";
 import FormatDateTime from "../../components/General/FormatDateTime";
 import {
+  completeMedicalRecord,
   getMedicalRecord,
   updateMedicalRecord,
 } from "../../services/doctor/MedicalExamServices";
@@ -135,6 +136,21 @@ function MedicalExaminationRecord(props) {
       setBasicsInfo(handleBasicsInfo(data.patient));
       setSymptom(data.symptom || "");
       setDiagnostic(data.diagnosis || "");
+    }
+  };
+
+  const handleCompleteMedicalRecord = async () => {
+    console.log(medicalRecordId);
+    const response = await completeMedicalRecord(medicalRecordId);
+    if (response.success) {
+      enqueueSnackbar("Hoàn thành khám bệnh thành công", {
+        variant: "success",
+      });
+      navigate("/doctor/doctor-bookings", { replace: true });
+    } else {
+      enqueueSnackbar("Hoàn thành khám bệnh thất bại", {
+        variant: "error",
+      });
     }
   };
 
@@ -372,7 +388,7 @@ function MedicalExaminationRecord(props) {
         onClose={() => setOpenComplete(false)}
         title={"Xác nhận hoàn thành khám bệnh"}
         content={"Bạn có chắc chắn muốn hoàn thành khám bệnh này?"}
-        onOk={() => console.log("ok")}
+        onOk={() => handleCompleteMedicalRecord()}
         onCancel={() => setOpenComplete(false)}
       />
     </>

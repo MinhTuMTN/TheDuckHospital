@@ -25,13 +25,20 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<?> createBookingAndPayment(
             @RequestBody @Valid BookingRequest bookingRequest,
-            @RequestHeader(name = "Authorization") String token
+            @RequestHeader(name = "Authorization") String token,
+            HttpServletRequest request
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Create booking and payment successfully")
-                        .data(bookingServices.createBookingAndPayment(token, bookingRequest))
+                        .data(bookingServices
+                                .createBookingAndPayment(
+                                        token,
+                                        bookingRequest,
+                                        request.getHeader("origin")
+                                )
+                        )
                         .build()
         );
     }
@@ -42,11 +49,8 @@ public class BookingController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        UUID transactionId = bookingServices.checkBookingCallback(params);
-        if (transactionId != null)
-            response.sendRedirect("http://localhost:3000/payment-success?transactionId=" + transactionId);
-        else
-            response.sendRedirect("http://localhost:3000/payment-failed");
+        String url = bookingServices.checkBookingCallback(params);
+        response.sendRedirect(url);
     }
 
     @GetMapping

@@ -55,4 +55,6 @@ public interface IMedicalExamServices {
             UUID medicalExaminationId,
             UUID historyId
     );
+
+    MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId);
 }

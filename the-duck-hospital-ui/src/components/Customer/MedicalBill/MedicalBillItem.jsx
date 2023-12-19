@@ -25,7 +25,6 @@ const StyledStatus = styled(Card)(({ theme }) => ({
   width: "fit-content",
   padding: "4px 10px",
   textAlign: "center",
-  backgroundColor: theme.status === "true" ? "#02CD60" : "#f44336",
   color: "#fff",
   borderRadius: ".5rem",
 }));
@@ -95,7 +94,11 @@ function MedicalBillItem(props) {
           icon={LooksOneOutlined}
           propName="Trạng thái"
           value={
-            <StyledStatus status={item.status}>
+            <StyledStatus
+              sx={{
+                backgroundColor: item.status ? "#02CD60" : "#f44336",
+              }}
+            >
               {item.status ? "Đã khám" : "Chưa khám"}
             </StyledStatus>
           }

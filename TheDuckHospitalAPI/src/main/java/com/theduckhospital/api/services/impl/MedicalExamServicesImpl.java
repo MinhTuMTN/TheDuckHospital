@@ -438,6 +438,15 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         return new HistoryMedicalRecord(historyRecord);
     }
 
+    @Override
+    public MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId) {
+        return updateStateMedicalExamRecord(
+                authorization,
+                medicalExaminationId,
+                MedicalExamState.DONE
+        );
+    }
+
     private PrescriptionItem createPrescriptionItem(
             Prescription prescription,
             AddMedicine request

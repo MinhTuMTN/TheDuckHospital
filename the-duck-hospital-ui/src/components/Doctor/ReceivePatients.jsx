@@ -105,16 +105,7 @@ function ReceivePatients(props) {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Button
-                  variant="text"
-                  color="info"
-                  onClick={() => {
-                    window.open(
-                      "http://res.cloudinary.com/dsmvlvfy5/image/upload/v1702821055/v9rbovpcuude0fszx2fz.pdf",
-                      "_blank"
-                    );
-                  }}
-                >
+                <Button variant="text" color="info">
                   Tìm kiếm
                 </Button>
               </InputAdornment>
