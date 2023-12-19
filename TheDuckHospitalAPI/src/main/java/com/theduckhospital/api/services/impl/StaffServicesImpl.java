@@ -3,16 +3,14 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.AccountRepository;
-import com.theduckhospital.api.repository.DoctorScheduleRepository;
-import com.theduckhospital.api.repository.StaffRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,11 +26,16 @@ import static com.theduckhospital.api.constant.Role.*;
 @Service
 public class StaffServicesImpl implements IStaffServices {
     private final StaffRepository staffRepository;
+    private final DoctorRepository doctorRepository;
     private final AccountRepository accountRepository;
     private final DoctorScheduleRepository doctorScheduleRepository;
     private final IDepartmentServices departmentServices;
     private final PasswordEncoder passwordEncoder;
     private final IMSGraphServices graphServices;
+    private final LaboratoryTechnicianRepository laboratoryTechnicianRepository;
+    private final NurseRepository nurseRepository;
+    private final PharmacistRepository pharmacistRepository;
+    private final CashierRepository cashierRepository;
 
     public StaffServicesImpl(
             StaffRepository staffRepository,
@@ -40,7 +43,12 @@ public class StaffServicesImpl implements IStaffServices {
             IDepartmentServices departmentServices,
             PasswordEncoder passwordEncoder,
             AccountRepository accountRepository,
-            DoctorScheduleRepository doctorScheduleRepository
+            DoctorScheduleRepository doctorScheduleRepository,
+            DoctorRepository doctorRepository,
+            LaboratoryTechnicianRepository laboratoryTechnicianRepository,
+            NurseRepository nurseRepository,
+            PharmacistRepository pharmacistRepository,
+            CashierRepository cashierRepository
     ) {
         this.staffRepository = staffRepository;
         this.graphServices = graphServices;
@@ -48,6 +56,11 @@ public class StaffServicesImpl implements IStaffServices {
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.doctorRepository = doctorRepository;
+        this.laboratoryTechnicianRepository = laboratoryTechnicianRepository;
+        this.nurseRepository = nurseRepository;
+        this.pharmacistRepository = pharmacistRepository;
+        this.cashierRepository = cashierRepository;
     }
     @Override
     @Transactional
@@ -101,6 +114,67 @@ public class StaffServicesImpl implements IStaffServices {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return null;
         }
+    }
+
+    @Override
+    public Staff updateStaff(UUID staffId, UpdateStaffRequest request) {
+        Staff staff;
+        Optional<?> optional;
+        switch (request.getRole()) {
+            case DOCTOR ->  {
+                optional = doctorRepository.findById(staffId);
+                if (optional.isEmpty()) {
+                    throw new NotFoundException("Doctor not found");
+                }
+                Doctor doctor = (Doctor) optional.get();
+                doctor.setDegree(request.getDegree());
+                staff = doctor;
+            }
+            case NURSE -> {
+                optional = nurseRepository.findById(staffId);
+                if (optional.isEmpty()) {
+                    throw new NotFoundException("Nurse not found");
+                }
+                staff = (Nurse) optional.get();
+            }
+            case CASHIER -> {
+                optional = cashierRepository.findById(staffId);
+                    if (optional.isEmpty()) {
+                        throw new NotFoundException("Cashier not found");
+                    }
+                    staff = (Cashier) optional.get();
+            }
+            case PHARMACIST -> {
+                optional = pharmacistRepository.findById(staffId);
+                    if (optional.isEmpty()) {
+                        throw new NotFoundException("Pharmacist not found");
+                    }
+                    staff = (Pharmacist) optional.get();
+            }
+            case LABORATORY_TECHNICIAN ->  {
+                optional = laboratoryTechnicianRepository.findById(staffId);
+                if (optional.isEmpty()) {
+                    throw new NotFoundException("Pharmacist not found");
+                }
+                staff = (Pharmacist) optional.get();
+            }
+            default -> {
+                optional = staffRepository.findById(staffId);
+                if (optional.isEmpty()) {
+                    throw new NotFoundException("Pharmacist not found");
+                }
+                staff = (Staff) optional.get();
+            }
+        }
+
+        staff.setGender(Gender.values()[request.getGender()]);
+        staff.setFullName(request.getFullName());
+        staff.setIdentityNumber(request.getIdentityNumber());
+        staff.setPhoneNumber(request.getPhoneNumber());
+        staff.setDateOfBirth(request.getDateOfBirth());
+
+
+        return staffRepository.save(staff);
     }
 
     private Doctor createDoctor(CreateStaffRequest request) {

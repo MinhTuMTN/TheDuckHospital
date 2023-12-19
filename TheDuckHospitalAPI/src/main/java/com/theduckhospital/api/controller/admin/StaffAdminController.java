@@ -2,7 +2,9 @@ package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
+import com.theduckhospital.api.entity.Staff;
 import com.theduckhospital.api.services.IStaffServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,27 @@ public class StaffAdminController {
                                 .message("Create staff successfully")
                                 .data(result)
                                 .build()
+                );
+    }
+
+    @PutMapping("/{staffId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateStaff(@PathVariable UUID staffId, @RequestBody @Valid UpdateStaffRequest request) {
+        Staff result = staffServices.updateStaff(staffId, request);
+        if (result == null) {
+            return ResponseEntity.badRequest().body(
+                    GeneralResponse.builder()
+                            .success(false)
+                            .message("Cannot update staff")
+                            .build()
+            );
+        }
+        return ResponseEntity.ok()
+                .body(GeneralResponse.builder()
+                        .success(true)
+                        .message("Update staff successfully")
+                        .data(result)
+                        .build()
                 );
     }
 

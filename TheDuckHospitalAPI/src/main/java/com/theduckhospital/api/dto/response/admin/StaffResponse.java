@@ -14,6 +14,7 @@ public class StaffResponse {
     private String phoneNumber;
     private String identityNumber;
     private String role;
+    private int gender;
     private String departmentName;
     private Date dateOfBirth;
     private boolean headOfDepartment;
@@ -26,6 +27,7 @@ public class StaffResponse {
         this.phoneNumber = staff.getPhoneNumber();
         this.identityNumber = staff.getIdentityNumber();
         this.dateOfBirth = staff.getDateOfBirth();
+        this.gender = staff.getGender().ordinal();
         this.deleted = staff.isDeleted();
 
         if (staff instanceof Doctor) {

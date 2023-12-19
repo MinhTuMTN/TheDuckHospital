@@ -12,6 +12,10 @@ export const createStaff = (data) => {
     return post("/admin/staffs", data, { Authorization: "" });
 };
 
+export const updateStaff = (staffId, data) => {
+    return put(`/admin/staffs/${staffId}`, data, { Authorization: "" });
+};
+
 export const getStaffById = (staffId) => {
     return get(`/admin/staffs/${staffId}`, null, { Authorization: "" });
 };

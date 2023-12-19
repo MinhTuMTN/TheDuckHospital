@@ -209,9 +209,6 @@ function DepartmentDetail(props) {
       <BoxStyle
         component={Grid}
         alignItems={"center"}
-        sx={{
-          borderBottom: "1px solid #E0E0E0",
-        }}
         container
       >
         <Grid item xs={6}>

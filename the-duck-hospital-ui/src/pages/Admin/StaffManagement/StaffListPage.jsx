@@ -223,6 +223,7 @@ function StaffListPage(props) {
         return;
       }
     }
+    
     let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
     const response = await createStaff({
       fullName: staff.fullName,

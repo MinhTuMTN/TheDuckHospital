@@ -1,8 +1,4 @@
 import styled from "@emotion/styled";
-import CircleIcon from "@mui/icons-material/Circle";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useTheme } from "@emotion/react";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import PhoneAndroidOutlinedIcon from '@mui/icons-material/PhoneAndroidOutlined';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
@@ -10,23 +6,11 @@ import BookmarkAddedOutlinedIcon from '@mui/icons-material/BookmarkAddedOutlined
 import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
 import {
-  Box,
   Button,
-  IconButton,
-  Popover,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
   Typography,
-  useMediaQuery,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   borderRadius: "10px",

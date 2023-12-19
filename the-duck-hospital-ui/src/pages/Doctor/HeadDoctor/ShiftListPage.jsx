@@ -8,26 +8,18 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
   Typography,
   styled,
-  tableCellClasses,
   useMediaQuery,
 } from "@mui/material";
 import React, { useState } from "react";
-import BorderTextBox from "../../../components/Admin/PatientManagement/BorderTextBox";
-import { DateCalendar, DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
-import SearchIcon from '@mui/icons-material/Search';
 import ScheduleItem from "../../../components/Doctor/HeadDoctor/ShiftList/ScheduleItem";
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
-
-// function disableInvalidMorningDate(date) {
-//   return invalidDate.mornings?.includes(date.format("YYYY/MM/DD"));
-// }
 
 const items = [
   {
@@ -125,17 +117,6 @@ const TieuDe = styled(Typography)(({ theme }) => ({
   fontSize: "1.1rem !important",
   fontWeight: "720 !important",
   borderBottom: "1px solid #d1d1d1"
-}));
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#F4F6F8",
-    color: theme.palette.text.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
 }));
 
 function ShiftListPage(props) {
