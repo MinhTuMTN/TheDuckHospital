@@ -60,7 +60,7 @@ function VerifyInformation(props) {
     color: "transparent",
   };
 
-  const [patientProfiles, setPatientProfiles] = useState([
+  const patientProfiles = [
     {
       patientProfileId: 1,
     },
@@ -70,7 +70,7 @@ function VerifyInformation(props) {
     {
       patientProfileId: 3,
     },
-  ]);
+  ];
 
   return (
     <>

@@ -53,6 +53,14 @@ const CustomButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
 }));
 
+const convertToTitleCase = (input) => {
+  return input
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 function CreateNewProfile(props) {
   const { profile } = props;
   const { enqueueSnackbar } = useSnackbar();
@@ -218,9 +226,26 @@ function CreateNewProfile(props) {
       enqueueSnackbar(message, { variant: "error" });
     }
   };
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const validatePhoneNumber = () => {
+    // Biểu thức chính quy để kiểm tra số điện thoại (định dạng: +12 345-6789)
+    const phoneRegex = /^0\d{9}$/;
+
+    if (!phoneRegex.test(phoneNumber)) {
+      setPhoneNumberError("Số điện thoại không hợp lệ");
+    } else {
+      setPhoneNumberError("");
+    }
+  };
+
+  const isValidPhoneNumber = (input) => {
+    const phoneNumberRegex = /^0[0-9]{0,9}$/; // Giả sử số điện thoại có tối đa 10 số
+    return phoneNumberRegex.test(input);
+  };
+
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid item xs={12} marginTop={1}>
         <Typography
           variant="body1"
           style={{
@@ -279,7 +304,7 @@ function CreateNewProfile(props) {
             required
             placeholder="Nguyễn Gia Văn"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => setFullName(convertToTitleCase(e.target.value))}
           />
         </Stack>
       </Grid>
@@ -326,7 +351,17 @@ function CreateNewProfile(props) {
             required
             placeholder="Nhập số điện thoại"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) => {
+              const inputValue = e.target.value;
+              // Kiểm tra nếu giá trị nhập vào là số hợp lệ thì cập nhật state
+              if (isValidPhoneNumber(inputValue) || inputValue === "") {
+                setPhoneNumber(inputValue);
+              }
+            }}
+            type="tel" // Sử dụng type="tel"
+            onBlur={validatePhoneNumber}
+            helperText={phoneNumberError}
+            error={!!phoneNumberError}
           />
         </Stack>
       </Grid>
