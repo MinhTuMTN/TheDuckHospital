@@ -143,15 +143,17 @@ function Row(props) {
             </IconButton>
           </Stack>
         </TableCell>
+        <TableCell align="center" width={"0%"}>
+          <Box sx={{ display: "none" }}>
+            <Invoice
+              ref={componentRef}
+              patientInfo={props.patientInfo}
+              doctorName={fullName}
+              medicalTest={row}
+            />
+          </Box>
+        </TableCell>
       </TableRow>
-      <Box sx={{ display: "none" }}>
-        <Invoice
-          ref={componentRef}
-          patientInfo={props.patientInfo}
-          doctorName={fullName}
-          medicalTest={row}
-        />
-      </Box>
     </>
   );
 }
@@ -292,6 +294,7 @@ function ListTestToDo(props) {
         <TableBody>
           {rows.map((row, index) => (
             <Row
+              key={row.medicalTestId}
               row={row}
               index={index}
               handleDeleteTest={handleDeleteTest}

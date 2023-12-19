@@ -19,7 +19,7 @@ import {
   Typography,
   tableCellClasses,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 const medicines = [
   { label: "Paracetamol", value: "Paracetamol" },
   { label: "Oresol", value: "Oresol" },
@@ -89,17 +89,17 @@ function Prescription(props) {
     }));
   };
 
-  const calculateTotal = () => {
+  const calculateTotal = useCallback(() => {
     const selectedBuoiCount =
       Object.values(selectedBuoi).filter(Boolean).length;
     const total = selectedBuoiCount * daysForOneMedicine * medicineOneTime;
     setTotalForOneMedicine(total);
-  };
+  }, [daysForOneMedicine, medicineOneTime, selectedBuoi]);
 
   // Update the total whenever daysForOneMedicine, medicineOneTime, or selectedBuoi changes
   React.useEffect(() => {
     calculateTotal();
-  }, [daysForOneMedicine, medicineOneTime, selectedBuoi]);
+  }, [calculateTotal]);
 
   return (
     <TableContainer
