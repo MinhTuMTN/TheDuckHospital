@@ -1,15 +1,9 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import PropTypes from "prop-types";
 import HistoryIcon from "@mui/icons-material/History";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useNavigate } from "react-router-dom";
 InfoPatient.propTypes = {
   mainInfo: PropTypes.object,
   info: PropTypes.array,
@@ -63,6 +57,7 @@ function Row(props) {
 function InfoPatient(props) {
   const { mainInfo, info, history } = props;
   const initials = getInitials(mainInfo?.fullName);
+  const nagivate = useNavigate();
   return (
     <Stack
       direction={"column"}
@@ -260,6 +255,9 @@ function InfoPatient(props) {
                       fontSize: "18px",
                       color: "#474747",
                       transition: "all 0.4s ease-in",
+                    }}
+                    onClick={() => {
+                      nagivate("/doctor/history/:medicalRecordId");
                     }}
                   />
                 </IconButton>
