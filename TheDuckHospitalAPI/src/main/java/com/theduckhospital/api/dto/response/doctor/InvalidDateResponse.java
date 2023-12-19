@@ -1,4 +1,4 @@
-package com.theduckhospital.api.dto.response.admin;
+package com.theduckhospital.api.dto.response.doctor;
 
 import lombok.Data;
 

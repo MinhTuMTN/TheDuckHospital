@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
+import com.theduckhospital.api.dto.response.doctor.PaginationRoomsResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseDoctorScheduleItemResponse;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
@@ -204,5 +205,34 @@ public class RoomServicesImpl implements IRoomServices {
         List<Room> rooms = department.getRooms();
 
         return rooms;
+    }
+
+    @Override
+    public PaginationRoomsResponse getPaginationRooms(
+            String authorization,
+            int page,
+            int limit
+    ) {
+        Doctor headDoctor = doctorServices.getDoctorByToken(authorization);
+        if (!headDoctor.isHeadOfDepartment()) {
+            throw new RuntimeException("You are not head of department");
+        }
+
+        Department department = headDoctor.getDepartment();
+
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Room> roomPage = roomRepository.findByDepartmentAndDeletedIsFalse(department, pageable);
+
+        List<RoomResponse> response = new ArrayList<>();
+        for (Room room : roomPage.getContent()) {
+            response.add(new RoomResponse(room));
+        }
+
+        return new PaginationRoomsResponse(
+                response,
+                roomRepository.countByDepartmentAndDeletedIsFalse(department),
+                page,
+                limit
+        );
     }
 }

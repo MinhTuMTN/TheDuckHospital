@@ -2,81 +2,29 @@ import { useTheme } from "@emotion/react";
 import {
   Box,
   Grid,
-  Pagination,
   Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
+  TablePagination,
   TableRow,
   Typography,
   styled,
   useMediaQuery,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import ScheduleItem from "../../../components/Doctor/HeadDoctor/ShiftList/ScheduleItem";
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
-
-const items = [
-  {
-    roomId: 1,
-    roomName: "A1-101",
-    departmentName: "Khoa da liễu",
-    deleted: "false",
-  },
-  {
-    roomId: 2,
-    roomName: "A1-101",
-    departmentName: "Khoa da liễu",
-    deleted: "false",
-  },
-  {
-    roomId: 3,
-    roomName: "A1-101",
-    departmentName: "Khoa da liễu",
-    deleted: "false",
-  },
-  {
-    roomId: 4,
-    roomName: "A1-101",
-    departmentName: "Khoa da liễu",
-    deleted: "false",
-  },
-  {
-    roomId: 5,
-    roomName: "A1-101",
-    departmentName: "Khoa da liễu",
-    deleted: "false",
-  },
-];
-
-const morningSchedule = {
-  doctorName: "PGS. Nguyễn Văn A",
-  phoneNumber: "0123456789",
-  identityNumber: "123456789012",
-  email: "anv@theduckhospital.onmicrosoft.com",
-  booking: 10,
-  gender: "FEMALE",
-  dateOfBirth: "27/01/2002",
-};
-
-const afternoonSchedule = {
-  doctorName: "PGS. Nguyễn Văn B",
-  phoneNumber: "0123456789",
-  identityNumber: "123456789012",
-  email: "bnv@theduckhospital.onmicrosoft.com",
-  booking: 20,
-  gender: "MALE",
-  dateOfBirth: "27/01/2002",
-};
+import { getDateHasSchedule, getRoomsDepartmentPagination, getSchedulesHeadDoctor } from "../../../services/doctor/headDoctor/ScheduleServices";
 
 function Row(props) {
   const { row, index, onClick, selectedRow } = props;
-  const theme = useTheme()
+  const theme = useTheme();
 
   return (
     <>
@@ -123,13 +71,76 @@ function ShiftListPage(props) {
   const theme = useTheme();
   const [valueDate, setValueDate] = useState(dayjs());
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [page, setPage] = useState(0);
-  const [totalPage, setTotalPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [page, setPage] = useState(1);
   const [selectedRow, setSelectedRow] = useState(1);
+  const [rooms, setRooms] = useState([]);
+  const [schedules, setSchedules] = useState({});
+  const [dateSchedule, setDateSchedule] = useState([]);
+  const [refresh, setRefresh] = useState(true);
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage + 1);
+  };
+
+  const handleGetRoomInDepartment = useCallback(async () => {
+    const response = await getRoomsDepartmentPagination({
+      page: page - 1,
+      limit: limit,
+    });
+    if (response.success) {
+      setRooms(response.data.data.rooms);
+      if (response.data.data.rooms.length > 0) {
+        setSelectedRow(response.data.data.rooms[0].roomId);
+      }
+      setTotalItems(response.data.data.total);
+      setPage(response.data.data.page + 1);
+      setLimit(response.data.data.limit);
+    }
+  }, [limit, page]);
+
+  useEffect(() => {
+    handleGetRoomInDepartment();
+  }, [handleGetRoomInDepartment]);
+
+  useEffect(() => {
+    const handleGetSchedules = async () => {
+      const response = await getSchedulesHeadDoctor({
+        roomId: selectedRow,
+        date: dayjs(valueDate).format("YYYY/MM/DD"),
+      });
+      if (response.success) {
+        setSchedules(response.data.data);
+      }
+    }
+
+    handleGetSchedules();
+  }, [selectedRow, valueDate, refresh]);
+
+  useEffect(() => {
+    const handleGetDateHasSchedule = async () => {
+      const response = await getDateHasSchedule({
+        roomId: selectedRow,
+      });
+      if (response.success) {
+        setDateSchedule(
+          response.data.data.map(
+            (date) => dayjs(date).format("YYYY/MM/DD")
+          )
+        );
+      }
+    };
+
+    handleGetDateHasSchedule();
+  }, [selectedRow, refresh]);
+
+  function disableDateNotHasSchedule(date) {
+    return !dateSchedule?.includes(date.format("YYYY/MM/DD"));
+  }
 
   const handleClick = (key) => {
     setSelectedRow(key);
-    console.log(key);
   }
 
   return (
@@ -160,6 +171,7 @@ function ShiftListPage(props) {
             label="Ngày làm việc"
             value={valueDate}
             onChange={(newDate) => setValueDate(newDate)}
+            shouldDisableDate={disableDateNotHasSchedule}
           />
         </LocalizationProvider>
       </Stack>
@@ -169,7 +181,7 @@ function ShiftListPage(props) {
         spacing={3}
         sx={{ mt: 3, justifyContent: "space-between" }}
       >
-        <Grid item xs={10}>
+        <Grid item xs={9.8}>
           <Stack direction="row" spacing={2}>
             <Stack
               direction="column"
@@ -185,8 +197,13 @@ function ShiftListPage(props) {
               <TieuDe sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}>
                 Buổi Sáng
               </TieuDe>
-              {morningSchedule ?
-                <ScheduleItem schedule={morningSchedule} /> :
+              {schedules.morning?.doctor ?
+                <ScheduleItem
+                  schedule={schedules.morning}
+                  setRefresh={setRefresh}
+                  refresh={refresh}
+                  valueDate={valueDate}
+                /> :
                 <Stack
                   sx={{
                     padding: 2,
@@ -220,8 +237,13 @@ function ShiftListPage(props) {
                   Buổi Chiều
                 </TieuDe>
               </Box>
-              {afternoonSchedule ?
-                <ScheduleItem schedule={afternoonSchedule} /> :
+              {schedules.afternoon?.doctor ?
+                <ScheduleItem
+                  schedule={schedules.afternoon}
+                  setRefresh={setRefresh}
+                  refresh={refresh}
+                  valueDate={valueDate}
+                /> :
                 <Stack
                   sx={{
                     padding: 2,
@@ -241,7 +263,7 @@ function ShiftListPage(props) {
             </Stack>
           </Stack>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={2.2}>
           <Stack
             direction="column"
             component={Paper}
@@ -257,7 +279,7 @@ function ShiftListPage(props) {
             </TieuDe>
             <Table>
               <TableBody>
-                {items?.map((row, index) => (
+                {rooms?.map((row, index) => (
                   <Row
                     key={index}
                     row={row}
@@ -267,16 +289,19 @@ function ShiftListPage(props) {
                 ))}
               </TableBody>
             </Table>
-            <Pagination
+            <TablePagination
+              component={"div"}
               sx={{
                 width: "100%",
                 display: "flex",
                 justifyContent: "center",
                 marginTop: "10px",
               }}
-              count={2}
-              page={page + 1}
-              onChange={(event, value) => setPage(value - 1)}
+              count={totalItems}
+              onPageChange={handlePageChange}
+              page={page - 1}
+              rowsPerPage={limit}
+              rowsPerPageOptions={[]}
             />
           </Stack>
         </Grid>

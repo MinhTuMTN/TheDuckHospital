@@ -4,15 +4,14 @@ import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
+import com.theduckhospital.api.dto.request.headdoctor.UpdateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
-import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
+import com.theduckhospital.api.dto.response.doctor.*;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
-import com.theduckhospital.api.dto.response.doctor.DoctorScheduleItemResponse;
-import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
-import com.theduckhospital.api.dto.response.doctor.SearchMedicalExamResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
@@ -29,6 +28,8 @@ import org.springframework.stereotype.Service;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -416,6 +417,38 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     @Override
+    public ScheduleRoomHeadDoctorResponse getScheduleHeadDoctor(
+            String authorization,
+            int roomId,
+            Date date
+    ){
+        Doctor headDoctor = getHeadDoctor(authorization);
+
+        Department department = headDoctor.getDepartment();
+
+        Room room = roomServices.findRoomById(roomId);
+        if (room.getDepartment().getDepartmentId() != department.getDepartmentId()) {
+            throw new BadRequestException("Room is not in your department");
+        }
+
+        DoctorSchedule morningDoctorSchedule = doctorScheduleRepository
+                .findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(room, date, MORNING);
+        ScheduleRoomItemResponse morningSchedule = new ScheduleRoomItemResponse(
+                morningDoctorSchedule,
+                calculateNumberOfBookings(morningDoctorSchedule)
+        );
+
+        DoctorSchedule afternoonDoctorSchedule = doctorScheduleRepository
+                .findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(room, date, AFTERNOON);
+        ScheduleRoomItemResponse afternoonSchedule = new ScheduleRoomItemResponse(
+                afternoonDoctorSchedule,
+                calculateNumberOfBookings(afternoonDoctorSchedule)
+        );
+
+        return new ScheduleRoomHeadDoctorResponse(morningSchedule, afternoonSchedule);
+    }
+
+    @Override
     public InvalidDateResponse getInvalidDateSchedule(
             String authorization,
             int roomId,
@@ -438,6 +471,63 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         List<Date> afternoonSchedule = getInvalidDate(room, doctor, AFTERNOON);
 
         return new InvalidDateResponse(morningSchedule, afternoonSchedule);
+    }
+
+    @Override
+    public boolean deleteDoctorSchedule(
+            String authorization,
+            UUID doctorScheduleId
+    ){
+        getHeadDoctor(authorization);
+
+        Optional<DoctorSchedule> optional = doctorScheduleRepository.findById(doctorScheduleId);
+        if(optional.isEmpty()) {
+            throw new NotFoundException("Doctor schedule not found");
+        }
+
+        DoctorSchedule doctorSchedule = optional.get();
+
+        if(calculateNumberOfBookings(doctorSchedule) > 0) {
+            throw new BadRequestException("Cant delete schedule has booking");
+        }
+
+        doctorSchedule.setDeleted(true);
+
+        doctorScheduleRepository.save(doctorSchedule);
+        return true;
+    }
+
+    @Override
+    public List<Date> getDateHasSchedule(
+            String authorization,
+            int roomId
+    ){
+        Doctor headDoctor = getHeadDoctor(authorization);
+
+        Department department = headDoctor.getDepartment();
+
+        Room room = roomServices.findRoomById(roomId);
+        if (room.getDepartment().getDepartmentId() != department.getDepartmentId()) {
+            throw new BadRequestException("Room is not in your department");
+        }
+
+        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+                room,
+                MORNING
+        );
+
+        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+                room,
+                AFTERNOON
+        );
+
+        List<DoctorSchedule> mergedList = Stream.concat(morningSchedules.stream(), afternoonSchedules.stream())
+                .distinct()
+                .toList();
+
+        return mergedList.stream()
+                .map(DoctorSchedule::getDate)
+                .collect(Collectors.toList());
     }
 
     private List<Date> getInvalidDate(
@@ -479,5 +569,52 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         return doctorSchedule;
+    }
+
+    @Override
+    public List<Doctor> getActiveDoctorsInDepartment(String authorization) {
+        Doctor headDoctor = getHeadDoctor(authorization);
+
+        Department department = headDoctor.getDepartment();
+
+        List<Doctor> doctors = department.getDoctors();
+        doctors.removeIf(Staff::isDeleted);
+
+        return doctors;
+    }
+
+    @Override
+    public DoctorSchedule updateDoctorSchedule(
+            String authorization,
+            UUID doctorScheduleId,
+            UpdateDoctorScheduleRequest request
+    ) {
+        Calendar today = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        date.setTime(request.getDate());
+
+        boolean sameDay = today.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR) &&
+                today.get(Calendar.YEAR) == date.get(Calendar.YEAR);
+
+        if (sameDay || date.before(today)) {
+            throw new BadRequestException("Not today or the previous days");
+        }
+        Doctor headDoctor = getHeadDoctor(authorization);
+
+        Department department = headDoctor.getDepartment();
+        Doctor doctor = doctorServices.getDoctorById(request.getStaffId());
+        if (doctor.getDepartment().getDepartmentId() != (department.getDepartmentId())) {
+            throw new BadRequestException("Doctor is not in your department");
+        }
+
+        Optional<DoctorSchedule> scheduleOptional = doctorScheduleRepository.findById(doctorScheduleId);
+        if(scheduleOptional.isEmpty()) {
+            throw new NotFoundException("Doctor schedule not found");
+        }
+
+        DoctorSchedule doctorSchedule = scheduleOptional.get();
+        doctorSchedule.setDoctor(doctor);
+        return doctorScheduleRepository.save(doctorSchedule);
     }
 }

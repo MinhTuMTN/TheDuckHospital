@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Integer> {
     Page<Room> findPaginationByOrderByDeleted(Pageable pageable);
+    Page<Room> findByDepartmentAndDeletedIsFalse(Department department, Pageable pageable);
+    long countByDepartmentAndDeletedIsFalse(Department department);
     List<Room> findAllByOrderByDeleted();
     List<Room> findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
             String roomName

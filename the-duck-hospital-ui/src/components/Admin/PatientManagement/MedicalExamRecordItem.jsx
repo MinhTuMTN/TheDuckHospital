@@ -140,10 +140,13 @@ function MedicalExamRecordItem(props) {
           <Typography
             style={{
               fontWeight: "600",
-              fontSize: "18px"
+              fontSize: "18px",
             }}
           >
-            {item.state === "DONE" ? <FormatCurrency amount={item.price} /> : "Chưa Hoàn Thành"}
+            {
+              item.state === "DONE" ? "Hoàn thành" :
+                item.state === "PROCESSING" ? "Đang khám" : "Đang chờ"
+            }
           </Typography>
         </Stack>
       </MuiAccordionSummary>
@@ -391,7 +394,7 @@ function MedicalExamRecordItem(props) {
                       textAlign: "right"
                     }}
                   >
-                    <FormatCurrency amount={item.medicine.price}/>
+                    <FormatCurrency amount={item.medicine.price} />
                   </Typography>
                   <Typography
                     style={{
@@ -400,7 +403,7 @@ function MedicalExamRecordItem(props) {
                       textAlign: "right"
                     }}
                   >
-                    <FormatCurrency amount={item.medicine.price * item.quantity}/>
+                    <FormatCurrency amount={item.medicine.price * item.quantity} />
                   </Typography>
                 </Stack>))}
               {/* <Stack
@@ -475,7 +478,7 @@ function MedicalExamRecordItem(props) {
                     marginTop: 3,
                   }}
                 >
-                  <FormatCurrency amount={item.price}/>
+                  <FormatCurrency amount={item.price} />
                 </Typography>
               </Stack>
             </BorderTextBox>}

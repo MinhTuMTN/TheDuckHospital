@@ -1,6 +1,5 @@
 package com.theduckhospital.api.dto.response.admin;
 
-import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import lombok.Data;
 
 import java.util.List;

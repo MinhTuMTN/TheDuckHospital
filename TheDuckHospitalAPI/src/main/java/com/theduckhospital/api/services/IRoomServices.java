@@ -3,6 +3,7 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
+import com.theduckhospital.api.dto.response.doctor.PaginationRoomsResponse;
 import com.theduckhospital.api.entity.Room;
 
 import java.text.ParseException;
@@ -15,7 +16,7 @@ public interface IRoomServices {
     RoomResponse restoreRoom(int roomId);
 
     FilteredRoomsResponse getPaginationFilteredRooms(
-            String search,
+            String authorization,
             int page,
             int limit
     );
@@ -28,4 +29,10 @@ public interface IRoomServices {
     Object getTodayDoctorSchedules(int roomId) throws ParseException;
 
     List<Room> getRoomsDepartment(String authorization);
+
+    PaginationRoomsResponse getPaginationRooms(
+            String authorization,
+            int page,
+            int limit
+    );
 }
