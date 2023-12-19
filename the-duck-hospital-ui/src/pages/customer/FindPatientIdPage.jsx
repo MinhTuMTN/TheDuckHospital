@@ -14,8 +14,10 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAllProvinces } from "../../services/common/AddressesServices";
+import { findPatientProfileByInfo } from "../../services/customer/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
   fontWeight: "400 !important",
@@ -68,7 +70,7 @@ function FindPatientIdPage(props) {
 
   const [fullName, setFullName] = React.useState("");
   const [yearBirth, setYearBirth] = React.useState("");
-  const [gender, setGender] = React.useState(0);
+  const [gender, setGender] = React.useState("MALE");
 
   // Provinces
   const [provinces, setProvinces] = React.useState([]);
@@ -86,6 +88,36 @@ function FindPatientIdPage(props) {
   useEffect(() => {
     handleGetAllProvinces();
   }, [handleGetAllProvinces]);
+
+  const navigate = useNavigate();
+
+  const handleFindPatientProfile = async () => {
+    const response = await findPatientProfileByInfo(
+      fullName,
+      gender,
+      selectedProvinceId,
+      yearBirth
+    );
+    if (response.success) {
+      const data = response.data.data;
+      if (data.length === 0) {
+        enqueueSnackbar("Không tìm thấy bệnh nhân", {
+          variant: "error",
+        });
+        return;
+      }
+
+      navigate("/verify-information", {
+        state: {
+          patientProfiles: data,
+        },
+      });
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra", {
+        variant: "error",
+      });
+    }
+  };
   return (
     <Box
       sx={{
@@ -176,13 +208,12 @@ function FindPatientIdPage(props) {
                 fullWidth
                 required
                 maxLength={4}
+                autoComplete="off"
                 placeholder="Năm sinh"
                 value={yearBirth}
                 onChange={(e) => {
-                  // Kiểm tra xem giá trị nhập vào có phải là số không
                   const input = e.target.value;
                   if (/^\d+$/.test(input) || input === "") {
-                    // Nếu là số hoặc trống, và không quá 4 ký tự, cho phép cập nhật giá trị
                     if (input.length <= 4) {
                       setYearBirth(input);
                     }
@@ -206,7 +237,6 @@ function FindPatientIdPage(props) {
               </CustomTypography>
               <FormControl fullWidth>
                 <Select
-                  disabled={profile?.patientCode}
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={gender}
@@ -215,8 +245,8 @@ function FindPatientIdPage(props) {
                     textAlign: "left",
                   }}
                 >
-                  <MenuItem value={0}>Nam</MenuItem>
-                  <MenuItem value={1}>Nữ</MenuItem>
+                  <MenuItem value={"MALE"}>Nam</MenuItem>
+                  <MenuItem value={"FEMALE"}>Nữ</MenuItem>
                 </Select>
               </FormControl>
             </Stack>
@@ -293,6 +323,7 @@ function FindPatientIdPage(props) {
                 fontSize: "14px !important",
                 textTransform: "none",
               }}
+              onClick={handleFindPatientProfile}
             >
               Tìm kiếm
             </CustomButton>

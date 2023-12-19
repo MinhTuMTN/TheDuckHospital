@@ -55,7 +55,7 @@ import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
 import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 import History from "../pages/Doctor/History";
 import HistoryPage from "../pages/customer/HistoryPage";
-import VerifyInformation from "../components/Customer/FindProfile/VerifyInformation";
+import VerifyInformation from "../pages/customer/VerifyInformation";
 import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
 
 const LoadComponent = (Component) => (props) =>

@@ -6,7 +6,9 @@ import CakeIcon from "@mui/icons-material/Cake";
 import PlaceIcon from "@mui/icons-material/Place";
 import PhoneIcon from "@mui/icons-material/Phone";
 import dayjs from "dayjs";
+
 function VerifyInformationItem(props) {
+  const { profile } = props;
   return (
     <Box
       sx={{
@@ -26,22 +28,22 @@ function VerifyInformationItem(props) {
       <Stack direction={"column"} spacing={0.5} width={"100%"}>
         <RowInfo
           title={"Họ và tên:"}
-          value={"Nguyễn Văn A"}
+          value={profile.fullName}
           icon={<PersonIcon />}
         />
         <RowInfo
           title={"Ngày sinh:"}
-          value={dayjs("20/10/2002").format("DD/MM/YYYY")}
+          value={dayjs(profile.dateOfBirth).format("DD/MM/YYYY")}
           icon={<CakeIcon />}
         />
         <RowInfo
           title={"Địa chỉ:"}
-          value={"1 Võ Văn Ngân, phường Linh Chiểu, quận Thủ Đức, TP.HCM"}
+          value={`${profile.streetName}, ${profile?.ward?.wardName}, ${profile?.district?.districtName}, ${profile?.province?.provinceName}`}
           icon={<PlaceIcon />}
         />
         <RowInfo
           title={"Số điện thoại:"}
-          value={"0123456789"}
+          value={profile.phoneNumber}
           icon={<PhoneIcon />}
         />
       </Stack>

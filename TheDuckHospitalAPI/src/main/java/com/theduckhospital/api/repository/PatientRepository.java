@@ -4,6 +4,7 @@ import com.theduckhospital.api.entity.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +20,5 @@ public interface PatientRepository extends JpaRepository<Patient, UUID> {
             String phoneNumber,
             String identityNumber
     );
+    Optional<Patient> findPatientByPatientCodeAndDeletedIsFalse(String patientCode);
 }

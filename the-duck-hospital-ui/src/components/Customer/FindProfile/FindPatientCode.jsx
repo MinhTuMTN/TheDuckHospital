@@ -1,8 +1,11 @@
 import styled from "@emotion/styled";
 import { Button, Grid, Stack, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { findPatientProfileByPatientCode } from "../../../services/customer/PatientProfileServices";
+import { useNavigate } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -27,6 +30,20 @@ const GridBreak = styled(Grid)(({ theme }) => ({
 }));
 
 function FindPatientCode(props) {
+  const [patientCode, setPatientCode] = useState("");
+  const navigate = useNavigate();
+  const handleSearchPatientProfile = async () => {
+    const response = await findPatientProfileByPatientCode(patientCode);
+    if (response.success) {
+      navigate("/verify-information", {
+        state: { patientProfiles: response.data.data },
+      });
+    } else {
+      enqueueSnackbar("Không tìm thấy bệnh nhân", {
+        variant: "error",
+      });
+    }
+  };
   return (
     <Grid container spacing={2} justifyContent={"center"}>
       <Grid item xs={12}>
@@ -57,6 +74,13 @@ function FindPatientCode(props) {
           variant="outlined"
           id="outlined-basic"
           required
+          value={patientCode}
+          onChange={(e) => setPatientCode(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearchPatientProfile();
+            }
+          }}
           placeholder="Nhập mã bệnh nhân"
           sx={{
             width: "100% !important",
@@ -66,7 +90,7 @@ function FindPatientCode(props) {
 
       <GridBreak />
       <Grid item xs={12} md={6}>
-        <CustomButton variant="contained">
+        <CustomButton variant="contained" onClick={handleSearchPatientProfile}>
           <SearchIcon style={{ marginRight: "5px" }} />
           Tìm kiếm
         </CustomButton>
@@ -101,8 +125,10 @@ function FindPatientCode(props) {
               fontSize: "1rem",
               "&:hover": {
                 color: "#0b5394",
+                cursor: "pointer",
               },
             }}
+            onClick={() => navigate("/find-patient-id")}
           >
             Tôi mất mã bệnh nhân của mình
           </Typography>

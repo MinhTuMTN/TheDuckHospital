@@ -1,6 +1,8 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
@@ -29,4 +31,10 @@ public interface IPatientProfileServices {
     NursePatientProfileItemResponse nurseUpdatePatientProfile(NurseUpdatePatientProfileRequest request);
 
     NursePatientProfileItemResponse nurseCreatePatientProfile(NurseCreatePatientProfileRequest request);
+
+    List<PatientProfileItemResponse> patientSearchByPatientCode(String patientCode);
+
+    PatientProfileItemResponse addPatientProfile(String authorization, AddPatientProfileRequest request);
+
+    List<PatientProfileItemResponse> findPatientCode(FindPatientCodeRequest request);
 }

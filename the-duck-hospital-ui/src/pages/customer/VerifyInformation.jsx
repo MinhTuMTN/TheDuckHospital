@@ -15,10 +15,12 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import CustomLink from "../../General/CustomLink";
+import { useLocation, useNavigate } from "react-router-dom";
+import CustomLink from "../../components/General/CustomLink";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import VerifyInformationItem from "./VerifyInformationItem";
+import VerifyInformationItem from "../../components/Customer/FindProfile/VerifyInformationItem";
+import { addPatientProfile } from "../../services/customer/PatientProfileServices";
+import { enqueueSnackbar } from "notistack";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -46,6 +48,10 @@ function VerifyInformation(props) {
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
 
+  const patientProfiles = useLocation().state?.patientProfiles;
+  const [selectPatientProfileId, setSelectPatientProfileId] = useState("");
+  const [phone, setPhone] = useState("");
+
   const breakcrumbs = [
     <CustomLink key={1} to="/">
       <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>
@@ -60,17 +66,16 @@ function VerifyInformation(props) {
     color: "transparent",
   };
 
-  const patientProfiles = [
-    {
-      patientProfileId: 1,
-    },
-    {
-      patientProfileId: 2,
-    },
-    {
-      patientProfileId: 3,
-    },
-  ];
+  const handleAddPatientProfile = async () => {
+    const response = await addPatientProfile(selectPatientProfileId, phone);
+    if (response.success) {
+      navigate("/user");
+    } else {
+      enqueueSnackbar("Số đien thoại không hợp lệ", {
+        variant: "error",
+      });
+    }
+  };
 
   return (
     <>
@@ -145,7 +150,7 @@ function VerifyInformation(props) {
               justifyContent: "center",
             }}
           >
-            {patientProfiles.map((profile) => (
+            {patientProfiles?.map((profile) => (
               <Grid
                 key={profile.patientProfileId}
                 item
@@ -172,10 +177,11 @@ function VerifyInformation(props) {
                     width: "100%",
                   }}
                   onClick={() => {
+                    setSelectPatientProfileId(profile.patientProfileId);
                     setOpenDialog(true);
                   }}
                 >
-                  <VerifyInformationItem />
+                  <VerifyInformationItem profile={profile} />
                 </Box>
               </Grid>
             ))}
@@ -193,14 +199,25 @@ function VerifyInformation(props) {
               autoFocus
               margin="dense"
               id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoComplete="off"
               placeholder="Số điện thoại"
               fullWidth
               variant="outlined"
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)}>Huỷ</Button>
-            <Button onClick={() => setOpenDialog(false)}>Xác thực</Button>
+            <Button
+              onClick={() => {
+                setOpenDialog(false);
+                setPhone("");
+                setSelectPatientProfileId("");
+              }}
+            >
+              Huỷ
+            </Button>
+            <Button onClick={handleAddPatientProfile}>Xác thực</Button>
           </DialogActions>
         </Dialog>
       </React.Fragment>

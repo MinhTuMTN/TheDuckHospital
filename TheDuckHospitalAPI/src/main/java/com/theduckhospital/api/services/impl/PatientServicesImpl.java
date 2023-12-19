@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredPatientsResponse;
 import com.theduckhospital.api.dto.response.admin.PatientResponse;
 import com.theduckhospital.api.entity.*;
@@ -101,6 +102,13 @@ public class PatientServicesImpl implements IPatientServices {
         Patient patient = optional.get();
 
         return new PatientResponse(patient);
+    }
+
+    @Override
+    public Patient findPatientByPatientCode(String patientCode) {
+        return patientRepository.findPatientByPatientCodeAndDeletedIsFalse(
+                patientCode
+        ).orElseThrow(() -> new NotFoundException("Can't find Patient"));
     }
 
 }

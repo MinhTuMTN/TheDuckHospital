@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.entity.Patient;
 import com.theduckhospital.api.dto.response.admin.FilteredPatientsResponse;
 import com.theduckhospital.api.dto.response.admin.PatientResponse;
@@ -18,4 +19,5 @@ public interface IPatientServices {
     );
 
     PatientResponse getPatientById(UUID patientId);
+    Patient findPatientByPatientCode(String patientCode);
 }
