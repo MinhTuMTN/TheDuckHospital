@@ -110,6 +110,7 @@ function HistoryPage(props) {
             patientInfo={medicalRecord?.patientProfile}
             prescriptionItems={medicalRecord?.prescriptionItems}
             reExaminationDate={medicalRecord?.reExaminationDate}
+            date={medicalRecord?.date}
           />
         </Grid>
       </Grid>

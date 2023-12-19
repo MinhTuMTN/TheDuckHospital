@@ -82,6 +82,7 @@ function HistoryDetail(props) {
     diagnostic,
     departmentName,
     reExaminationDate,
+    date,
   } = props;
   const contacts = [
     {
@@ -197,7 +198,7 @@ function HistoryDetail(props) {
 
         <ContactCustomerInfo
           title="Ngày khám"
-          content={dayjs().format("DD/MM/YYYY HH:mm")}
+          content={dayjs(date).format("DD/MM/YYYY HH:mm")}
           titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
