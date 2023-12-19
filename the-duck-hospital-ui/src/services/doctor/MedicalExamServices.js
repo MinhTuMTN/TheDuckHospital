@@ -14,3 +14,7 @@ export const updateMedicalRecord = (medicalRecordId, symptom, diagnosis) => {
     diagnosis,
   });
 };
+
+export const getHistoryMedicalRecord = (medicalRecordId, historyId) => {
+  return get(`/doctor/medical-records/${medicalRecordId}/history/${historyId}`);
+};

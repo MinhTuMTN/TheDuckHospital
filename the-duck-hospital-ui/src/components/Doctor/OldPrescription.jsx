@@ -9,6 +9,8 @@ import {
   tableCellClasses,
 } from "@mui/material";
 import React from "react";
+import { getMedicineUnit } from "../../services/doctor/MedicineServices";
+import FormatCurrency from "../General/FormatCurrency";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -22,24 +24,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function OldPrescription(props) {
-  const [rows, setRows] = React.useState([
-    {
-      id: 1,
-      medicineName: "Eugica",
-      description: "Sáng uống 1 viên, tối uống 1 viên",
-      quantity: 10,
-      unit: "viên",
-      total: 10000,
-    },
-    {
-      id: 2,
-      medicineName: "Sữa tẩy trang cho da nhạy cảm",
-      description: "TẨY TRANG",
-      quantity: 1,
-      unit: "Chai",
-      total: 244000,
-    },
-  ]);
+  const { prescriptionItems } = props;
 
   return (
     <TableContainer
@@ -73,17 +58,19 @@ function OldPrescription(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
+          {prescriptionItems?.map((row, index) => (
             <TableRow key={row.id}>
               <TableCell align="center">
                 {index < 9 ? `0${index + 1}` : index + 1}
               </TableCell>
-              <TableCell align="left">{row.medicineName}</TableCell>
-              <TableCell align="left">{row.description}</TableCell>
+              <TableCell align="left">{row?.medicine?.medicineName}</TableCell>
+              <TableCell align="left">{row?.dosageInstruction}</TableCell>
               <TableCell align="right">
-                x {row.quantity} {row.unit}
+                x {row.quantity} {getMedicineUnit(row?.medicine?.unit)}
               </TableCell>
-              <TableCell align="right">{row.total}</TableCell>
+              <TableCell align="right">
+                <FormatCurrency amount={row.price} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

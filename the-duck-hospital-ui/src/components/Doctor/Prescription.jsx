@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import {
   Autocomplete,
+  Box,
   Button,
   Checkbox,
   FormControlLabel,
@@ -30,6 +31,9 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useParams } from "react-router-dom";
 import FormatCurrency from "../General/FormatCurrency";
+import PrescriptionInvoice from "./PrescriptionInvoice";
+import { useAuth } from "../../auth/AuthProvider";
+import { useReactToPrint } from "react-to-print";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -49,6 +53,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function Prescription(props) {
+  const { patientInfo, diagnostic } = props;
+  const { fullName } = useAuth();
   const { medicalRecordId } = useParams();
   const [hiddenButtonAdd, setHidden] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -158,6 +164,11 @@ function Prescription(props) {
     handleGetPrescription();
   }, [medicalRecordId]);
 
+  const componentRef = React.useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
   return (
     <TableContainer
       sx={{
@@ -167,15 +178,42 @@ function Prescription(props) {
       <Table sx={{ minWidth: 650 }} aria-label="caption table">
         <caption style={{ width: "100%", textAlign: "right" }}>
           {hiddenButtonAdd === false ? (
-            <Button
-              variant="outlined"
-              sx={{
-                textTransform: "none",
-              }}
-              onClick={() => setHidden(true)}
-            >
-              Thêm thuốc
-            </Button>
+            <>
+              <Button
+                variant="outlined"
+                sx={{
+                  textTransform: "none",
+                  mr: 1,
+                  display: prescriptionItems.length > 0 ? "" : "none",
+                }}
+                color="normal2"
+                onClick={handlePrint}
+              >
+                In toa thuốc
+              </Button>
+              <Button
+                variant="outlined"
+                sx={{
+                  textTransform: "none",
+                }}
+                onClick={() => setHidden(true)}
+              >
+                Thêm thuốc
+              </Button>
+              <Box
+                sx={{
+                  display: "none",
+                }}
+              >
+                <PrescriptionInvoice
+                  ref={componentRef}
+                  patientInfo={patientInfo}
+                  prescriptionItems={prescriptionItems}
+                  doctorName={fullName}
+                  diagnostic={diagnostic}
+                />
+              </Box>
+            </>
           ) : (
             <>
               <Grid
@@ -323,12 +361,25 @@ function Prescription(props) {
                     variant="outlined"
                     sx={{
                       textTransform: "none",
+                      width: "85%",
                     }}
                     onClick={() => {
                       handleAddMedicine();
                     }}
                   >
                     Thêm
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="delete"
+                    sx={{
+                      textTransform: "none",
+                      width: "85%",
+                      mt: 1,
+                    }}
+                    onClick={() => setHidden(false)}
+                  >
+                    Hủy
                   </Button>
                 </Grid>
               </Grid>

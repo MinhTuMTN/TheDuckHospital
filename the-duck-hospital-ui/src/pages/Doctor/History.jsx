@@ -21,12 +21,12 @@ import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import dayjs from "dayjs";
 import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import InfoPatientHistory from "../../components/Doctor/InfoPatientHistory";
 import ListTestHaveDone from "../../components/Doctor/ListTestHaveDone";
 import OldPrescription from "../../components/Doctor/OldPrescription";
 import FormatDateTime from "../../components/General/FormatDateTime";
-import { getMedicalRecord } from "../../services/doctor/MedicalExamServices";
+import { getHistoryMedicalRecord } from "../../services/doctor/MedicalExamServices";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -91,26 +91,28 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const infoDoctor = [
-  {
-    label: "Bác sĩ:",
-    value: "Phùng Thị Ánh Tuyết",
-    icon: <PersonIcon fontSize="18px" />,
-  },
-  {
-    label: "Ngày khám:",
-    value: "20/10/2021",
-    icon: <TodayIcon fontSize="18px" />,
-  },
-];
+const createInfoDoctor = (doctorName, date) => {
+  const infoDoctor = [
+    {
+      label: "Bác sĩ:",
+      value: doctorName,
+      icon: <PersonIcon fontSize="18px" />,
+    },
+    {
+      label: "Ngày khám:",
+      value: dayjs(date)?.format("DD/MM/YYYY"),
+      icon: <TodayIcon fontSize="18px" />,
+    },
+  ];
+
+  return infoDoctor;
+};
 
 function History(props) {
   const navigate = useNavigate();
   const { medicalRecordId } = useParams();
+  const location = useLocation();
   const [info, setInfo] = React.useState({});
-  const [basicsInfo, setBasicsInfo] = React.useState([]);
-  const [symptom, setSymptom] = React.useState("");
-  const [diagnostic, setDiagnostic] = React.useState("");
   const [expanded, setExpanded] = React.useState("panel1");
 
   const handleChange = (panel) => (event, newExpanded) => {
@@ -119,17 +121,19 @@ function History(props) {
 
   useEffect(() => {
     const handleGetMedicalRecord = async () => {
-      const response = await getMedicalRecord(medicalRecordId);
+      if (!location?.state?.medicalRecordId) navigate(-1);
+
+      const response = await getHistoryMedicalRecord(
+        location?.state?.medicalRecordId,
+        medicalRecordId
+      );
       if (response.success) {
         const data = response.data.data;
         setInfo(data);
-        setBasicsInfo(handleBasicsInfo(data.patient));
-        setSymptom(data.symptom || "");
-        setDiagnostic(data.diagnosis || "");
       }
     };
     handleGetMedicalRecord();
-  }, [medicalRecordId]);
+  }, [medicalRecordId, location?.state?.medicalRecordId, navigate]);
 
   return (
     <>
@@ -238,8 +242,8 @@ function History(props) {
           <Grid item xs={12} md={3.5}>
             <InfoPatientHistory
               mainInfo={info?.patient}
-              info={basicsInfo}
-              infoDoctor={infoDoctor}
+              info={handleBasicsInfo(info?.patient)}
+              infoDoctor={createInfoDoctor(info?.doctorName, info?.date)}
             />
           </Grid>
 
@@ -273,30 +277,28 @@ function History(props) {
                 </Typography>
                 <Typography variant="body1" fontWeight={400}>
                   Tái khám:{" "}
-                  <span style={{ fontWeight: "450" }}>20/10/2021</span>
+                  <span style={{ fontWeight: "450" }}>
+                    {info?.reExaminationDate
+                      ? dayjs(info?.reExaminationDate).format("DD/MM/YYYY")
+                      : "Không có"}
+                  </span>
                 </Typography>
               </Stack>
               <CustomTextField
-                disabled
                 size="medium"
                 variant="outlined"
                 id="outlined-basic"
-                label="Triệu chứng"
                 fullWidth
                 required
-                value={symptom}
-                onChange={(e) => setSymptom(e.target.value)}
+                value={info?.symptom}
               />
               <CustomTextField
-                disabled
                 size="medium"
                 variant="outlined"
                 id="outlined-basic"
-                label="Chuẩn đoán"
                 fullWidth
                 required
-                value={diagnostic}
-                onChange={(e) => setDiagnostic(e.target.value)}
+                value={info?.diagnosis}
               />
 
               <div>
@@ -311,7 +313,7 @@ function History(props) {
                     <Typography>Xét nghiệm đã làm</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <ListTestHaveDone patientInfo={info} />
+                    <ListTestHaveDone medicalTests={info?.medicalTests} />
                   </AccordionDetails>
                 </Accordion>
                 <Accordion
@@ -325,7 +327,9 @@ function History(props) {
                     <Typography>Toa thuốc</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <OldPrescription />
+                    <OldPrescription
+                      prescriptionItems={info?.prescriptionItems}
+                    />
                   </AccordionDetails>
                 </Accordion>
               </div>

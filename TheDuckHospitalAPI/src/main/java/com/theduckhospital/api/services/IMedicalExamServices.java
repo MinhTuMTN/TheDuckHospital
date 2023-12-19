@@ -10,6 +10,7 @@ import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
+import com.theduckhospital.api.dto.response.doctor.HistoryMedicalRecord;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.PrescriptionItem;
 
@@ -48,4 +49,10 @@ public interface IMedicalExamServices {
     List<PrescriptionItem> doctorGetMedicines(String authorization, UUID medicalExaminationId);
 
     List<PrescriptionItem> doctorDeleteMedicine(String authorization, UUID medicalExaminationId, UUID prescriptionItemId);
+
+    HistoryMedicalRecord doctorGetHistoryMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId,
+            UUID historyId
+    );
 }

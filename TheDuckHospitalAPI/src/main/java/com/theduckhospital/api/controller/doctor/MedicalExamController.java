@@ -50,6 +50,26 @@ public class MedicalExamController {
         );
     }
 
+    @GetMapping("/{medicalExaminationId}/history/{historyId}")
+    public ResponseEntity<?> getHistoryMedicalExamination(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId,
+            @PathVariable("historyId") UUID historyId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalExamServices
+                                .doctorGetHistoryMedicalExamination(
+                                        authorization,
+                                        medicalExaminationId,
+                                        historyId
+                                ))
+                        .build()
+        );
+    }
+
     @PutMapping("/{medicalExaminationId}")
     public ResponseEntity<?> updateMedicalExamination(
             @RequestHeader("Authorization") String authorization,

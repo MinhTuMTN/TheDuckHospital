@@ -3,7 +3,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import HistoryIcon from "@mui/icons-material/History";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 InfoPatient.propTypes = {
   mainInfo: PropTypes.object,
@@ -58,6 +59,7 @@ function Row(props) {
 function InfoPatient(props) {
   const { mainInfo, info, history } = props;
   const initials = getInitials(mainInfo?.fullName);
+  const { medicalRecordId } = useParams();
   const nagivate = useNavigate();
   return (
     <Stack
@@ -176,177 +178,100 @@ function InfoPatient(props) {
         ) : (
           <>
             <Stack direction={"column"} spacing={1} padding={0} width={"100%"}>
-              <Stack
-                component={Paper}
-                elevation={1}
-                spacing={1}
-                direction={"row"}
-                justifyContent={"space-between"}
-                width={"100%"}
-                sx={{
-                  paddingX: "16px",
-                  paddingY: "12px",
-                }}
-              >
-                <Stack direction={"column"} spacing={0.5} width={"100%"}>
-                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={440}
-                      style={{
-                        fontSize: "16px",
-                      }}
-                    >
-                      Ngày khám:
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={440}
-                      style={{
-                        fontSize: "16px",
-                      }}
-                    >
-                      20/10/2021
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={400}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      Chuyên khoa:
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={400}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      Nội khoa
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <IconButton
-                  variant="text"
+              {history?.map((row, index) => (
+                <Stack
+                  component={Paper}
+                  elevation={1}
+                  spacing={1}
+                  direction={"row"}
+                  justifyContent={"space-between"}
+                  width={"100%"}
                   sx={{
-                    alignItems: "center",
-                    width: "40px",
-                    height: "40px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease-in",
-                    color: "#474747",
-                    ":hover": {
-                      boxShadow:
-                        "9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;",
-                      transform: "translateY(2px)",
-                      "& .icon": {
-                        transform: "translateX(5px)",
-                      },
-                    },
+                    paddingX: "16px",
+                    paddingY: "12px",
                   }}
+                  key={`history-${index}`}
                 >
-                  <NavigateNextIcon
-                    className="icon"
-                    sx={{
-                      fontSize: "18px",
-                      color: "#474747",
-                      transition: "all 0.4s ease-in",
-                    }}
-                    onClick={() => {
-                      nagivate("/doctor/history/:medicalRecordId");
-                    }}
-                  />
-                </IconButton>
-              </Stack>
-              <Stack
-                component={Paper}
-                elevation={1}
-                spacing={1}
-                direction={"row"}
-                justifyContent={"space-between"}
-                width={"100%"}
-                sx={{
-                  paddingX: "16px",
-                  paddingY: "12px",
-                }}
-              >
-                <Stack direction={"column"} spacing={0.5} width={"100%"}>
-                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={440}
-                      style={{
-                        fontSize: "16px",
-                      }}
-                    >
-                      Ngày khám:
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={440}
-                      style={{
-                        fontSize: "16px",
-                      }}
-                    >
-                      20/10/2021
-                    </Typography>
-                  </Stack>
+                  <Stack direction={"column"} spacing={0.5} width={"100%"}>
+                    <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                      <Typography
+                        variant="body1"
+                        fontWeight={440}
+                        style={{
+                          fontSize: "16px",
+                        }}
+                      >
+                        Ngày khám:
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={440}
+                        style={{
+                          fontSize: "16px",
+                        }}
+                      >
+                        {dayjs(row?.date).format("DD/MM/YYYY")}
+                      </Typography>
+                    </Stack>
 
-                  <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                    <Typography
-                      variant="body1"
-                      fontWeight={400}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      Chuyên khoa:
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={400}
-                      style={{
-                        fontSize: "14px",
-                      }}
-                    >
-                      Nội khoa
-                    </Typography>
+                    <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                      <Typography
+                        variant="body1"
+                        fontWeight={400}
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
+                        Chuyên khoa:
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={400}
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
+                        {row?.department}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                </Stack>
-                <IconButton
-                  variant="text"
-                  sx={{
-                    alignItems: "center",
-                    width: "40px",
-                    height: "40px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease-in",
-                    color: "#474747",
-                    ":hover": {
-                      boxShadow:
-                        "9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;",
-                      transform: "translateY(2px)",
-                      "& .icon": {
-                        transform: "translateX(5px)",
-                      },
-                    },
-                  }}
-                >
-                  <NavigateNextIcon
-                    className="icon"
+                  <IconButton
+                    variant="text"
                     sx={{
-                      fontSize: "18px",
+                      alignItems: "center",
+                      width: "40px",
+                      height: "40px",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease-in",
                       color: "#474747",
-                      transition: "all 0.4s ease-in",
+                      ":hover": {
+                        boxShadow:
+                          "9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;",
+                        transform: "translateY(2px)",
+                        "& .icon": {
+                          transform: "translateX(5px)",
+                        },
+                      },
                     }}
-                  />
-                </IconButton>
-              </Stack>
+                  >
+                    <NavigateNextIcon
+                      className="icon"
+                      sx={{
+                        fontSize: "18px",
+                        color: "#474747",
+                        transition: "all 0.4s ease-in",
+                      }}
+                      onClick={() => {
+                        nagivate(`/doctor/history/${row?.medicalRecordId}`, {
+                          state: {
+                            medicalRecordId,
+                          },
+                        });
+                      }}
+                    />
+                  </IconButton>
+                </Stack>
+              ))}
             </Stack>
           </>
         )}
