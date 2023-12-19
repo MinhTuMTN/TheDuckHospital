@@ -245,7 +245,7 @@ function MedicalExaminationRecord(props) {
           <Grid item xs={12} md={3.5}>
             <InfoPatient
               mainInfo={info?.patient}
-              history={null}
+              history={{}}
               info={basicsInfo}
             />
           </Grid>

@@ -143,15 +143,17 @@ function Row(props) {
             </IconButton>
           </Stack>
         </TableCell>
+        <TableCell align="center" width={"0%"}>
+          <Box sx={{ display: "none" }}>
+            <Invoice
+              ref={componentRef}
+              patientInfo={props.patientInfo}
+              doctorName={fullName}
+              medicalTest={row}
+            />
+          </Box>
+        </TableCell>
       </TableRow>
-      <Box sx={{ display: "none" }}>
-        <Invoice
-          ref={componentRef}
-          patientInfo={props.patientInfo}
-          doctorName={fullName}
-          medicalTest={row}
-        />
-      </Box>
     </>
   );
 }
@@ -241,7 +243,7 @@ function ListTestToDo(props) {
                   }}
                   sx={{ width: "300px" }}
                   renderInput={(params) => (
-                    <TextField {...params} placeholder="Tên dịch vụ" />
+                    <TextField {...params} placeholder="Xét nghiệm" />
                   )}
                 />
                 <CustomTextField
@@ -292,6 +294,7 @@ function ListTestToDo(props) {
         <TableBody>
           {rows.map((row, index) => (
             <Row
+              key={row.medicalTestId}
               row={row}
               index={index}
               handleDeleteTest={handleDeleteTest}
