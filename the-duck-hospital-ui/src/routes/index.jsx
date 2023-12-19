@@ -51,6 +51,8 @@ import PaymentOrders from "../pages/customer/PaymentOrders";
 import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
 import Analytics from "../pages/Admin/Analytics";
+import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
+import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -224,10 +226,17 @@ function Router(props) {
               element: <MedicalExaminationRecord />,
             },
             {
+              path: "medical-test-record/:medicalTestId",
+              element: <MedicalTestRecord />,
+            },
+            {
               path: "doctor-schedules",
               element: <SchedulePage />,
             },
-
+            {
+              path: "doctor-test",
+              element: <MedicalTestPage />,
+            },
             {
               path: "head-doctor",
               element: <ProtectedLayout forRole={["HeadDoctor"]} />,
