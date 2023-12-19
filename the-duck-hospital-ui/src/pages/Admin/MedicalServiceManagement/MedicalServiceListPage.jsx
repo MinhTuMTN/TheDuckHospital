@@ -151,7 +151,7 @@ function MedicalServiceListPage(props) {
     if (response.success) {
       enqueueSnackbar("Thêm dịch vụ thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      handleGetServices();
+      setEnterPressed(true);
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 

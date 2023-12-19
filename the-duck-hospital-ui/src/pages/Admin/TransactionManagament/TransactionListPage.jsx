@@ -1,19 +1,49 @@
 import {
   Box,
+  Button,
+  Chip,
   Container,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
-import SearchTransactionList from "../../../components/Admin/TransactionManagement/SearchTransactionList";
 import TransactionTable from "../../../components/Admin/TransactionManagement/TransactionTable";
 import { getPaginationTransactions } from "../../../services/admin/TransactionServices";
 import { enqueueSnackbar } from "notistack";
+import TransactionFilter from "../../../components/Admin/TransactionManagement/TransactionFilter";
+
+
+const statusOptions = [
+  {
+    value: "PENDING",
+    name: "Chờ xử lý",
+  },
+  {
+    value: "SUCCESS",
+    name: "Thành công",
+  },
+  {
+    value: "FAILED",
+    name: "Thất bại",
+  },
+];
+
+const paymentOptions = [
+  {
+    value: "VNPay",
+    name: "Online",
+  },
+  {
+    value: "CASH",
+    name: "Tại quầy",
+  },
+];
 
 function TransactionListPage(props) {
-  const [search, setSearch] = useState("");
-  // const [buttonClicked, setButtonClicked] = useState(true);
+  const [filterButtonClicked, setFilterButtonClicked] = useState(true);
+  const [pageChange, setPageChange] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
@@ -21,17 +51,44 @@ function TransactionListPage(props) {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
+    setPageChange(true);
+    setFilterButtonClicked(true);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
     setPage(1);
+    setFilterButtonClicked(true);
+  };
+
+  const [selectedPayment, setSelectedPayment] = useState([]);
+  const handleChangePaymentFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedPayment((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedPayment((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const handleChangeStatusFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedStatus((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedStatus((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
   };
 
   const handleGetTransactions = useCallback(async () => {
-    // if (!buttonClicked) return;
+    if (!filterButtonClicked) return;
     const response = await getPaginationTransactions({
-      page: page - 1,
+      page: pageChange ? page - 1 : 0,
       limit: limit,
+      transactionPayment: selectedPayment,
+      transactionStatus: selectedStatus,
     });
     if (response.success) {
       setTransactions(response.data.data.transactions);
@@ -39,12 +96,16 @@ function TransactionListPage(props) {
       setPage(response.data.data.page + 1);
       setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    // setButtonClicked(false);
-}, [page, limit]);
-
-  // useEffect(() => {
-  //   setButtonClicked(true);
-  // }, [page, limit]);
+    setFilterButtonClicked(false);
+    setPageChange(false);
+  }, [
+    page,
+    limit,
+    selectedStatus,
+    selectedPayment,
+    filterButtonClicked,
+    pageChange,
+  ]);
 
   useEffect(() => {
     handleGetTransactions();
@@ -75,16 +136,13 @@ function TransactionListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchTransactionList
-                value={search}
-                onChange={setSearch}
-              // onApply={() => {
-              //   setButtonClicked(true);
-              // }}
-              />
-              {/* <Box py={2} px={3}>
-                  {selectedCategory.length === 0 &&
-                    selectedQuantity.length === 0 &&
+              <Stack direction="row" spacing={1}>
+                <Box
+                  py={2}
+                  px={3}
+                  width="90%"
+                >
+                  {selectedPayment.length === 0 &&
                     selectedStatus.length === 0 && (
                       <TextField
                         disabled
@@ -98,85 +156,69 @@ function TransactionListPage(props) {
                         placeholder="Không có bộ lọc nào được chọn"
                       />
                     )}
-                  {selectedCategory.map((item, index) => (
-                    <Chip
-                      color="primary"
-                      label={
-                        catalogs.find((c) => c.catalogId === item)?.catalogName
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedCategory((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedStatus.map((item, index) => (
-                    <Chip
-                      color="secondary"
-                      label={statusOptions.find((i) => i.value === item)?.name}
-                      key={index}
-                      onDelete={() =>
-                        setSelectedStatus((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-
-                  {selectedQuantity.map((item, index) => (
-                    <Chip
-                      color="warning"
-                      label={
-                        quantityOptions.find((i) => i.value === item)?.name
-                      }
-                      key={index}
-                      onDelete={() =>
-                        setSelectedQuantity((prev) =>
-                          prev.filter((i) => i !== item)
-                        )
-                      }
-                    />
-                  ))}
-                </Box> */}
-              {/* <Stack
-                  direction={"row"}
-                  spacing={1}
-                  paddingLeft={2}
-                  paddingBottom={1}
+                  <Stack direction="row" spacing={1}>
+                    {selectedPayment.map((item, index) => (
+                      <Chip
+                        color="info"
+                        label={
+                          paymentOptions.find((i) => i.value === item)?.name
+                        }
+                        key={index}
+                        onDelete={() =>
+                          setSelectedPayment((prev) =>
+                            prev.filter((i) => i !== item)
+                          )
+                        }
+                      />
+                    ))}
+                    {selectedStatus.map((item, index) => (
+                      <Chip
+                        color="warning"
+                        label={statusOptions.find((i) => i.value === item)?.name}
+                        key={index}
+                        onDelete={() =>
+                          setSelectedStatus((prev) =>
+                            prev.filter((i) => i !== item)
+                          )
+                        }
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+                <Button
+                  onClick={() => {
+                    setFilterButtonClicked(true);
+                  }}
                   sx={{
-                    borderBottom: "1px solid #e0e0e0",
+                    flexBasis: "15%",
+                    width:"10%",
                   }}
                 >
-                  <ProductFilter
-                    label={"Danh mục"}
-                    options={catalogs}
-                    selectedValues={selectedCategory}
-                    onChange={handleChangeCategoryFilter}
-                  />
-                  <ProductFilter
-                    label={"Trạng thái"}
-                    options={statusOptions}
-                    selectedValues={selectedStatus}
-                    onChange={handleChangeStatusFilter}
-                  />
-                  <ProductFilter
-                    label={"Số lượng"}
-                    options={quantityOptions}
-                    selectedValues={selectedQuantity}
-                    onChange={handleChangeQuantityFilter}
-                  />
-                </Stack> */}
-              {/* <ProductsTableBasis
-                  count={dataFetched.length}
-                  items={dataFetched}
-                  onPageChange={handlePageChange}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  page={page}
-                  rowsPerPage={rowsPerPage}
-                /> */}
+                  Áp dụng
+                </Button>
+              </Stack>
+              <Stack
+                direction={"row"}
+                spacing={1}
+                paddingLeft={2}
+                paddingBottom={1}
+                sx={{
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                <TransactionFilter
+                  label={"Thanh toán"}
+                  options={paymentOptions}
+                  selectedValues={selectedPayment}
+                  onChange={handleChangePaymentFilter}
+                />
+                <TransactionFilter
+                  label={"Trạng thái"}
+                  options={statusOptions}
+                  selectedValues={selectedStatus}
+                  onChange={handleChangeStatusFilter}
+                />
+              </Stack>
               <TransactionTable
                 count={totalItems ? totalItems : 0}
                 items={transactions}

@@ -1,7 +1,7 @@
 import { get } from "../AxiosInstance";
 
 export const getPaginationTransactions = (params) => {
-    return get("/admin/transactions/filter", params, { Authorization: "" });
+    return get("/admin/transactions/filtered", params, { Authorization: "" });
   };
 
 export const getTransactionById = (transactionId) => {

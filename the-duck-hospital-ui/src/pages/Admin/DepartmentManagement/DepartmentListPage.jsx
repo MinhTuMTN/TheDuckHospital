@@ -97,7 +97,7 @@ function DepartmentListPage(props) {
     if (response.success) {
       enqueueSnackbar("Thêm khoa thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      handleGetDepartments();
+      setEnterPressed(true);
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 

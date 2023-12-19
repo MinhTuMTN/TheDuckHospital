@@ -234,7 +234,7 @@ function StaffListPage(props) {
       setEmail(response.data.data.email);
       setPhoneNumber(response.data.data.phoneNumber);
       setPassword(response.data.data.password);
-      handleGetStaffs();
+      setButtonClicked(true);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }
 

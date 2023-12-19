@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.request.admin;
 
+import com.theduckhospital.api.constant.MedicineUnit;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,4 +14,6 @@ public class CreateMedicineRequest {
     private Double price;
     @NotNull(message = "Medicine quantity is required")
     private Integer quantity;
+    @NotNull(message = "Unit is required")
+    private MedicineUnit unit;
 }
