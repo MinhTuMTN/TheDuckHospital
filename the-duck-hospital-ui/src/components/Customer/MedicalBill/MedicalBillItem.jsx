@@ -22,11 +22,11 @@ const StyledMedicalBillItem = styled(Box)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-const StyledStatus = styled(Card)(({ theme, status }) => ({
+const StyledStatus = styled(Card)(({ theme }) => ({
   width: "fit-content",
   padding: "4px 10px",
   textAlign: "center",
-  backgroundColor: status === "true" ? "#02CD60" : "#f44336",
+  backgroundColor: theme.status === "true" ? "#02CD60" : "#f44336",
 
   color: "#fff",
   borderRadius: ".5rem",
