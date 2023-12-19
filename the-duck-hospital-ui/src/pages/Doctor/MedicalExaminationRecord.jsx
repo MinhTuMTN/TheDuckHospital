@@ -8,6 +8,8 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   Grid,
   Paper,
   Stack,
@@ -27,9 +29,12 @@ import Prescription from "../../components/Doctor/Prescription";
 import DialogConfirm from "../../components/General/DialogConfirm";
 import FormatDateTime from "../../components/General/FormatDateTime";
 import {
+  completeMedicalRecord,
   getMedicalRecord,
   updateMedicalRecord,
 } from "../../services/doctor/MedicalExamServices";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -40,6 +45,13 @@ const Accordion = styled((props) => (
   },
   "&:before": {
     display: "none",
+  },
+}));
+
+const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
+  width: "100%",
+  "& input": {
+    height: "50px",
   },
 }));
 
@@ -103,7 +115,8 @@ function MedicalExaminationRecord(props) {
   const [diagnostic, setDiagnostic] = React.useState("");
   const [expanded, setExpanded] = React.useState("panel1");
   const [openComplete, setOpenComplete] = React.useState(false);
-
+  const [isCheck, setIsCheck] = React.useState(false);
+  const [dateOfReExamination, setDateOfReExamination] = React.useState(dayjs());
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
@@ -135,6 +148,21 @@ function MedicalExaminationRecord(props) {
       setBasicsInfo(handleBasicsInfo(data.patient));
       setSymptom(data.symptom || "");
       setDiagnostic(data.diagnosis || "");
+    }
+  };
+
+  const handleCompleteMedicalRecord = async () => {
+    console.log(medicalRecordId);
+    const response = await completeMedicalRecord(medicalRecordId);
+    if (response.success) {
+      enqueueSnackbar("Hoàn thành khám bệnh thành công", {
+        variant: "success",
+      });
+      navigate("/doctor/doctor-bookings", { replace: true });
+    } else {
+      enqueueSnackbar("Hoàn thành khám bệnh thất bại", {
+        variant: "error",
+      });
     }
   };
 
@@ -245,7 +273,7 @@ function MedicalExaminationRecord(props) {
           <Grid item xs={12} md={3.5}>
             <InfoPatient
               mainInfo={info?.patient}
-              history={{}}
+              history={info?.history}
               info={basicsInfo}
             />
           </Grid>
@@ -294,6 +322,39 @@ function MedicalExaminationRecord(props) {
                 onChange={(e) => setDiagnostic(e.target.value)}
               />
 
+              <Stack
+                direction={"row"}
+                alignItems={"center"}
+                spacing={1}
+                style={{
+                  justifyContent: "flex-start",
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      label="Tái khám"
+                      value={isCheck}
+                      onClick={() => setIsCheck(!isCheck)}
+                    />
+                  }
+                  sx={{
+                    width: "150px",
+                  }}
+                  label="Tái khám"
+                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <CustomDatePicker
+                    readOnly={!isCheck}
+                    format="DD/MM/YYYY"
+                    value={dateOfReExamination}
+                    onChange={(newValue) => setDateOfReExamination(newValue)}
+                    defaultValue={dayjs()}
+                  />
+                </LocalizationProvider>
+              </Stack>
+
               <div>
                 <Accordion
                   expanded={expanded === "panel1"}
@@ -320,7 +381,7 @@ function MedicalExaminationRecord(props) {
                     <Typography>Toa thuốc</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Prescription />
+                    <Prescription patientInfo={info} diagnostic={diagnostic} />
                   </AccordionDetails>
                 </Accordion>
               </div>
@@ -372,7 +433,7 @@ function MedicalExaminationRecord(props) {
         onClose={() => setOpenComplete(false)}
         title={"Xác nhận hoàn thành khám bệnh"}
         content={"Bạn có chắc chắn muốn hoàn thành khám bệnh này?"}
-        onOk={() => console.log("ok")}
+        onOk={() => handleCompleteMedicalRecord()}
         onCancel={() => setOpenComplete(false)}
       />
     </>

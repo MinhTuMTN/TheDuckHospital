@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { DoctorContext } from "../../auth/DoctorProvider";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -18,6 +19,7 @@ function TopNavBarDoctor(props) {
   const { onDrawerClick } = props;
   const location = useLocation();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const { roomName, departmentName } = React.useContext(DoctorContext);
 
   return (
     <>
@@ -33,7 +35,8 @@ function TopNavBarDoctor(props) {
           },
           top: 0,
           width: {
-            lg: `calc(100% - ${SIDE_NAV_WIDTH}px)`,
+            lg: `calc(100vw - ${SIDE_NAV_WIDTH}px)`,
+            sm: "100vw",
           },
           zIndex: (theme) => theme.zIndex.appBar,
         }}
@@ -79,7 +82,7 @@ function TopNavBarDoctor(props) {
               {location?.state?.label}
             </Typography>
 
-            {/* {roomName === "none" ? (
+            {!roomName || !departmentName ? (
               <Typography
                 variant={"body1"}
                 style={{
@@ -87,7 +90,7 @@ function TopNavBarDoctor(props) {
                   fontWeight: "500",
                 }}
               >
-                {topNavBarLabel}
+                {"Khám chữa bệnh"}
               </Typography>
             ) : (
               <Typography
@@ -97,12 +100,9 @@ function TopNavBarDoctor(props) {
                   fontWeight: "500",
                 }}
               >
-                Phòng {roomName} - Chuyên khoa {roomName}
-                <span style={{ color: "#17abfb", textTransform: "capitalize" }}>
-                  {departmentName?.toLowerCase()?.replace("khoa", "").trim()}
-                </span>
+                Phòng {roomName} - {departmentName}
               </Typography>
-            )} */}
+            )}
           </Stack>
         </Stack>
       </Box>

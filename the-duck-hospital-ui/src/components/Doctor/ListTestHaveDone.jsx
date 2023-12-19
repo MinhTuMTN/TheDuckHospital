@@ -3,7 +3,6 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import {
-  Box,
   IconButton,
   Stack,
   Table,
@@ -14,13 +13,7 @@ import {
   TableRow,
   tableCellClasses,
 } from "@mui/material";
-import { enqueueSnackbar } from "notistack";
 import React from "react";
-import { useParams } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
-import { useAuth } from "../../auth/AuthProvider";
-import { deleteMedicalTest } from "../../services/doctor/MedicalTestServices";
-import Invoice from "./Invoice";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -34,12 +27,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function Row(props) {
-  const { row, index, handleDeleteTest } = props;
-  const { fullName } = useAuth();
-  const componentRef = React.useRef();
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
+  const { row, index } = props;
   return (
     <>
       <TableRow key={row.medicalTestId}>
@@ -82,7 +70,7 @@ function Row(props) {
             </IconButton>
 
             <IconButton
-              hidden
+              disabled
               size="small"
               sx={{
                 width: "34px",
@@ -97,7 +85,6 @@ function Row(props) {
                   color: "#4caf50",
                 },
               }}
-              onClick={handlePrint}
             >
               <PrintOutlinedIcon
                 sx={{
@@ -106,7 +93,7 @@ function Row(props) {
               />
             </IconButton>
             <IconButton
-              hidden
+              disabled
               size="small"
               sx={{
                 width: "34px",
@@ -121,7 +108,6 @@ function Row(props) {
                   color: "#f0735a",
                 },
               }}
-              onClick={() => handleDeleteTest(row.medicalTestId)}
             >
               <DeleteOutlineOutlinedIcon
                 sx={{
@@ -131,33 +117,13 @@ function Row(props) {
             </IconButton>
           </Stack>
         </TableCell>
-        <TableCell align="center" width={"0%"}>
-          <Box sx={{ display: "none" }}>
-            <Invoice
-              ref={componentRef}
-              patientInfo={props.patientInfo}
-              doctorName={fullName}
-              medicalTest={row}
-            />
-          </Box>
-        </TableCell>
       </TableRow>
     </>
   );
 }
 
 function ListTestHaveDone(props) {
-  const { medicalRecordId } = useParams();
-  const [rows, setRows] = React.useState([]);
-
-  const handleDeleteTest = async (medicalTestId) => {
-    const response = await deleteMedicalTest(medicalRecordId, medicalTestId);
-    if (response.success) {
-      setRows(response.data.data);
-    } else {
-      enqueueSnackbar("Xóa xét nghiệm thất bại", { variant: "error" });
-    }
-  };
+  const { medicalTests } = props;
 
   return (
     <TableContainer
@@ -191,12 +157,11 @@ function ListTestHaveDone(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
+          {medicalTests?.map((row, index) => (
             <Row
               key={row.medicalTestId}
               row={row}
               index={index}
-              handleDeleteTest={handleDeleteTest}
               patientInfo={props.patientInfo}
             />
           ))}

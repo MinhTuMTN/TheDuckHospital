@@ -23,6 +23,7 @@ export const getMedicineUnit = (unit) => {
     BAG: "Túi",
     PACKAGE: "Gói",
     OTHER: "Khác",
+    CAPSULE: "Viên",
   };
 
   return data[unit];

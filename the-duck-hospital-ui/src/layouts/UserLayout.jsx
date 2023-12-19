@@ -86,9 +86,9 @@ const sidebarItems = [
     section: "Notifications",
   },
   {
-    display: "Lịch sử thanh toán",
+    display: "Lịch sử khám bệnh",
     icon: <HistoryOutlinedIcon />,
-    to: "/user/payment-history",
+    to: "/user/history-record",
     section: "PaymentHistory",
   },
 ];

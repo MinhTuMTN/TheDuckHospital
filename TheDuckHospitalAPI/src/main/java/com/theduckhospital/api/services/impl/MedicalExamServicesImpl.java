@@ -13,6 +13,7 @@ import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.admin.PrescriptionItemResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
+import com.theduckhospital.api.dto.response.doctor.HistoryMedicalRecord;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
@@ -169,7 +170,19 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 medicalExaminationId
         );
 
-        return new DoctorMedicalRecordResponse(medicalExaminationRecord);
+        Department department = medicalExaminationRecord
+                .getDoctorSchedule()
+                .getMedicalService()
+                .getDepartment();
+
+        List<MedicalExaminationRecord> history = medicalExaminationRepository
+                .findByPatientAndDoctorSchedule_MedicalService_DepartmentAndDeletedIsFalseAndDoctorSchedule_DateBefore(
+                        medicalExaminationRecord.getPatient(),
+                        department,
+                        medicalExaminationRecord.getDoctorSchedule().getDate()
+                );
+
+        return new DoctorMedicalRecordResponse(medicalExaminationRecord, history);
     }
 
     @Override
@@ -274,7 +287,22 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         medicalExaminationRecord.setDiagnosis(request.getDiagnosis());
         medicalExaminationRepository.save(medicalExaminationRecord);
 
-        return new DoctorMedicalRecordResponse(medicalExaminationRecord);
+        Department department = medicalExaminationRecord
+                .getDoctorSchedule()
+                .getMedicalService()
+                .getDepartment();
+
+        List<MedicalExaminationRecord> history = medicalExaminationRepository
+                .findByPatientAndDoctorSchedule_MedicalService_DepartmentAndDeletedIsFalseAndDoctorSchedule_DateBefore(
+                        medicalExaminationRecord.getPatient(),
+                        department,
+                        medicalExaminationRecord.getDoctorSchedule().getDate()
+                );
+
+        return new DoctorMedicalRecordResponse(
+                medicalExaminationRecord,
+                history
+        );
     }
 
     @Override
@@ -386,6 +414,37 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         return prescriptionItems.stream().filter(
                 prescriptionItem1 -> !prescriptionItem1.isDeleted()
         ).toList();
+    }
+
+    @Override
+    public HistoryMedicalRecord doctorGetHistoryMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId,
+            UUID historyId) {
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        MedicalExaminationRecord historyRecord = medicalExaminationRepository
+                .findById(historyId).orElseThrow(
+                        () -> new NotFoundException("History not found")
+                );
+
+        if (historyRecord.isDeleted() || !historyRecord.getPatient().equals(medicalExaminationRecord.getPatient()))
+            throw new BadRequestException("History is deleted or not belong to this patient");
+
+
+        return new HistoryMedicalRecord(historyRecord);
+    }
+
+    @Override
+    public MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId) {
+        return updateStateMedicalExamRecord(
+                authorization,
+                medicalExaminationId,
+                MedicalExamState.DONE
+        );
     }
 
     private PrescriptionItem createPrescriptionItem(

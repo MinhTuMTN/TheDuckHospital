@@ -54,6 +54,7 @@ import Analytics from "../pages/Admin/Analytics";
 import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
 import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 import History from "../pages/Doctor/History";
+import HistoryPage from "../pages/customer/HistoryPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -115,6 +116,10 @@ function Router(props) {
           element: <PaymentFailedPage />,
         },
         {
+          path: "/history-record-detail",
+          element: <HistoryPage />,
+        },
+        {
           path: "*",
           element: <NotFound />,
         },
@@ -141,7 +146,7 @@ function Router(props) {
                   element: <NotificationPage />,
                 },
                 {
-                  path: "payment-history",
+                  path: "history-record",
                   element: <PaymentHistoryPage />,
                 },
               ],

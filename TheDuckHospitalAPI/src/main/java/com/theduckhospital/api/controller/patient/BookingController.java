@@ -1,9 +1,9 @@
 package com.theduckhospital.api.controller.patient;
 
-import com.azure.core.annotation.Get;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IBookingServices;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +25,20 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<?> createBookingAndPayment(
             @RequestBody @Valid BookingRequest bookingRequest,
-            @RequestHeader(name = "Authorization") String token
+            @RequestHeader(name = "Authorization") String token,
+            HttpServletRequest request
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Create booking and payment successfully")
-                        .data(bookingServices.createBookingAndPayment(token, bookingRequest))
+                        .data(bookingServices
+                                .createBookingAndPayment(
+                                        token,
+                                        bookingRequest,
+                                        request.getHeader("origin")
+                                )
+                        )
                         .build()
         );
     }
@@ -39,13 +46,11 @@ public class BookingController {
     @GetMapping("/callback")
     public void callBackVNPay(
             @RequestParam(required=false) Map<String,String> params,
+            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        UUID transactionId = bookingServices.checkBookingCallback(params);
-        if (transactionId != null)
-            response.sendRedirect("http://localhost:3000/payment-success?transactionId=" + transactionId);
-        else
-            response.sendRedirect("http://localhost:3000/payment-failed");
+        String url = bookingServices.checkBookingCallback(params);
+        response.sendRedirect(url);
     }
 
     @GetMapping

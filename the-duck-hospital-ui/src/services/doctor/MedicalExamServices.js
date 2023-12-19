@@ -4,6 +4,10 @@ export const acceptMedicalRecord = (medicalRecordId) => {
   return put(`/doctor/medical-records/${medicalRecordId}/accept`);
 };
 
+export const completeMedicalRecord = (medicalRecordId) => {
+  return put(`/doctor/medical-records/${medicalRecordId}/complete`);
+};
+
 export const getMedicalRecord = (medicalRecordId) => {
   return get(`/doctor/medical-records/${medicalRecordId}`);
 };
@@ -13,4 +17,8 @@ export const updateMedicalRecord = (medicalRecordId, symptom, diagnosis) => {
     symptom,
     diagnosis,
   });
+};
+
+export const getHistoryMedicalRecord = (medicalRecordId, historyId) => {
+  return get(`/doctor/medical-records/${medicalRecordId}/history/${historyId}`);
 };
