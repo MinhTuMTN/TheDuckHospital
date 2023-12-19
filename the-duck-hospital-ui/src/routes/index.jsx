@@ -116,10 +116,6 @@ function Router(props) {
           element: <PaymentFailedPage />,
         },
         {
-          path: "/history-record-detail",
-          element: <HistoryPage />,
-        },
-        {
           path: "*",
           element: <NotFound />,
         },
@@ -154,6 +150,10 @@ function Router(props) {
             {
               path: "/user/medical-bills/:medicalBillId",
               element: <BookingItemPage />,
+            },
+            {
+              path: "/user/history-record/:medicalRecordId",
+              element: <HistoryPage />,
             },
           ],
         },

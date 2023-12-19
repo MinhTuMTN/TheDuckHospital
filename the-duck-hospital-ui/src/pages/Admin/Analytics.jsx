@@ -8,15 +8,14 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect, useState } from "react";
-import TotalPatients from "../../components/Admin/Analytics/TotalPatients";
+import BookingChart from "../../components/Admin/Analytics/BookingChart";
+import PaymentMethodsPieChart from "../../components/Admin/Analytics/PaymentMethodsPieChart";
 import RevenueChart from "../../components/Admin/Analytics/RevenueChart";
 import TopDepartment from "../../components/Admin/Analytics/TopDepartment";
-import dayjs from "dayjs";
-import { enqueueSnackbar } from "notistack";
+import TotalPatients from "../../components/Admin/Analytics/TotalPatients";
 import { getAllStatistics } from "../../services/admin/StatisticsServices";
-import PaymentMethodsPieChart from "../../components/Admin/Analytics/PaymentMethodsPieChart";
-import BookingChart from "../../components/Admin/Analytics/BookingChart";
 
 const paperStyle = {
   marginTop: 4,
@@ -85,7 +84,9 @@ function Analytics(props) {
               <Grid item xs={12} md={4}>
                 <TopDepartment topDepartments={statistics.topDepartments} />
                 <TotalPatients statisticData={statistics} />
-                <PaymentMethodsPieChart pieChartData={statistics.paymentMethodStatistics} />
+                <PaymentMethodsPieChart
+                  pieChartData={statistics.paymentMethodStatistics}
+                />
               </Grid>
             </Grid>
           </Stack>

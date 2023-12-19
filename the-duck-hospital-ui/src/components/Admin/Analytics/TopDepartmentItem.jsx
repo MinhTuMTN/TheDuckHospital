@@ -1,12 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Box,
-  CardMedia,
-  Grid,
-  Stack,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, Grid, Stack, Typography, useMediaQuery } from "@mui/material";
 import React, { useMemo } from "react";
 
 const CustomText = styled(Typography)(({ theme }) => ({
@@ -34,48 +27,50 @@ function TopDepartmentItem(props) {
   return (
     <Grid container spacing={0.5} alignItems={"center"}>
       <Grid item xs={7.5} container>
-          <Stack direction="column" spacing={0.5}>
-            <CustomText
-              variant="body1"
-              style={{
-                fontWeight: "500",
-              }}
-            >
-              {department.departmentName}
-            </CustomText>
-            <CustomText
-              variant="body1"
-              style={{
-                color: "#667085",
-                fontWeight: "400",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                maxWidth: maxWidth,
-              }}
-            >
-              {department.headDoctorName ? department.headDoctorName : "Chưa cập nhật"}
-            </CustomText>
-          </Stack>
+        <Stack direction="column" spacing={0.5}>
+          <CustomText
+            variant="body1"
+            style={{
+              fontWeight: "500",
+            }}
+          >
+            {department.departmentName}
+          </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              color: "#667085",
+              fontWeight: "400",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {department.headDoctorName
+              ? department.headDoctorName
+              : "Chưa cập nhật"}
+          </CustomText>
+        </Stack>
       </Grid>
       <Grid item xs={3}>
         <Stack direction="row" spacing={0.5}>
-        <CustomText
-          variant="body1"
-          style={{
-            fontWeight: "550",
-            color: "#10b981",
-          }}
-        >
-          {department.totalPatients}
-        </CustomText>
-        <CustomText
-          style={{
-            fontWeight: "400",
-            color: "#667085",
-          }}
-        >
-          bệnh nhân
-        </CustomText>
+          <CustomText
+            variant="body1"
+            style={{
+              fontWeight: "550",
+              color: "#10b981",
+            }}
+          >
+            {department.totalPatients}
+          </CustomText>
+          <CustomText
+            style={{
+              fontWeight: "400",
+              color: "#667085",
+            }}
+          >
+            bệnh nhân
+          </CustomText>
         </Stack>
       </Grid>
       <Grid

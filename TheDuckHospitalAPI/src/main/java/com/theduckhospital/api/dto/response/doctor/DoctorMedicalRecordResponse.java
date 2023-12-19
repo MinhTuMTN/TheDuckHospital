@@ -14,6 +14,7 @@ public class DoctorMedicalRecordResponse {
     private String symptom;
     private String diagnosis;
     List<HistoryMedicalRecord> history;
+    private Date dateOfReExamination;
 
     public DoctorMedicalRecordResponse(
             MedicalExaminationRecord medicalExaminationRecord,
@@ -30,5 +31,6 @@ public class DoctorMedicalRecordResponse {
                 .stream()
                 .map(HistoryMedicalRecord::new)
                 .toList();
+        this.dateOfReExamination = medicalExaminationRecord.getReExaminationDate();
     }
 }

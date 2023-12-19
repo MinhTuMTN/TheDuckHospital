@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
   Breadcrumbs,
@@ -7,10 +8,11 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import HistoryDetail from "../../components/Customer/History/HistoryDetail";
-import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { getHistoryMedicalRecordDetails } from "../../services/customer/MedicalRecordServices";
+import { enqueueSnackbar } from "notistack";
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
   fontWeight: "500",
@@ -23,17 +25,6 @@ const CustomButton = styled(Button)(({ theme }) => ({
   fontSize: "14px !important",
   textTransform: "none",
 }));
-const patientInfo = {
-  patient: [
-    {
-      patientCode: "BN001",
-      fullName: "Trần Thị Kim Tuyết",
-      dateOfBirth: "20/10/1999",
-      address: "1 Võ Văn Ngân, Thủ Đức, TP.HCM",
-    },
-    // Add more patient objects as needed
-  ],
-};
 
 function HistoryPage(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -44,6 +35,23 @@ function HistoryPage(props) {
     <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,
     <CustomTextBreakcrumb key={2}>Lịch sử khám bệnh</CustomTextBreakcrumb>,
   ];
+
+  const { medicalRecordId } = useParams();
+  const [medicalRecord, setMedicalRecord] = useState({});
+  useEffect(() => {
+    const handleGetMedicalRecord = async () => {
+      const response = await getHistoryMedicalRecordDetails(medicalRecordId);
+      if (response.success) setMedicalRecord(response.data.data);
+      else {
+        enqueueSnackbar("Lấy thông tin lịch sử khám bệnh thất bại", {
+          variant: "error",
+        });
+        navigate(-1);
+      }
+    };
+    handleGetMedicalRecord();
+  }, [medicalRecordId, navigate]);
+
   return (
     <Box
       sx={{
@@ -83,7 +91,7 @@ function HistoryPage(props) {
               },
             }}
             onClick={() => {
-              navigate("/");
+              navigate(-1);
             }}
           >
             <ArrowBackIcon
@@ -96,33 +104,12 @@ function HistoryPage(props) {
         </Grid>
         <Grid item xs={12}>
           <HistoryDetail
-            diagnostic={"Bình thường"}
-            doctorName={"Nguyễn Trần Thi Uyên"}
-            departmentName={"Khoa nội"}
-            patientInfo={patientInfo}
-            prescriptionItems={[
-              {
-                medicineName: "Thuốc A",
-                quantity: 1,
-                unit: "Viên",
-                usage: "Uống",
-                note: "Sau bữa ăn",
-              },
-              {
-                medicineName: "Thuốc B",
-                quantity: 1,
-                unit: "Viên",
-                usage: "Uống",
-                note: "Sau bữa ăn",
-              },
-              {
-                medicineName: "Thuốc C",
-                quantity: 1,
-                unit: "Viên",
-                usage: "Uống",
-                note: "Sau bữa ăn",
-              },
-            ]}
+            diagnostic={medicalRecord?.diagnosis}
+            doctorName={medicalRecord?.doctorName}
+            departmentName={medicalRecord?.departmentName}
+            patientInfo={medicalRecord?.patientProfile}
+            prescriptionItems={medicalRecord?.prescriptionItems}
+            reExaminationDate={medicalRecord?.reExaminationDate}
           />
         </Grid>
       </Grid>
