@@ -57,7 +57,7 @@ function FindPatientCode(props) {
           variant="outlined"
           id="outlined-basic"
           required
-          placeholder="Nhập số điện thoại"
+          placeholder="Nhập mã bệnh nhân"
           sx={{
             width: "100% !important",
           }}

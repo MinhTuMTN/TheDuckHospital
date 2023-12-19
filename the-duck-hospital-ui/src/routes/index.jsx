@@ -52,6 +52,7 @@ import TransactionDetailPage from "../pages/Admin/TransactionManagament/Transact
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
 import History from "../pages/Doctor/History";
 import HistoryPage from "../pages/customer/HistoryPage";
+import VerifyInformation from "../components/Customer/FindProfile/VerifyInformation";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -81,6 +82,10 @@ function Router(props) {
         {
           path: "/create-profile",
           element: <CreateProfile />,
+        },
+        {
+          path: "/verify-information",
+          element: <VerifyInformation />,
         },
         {
           path: "/edit-profile",
