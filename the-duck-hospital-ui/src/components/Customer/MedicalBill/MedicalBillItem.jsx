@@ -4,6 +4,7 @@ import {
   LocalHospitalOutlined,
   LooksOneOutlined,
 } from "@mui/icons-material";
+import LibraryAddCheckOutlinedIcon from "@mui/icons-material/LibraryAddCheckOutlined";
 import { Box, Card, CardMedia, Grid, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
@@ -72,27 +73,27 @@ function MedicalBillItem(props) {
       <Grid container spacing={1.5}>
         <Property
           icon={LocalHospitalOutlined}
-          propName="Chuyên khoa"
+          propName="Chuyên khoa:"
           value={item.departmentName}
         />
         <Property
           icon={"https://cdn-icons-png.flaticon.com/512/3481/3481061.png"}
-          propName="Bác sĩ"
+          propName="Bác sĩ:"
           value={item.doctorName}
         />
         <Property
           icon={CalendarMonth}
-          propName="Ngày khám"
+          propName="Ngày khám:"
           value={dayjs(item.date).format("DD/MM/YYYY")}
         />
         <Property
           icon={LooksOneOutlined}
-          propName="Số thứ tự"
+          propName="Số thứ tự:"
           value={item.queueNumber}
         />
         <Property
-          icon={LooksOneOutlined}
-          propName="Trạng thái"
+          icon={LibraryAddCheckOutlinedIcon}
+          propName="Trạng thái:"
           value={
             <StyledStatus
               sx={{
