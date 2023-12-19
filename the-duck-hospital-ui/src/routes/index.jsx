@@ -50,6 +50,7 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
 import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
+import History from "../pages/Doctor/History";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -221,6 +222,10 @@ function Router(props) {
             {
               path: "medical-examination-record/:medicalRecordId",
               element: <MedicalExaminationRecord />,
+            },
+            {
+              path: "history/:medicalRecordId",
+              element: <History />,
             },
             {
               path: "doctor-schedules",
