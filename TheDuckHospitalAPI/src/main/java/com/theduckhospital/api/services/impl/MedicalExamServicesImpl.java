@@ -490,7 +490,9 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             if (prescription != null) {
                 prescriptionItems = medicalExaminationRecord.getPrescription().getPrescriptionItems();
                 for (PrescriptionItem prescriptionItem : prescriptionItems) {
-                    prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                    if(!prescriptionItem.isDeleted()) {
+                        prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                    }
                 }
             }
 
