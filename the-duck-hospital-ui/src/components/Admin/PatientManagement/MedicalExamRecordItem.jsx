@@ -23,6 +23,30 @@ const scheduleTypes = [
   },
 ];
 
+
+const medicineUnit = [
+  {
+    value: "TUBE",
+    label: "Tuýp",
+  },
+  {
+    value: "BOTTLE",
+    label: "Chai",
+  },
+  {
+    value: "BOX",
+    label: "Hộp",
+  },
+  {
+    value: "BAG",
+    label: "Túi",
+  },
+  {
+    value: "CAPSULE",
+    label: "Viên",
+  },
+];
+
 const MuiAccordion = styled(Accordion)(({ theme }) => ({
   borderRadius: theme.spacing(1.2),
   marginBottom: theme.spacing(1),
@@ -119,7 +143,7 @@ function MedicalExamRecordItem(props) {
               fontSize: "18px"
             }}
           >
-            <FormatCurrency amount={item.price} />
+            {item.state === "DONE" ? <FormatCurrency amount={item.price} /> : "Chưa Hoàn Thành"}
           </Typography>
         </Stack>
       </MuiAccordionSummary>
@@ -260,7 +284,7 @@ function MedicalExamRecordItem(props) {
                     width: "70%"
                   }}
                 >
-                  {item.symptom}
+                  {item.symptom ? item.symptom : "Đang cập nhật"}
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={2}>
@@ -278,7 +302,7 @@ function MedicalExamRecordItem(props) {
                   style={{ fontSize: "16px", width: "70%" }}
                   color="peach.main"
                 >
-                  {item.diagnosis}
+                  {item.diagnosis ? item.diagnosis : "Đang cập nhật"}
                 </Typography>
               </Stack>
             </BorderTextBox>
@@ -332,50 +356,54 @@ function MedicalExamRecordItem(props) {
                   Tổng tiền
                 </Typography>
               </Stack>
-              <Stack
-                direction="row"
-                spacing={2}
-                sx={{
-                  mt: 1
-                }}
-              >
-                <Typography
-                  style={{
-                    fontSize: "16px",
-                    width: "50%"
+              {item.prescription?.map((item, index) => (
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    mt: 1
                   }}
+                  key={index}
                 >
-                  Paracetamol
-                </Typography>
-                <Typography
-                  style={{
-                    fontSize: "16px",
-                    width: "10%",
-                    textAlign: "center"
-                  }}
-                >
-                  x10
-                </Typography>
-                <Typography
-                  style={{
-                    fontSize: "16px",
-                    width: "20%",
-                    textAlign: "right"
-                  }}
-                >
-                  650 VNĐ
-                </Typography>
-                <Typography
-                  style={{
-                    fontSize: "16px",
-                    width: "20%",
-                    textAlign: "right"
-                  }}
-                >
-                  6.500 VNĐ
-                </Typography>
-              </Stack>
-              <Stack
+                  <Typography
+                    style={{
+                      fontSize: "16px",
+                      width: "50%"
+                    }}
+                  >
+                    {item.medicine.medicineName}
+                  </Typography>
+                  <Typography
+                    style={{
+                      fontSize: "16px",
+                      width: "10%",
+                      textAlign: "center"
+                    }}
+                  >
+                    {`x${item.quantity}` +
+                      ` ${medicineUnit.find(unit => unit.value === item.medicine.unit) ?
+                        medicineUnit.find(unit => unit.value === item.medicine.unit).label : ""}`}
+                  </Typography>
+                  <Typography
+                    style={{
+                      fontSize: "16px",
+                      width: "20%",
+                      textAlign: "right"
+                    }}
+                  >
+                    <FormatCurrency amount={item.medicine.price}/>
+                  </Typography>
+                  <Typography
+                    style={{
+                      fontSize: "16px",
+                      width: "20%",
+                      textAlign: "right"
+                    }}
+                  >
+                    <FormatCurrency amount={item.medicine.price * item.quantity}/>
+                  </Typography>
+                </Stack>))}
+              {/* <Stack
                 direction="row"
                 spacing={2}
                 sx={{
@@ -417,7 +445,7 @@ function MedicalExamRecordItem(props) {
                 >
                   46.000 VNĐ
                 </Typography>
-              </Stack>
+              </Stack> */}
               <Stack
                 direction="row"
                 spacing={2}
@@ -431,7 +459,8 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: 800,
                     fontSize: "17px",
-                    width: "65%"
+                    width: "65%",
+                    marginTop: 3,
                   }}
                 >
                   Tổng tiền đơn thuốc
@@ -442,10 +471,11 @@ function MedicalExamRecordItem(props) {
                     fontWeight: 800,
                     fontSize: "17px",
                     width: "35%",
-                    textAlign: "right"
+                    textAlign: "right",
+                    marginTop: 3,
                   }}
                 >
-                  52.600 VNĐ
+                  <FormatCurrency amount={item.price}/>
                 </Typography>
               </Stack>
             </BorderTextBox>}

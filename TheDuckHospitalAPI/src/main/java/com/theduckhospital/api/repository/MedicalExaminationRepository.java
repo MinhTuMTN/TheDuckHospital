@@ -1,10 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.MedicalExamState;
-import com.theduckhospital.api.entity.Department;
-import com.theduckhospital.api.entity.DoctorSchedule;
-import com.theduckhospital.api.entity.MedicalExaminationRecord;
-import com.theduckhospital.api.entity.Patient;
+import com.theduckhospital.api.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,5 +32,11 @@ public interface MedicalExaminationRepository
 
     List<MedicalExaminationRecord> findByPatientAndDoctorSchedule_MedicalService_DepartmentAndDeletedIsFalseAndDoctorSchedule_DateBefore(
             Patient patient, Department doctorSchedule_medicalService_department, Date doctorSchedule_date
+    );
+
+    Page<MedicalExaminationRecord> findByPatientProfileAndDeletedIsFalseAndStateOrderByDoctorSchedule_CreatedDateDesc(
+            PatientProfile patientProfile,
+            MedicalExamState state,
+            Pageable pageable
     );
 }

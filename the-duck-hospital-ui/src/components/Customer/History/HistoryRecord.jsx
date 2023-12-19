@@ -46,20 +46,16 @@ function HistoryRecord(props) {
           }}
           color={"template.normal1"}
         >
-          {historyRecord.fullName}
+          {historyRecord.profileName}
         </Typography>
         <IconButton>
           {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
         </IconButton>
       </Box>
       <Collapse in={open} timeout="auto" unmountOnExit>
-        {Array.isArray(historyRecord.history) ? (
-          historyRecord.history.map((item) => (
-            <HistoryRecordItem key={`${item.id}`} item={item} />
-          ))
-        ) : (
-          <HistoryRecordItem key={`${historyRecord.id}`} item={historyRecord} />
-        )}
+        {historyRecord?.items?.map((item) => (
+          <HistoryRecordItem key={`${item.medicalRecordId}`} item={item} />
+        ))}
       </Collapse>
     </Box>
   );

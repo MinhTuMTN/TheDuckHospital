@@ -36,6 +36,20 @@ public class MedicalExamController {
         );
     }
 
+    @PutMapping("/{medicalExaminationId}/complete")
+    public ResponseEntity<?> completeMedicalExamination(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalExamServices.completeMedicalExamination(authorization, medicalExaminationId))
+                        .build()
+        );
+    }
+
     @GetMapping("/{medicalExaminationId}")
     public ResponseEntity<?> getMedicalExamination(
             @RequestHeader("Authorization") String authorization,

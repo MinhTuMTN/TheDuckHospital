@@ -26,11 +26,14 @@ import { DoctorContext } from "../../../auth/DoctorProvider";
 
 export function DoctorScheduleItem(props) {
   const { schedule } = props;
-  const { updateDoctorScheduleId } = useContext(DoctorContext);
+  const { updateDoctorScheduleId, updateRoomName, updateDepartmentName } =
+    useContext(DoctorContext);
   const navigate = useNavigate();
   const handleClick = () => {
     updateDoctorScheduleId(schedule.doctorScheduleId);
-    navigate("/doctor/doctor-schedules");
+    updateRoomName(schedule.roomName);
+    updateDepartmentName(schedule.serviceName);
+    navigate("/doctor/doctor-bookings");
   };
   return (
     <Box

@@ -9,6 +9,8 @@ import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
+import com.theduckhospital.api.dto.response.PatientHistoryMedicalRecord;
+import com.theduckhospital.api.dto.response.PatientHistoryRecordDetails;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.admin.PrescriptionItemResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
@@ -24,6 +26,8 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -42,6 +46,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
     private final MedicineRepository medicineRepository;
+    private final IAccountServices accountServices;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
@@ -50,7 +55,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             IPatientServices patientServices,
             PatientProfileRepository patientProfileRepository,
             IDoctorServices doctorServices,
-            PrescriptionRepository prescriptionRepository, PrescriptionItemRepository prescriptionItemRepository, MedicineRepository medicineRepository) {
+            PrescriptionRepository prescriptionRepository, PrescriptionItemRepository prescriptionItemRepository, MedicineRepository medicineRepository, IAccountServices accountServices) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
         this.medicalServiceServices = medicalServiceServices;
@@ -62,6 +67,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.prescriptionRepository = prescriptionRepository;
         this.prescriptionItemRepository = prescriptionItemRepository;
         this.medicineRepository = medicineRepository;
+        this.accountServices = accountServices;
     }
 
     @Override
@@ -285,6 +291,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
 
         medicalExaminationRecord.setSymptom(request.getSymptom());
         medicalExaminationRecord.setDiagnosis(request.getDiagnosis());
+        medicalExaminationRecord.setReExaminationDate(request.getDateOfReExamination());
         medicalExaminationRepository.save(medicalExaminationRecord);
 
         Department department = medicalExaminationRecord
@@ -438,6 +445,66 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         return new HistoryMedicalRecord(historyRecord);
     }
 
+    @Override
+    public MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId) {
+        return updateStateMedicalExamRecord(
+                authorization,
+                medicalExaminationId,
+                MedicalExamState.DONE
+        );
+    }
+
+    @Override
+    public List<PatientHistoryMedicalRecord> patientGetMedicalRecords(String authorization) {
+        Account account = accountServices.findAccountByToken(authorization);
+
+        List<PatientProfile> patientProfiles = account
+                .getPatientProfile()
+                .stream()
+                .filter(patientProfile -> !patientProfile.isDeleted())
+                .toList();
+
+        List<PatientHistoryMedicalRecord> patientHistoryMedicalRecords = new ArrayList<>();
+        for (PatientProfile patientProfile : patientProfiles) {
+            Pageable pageable = PageRequest.of(0, 5);
+            List<MedicalExaminationRecord> medicalExaminationRecords = medicalExaminationRepository
+                    .findByPatientProfileAndDeletedIsFalseAndStateOrderByDoctorSchedule_CreatedDateDesc(
+                            patientProfile,
+                            MedicalExamState.DONE,
+                            pageable
+                    ).toList();
+
+            patientHistoryMedicalRecords.add(
+                    new PatientHistoryMedicalRecord(
+                            patientProfile.getFullName(),
+                            medicalExaminationRecords
+                    )
+            );
+        }
+
+        return patientHistoryMedicalRecords;
+    }
+
+    @Override
+    public PatientHistoryRecordDetails patientGetMedicalRecordDetails(
+            String authorization,
+            UUID medicalRecordId
+    ) {
+        Account account = accountServices.findAccountByToken(authorization);
+
+        MedicalExaminationRecord medicalExaminationRecord = medicalExaminationRepository
+                .findById(medicalRecordId)
+                .orElseThrow(() -> new NotFoundException("Medical Examination Record not found"));
+
+        if (medicalExaminationRecord.isDeleted() ||
+                !medicalExaminationRecord
+                        .getPatientProfile()
+                        .getAccount().equals(account))
+            throw new BadRequestException("Medical Examination Record is deleted or not belong to this patient");
+
+        return new PatientHistoryRecordDetails(medicalExaminationRecord);
+    }
+
     private PrescriptionItem createPrescriptionItem(
             Prescription prescription,
             AddMedicine request
@@ -540,7 +607,9 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             if (prescription != null) {
                 prescriptionItems = medicalExaminationRecord.getPrescription().getPrescriptionItems();
                 for (PrescriptionItem prescriptionItem : prescriptionItems) {
-                    prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                    if(!prescriptionItem.isDeleted()) {
+                        prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                    }
                 }
             }
 

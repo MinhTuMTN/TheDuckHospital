@@ -29,6 +29,7 @@ import Prescription from "../../components/Doctor/Prescription";
 import DialogConfirm from "../../components/General/DialogConfirm";
 import FormatDateTime from "../../components/General/FormatDateTime";
 import {
+  completeMedicalRecord,
   getMedicalRecord,
   updateMedicalRecord,
 } from "../../services/doctor/MedicalExamServices";
@@ -127,6 +128,8 @@ function MedicalExaminationRecord(props) {
         const data = response.data.data;
         setInfo(data);
         setBasicsInfo(handleBasicsInfo(data.patient));
+        setDateOfReExamination(dayjs(data.dateOfReExamination));
+        setIsCheck(data.dateOfReExamination ? true : false);
         setSymptom(data.symptom || "");
         setDiagnostic(data.diagnosis || "");
       }
@@ -138,7 +141,8 @@ function MedicalExaminationRecord(props) {
     const response = await updateMedicalRecord(
       medicalRecordId,
       symptom,
-      diagnostic
+      diagnostic,
+      isCheck ? dateOfReExamination : null
     );
     if (response.success) {
       enqueueSnackbar("Cập nhật thành công", { variant: "success" });
@@ -147,6 +151,21 @@ function MedicalExaminationRecord(props) {
       setBasicsInfo(handleBasicsInfo(data.patient));
       setSymptom(data.symptom || "");
       setDiagnostic(data.diagnosis || "");
+    }
+  };
+
+  const handleCompleteMedicalRecord = async () => {
+    console.log(medicalRecordId);
+    const response = await completeMedicalRecord(medicalRecordId);
+    if (response.success) {
+      enqueueSnackbar("Hoàn thành khám bệnh thành công", {
+        variant: "success",
+      });
+      navigate("/doctor/doctor-bookings", { replace: true });
+    } else {
+      enqueueSnackbar("Hoàn thành khám bệnh thất bại", {
+        variant: "error",
+      });
     }
   };
 
@@ -319,10 +338,10 @@ function MedicalExaminationRecord(props) {
                     <Checkbox
                       size="small"
                       label="Tái khám"
-                      value={isCheck}
                       onClick={() => setIsCheck(!isCheck)}
                     />
                   }
+                  checked={isCheck}
                   sx={{
                     width: "150px",
                   }}
@@ -332,6 +351,7 @@ function MedicalExaminationRecord(props) {
                   <CustomDatePicker
                     readOnly={!isCheck}
                     format="DD/MM/YYYY"
+                    shouldDisableDate={(day) => dayjs(day).isBefore(dayjs())}
                     value={dateOfReExamination}
                     onChange={(newValue) => setDateOfReExamination(newValue)}
                     defaultValue={dayjs()}
@@ -417,7 +437,7 @@ function MedicalExaminationRecord(props) {
         onClose={() => setOpenComplete(false)}
         title={"Xác nhận hoàn thành khám bệnh"}
         content={"Bạn có chắc chắn muốn hoàn thành khám bệnh này?"}
-        onOk={() => console.log("ok")}
+        onOk={() => handleCompleteMedicalRecord()}
         onCancel={() => setOpenComplete(false)}
       />
     </>

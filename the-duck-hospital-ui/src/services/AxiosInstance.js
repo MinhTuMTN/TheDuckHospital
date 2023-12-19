@@ -3,8 +3,8 @@ import axios from "axios";
 var qs = require("qs");
 const axiosInstance = axios.create({
   // baseURL: "https://the-duck-mobile.azurewebsites.net/api",
-  baseURL: "https://tb7drp6q-8080.asse.devtunnels.ms/api",
-  // baseURL: "http://localhost:8080/api",
+  // baseURL: "https://tb7drp6q-8080.asse.devtunnels.ms/api",
+  baseURL: "http://localhost:8080/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

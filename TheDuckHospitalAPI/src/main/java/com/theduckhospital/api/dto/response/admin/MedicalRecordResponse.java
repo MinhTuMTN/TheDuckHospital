@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.response.admin;
 
+import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.*;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class MedicalRecordResponse {
     private Prescription prescription3;
     private String diagnosis;
     private String symptom;
+    private MedicalExamState state;
 
     public MedicalRecordResponse(MedicalExaminationRecord record, List<PrescriptionItemResponse> prescription) {
         this.roomName = record.getDoctorSchedule().getRoom().getRoomName();
@@ -31,14 +33,12 @@ public class MedicalRecordResponse {
         this.prescription = prescription;
         if(record.getPrescription() != null) {
             this.price = record.getPrescription().getTotalCost();
-            this.prescription2 = record.getPrescription().getPrescriptionItems();
         } else {
             this.price = 0;
-            this.prescription2 = null;
         }
+        this.state = record.getState();
         this.reExamDate = record.getReExaminationDate();
         this.diagnosis = record.getDiagnosis();
         this.symptom = record.getSymptom();
-        this.prescription3 = record.getPrescription();
     }
 }

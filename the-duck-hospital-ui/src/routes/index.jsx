@@ -50,6 +50,9 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
 import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
+import Analytics from "../pages/Admin/Analytics";
+import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
+import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 import History from "../pages/Doctor/History";
 import HistoryPage from "../pages/customer/HistoryPage";
 import VerifyInformation from "../components/Customer/FindProfile/VerifyInformation";
@@ -123,10 +126,6 @@ function Router(props) {
           element: <PaymentFailedPage />,
         },
         {
-          path: "/history-record-detail",
-          element: <HistoryPage />,
-        },
-        {
           path: "*",
           element: <NotFound />,
         },
@@ -161,6 +160,10 @@ function Router(props) {
             {
               path: "/user/medical-bills/:medicalBillId",
               element: <BookingItemPage />,
+            },
+            {
+              path: "/user/history-record/:medicalRecordId",
+              element: <HistoryPage />,
             },
           ],
         },
@@ -239,6 +242,10 @@ function Router(props) {
               element: <MedicalExaminationRecord />,
             },
             {
+              path: "medical-test-record/:medicalTestId",
+              element: <MedicalTestRecord />,
+            },
+            {
               path: "history/:medicalRecordId",
               element: <History />,
             },
@@ -246,7 +253,10 @@ function Router(props) {
               path: "doctor-schedules",
               element: <SchedulePage />,
             },
-
+            {
+              path: "doctor-test",
+              element: <MedicalTestPage />,
+            },
             {
               path: "head-doctor",
               element: <ProtectedLayout forRole={["HeadDoctor"]} />,
@@ -271,12 +281,12 @@ function Router(props) {
       children: [
         {
           path: "analytics",
-          element: null,
+          element: <Analytics />,
         },
-        // {
-        //   element: <Analytics />,
-        //   index: true,
-        // },
+        {
+          element: <Analytics />,
+          index: true,
+        },
         {
           path: "account-management",
           element: <AccountListPage />,

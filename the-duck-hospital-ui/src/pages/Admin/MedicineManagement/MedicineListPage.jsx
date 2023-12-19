@@ -2,7 +2,11 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  FormHelperText,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -16,6 +20,29 @@ import MuiTextFeild from "../../../components/General/MuiTextFeild";
 import { createMedicine, getPaginationMedicines, updateMedicine } from "../../../services/admin/MedicineServices";
 import { enqueueSnackbar } from "notistack";
 
+const medicineUnit = [
+  {
+    value: "TUBE",
+    label: "Tuýp",
+  },
+  {
+    value: "BOTTLE",
+    label: "Chai",
+  },
+  {
+    value: "BOX",
+    label: "Hộp",
+  },
+  {
+    value: "BAG",
+    label: "Túi",
+  },
+  {
+    value: "CAPSULE",
+    label: "Viên",
+  },
+];
+
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "white",
   borderRadius: "6px",
@@ -25,6 +52,11 @@ const CustomButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     background: "#00a0ff",
   },
+}));
+
+const CustomTypography = styled(Typography)(({ theme }) => ({
+  fontSize: "14px !important",
+  marginBottom: "2px !important",
 }));
 
 function MedicineListPage(props) {
@@ -42,6 +74,7 @@ function MedicineListPage(props) {
     medicineName: "",
     price: 1000,
     quantity: 1,
+    unit: "CAPSULE",
   });
 
   const handlePageChange = (event, newPage) => {
@@ -81,7 +114,8 @@ function MedicineListPage(props) {
 
     if (medicine.medicineName?.trim() === "" ||
       medicine.price === null ||
-      medicine.quantity === null
+      medicine.quantity === null ||
+      medicine.unit === ""
     ) {
       enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
       return;
@@ -102,22 +136,24 @@ function MedicineListPage(props) {
         medicineName: medicine.medicineName.trim(),
         price: medicine.price,
         quantity: medicine.quantity,
+        unit: medicine.unit,
       });
       if (response.success) {
         enqueueSnackbar("Thêm thuốc thành công", { variant: "success" });
         setOpenDialogForm(false);
-        handleGetMedicines();
+        setEnterPressed(true);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     } else {
       const response = await updateMedicine(medicine.medicineId, {
         medicineName: medicine.medicineName.trim(),
         price: medicine.price,
         quantity: medicine.quantity,
+        unit: medicine.unit,
       });
       if (response.success) {
         enqueueSnackbar("Chỉnh sửa thuốc thành công", { variant: "success" });
         setOpenDialogForm(false);
-        handleGetMedicines();
+        setEnterPressed(true);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     }
     setAddButtonClicked(false);
@@ -154,6 +190,7 @@ function MedicineListPage(props) {
                     medicineName: "",
                     price: 1000,
                     quantity: 1,
+                    unit: "CAPSULE",
                   });
                   setOpenDialogForm(true);
                 }}
@@ -202,6 +239,7 @@ function MedicineListPage(props) {
             medicineName: "",
             price: 1000,
             quantity: 1,
+            unit: "CAPSULE",
           });
         }}
         onOk={handleCreateUpdateMedicine}
@@ -270,6 +308,46 @@ function MedicineListPage(props) {
               "Số lượng thuốc phải lớn hơn 0"
             }
           />
+          <Box>
+            <CustomTypography
+              variant="body1"
+              style={{
+                color: medicine.unit === "" && addButtonClicked ? "red" : "",
+              }}
+            >
+              Đơn vị
+            </CustomTypography>
+            <FormControl fullWidth error={medicine.unit === "" && addButtonClicked}>
+              <Select
+                value={medicine.unit}
+                onChange={(e) =>
+                  setMedicine((prev) => {
+                    return {
+                      ...prev,
+                      unit: e.target.value,
+                    };
+                  })
+                }
+                displayEmpty
+                required
+                sx={{
+                  fontSize: "16px !important",
+                }}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                {medicineUnit?.map((item, index) => (
+                  <MenuItem key={index} value={item.value}>
+                    <Typography style={{ fontSize: "16px" }}>
+                      {item.label}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+              {medicine.unit === "" && addButtonClicked && (
+                <FormHelperText>Đơn vị không được để trống</FormHelperText>
+              )}
+            </FormControl>
+          </Box>
         </Stack >
       </DialogForm >
     </>

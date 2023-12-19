@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Booking;
@@ -49,13 +50,37 @@ public class TransactionServicesImpl implements ITransactionServices {
         return transaction;
     }
 
+//    @Override
+//    public FilteredTransactionsResponse getTransactionsPagination(int page, int limit) {
+//        Pageable pageable = PageRequest.of(page, limit);
+//        Page<Transaction> transactionPage = transactionRepository.findPaginationByOrderByCreatedAtDesc(pageable);
+//
+//        List<TransactionResponse> filteredTransactions = new ArrayList<>();
+//
+//        for (Transaction transaction : transactionPage.getContent()) {
+//            List<Booking> bookings = transaction.getBookings();
+//            List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
+//
+//            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses));
+//        }
+//
+//        List<Transaction> transaction = transactionRepository.findAll();
+//
+//        return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
+//    }
+
     @Override
-    public FilteredTransactionsResponse getTransactionsPagination(int page, int limit) {
+    public FilteredTransactionsResponse getFilteredTransactionsPagination(
+            int page,
+            int limit,
+            List<String> transactionPayment,
+            List<TransactionStatus> transactionStatus
+    ) {
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Transaction> transactionPage = transactionRepository.findPaginationByOrderByCreatedAtDesc(pageable);
+        Page<Transaction> transactionPage = transactionRepository
+                .findByPaymentMethodInAndStatusInOrderByCreatedAtDesc(transactionPayment, transactionStatus, pageable);
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
-
         for (Transaction transaction : transactionPage.getContent()) {
             List<Booking> bookings = transaction.getBookings();
             List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
@@ -63,7 +88,8 @@ public class TransactionServicesImpl implements ITransactionServices {
             filteredTransactions.add(new TransactionResponse(transaction, bookingResponses));
         }
 
-        List<Transaction> transaction = transactionRepository.findAll();
+        List<Transaction> transaction = transactionRepository
+                .findByPaymentMethodInAndStatusIn(transactionPayment, transactionStatus);
 
         return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
     }

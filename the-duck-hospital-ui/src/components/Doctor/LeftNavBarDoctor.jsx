@@ -23,6 +23,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
 import TodayIcon from "@mui/icons-material/Today";
 import GroupsIcon from "@mui/icons-material/Groups";
+import BiotechIcon from '@mui/icons-material/Biotech';
 
 const sidebarItems = [
   {
@@ -30,7 +31,11 @@ const sidebarItems = [
     icon: <GroupsIcon />,
     to: "/doctor/doctor-bookings",
   },
-
+  {
+    display: "Xét nghiệm",
+    icon: <BiotechIcon />,
+    to: "/doctor/doctor-test",
+  },
   {
     display: "Lịch trực",
     icon: <TodayIcon />,

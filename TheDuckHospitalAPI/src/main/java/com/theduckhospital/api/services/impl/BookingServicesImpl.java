@@ -57,7 +57,7 @@ public class BookingServicesImpl implements IBookingServices {
 
     @Override
     @Transactional
-    public String createBookingAndPayment(String token, BookingRequest request) {
+    public String createBookingAndPayment(String token, BookingRequest request, String origin) {
         try {
             if (request.getDoctorScheduleIds().size() > 3)
                 throw new BadRequestException("Maximum 3 doctor schedules per booking");
@@ -91,6 +91,7 @@ public class BookingServicesImpl implements IBookingServices {
 
             Transaction transaction = new Transaction();
             transaction.setAmount(totalAmount + 10000);
+            transaction.setOrigin(origin);
             transactionRepository.save(transaction);
 
             for (DoctorSchedule doctorSchedule : doctorSchedules) {
@@ -114,7 +115,7 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public UUID checkBookingCallback(Map<String, String> vnpParams) {
+    public String checkBookingCallback(Map<String, String> vnpParams) {
         Map<String, String> results = new HashMap<>();
         List<String> keys = vnpParams.keySet().stream().toList();
         for (String key : keys) {
@@ -128,15 +129,32 @@ public class BookingServicesImpl implements IBookingServices {
         results.remove("vnp_SecureHash");
         String secureHash = VNPayConfig.hashAllFields(results);
         String vnp_SecureHash = vnpParams.get("vnp_SecureHash");
-        if (!secureHash.equals(vnp_SecureHash) || !vnpParams.get("vnp_ResponseCode").equals("00"))
-            return null;
 
         UUID transactionId = UUID.fromString(vnpParams.get("vnp_OrderInfo").split(":")[1]);
+
+        if (!secureHash.equals(vnp_SecureHash)
+                || !vnpParams.get("vnp_ResponseCode").equals("00")
+        ) {
+            Transaction transaction = updateTransactionAndBooking(
+                    transactionId,
+                    null,
+                    null,
+                    TransactionStatus.FAILED
+            );
+            if (transaction == null)
+                return null;
+
+            return transaction.getOrigin() + "/payment-failed";
+        }
+
         String bankCode = vnpParams.get("vnp_BankCode");
         String paymentMethod = "VNPAY";
-        updateTransactionAndBooking(transactionId, bankCode, paymentMethod);
+        Transaction transaction = updateTransactionAndBooking(transactionId, bankCode, paymentMethod, TransactionStatus.SUCCESS);
 
-        return transactionId;
+        if (transaction == null)
+            return null;
+
+        return transaction.getOrigin() + "/payment-success?transactionId=" + transaction.getTransactionId();
     }
 
     @Override
@@ -265,11 +283,16 @@ public class BookingServicesImpl implements IBookingServices {
         return booking;
     }
 
-    private void updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod) {
+    private Transaction updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod, TransactionStatus status) {
         Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
         if (transaction == null)
-            return;
+            return null;
 
+        if (status == TransactionStatus.FAILED) {
+            transaction.setStatus(status);
+            transactionRepository.save(transaction);
+            return transaction;
+        }
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setBankCode(bankCode);
         transaction.setPaymentMethod(paymentMethod);
@@ -290,6 +313,7 @@ public class BookingServicesImpl implements IBookingServices {
             bookingRepository.save(booking);
         }
 
+        return transaction;
     }
 
 }

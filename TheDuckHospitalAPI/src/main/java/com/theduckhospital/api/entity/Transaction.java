@@ -28,6 +28,7 @@ public class Transaction {
     private boolean deleted;
     private String bankCode;
     private String paymentMethod;
+    private String origin;
 
     @OneToMany(mappedBy = "transaction")
     @JsonBackReference

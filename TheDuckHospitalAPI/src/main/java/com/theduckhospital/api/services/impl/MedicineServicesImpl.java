@@ -26,6 +26,7 @@ public class MedicineServicesImpl implements IMedicineServices {
         medicine.setMedicineName(request.getMedicineName());
         medicine.setPrice(request.getPrice());
         medicine.setQuantity(request.getQuantity());
+        medicine.setUnit(request.getUnit());
         medicine.setDeleted(false);
 
         return medicineRepository.save(medicine);
@@ -37,6 +38,7 @@ public class MedicineServicesImpl implements IMedicineServices {
         medicine.setMedicineName(request.getMedicineName());
         medicine.setPrice(request.getPrice());
         medicine.setQuantity(request.getQuantity());
+        medicine.setUnit(request.getUnit());
 
         return medicineRepository.save(medicine);
     }

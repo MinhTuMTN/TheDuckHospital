@@ -1,6 +1,8 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.MedicalExamState;
+import com.theduckhospital.api.constant.MedicalTestState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +42,8 @@ public class MedicalTest {
     @JsonBackReference
     @ToStringExclude
     private LaboratoryTechnician laboratoryTechnician;
+
+    private MedicalTestState state = MedicalTestState.WAITING;
 
     private Date date;
     private boolean deleted;

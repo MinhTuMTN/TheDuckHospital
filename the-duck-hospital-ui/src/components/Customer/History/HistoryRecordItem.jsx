@@ -64,8 +64,9 @@ function Property(props) {
 function HistoryRecordItem(props) {
   const { item } = props;
   const navigate = useNavigate();
+
   return (
-    <StyledMedicalBillItem onClick={() => navigate(item.bookingId)}>
+    <StyledMedicalBillItem onClick={() => navigate(item.medicalRecordId)}>
       <Grid container spacing={1.5} alignItems={"center"}>
         <Grid item xs={11}>
           <Property
