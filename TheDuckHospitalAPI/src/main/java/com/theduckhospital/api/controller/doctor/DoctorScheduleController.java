@@ -33,12 +33,25 @@ public class DoctorScheduleController {
         );
     }
 
+    @GetMapping("/time-table")
+    public ResponseEntity<?> getDoctorTimeTable(
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(scheduleDoctorServices.getDoctorTimeTable(authorization))
+                        .build()
+        );
+    }
+
     @GetMapping("/{doctorScheduleId}/medical-records")
     public ResponseEntity<?> searchMedicalExaminationRecord(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("doctorScheduleId") UUID doctorScheduleId,
             @RequestParam(value = "patientName", defaultValue = "") String patientName,
-            @RequestParam(value = "state")MedicalExamState state,
+            @RequestParam(value = "state") MedicalExamState state,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size
     ) {

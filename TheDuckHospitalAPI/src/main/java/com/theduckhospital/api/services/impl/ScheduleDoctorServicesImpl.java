@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleReques
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorScheduleItemResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
 import com.theduckhospital.api.dto.response.doctor.SearchMedicalExamResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
@@ -263,6 +264,28 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 "waiting", String.valueOf(waiting),
                 "processing", String.valueOf(processing)
         );
+    }
+
+    @Override
+    public List<DoctorScheduleItemResponse> getDoctorTimeTable(String authorization) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+
+        // Get all doctor schedules 1 month from head of month
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, 2);
+        Date endDate = calendar.getTime();
+        calendar.add(Calendar.MONTH, -2);
+        Date startDate = calendar.getTime();
+
+        return doctorScheduleRepository
+                .findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleTypeAsc(
+                        doctor,
+                        startDate,
+                        endDate
+                ).stream()
+                .map(DoctorScheduleItemResponse::new)
+                .toList();
     }
 
     private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {
