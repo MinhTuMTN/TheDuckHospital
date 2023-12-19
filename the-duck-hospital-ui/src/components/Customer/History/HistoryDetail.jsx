@@ -157,25 +157,25 @@ function HistoryDetail(props) {
             sx={{ width: "100%", textAlign: "flex-start" }}
             title="Mã bệnh nhân"
             content={patientInfo?.patient[0]?.patientCode}
-            titleMinWidth={"120px"}
+            titleMinWidth={"125px"}
           />
         </Grid>
         <ContactCustomerInfo
           title="Họ tên"
           content={patientInfo?.patient[0]?.fullName}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
           title="Ngày sinh"
           content={dayjs(patientInfo?.patient[0]?.dateOfBirth).format(
             "DD/MM/YYYY"
           )}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
           title="Địa chỉ"
           content={patientInfo?.patient[0]?.address}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
       </Grid>
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
@@ -197,25 +197,25 @@ function HistoryDetail(props) {
         </Grid>
 
         <ContactCustomerInfo
-          title="Ngày tạo"
+          title="Ngày khám"
           content={dayjs().format("DD/MM/YYYY HH:mm")}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
           title="Chuyên khoa"
           content={`${departmentName}`}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
         <ContactCustomerInfo
-          title="Người tạo"
+          title="Bác sĩ chữa trị"
           content={`BS. ${doctorName}`}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
 
         <ContactCustomerInfo
           title="Chuẩn đoán"
           content={`${diagnostic}`}
-          titleMinWidth={"120px"}
+          titleMinWidth={"125px"}
         />
       </Grid>
 
