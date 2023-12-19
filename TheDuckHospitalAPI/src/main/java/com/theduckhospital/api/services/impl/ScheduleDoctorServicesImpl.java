@@ -205,7 +205,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         Doctor doctor = doctorServices.getDoctorByToken(authorization);
         Date today = DateCommon.getToday();
         return doctorScheduleRepository
-                .findByDoctorAndDateAndDeletedIsFalse(
+                .findByDoctorAndDateAndDeletedIsFalseOrderByScheduleTypeAsc(
                         doctor,
                         today
                 )

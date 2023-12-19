@@ -4,6 +4,8 @@ import com.theduckhospital.api.dto.request.admin.CreateMedicineRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredMedicinesResponse;
 import com.theduckhospital.api.entity.Medicine;
 
+import java.util.List;
+
 public interface IMedicineServices {
     Medicine createMedicine(CreateMedicineRequest request);
 
@@ -20,4 +22,6 @@ public interface IMedicineServices {
     );
 
     Medicine findMedicineById(int medicineId);
+
+    List<Medicine> getMedicines(String query, int limit);
 }

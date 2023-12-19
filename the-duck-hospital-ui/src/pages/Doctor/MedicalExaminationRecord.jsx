@@ -245,7 +245,7 @@ function MedicalExaminationRecord(props) {
           <Grid item xs={12} md={3.5}>
             <InfoPatient
               mainInfo={info?.patient}
-              history={{}}
+              history={info?.history}
               info={basicsInfo}
             />
           </Grid>
@@ -320,7 +320,7 @@ function MedicalExaminationRecord(props) {
                     <Typography>Toa thuốc</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Prescription />
+                    <Prescription patientInfo={info} diagnostic={diagnostic} />
                   </AccordionDetails>
                 </Accordion>
               </div>
