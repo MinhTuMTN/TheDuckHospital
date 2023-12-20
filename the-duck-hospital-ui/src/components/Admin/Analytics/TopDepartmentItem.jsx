@@ -26,7 +26,7 @@ function TopDepartmentItem(props) {
 
   return (
     <Grid container spacing={0.5} alignItems={"center"}>
-      <Grid item xs={7.5} container>
+      <Grid item xs={7} container>
         <Stack direction="column" spacing={0.5}>
           <CustomText
             variant="body1"
@@ -52,7 +52,7 @@ function TopDepartmentItem(props) {
           </CustomText>
         </Stack>
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={4}>
         <Stack direction="row" spacing={0.5}>
           <CustomText
             variant="body1"
@@ -75,7 +75,7 @@ function TopDepartmentItem(props) {
       </Grid>
       <Grid
         item
-        xs={1.5}
+        xs={1}
         sx={{
           display: "flex",
           justifyContent: "center",
