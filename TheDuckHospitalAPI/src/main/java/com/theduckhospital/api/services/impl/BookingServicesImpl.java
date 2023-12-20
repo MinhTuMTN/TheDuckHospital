@@ -95,6 +95,14 @@ public class BookingServicesImpl implements IBookingServices {
             transactionRepository.save(transaction);
 
             for (DoctorSchedule doctorSchedule : doctorSchedules) {
+                long maxQueueNumber = bookingRepository
+                        .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                                doctorSchedule,
+                                -1
+                        );
+                if (maxQueueNumber >= doctorSchedule.getSlot())
+                    continue;
+                
                 Booking booking = new Booking();
                 booking.setPatientProfile(patientProfile);
                 booking.setDoctorSchedule(doctorSchedule);

@@ -46,4 +46,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             "GROUP BY ds.date " +
             "ORDER BY ds.date ASC")
     List<Object[]> countBookingsByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+
 }
