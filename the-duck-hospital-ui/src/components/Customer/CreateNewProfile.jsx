@@ -296,6 +296,7 @@ function CreateNewProfile(props) {
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <CustomTextField
+            autoComplete="off"
             disabled={profile?.patientCode}
             size="medium"
             variant="outlined"
@@ -344,6 +345,7 @@ function CreateNewProfile(props) {
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <CustomTextField
+            autoComplete="off"
             size="medium"
             variant="outlined"
             id="outlined-basic"
@@ -406,6 +408,7 @@ function CreateNewProfile(props) {
             Số CMND/CCCD
           </CustomTypography>
           <CustomTextField
+            autoComplete="off"
             disabled={profile?.patientCode}
             size="medium"
             variant="outlined"
@@ -564,6 +567,7 @@ function CreateNewProfile(props) {
             <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
           </CustomTypography>
           <CustomTextField
+            autoComplete="off"
             size="medium"
             variant="outlined"
             id="outlined-basic"
@@ -587,6 +591,7 @@ function CreateNewProfile(props) {
             Email
           </CustomTypography>
           <CustomTextField
+            autoComplete="off"
             size="medium"
             variant="outlined"
             id="outlined-basic"
