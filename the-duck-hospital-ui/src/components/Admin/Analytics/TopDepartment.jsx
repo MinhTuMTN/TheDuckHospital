@@ -85,35 +85,6 @@ function TopDepartment(props) {
                   <TopDepartmentItem department={department} index={index} />
                 </CustomListItem>
               ))}
-              {/* 
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem> */}
             </Stack>
           </List>
         </Stack>
