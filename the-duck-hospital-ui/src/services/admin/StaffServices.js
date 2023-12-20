@@ -5,7 +5,7 @@ export const getAllStaffs = () => {
 };
 
 export const getPaginationStaffs = (params) => {
-    return get("/admin/staffs/filtered");
+    return get("/admin/staffs/filtered", params);
 };
 
 export const createStaff = (data) => {
