@@ -247,7 +247,7 @@ function StaffDetail(props) {
               <TieuDeCot>Khoa</TieuDeCot>
             </Grid>
             <Grid item xs={8} md={9}>
-              <NoiDung>{staff.departmentName}</NoiDung>
+              <NoiDung>{staff.departmentName ? staff.departmentName : "Đang cập nhật"}</NoiDung>
             </Grid>
           </Grid>
         </BoxStyle>

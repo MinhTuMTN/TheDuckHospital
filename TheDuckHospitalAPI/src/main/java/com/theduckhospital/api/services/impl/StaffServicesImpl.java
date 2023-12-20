@@ -238,16 +238,6 @@ public class StaffServicesImpl implements IStaffServices {
         Staff staff = optional.get();
         staff.setDeleted(false);
 
-        if (staff instanceof  Doctor) {
-            List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
-            if(!schedules.isEmpty()) {
-                schedules.forEach(schedule -> {
-                    schedule.setDeleted(false);
-                    doctorScheduleRepository.save(schedule);
-                });
-            }
-        }
-
         Account account = staff.getAccount();
         account.setDeleted(false);
 

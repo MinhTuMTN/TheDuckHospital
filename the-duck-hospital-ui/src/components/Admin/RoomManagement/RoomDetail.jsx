@@ -230,7 +230,7 @@ function RoomDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{room.departmentName}</NoiDung>
+            <NoiDung>{room.departmentName ? room.departmentName : "Đang cập nhật"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>

@@ -202,9 +202,8 @@ public class RoomServicesImpl implements IRoomServices {
         }
 
         Department department = headDoctor.getDepartment();
-        List<Room> rooms = department.getRooms();
 
-        return rooms;
+        return department.getRooms();
     }
 
     @Override
