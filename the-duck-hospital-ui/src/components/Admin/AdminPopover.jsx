@@ -1,18 +1,11 @@
-import { MenuItem, MenuList, Popover } from "@mui/material";
-import React from "react";
+import { Avatar, Divider, Popover, Stack, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-// import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../auth/AuthProvider";
+import AdminMenuList from "../General/Navbar/AdminMenuList";
+
 function AdminPopover(props) {
   const { anchorEl, onClose, open } = props;
-
-  // const { setToken } = useAuth();
-  // const handleLogout = useCallback(() => {
-  //   onClose?.();
-  //   setToken(null);
-  //   window.location.href = "/";
-  // }, [setToken, onClose]);
+  const { setToken, fullName } = useAuth();
 
   return (
     <Popover
@@ -24,48 +17,35 @@ function AdminPopover(props) {
       onClose={onClose}
       open={open}
     >
-      <MenuList
-        disablePadding
-        dense
+      <Stack
+        spacing={1}
+        direction={"column"}
         sx={{
-          p: "8px",
-          "& > *": {
-            borderRadius: 1,
-          },
+          width: "235px",
+          px: "8px",
+          paddingY: "16px",
         }}
       >
-        <MenuItem
-          style={{
-            fontSize: "14px",
-            fontWeight: "400",
-            alignItems: "center",
-          }}
-        >
-          <InfoOutlinedIcon
-            fontSize="small"
-            sx={{
-              marginRight: "8px",
-            }}
-          />
-          Thông tin
-        </MenuItem>
-        <MenuItem
-          // onClick={handleLogout}
-          style={{
-            fontSize: "14px",
-            fontWeight: "400",
-            alignItems: "center",
-          }}
-        >
-          <LogoutOutlinedIcon
-            fontSize="small"
-            sx={{
-              marginRight: "8px",
-            }}
-          />
-          Đăng xuất
-        </MenuItem>
-      </MenuList>
+        <Stack direction={"row"} spacing={1.7} paddingX={1}>
+          <Avatar />
+          <Stack direction={"column"}>
+            <Typography
+              variant="h6"
+              style={{ fontSize: "14px", fontWeight: "400" }}
+            >
+              Xin chào,
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{ fontSize: "14px", fontWeight: "bold" }}
+            >
+              {fullName}
+            </Typography>
+          </Stack>
+        </Stack>
+        <Divider />
+          <AdminMenuList onClose={onClose} setToken={setToken} />
+      </Stack>
     </Popover>
   );
 }

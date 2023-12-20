@@ -5,11 +5,12 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicineServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/medicines")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class MedicineAdminController {
     private final IMedicineServices medicineServices;
 

@@ -362,7 +362,6 @@ function DoctorTable(props) {
                   width: "60%",
                 }}
               />
-
               <CustomTextField
                 type="number"
                 label="Số lượng chỗ"
@@ -454,7 +453,6 @@ function DoctorTable(props) {
                 >
                   Phòng *
                 </CustomTypography>
-
                 <FormControl
                   fullWidth
                   error={doctorSchedule.roomId === "" && addButtonClicked}

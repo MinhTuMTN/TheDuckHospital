@@ -1,9 +1,22 @@
 import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CountUpAnimation from "./CountUpAnimation";
+import { getAllHomeStatistics } from "../../../services/common/StatisticsServices";
 
 function TimeWorking(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const [statistics, setStatistics] = React.useState({});
+
+  useEffect(() => {
+    const getHomeStatistics = async () => {
+      const response = await getAllHomeStatistics();
+      if(response.success) {
+        setStatistics(response.data.data);
+      }
+    };
+    getHomeStatistics();
+  }, []);
+  
   return (
     <Box
       sx={{
@@ -90,7 +103,7 @@ function TimeWorking(props) {
             zIndex: "100",
           }}
         >
-          <CountUpAnimation value={80} />
+          <CountUpAnimation value={statistics?.totalDoctors} />
           <Typography
             variant="body1"
             sx={{
@@ -123,7 +136,7 @@ function TimeWorking(props) {
             zIndex: "100",
           }}
         >
-          <CountUpAnimation value={20} />
+          <CountUpAnimation value={statistics?.totalDepartments} />
           <Typography
             variant="body1"
             sx={{

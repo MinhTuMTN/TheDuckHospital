@@ -87,7 +87,12 @@ public class DoctorServicesImpl implements IDoctorServices {
     }
 
     @Override
-    public FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(String authorization, int page, int limit) {
+    public FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(
+            String authorization,
+            String search,
+            int page,
+            int limit
+    ) {
         Doctor headDoctor = getDoctorByToken(authorization);
         if (!headDoctor.isHeadOfDepartment()) {
             throw new RuntimeException("You are not head of department");
@@ -96,7 +101,8 @@ public class DoctorServicesImpl implements IDoctorServices {
         Department department = headDoctor.getDepartment();
 
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Doctor> doctorPage = doctorRepository.findByDeletedFalseAndDepartment(pageable, department);
+        Page<Doctor> doctorPage = doctorRepository
+                .findByFullNameContainingAndDeletedFalseAndDepartment(search, department, pageable);
 
         List<ActiveDoctorResponse> filteredDoctors = new ArrayList<>();
 

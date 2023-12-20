@@ -1,21 +1,18 @@
 package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.constant.Role;
-import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IAccountServices;
-import com.theduckhospital.api.services.IStaffServices;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/accounts")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AccountAdminController {
     private final IAccountServices accountServices;
 

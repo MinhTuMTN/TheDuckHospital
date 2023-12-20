@@ -5,11 +5,12 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IRoomServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/rooms")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class RoomAdminController {
     private final IRoomServices roomServices;
 

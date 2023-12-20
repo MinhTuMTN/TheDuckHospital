@@ -1,9 +1,9 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.dto.response.HomeStatisticsResponse;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.repository.*;
-import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IStatisticsServices;
 import org.springframework.stereotype.Service;
@@ -19,24 +19,22 @@ public class StatisticsServicesImpl implements IStatisticsServices {
     private final BookingRepository bookingRepository;
     private final PatientRepository patientRepository;
     private final TransactionRepository transactionRepository;
-    private final DoctorScheduleRepository doctorScheduleRepository;
-    private final IDepartmentServices departmentServices;
+    private final DoctorRepository doctorRepository;
+
     private final IDoctorServices doctorServices;
-    public StatisticsServicesImpl(IDepartmentServices departmentServices,
-                                  IDoctorServices doctorServices,
+    public StatisticsServicesImpl(IDoctorServices doctorServices,
                                   DepartmentRepository departmentRepository,
                                   BookingRepository bookingRepository,
                                   PatientRepository patientRepository,
                                   TransactionRepository transactionRepository,
-                                  DoctorScheduleRepository doctorScheduleRepository
+                                  DoctorRepository doctorRepository
     ) {
-        this.departmentServices = departmentServices;
         this.doctorServices = doctorServices;
         this.departmentRepository = departmentRepository;
         this.bookingRepository = bookingRepository;
         this.patientRepository = patientRepository;
         this.transactionRepository = transactionRepository;
-        this.doctorScheduleRepository = doctorScheduleRepository;
+        this.doctorRepository = doctorRepository;
     }
 
     @Override
@@ -62,11 +60,8 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                 .map(entry -> new DepartmentStatisticsResponse(
                         entry.getKey(),
                         doctorServices.findHeadDoctor(entry.getKey()),
-                        entry.getValue()))
-                .collect(Collectors.toList());
-
-        departmentStatistics.sort((response1, response2) ->
-                Long.compare(response2.getTotalPatients(), response1.getTotalPatients()));
+                        entry.getValue())).sorted((response1, response2) ->
+                        Long.compare(response2.getTotalPatients(), response1.getTotalPatients())).toList();
 
         List<DepartmentStatisticsResponse> topDepartment = departmentStatistics.stream().limit(5)
                 .collect(Collectors.toList());
@@ -105,25 +100,14 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         return new RevenueStatisticsResponse(values, labels);
     }
 
-//    @Override
-//    public BookingStatisticsResponse getBookingStatistics(Date startDate, Date endDate) {
-//
-//        List<Booking> bookings = bookingRepository.findByDoctorScheduleDateBetween(startDate, endDate);
-//
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//
-//        List<BookingStatisticsResponse> bookingStatistics = new ArrayList<>();
-//        List<Long> values = new ArrayList<>();
-//        List<String> labels = new ArrayList<>();
-//        for (int i = 0; i < bookings.size(); i++) {
-//            long numberOfBookings = bookingRepository.countByDoctorSchedule(bookings.get(i).getDoctorSchedule());
-//            values.add(numberOfBookings);
-//            labels.add(dateFormat.format(bookings.get(i).getDoctorSchedule().getDate()));
-//        }
-//
-//
-//        return new BookingStatisticsResponse(values, labels);
-//    }
+    @Override
+    public HomeStatisticsResponse getHomeStatistics() {
+        long totalDepartments = departmentRepository.count();
+
+        long totalDoctors = doctorRepository.count();
+
+        return new HomeStatisticsResponse(totalDoctors, totalDepartments);
+    }
 
     @Override
     public BookingStatisticsResponse getBookingStatistics(Date startDate, Date endDate) {
@@ -139,17 +123,12 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                 .map(entry -> dateFormat.format((Date) entry[0])) // Assuming the date is at index 0
                 .collect(Collectors.toList());
 
-//        List<BookingStatisticsItemResponse> bookingStatistics = new ArrayList<>();
-//        for (int i = 0; i < bookings.size(); i++) {
-//            long numberOfBookings = bookingRepository.countByDoctorSchedule(bookings.get(i).getDoctorSchedule());
-//            bookingStatistics.add(new BookingStatisticsItemResponse(i, numberOfBookings, bookings.get(i).getDoctorSchedule().getDate()));
-//        }
 
         return new BookingStatisticsResponse(values, labels);
     }
 
     public PieChartItemResponse getPaymentMethodCount(int id, String paymentMethod) {
         long count = transactionRepository.countByPaymentMethod(paymentMethod);
-        return new PieChartItemResponse(id, count, paymentMethod == "CASH" ? "Online" : "Tại quầy");
+        return new PieChartItemResponse(id, count, Objects.equals(paymentMethod, "CASH") ? "Online" : "Tại quầy");
     }
 }

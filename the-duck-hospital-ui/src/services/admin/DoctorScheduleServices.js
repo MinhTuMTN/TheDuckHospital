@@ -1,9 +1,9 @@
 import { get } from "../AxiosInstance";
 
 export const getSchedulesByRoomIdAndDate = (params) => {
-  return get(`/admin/doctor-schedules/room`, params, { Authorization: "" });
+  return get(`/admin/doctor-schedules/room`, params);
 };
 
 export const getSchedulesByStaffIdAndDate = (params) => {
-  return get(`/admin/doctor-schedules/doctor`, params, { Authorization: "" });
+  return get(`/admin/doctor-schedules/doctor`, params);
 };

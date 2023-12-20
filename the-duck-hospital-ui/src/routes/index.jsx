@@ -59,11 +59,11 @@ import VerifyInformation from "../pages/customer/VerifyInformation";
 import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
 
 const LoadComponent = (Component) => (props) =>
-  (
-    <React.Suspense fallback={<Loading />}>
-      <Component {...props} />
-    </React.Suspense>
-  );
+(
+  <React.Suspense fallback={<Loading />}>
+    <Component {...props} />
+  </React.Suspense>
+);
 
 const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 
@@ -225,7 +225,6 @@ function Router(props) {
     {
       path: "/",
     },
-
     {
       element: <ProtectedLayout forRole={["Doctor", "HeadDoctor"]} />,
       children: [
@@ -276,92 +275,98 @@ function Router(props) {
       ],
     },
     {
-      path: "/admin",
-      element: <AdminLayout />,
+      path: "/",
+      element: <ProtectedLayout forRole={["Admin"]} />,
       children: [
         {
-          path: "analytics",
-          element: <Analytics />,
-        },
-        {
-          element: <Analytics />,
-          index: true,
-        },
-        {
-          path: "account-management",
-          element: <AccountListPage />,
-        },
-        {
-          path: "account-management/:userId",
-          element: <AccountDetailPage />,
-        },
-        {
-          path: "account-management/:userId/patient-profile/:patientProfileId",
-          element: <PatientProfileDetailPage />,
-        },
-        {
-          path: "staff-management",
-          element: <StaffListPage />,
-        },
-        {
-          path: "staff-management/:staffId",
-          element: <StaffDetailPage />,
-        },
-        {
-          path: "room-management",
-          element: <RoomListPage />,
-        },
-        {
-          path: "room-management/:roomId",
-          element: <RoomDetailPage />,
-        },
-        {
-          path: "department-management",
-          element: <DepartmentListPage />,
-        },
-        {
-          path: "department-management/:departmentId",
-          element: <DepartmentDetailPage />,
-        },
-        {
-          path: "department-management/:departmentId/staff/:staffId",
-          element: <StaffDetailPage />,
-        },
-        {
-          path: "patient-management",
-          element: <PatientListPage />,
-        },
-        {
-          path: "patient-management/:patientId",
-          element: <PatientDetailPage />,
-        },
-        {
-          path: "patient-management/:patientId/patient-profile/:patientProfileId",
-          element: <PatientProfileDetailPage />,
-        },
-        {
-          path: "service-management",
-          element: <MedicalServiceListPage />,
-        },
-        {
-          path: "service-management/:serviceId",
-          element: <MedicalServiceDetailPage />,
-        },
-        {
-          path: "transaction-management",
-          element: <TransactionListPage />,
-        },
-        {
-          path: "transaction-management/:transactionId",
-          element: <TransactionDetailPage />,
-        },
-        {
-          path: "medicine-management",
-          element: <MedicineListPage />,
-        },
-        {
-          path: "medicine-management/:medicineId",
-          element: <MedicineDetailPage />,
+          path: "/admin",
+          element: <AdminLayout />,
+          children: [
+            {
+              path: "analytics",
+              element: <Analytics />,
+            },
+            {
+              element: <Analytics />,
+              index: true,
+            },
+            {
+              path: "account-management",
+              element: <AccountListPage />,
+            },
+            {
+              path: "account-management/:userId",
+              element: <AccountDetailPage />,
+            },
+            {
+              path: "account-management/:userId/patient-profile/:patientProfileId",
+              element: <PatientProfileDetailPage />,
+            },
+            {
+              path: "staff-management",
+              element: <StaffListPage />,
+            },
+            {
+              path: "staff-management/:staffId",
+              element: <StaffDetailPage />,
+            },
+            {
+              path: "room-management",
+              element: <RoomListPage />,
+            },
+            {
+              path: "room-management/:roomId",
+              element: <RoomDetailPage />,
+            },
+            {
+              path: "department-management",
+              element: <DepartmentListPage />,
+            },
+            {
+              path: "department-management/:departmentId",
+              element: <DepartmentDetailPage />,
+            },
+            {
+              path: "department-management/:departmentId/staff/:staffId",
+              element: <StaffDetailPage />,
+            },
+            {
+              path: "patient-management",
+              element: <PatientListPage />,
+            },
+            {
+              path: "patient-management/:patientId",
+              element: <PatientDetailPage />,
+            },
+            {
+              path: "patient-management/:patientId/patient-profile/:patientProfileId",
+              element: <PatientProfileDetailPage />,
+            },
+            {
+              path: "service-management",
+              element: <MedicalServiceListPage />,
+            },
+            {
+              path: "service-management/:serviceId",
+              element: <MedicalServiceDetailPage />,
+            },
+            {
+              path: "transaction-management",
+              element: <TransactionListPage />,
+            },
+            {
+              path: "transaction-management/:transactionId",
+              element: <TransactionDetailPage />,
+            },
+            {
+              path: "medicine-management",
+              element: <MedicineListPage />,
+            },
+            {
+              path: "medicine-management/:medicineId",
+              element: <MedicineDetailPage />,
+            },
+          ],
         },
       ],
     },

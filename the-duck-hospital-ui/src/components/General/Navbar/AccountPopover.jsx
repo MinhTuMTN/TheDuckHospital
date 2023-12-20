@@ -4,6 +4,7 @@ import { useAuth } from "../../../auth/AuthProvider";
 import PatientMenuList from "./PatientMenuList";
 import NurseMenuList from "./NurseMenuList";
 import DoctorMenuList from "./DoctorMenuList";
+import AdminMenuList from "./AdminMenuList";
 
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
@@ -54,6 +55,9 @@ function AccountPopover(props) {
         )}
         {(role === "Doctor" || role === "HeadDoctor") && (
           <DoctorMenuList onClose={onClose} setToken={setToken} />
+        )}
+        {role === "Admin" && (
+          <AdminMenuList onClose={onClose} setToken={setToken} />
         )}
       </Stack>
     </Popover>

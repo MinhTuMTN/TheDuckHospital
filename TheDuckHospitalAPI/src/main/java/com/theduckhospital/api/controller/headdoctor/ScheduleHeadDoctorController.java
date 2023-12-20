@@ -154,6 +154,7 @@ public class ScheduleHeadDoctorController {
     @GetMapping("/doctors/filter")
     public ResponseEntity<?> getActiveDoctorsPagination(
             @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int limit
     ){
@@ -161,7 +162,7 @@ public class ScheduleHeadDoctorController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get active doctors pagination successfully")
-                        .data(doctorServices.getPaginationActiveDoctorsDepartment(authorizationHeader, page, limit))
+                        .data(doctorServices.getPaginationActiveDoctorsDepartment(authorizationHeader, search, page, limit))
                         .build()
         );
     }
