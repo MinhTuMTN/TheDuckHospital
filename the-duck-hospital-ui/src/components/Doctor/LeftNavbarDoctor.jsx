@@ -23,7 +23,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
 import TodayIcon from "@mui/icons-material/Today";
 import GroupsIcon from "@mui/icons-material/Groups";
-import BiotechIcon from '@mui/icons-material/Biotech';
+import BiotechIcon from "@mui/icons-material/Biotech";
 
 const sidebarItems = [
   {
@@ -32,14 +32,17 @@ const sidebarItems = [
     to: "/doctor/doctor-bookings",
   },
   {
-    display: "Xét nghiệm",
-    icon: <BiotechIcon />,
-    to: "/doctor/doctor-test",
-  },
-  {
     display: "Lịch trực",
     icon: <TodayIcon />,
     to: "/doctor/doctor-schedules",
+  },
+];
+
+const technicianSidebarItems = [
+  {
+    display: "Xét nghiệm",
+    icon: <BiotechIcon />,
+    to: "/doctor/doctor-test",
   },
 ];
 
@@ -90,6 +93,8 @@ function LeftNavBarDoctor(props) {
   const theme = useTheme();
   const navigate = useNavigate();
   const { role } = useAuth();
+
+  const mainItems = role === "Doctor" ? sidebarItems : technicianSidebarItems;
   const content = (
     <Box
       sx={{
@@ -135,7 +140,7 @@ function LeftNavBarDoctor(props) {
           </Typography>
         </Box>
         <List>
-          {sidebarItems.map((item, index) => (
+          {mainItems.map((item, index) => (
             <NavLink
               key={`nav-bar-store-${index}`}
               style={{ textDecoration: "none" }}

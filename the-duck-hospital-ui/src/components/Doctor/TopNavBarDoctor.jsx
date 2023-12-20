@@ -11,6 +11,7 @@ import {
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { DoctorContext } from "../../auth/DoctorProvider";
+import { useAuth } from "../../auth/AuthProvider";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -20,6 +21,7 @@ function TopNavBarDoctor(props) {
   const location = useLocation();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { roomName, departmentName } = React.useContext(DoctorContext);
+  const { role } = useAuth();
 
   return (
     <>
@@ -92,7 +94,7 @@ function TopNavBarDoctor(props) {
               >
                 {"Khám chữa bệnh"}
               </Typography>
-            ) : (
+            ) : role === "Doctor" || role === "HeadDoctor" ? (
               <Typography
                 variant={"body1"}
                 style={{
@@ -101,6 +103,16 @@ function TopNavBarDoctor(props) {
                 }}
               >
                 Phòng {roomName} - {departmentName}
+              </Typography>
+            ) : (
+              <Typography
+                variant={"body1"}
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "500",
+                }}
+              >
+                Phòng xét nghiệm
               </Typography>
             )}
           </Stack>

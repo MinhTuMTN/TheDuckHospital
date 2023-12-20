@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  BiotechOutlined,
   BookmarkBorderOutlined,
   CalendarMonthOutlined,
   Close,
@@ -75,6 +76,14 @@ const doctorMainItems = [
     display: "Lịch trực",
     icon: <CalendarMonthOutlined />,
     to: "/doctor/doctor-schedules",
+  },
+];
+
+const laboratoryTechnicianMainItems = [
+  {
+    display: "Xét nghiệm",
+    icon: <BiotechOutlined />,
+    to: "/doctor/doctor-test",
   },
 ];
 
@@ -202,6 +211,9 @@ function RightNavBar(props) {
       break;
     case "Nurse":
       mainItems = nurseMainItems;
+      break;
+    case "LaboratoryTechnician":
+      mainItems = laboratoryTechnicianMainItems;
       break;
     default:
       break;
