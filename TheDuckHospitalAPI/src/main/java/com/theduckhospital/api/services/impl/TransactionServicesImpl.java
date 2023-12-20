@@ -50,25 +50,6 @@ public class TransactionServicesImpl implements ITransactionServices {
         return transaction;
     }
 
-//    @Override
-//    public FilteredTransactionsResponse getTransactionsPagination(int page, int limit) {
-//        Pageable pageable = PageRequest.of(page, limit);
-//        Page<Transaction> transactionPage = transactionRepository.findPaginationByOrderByCreatedAtDesc(pageable);
-//
-//        List<TransactionResponse> filteredTransactions = new ArrayList<>();
-//
-//        for (Transaction transaction : transactionPage.getContent()) {
-//            List<Booking> bookings = transaction.getBookings();
-//            List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
-//
-//            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses));
-//        }
-//
-//        List<Transaction> transaction = transactionRepository.findAll();
-//
-//        return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
-//    }
-
     @Override
     public FilteredTransactionsResponse getFilteredTransactionsPagination(
             int page,
@@ -78,7 +59,11 @@ public class TransactionServicesImpl implements ITransactionServices {
     ) {
         Pageable pageable = PageRequest.of(page, limit);
         Page<Transaction> transactionPage = transactionRepository
-                .findByPaymentMethodInAndStatusInOrderByCreatedAtDesc(transactionPayment, transactionStatus, pageable);
+                .findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
+                        transactionPayment,
+                        transactionStatus,
+                        pageable
+                );
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
         for (Transaction transaction : transactionPage.getContent()) {
@@ -89,7 +74,7 @@ public class TransactionServicesImpl implements ITransactionServices {
         }
 
         List<Transaction> transaction = transactionRepository
-                .findByPaymentMethodInAndStatusIn(transactionPayment, transactionStatus);
+                .findByPaymentMethodInAndStatusInAndBookingsIsNotEmpty(transactionPayment, transactionStatus);
 
         return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
     }

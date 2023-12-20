@@ -1,7 +1,6 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.TransactionStatus;
-import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +13,12 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    Page<Transaction> findPaginationByOrderByCreatedAtDesc(Pageable pageable);
-    Page<Transaction> findByPaymentMethodInAndStatusInOrderByCreatedAtDesc(
+    Page<Transaction> findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
             List<String> transactionPayment,
             List<TransactionStatus> transactionStatus,
             Pageable pageable
     );
-    List<Transaction> findByPaymentMethodInAndStatusIn(
+    List<Transaction> findByPaymentMethodInAndStatusInAndBookingsIsNotEmpty(
             List<String> transactionPayment,
             List<TransactionStatus> transactionStatus
     );
