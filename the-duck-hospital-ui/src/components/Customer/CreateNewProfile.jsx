@@ -328,6 +328,7 @@ function CreateNewProfile(props) {
               value={dateOfBirth}
               onChange={(newValue) => setDateOfBirth(newValue)}
               defaultValue={dayjs()}
+              shouldDisableDate={(day) => dayjs(day).isAfter(dayjs())}
             />
           </LocalizationProvider>
         </Stack>

@@ -175,6 +175,7 @@ function FindPatientIdPage(props) {
                 <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
               </CustomTypography>
               <CustomTextField
+                autoComplete="off"
                 disabled={profile?.patientCode}
                 size="medium"
                 variant="outlined"
@@ -202,7 +203,6 @@ function FindPatientIdPage(props) {
                 <span style={{ color: "#e91919", fontWeight: "bold" }}>*</span>
               </CustomTypography>
               <CustomTextField
-                disabled={profile?.patientCode}
                 size="medium"
                 variant="outlined"
                 fullWidth
@@ -308,6 +308,9 @@ function FindPatientIdPage(props) {
                 fontSize: "14px !important",
                 textTransform: "none",
                 marginRight: "20px",
+              }}
+              onClick={() => {
+                navigate(-1);
               }}
             >
               Quay lại

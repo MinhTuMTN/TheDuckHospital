@@ -70,6 +70,7 @@ function FindPatientCode(props) {
         md={6}
       >
         <CustomTextField
+          autoComplete="off"
           size="medium"
           variant="outlined"
           id="outlined-basic"
