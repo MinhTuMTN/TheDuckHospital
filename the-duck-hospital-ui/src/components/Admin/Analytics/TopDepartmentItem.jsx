@@ -69,7 +69,7 @@ function TopDepartmentItem(props) {
               color: "#667085",
             }}
           >
-            bệnh nhân
+            lượt khám
           </CustomText>
         </Stack>
       </Grid>
