@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/doctor/medical-tests")
-@PreAuthorize("hasAnyRole('ROLE_DOCTOR', 'ROLE_HEAD_DOCTOR')")
+@PreAuthorize("hasAnyRole('ROLE_DOCTOR', 'ROLE_HEAD_DOCTOR', 'ROLE_LABORATORY_TECHNICIAN')")
 public class MedicalTestController {
     private final IMedicalServiceServices medicalServiceServices;
     private final IMedicalTestServices medicalTestServices;
