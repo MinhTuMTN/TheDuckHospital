@@ -15,3 +15,30 @@ export const getAllPatientProfiles = () => {
 export const deletePatientProfile = (id) => {
   return del(`/patients/patient-profiles/${id}`);
 };
+
+export const findPatientProfileByPatientCode = (patientCode) => {
+  return get(`/patients/patient-profiles/search`, {
+    patientCode: patientCode,
+  });
+};
+
+export const addPatientProfile = (patientProfileId, phoneNumber) => {
+  return post(`/patients/patient-profiles/add-profile`, {
+    patientProfileId,
+    phoneNumber,
+  });
+};
+
+export const findPatientProfileByInfo = (
+  fullName,
+  gender,
+  provinceId,
+  yearOfBirth
+) => {
+  return post(`/patients/patient-profiles/search-patient_code`, {
+    fullName,
+    yearOfBirth,
+    provinceId,
+    gender,
+  });
+};

@@ -55,6 +55,8 @@ import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
 import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 import History from "../pages/Doctor/History";
 import HistoryPage from "../pages/customer/HistoryPage";
+import VerifyInformation from "../pages/customer/VerifyInformation";
+import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -84,6 +86,14 @@ function Router(props) {
         {
           path: "/create-profile",
           element: <CreateProfile />,
+        },
+        {
+          path: "/find-patient-id",
+          element: <FindPatientIdPage />,
+        },
+        {
+          path: "/verify-information",
+          element: <VerifyInformation />,
         },
         {
           path: "/edit-profile",

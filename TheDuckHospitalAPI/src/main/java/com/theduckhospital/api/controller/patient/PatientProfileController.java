@@ -1,6 +1,8 @@
 package com.theduckhospital.api.controller.patient;
 
+import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import jakarta.validation.Valid;
@@ -26,7 +28,7 @@ public class PatientProfileController {
     public ResponseEntity<?> createPatientProfile(
             @RequestHeader("Authorization") String authorization,
             @RequestBody @Valid CreatePatientProfileRequest request
-            ) {
+    ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Create patient profile successfully")
@@ -74,4 +76,50 @@ public class PatientProfileController {
                 .build()
         );
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPatientProfileByPatientCode(
+            @RequestParam(name = "patientCode") String patientCode
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Search Patient Profile Successful")
+                        .data(patientProfileServices.patientSearchByPatientCode(patientCode))
+                        .build()
+        );
+    }
+
+    @PostMapping("/add-profile")
+    public ResponseEntity<?> addPatientProfile(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody AddPatientProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Add Patient Profile Successful")
+                        .data(patientProfileServices.addPatientProfile(
+                                authorization,
+                                request
+                        ))
+                        .build()
+        );
+    }
+
+    @PostMapping("/search-patient_code")
+    public ResponseEntity<?> searchPatientProfileByPatientCode(
+            @RequestBody FindPatientCodeRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Search Patient Profile Successful")
+                        .data(patientProfileServices.findPatientCode(
+                                request
+                        ))
+                        .build()
+        );
+    }
+
 }

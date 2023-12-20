@@ -11,7 +11,7 @@ import {
 import React from "react";
 import CustomTabPanel from "../../components/Customer/CustomTabPanel";
 import CreateNewProfile from "../../components/Customer/CreateNewProfile";
-import FindPatientCode from "../../components/Customer/FindPatientCode";
+import FindPatientCode from "../../components/Customer/FindProfile/FindPatientCode";
 import { useLocation } from "react-router-dom";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({

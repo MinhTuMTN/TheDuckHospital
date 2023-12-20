@@ -1,7 +1,9 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
+import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
+import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
@@ -13,6 +15,7 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.NationRepository;
 import com.theduckhospital.api.repository.PatientProfileRepository;
+import com.theduckhospital.api.repository.ProvinceRepository;
 import com.theduckhospital.api.repository.WardRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPatientProfileServices;
@@ -28,16 +31,18 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
     private final IAccountServices accountServices;
     private final NationRepository nationRepository;
     private final WardRepository wardRepository;
+    private final ProvinceRepository provinceRepository;
     private final PatientProfileRepository patientProfileRepository;
     private final IPatientServices patientServices;
 
     public PatientProfileServicesImpl(
             IAccountServices accountServices,
             NationRepository nationRepository,
-            WardRepository wardRepository, PatientProfileRepository patientProfileRepository, IPatientServices patientServices) {
+            WardRepository wardRepository, ProvinceRepository provinceRepository, PatientProfileRepository patientProfileRepository, IPatientServices patientServices) {
         this.accountServices = accountServices;
         this.nationRepository = nationRepository;
         this.wardRepository = wardRepository;
+        this.provinceRepository = provinceRepository;
         this.patientProfileRepository = patientProfileRepository;
         this.patientServices = patientServices;
     }
@@ -250,6 +255,54 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
         patientProfileRepository.save(patientProfile);
 
         return new NursePatientProfileItemResponse(patientProfile);
+    }
+
+    @Override
+    public List<PatientProfileItemResponse> patientSearchByPatientCode(String patientCode) {
+        Patient patient = patientServices.findPatientByPatientCode(patientCode);
+
+        return patient.getPatientProfiles()
+                .stream()
+                .filter(patientProfile -> !patientProfile.isDeleted())
+                .map(PatientProfileItemResponse::new)
+                .toList();
+    }
+
+    @Override
+    public PatientProfileItemResponse addPatientProfile(String authorization, AddPatientProfileRequest request) {
+        PatientProfile patientProfile = patientProfileRepository.findById(
+                request.getPatientProfileId()
+        ).orElseThrow(() -> new NotFoundException("Patient Profile not found"));
+
+        if (patientProfile.isDeleted() || !patientProfile.getPhoneNumber().equals(request.getPhoneNumber())) {
+            throw new BadRequestException("Patient Profile not valid");
+        }
+
+        Account account = accountServices.findAccountByToken(authorization);
+        patientProfile.setAccount(account);
+        patientProfileRepository.save(patientProfile);
+
+        return new PatientProfileItemResponse(patientProfile);
+    }
+
+    @Override
+    public List<PatientProfileItemResponse> findPatientCode(FindPatientCodeRequest request) {
+        Province province = provinceRepository
+                .findById(request.getProvinceId())
+                .orElseThrow(() -> new NotFoundException("Province not found"));
+
+        List<PatientProfile> patientProfiles = patientProfileRepository
+                .findPatientProfilesByInfo(
+                        request.getFullName(),
+                        request.getYearOfBirth(),
+                        province,
+                        request.getGender()
+                );
+
+        return patientProfiles.stream()
+                .filter(patientProfile -> !patientProfile.isDeleted())
+                .map(PatientProfileItemResponse::new)
+                .toList();
     }
 
 
