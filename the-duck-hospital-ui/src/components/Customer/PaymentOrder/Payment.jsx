@@ -126,7 +126,7 @@ function Payment(props) {
       ),
     });
     setIsLoading(false);
-    if (response.success) {
+    if (response.success && response.data.data) {
       window.location.href = response.data.data;
     } else {
       enqueueSnackbar("Đặt lịch không thành công", { variant: "error" });

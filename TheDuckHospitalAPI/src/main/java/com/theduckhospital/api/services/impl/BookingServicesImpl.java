@@ -85,16 +85,7 @@ public class BookingServicesImpl implements IBookingServices {
                     }
                 }
 
-                totalAmount += doctorSchedule.getMedicalService().getPrice();
-                doctorSchedules.add(doctorSchedule);
-            }
-
-            Transaction transaction = new Transaction();
-            transaction.setAmount(totalAmount + 10000);
-            transaction.setOrigin(origin);
-            transactionRepository.save(transaction);
-
-            for (DoctorSchedule doctorSchedule : doctorSchedules) {
+                // Check doctor schedule is full
                 long maxQueueNumber = bookingRepository
                         .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
                                 doctorSchedule,
@@ -102,7 +93,29 @@ public class BookingServicesImpl implements IBookingServices {
                         );
                 if (maxQueueNumber >= doctorSchedule.getSlot())
                     continue;
-                
+
+                // Check already booked
+                Optional<Booking> bookingOptional = bookingRepository
+                        .findByPatientProfileAndDoctorScheduleAndDeletedIsFalse(
+                                patientProfile,
+                                doctorSchedule
+                        );
+                if (bookingOptional.isPresent())
+                    continue;
+
+                totalAmount += doctorSchedule.getMedicalService().getPrice();
+                doctorSchedules.add(doctorSchedule);
+            }
+
+            if (doctorSchedules.isEmpty())
+                throw new BadRequestException("No doctor schedule available");
+
+            Transaction transaction = new Transaction();
+            transaction.setAmount(totalAmount + 10000);
+            transaction.setOrigin(origin);
+            transactionRepository.save(transaction);
+
+            for (DoctorSchedule doctorSchedule : doctorSchedules) {
                 Booking booking = new Booking();
                 booking.setPatientProfile(patientProfile);
                 booking.setDoctorSchedule(doctorSchedule);

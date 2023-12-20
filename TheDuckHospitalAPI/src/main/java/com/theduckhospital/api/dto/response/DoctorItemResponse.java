@@ -4,7 +4,6 @@ import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
-import com.theduckhospital.api.entity.DoctorSchedule;
 import lombok.Data;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class DoctorItemResponse {
     private Gender gender;
     private Degree degree;
     private Department department;
-    private List<DoctorSchedule> doctorSchedules;
+    private List<DoctorScheduleItemResponse> doctorSchedules;
     private double price;
 
     public DoctorItemResponse(Doctor doctor) {
@@ -28,7 +27,7 @@ public class DoctorItemResponse {
         department = doctor.getDepartment();
         doctorSchedules = doctor.getDoctorSchedules().stream().filter(
                 doctorSchedule -> !doctorSchedule.isDeleted()
-        ).toList();
+        ).map(DoctorScheduleItemResponse::new).toList();
         price = doctor.getDoctorSchedules().stream().filter(
                 doctorSchedule -> !doctorSchedule.isDeleted()
         ).mapToDouble(ds -> ds.getMedicalService().getPrice()).min().orElse(0);

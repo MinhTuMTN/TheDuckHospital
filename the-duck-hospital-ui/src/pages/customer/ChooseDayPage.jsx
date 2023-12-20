@@ -345,6 +345,7 @@ function ChooseDayPage(props) {
                       handleButtonClick(schedule.doctorScheduleId);
                       setSelectedSchedule(schedule);
                     }}
+                    disabled={!schedule.available}
                   >
                     {schedule.scheduleType === "MORNING"
                       ? "Buổi sáng"
