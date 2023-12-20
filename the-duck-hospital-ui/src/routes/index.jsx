@@ -226,7 +226,11 @@ function Router(props) {
       path: "/",
     },
     {
-      element: <ProtectedLayout forRole={["Doctor", "HeadDoctor"]} />,
+      element: (
+        <ProtectedLayout
+          forRole={["Doctor", "HeadDoctor", "LaboratoryTechnician"]}
+        />
+      ),
       children: [
         {
           path: "/doctor",
