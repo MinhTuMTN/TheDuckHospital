@@ -250,7 +250,7 @@ function DepartmentDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{department.description}</NoiDung>
+            <NoiDung>{department.description ? department.description : "Đang cập nhật"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>

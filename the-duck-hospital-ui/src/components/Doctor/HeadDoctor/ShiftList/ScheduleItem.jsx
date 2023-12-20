@@ -5,6 +5,7 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import BookmarkAddedOutlinedIcon from '@mui/icons-material/BookmarkAddedOutlined';
 import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
+import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
 import {
   Box,
   Button,
@@ -13,6 +14,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
@@ -36,13 +38,23 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
   marginBottom: "2px !important",
 }));
 
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  input: {
+    height: "3.5rem",
+  },
+}));
+
 function ScheduleItem(props) {
   const { schedule, setRefresh, refresh, valueDate } = props;
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [doctors, setDoctors] = useState([]);
-  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [editDoctorSchedule, setEditDoctorSchedule] = useState({
+    selectedDoctor: "",
+    slot: 1,
+  });
   const [updateButtonClicked, setUpdateButtonClicked] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
+  const currentDay = dayjs();
 
   const handleDeleteSchedule = async () => {
     const response = await deleteDoctorSchedule(schedule.doctorScheduleId);
@@ -67,19 +79,26 @@ function ScheduleItem(props) {
   const handleUpdateSchedule = async () => {
     setUpdateButtonClicked(true);
 
-    if (selectedDoctor === "") {
+    if (editDoctorSchedule.selectedDoctor === "") {
       enqueueSnackbar("Bác sĩ không được để trống", { variant: "error" });
       return;
     }
 
-    const currentDay = dayjs();
+    if (editDoctorSchedule.slot < schedule.numberOfBookings ||
+      editDoctorSchedule.slot === 0
+    ) {
+      enqueueSnackbar("Số chỗ phải lớn hơn lượng đặt hiện tại và lớn hơn 0", { variant: "error" });
+      return;
+    }
+
     if (dayjs(valueDate).isSame(currentDay, 'day') || dayjs(valueDate).isBefore(currentDay, 'day')) {
       enqueueSnackbar("Chỉ được cập nhật lịch trực trước hôm nay một ngày", { variant: "error" });
       return;
     }
 
     const response = await updateDoctorSchedule(schedule.doctorScheduleId, {
-      staffId: selectedDoctor,
+      staffId: editDoctorSchedule.selectedDoctor,
+      slot: editDoctorSchedule.slot,
       date: dayjs(valueDate).format("YYYY-MM-DD"),
     });
     if (response.success) {
@@ -199,6 +218,22 @@ function ScheduleItem(props) {
           {schedule.numberOfBookings}
         </Typography>
       </Stack>
+      <Stack direction="row" justifyContent="space-between">
+        <Stack direction="row" spacing={1}>
+          <EventAvailableOutlinedIcon />
+          <Typography
+            sx={{
+              fontSize: "18px",
+              fontWeight: 600,
+            }}
+          >
+            Chỗ còn lại
+          </Typography>
+        </Stack>
+        <Typography>
+          {schedule.slot - schedule.numberOfBookings}
+        </Typography>
+      </Stack>
       <Stack
         spacing={1}
         direction={"row"}
@@ -224,18 +259,22 @@ function ScheduleItem(props) {
         </CustomButton>
         <CustomButton
           variant="contained"
+          disabled={dayjs(valueDate).isSame(currentDay, 'day') || dayjs(valueDate).isBefore(currentDay, 'day')}
           sx={{
-            backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+            background: "linear-gradient(to right, #42a5f5, #6fccea)",
             color: "#fff",
             width: "35%",
             "&:hover": {
-              backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
+              background: "linear-gradient(to right, #42a5f5, #6fccea)",
             },
           }}
-        onClick={() => {
-          setSelectedDoctor(schedule.doctor.staffId);
-          setOpenDialogForm(true);
-        }}
+          onClick={() => {
+            setEditDoctorSchedule((prev) => ({
+              ...prev,
+              selectedDoctor: schedule.doctor.staffId,
+            }));
+            setOpenDialogForm(true);
+          }}
         >
           Cập nhật
         </CustomButton>
@@ -266,23 +305,33 @@ function ScheduleItem(props) {
           setUpdateButtonClicked(false);
         }}
       >
-        <Stack width={"30rem"} mt={3} spacing={4}>
-          <Box>
+        <Stack
+          direction="row"
+          width={"30rem"}
+          mt={3}
+          spacing={1}
+        >
+          <Box style={{ width: "60%" }}>
             <CustomTypography
               variant="body1"
               style={{
-                color: selectedDoctor === "" && updateButtonClicked ? "red" : "",
+                color: editDoctorSchedule.selectedDoctor === "" && updateButtonClicked ? "red" : "",
               }}
             >
               Bác sĩ
             </CustomTypography>
-
-            <FormControl fullWidth error={selectedDoctor === "" && updateButtonClicked}>
+            <FormControl
+              fullWidth
+              error={editDoctorSchedule.selectedDoctor === "" && updateButtonClicked}
+            >
               <Select
-                value={selectedDoctor}
-                onChange={(e) =>
-                  setSelectedDoctor(e.target.value)
-                }
+                value={editDoctorSchedule.selectedDoctor}
+                onChange={(e) => {
+                  setEditDoctorSchedule((prev) => ({
+                    ...prev,
+                    selectedDoctor: e.target.value,
+                  }));
+                }}
                 displayEmpty
                 required
                 sx={{
@@ -298,10 +347,51 @@ function ScheduleItem(props) {
                   </MenuItem>
                 ))}
               </Select>
-              {selectedDoctor === "" && updateButtonClicked && (
+              {editDoctorSchedule.selectedDoctor === "" && updateButtonClicked && (
                 <FormHelperText>Bác sĩ không được để trống</FormHelperText>
               )}
             </FormControl>
+          </Box>
+          <Box
+            style={{
+              width: "40%",
+            }}
+          >
+            <CustomTypography
+              variant="body1"
+              style={{
+                color: (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                  editDoctorSchedule.slot === 0) && updateButtonClicked ? "red" : "",
+              }}
+            >
+              Số lượng chỗ
+            </CustomTypography>
+            <CustomTextField
+              type="number"
+              autoFocus
+              autoComplete="off"
+              InputProps={{ inputProps: { min: schedule.numberOfBookings } }}
+              value={
+                editDoctorSchedule.slot ?
+                  editDoctorSchedule.slot.toString() :
+                  schedule.numberOfBookings.toString()
+              }
+              onChange={(e) => {
+                setEditDoctorSchedule((prev) => ({
+                  ...prev,
+                  slot: e.target.value && parseInt(e.target.value) >= schedule.numberOfBookings ?
+                  parseInt(e.target.value) : schedule.numberOfBookings,
+                }));
+              }}
+              required
+              error={(editDoctorSchedule.slot < schedule.numberOfBookings ||
+                editDoctorSchedule.slot === 0) && updateButtonClicked}
+              helperText={
+                (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                  editDoctorSchedule.slot === 0) &&
+                updateButtonClicked && "Số lượng chỗ không hợp lệ"
+              }
+            />
           </Box>
         </Stack>
       </DialogForm>

@@ -375,7 +375,8 @@ function DoctorTable(props) {
                 onChange={(e) => {
                   setDoctorSchedule((prev) => ({
                     ...prev,
-                    slot: e.target.value ? parseInt(e.target.value) : 1,
+                    slot: e.target.value && parseInt(e.target.value) > 0 ?
+                    parseInt(e.target.value) : 1,
                   }));
                 }}
                 required

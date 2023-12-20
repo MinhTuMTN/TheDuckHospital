@@ -598,6 +598,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         if (sameDay || date.before(today)) {
             throw new BadRequestException("Not today or the previous days");
         }
+
         Doctor headDoctor = getHeadDoctor(authorization);
 
         Department department = headDoctor.getDepartment();
@@ -612,7 +613,13 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         DoctorSchedule doctorSchedule = scheduleOptional.get();
+
+        if (request.getSlot() == 0 || request.getSlot() < calculateNumberOfBookings(doctorSchedule)){
+            throw new BadRequestException("Invalid Slot");
+        }
+
         doctorSchedule.setDoctor(doctor);
+        doctorSchedule.setSlot(request.getSlot());
         return doctorScheduleRepository.save(doctorSchedule);
     }
 }

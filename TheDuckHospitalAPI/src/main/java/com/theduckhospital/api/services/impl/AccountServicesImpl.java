@@ -396,15 +396,6 @@ public class AccountServicesImpl implements IAccountServices {
         if (staff != null) {
             staff.setDeleted(false);
             staffRepository.save(staff);
-            if (staff instanceof Doctor) {
-                List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
-                if(!schedules.isEmpty()) {
-                    schedules.forEach(schedule -> {
-                        schedule.setDeleted(false);
-                        doctorScheduleRepository.save(schedule);
-                    });
-                }
-            }
         }
 
         List<PatientProfile> patientProfile = account.getPatientProfile();
