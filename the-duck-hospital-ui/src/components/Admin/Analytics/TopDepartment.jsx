@@ -64,7 +64,7 @@ function TopDepartment(props) {
             marginTop: "8px",
           }}
         />
-        <TieuDe>Khoa có nhiều bệnh nhân</TieuDe>
+        <TieuDe>Khoa có nhiều lượt khám</TieuDe>
       </BoxStyle>
       <BoxStyle2 className="Hello">
         <Stack direction={"row"} spacing={1} alignItems={"center"}>
