@@ -509,6 +509,14 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Room is not in your department");
         }
 
+        List<DoctorSchedule> mergedList = getMergedScheduleRoom(room);
+
+        return mergedList.stream()
+                .map(DoctorSchedule::getDate)
+                .collect(Collectors.toList());
+    }
+
+    private List<DoctorSchedule> getMergedScheduleRoom(Room room) {
         List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
                 room,
                 MORNING
@@ -519,9 +527,39 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 AFTERNOON
         );
 
+        return Stream.concat(morningSchedules.stream(), afternoonSchedules.stream())
+                .distinct()
+                .toList();
+    }
+    @Override
+    public List<Date> getDateHasDoctorSchedule(UUID staffId){
+        Doctor doctor = doctorServices.getDoctorById(staffId);
+
+        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+                doctor,
+                MORNING
+        );
+
+        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+                doctor,
+                AFTERNOON
+        );
+
         List<DoctorSchedule> mergedList = Stream.concat(morningSchedules.stream(), afternoonSchedules.stream())
                 .distinct()
                 .toList();
+
+        return mergedList.stream()
+                .map(DoctorSchedule::getDate)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Date> getDateHasDoctorScheduleRoom(int roomId){
+        Room room = roomServices.findRoomById(roomId);
+
+
+        List<DoctorSchedule> mergedList = getMergedScheduleRoom(room);
 
         return mergedList.stream()
                 .map(DoctorSchedule::getDate)

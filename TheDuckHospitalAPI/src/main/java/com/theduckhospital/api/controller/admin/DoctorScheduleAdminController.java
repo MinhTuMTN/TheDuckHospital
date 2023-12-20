@@ -41,4 +41,26 @@ public class DoctorScheduleAdminController {
         );
     }
 
+    @GetMapping("/{staffId}/date-has-schedule")
+    public ResponseEntity<?> getDateHasDoctorSchedule(@PathVariable UUID staffId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedule successfully")
+                        .data(scheduleDoctorServices.getDateHasDoctorSchedule(staffId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/room/{roomId}/date-has-schedule")
+    public ResponseEntity<?> getDateHasDoctorScheduleRoom(@PathVariable int roomId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedule successfully")
+                        .data(scheduleDoctorServices.getDateHasDoctorScheduleRoom(roomId))
+                        .build()
+        );
+    }
+
 }

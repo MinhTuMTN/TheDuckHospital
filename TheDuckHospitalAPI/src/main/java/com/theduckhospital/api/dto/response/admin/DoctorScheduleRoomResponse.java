@@ -23,6 +23,7 @@ public class DoctorScheduleRoomResponse {
     private String phoneNumber;
     private int queueNumber;
     private long numberOfBookings;
+    private int slot;
     private Date date;
 
     public DoctorScheduleRoomResponse(DoctorSchedule schedule, long numberOfBookings) {
@@ -39,5 +40,6 @@ public class DoctorScheduleRoomResponse {
         this.queueNumber = schedule.getQueueNumber();
         this.date = schedule.getDate();
         this.numberOfBookings = numberOfBookings;
+        this.slot = schedule.getSlot();
     }
 }

@@ -246,7 +246,6 @@ function StaffDetail(props) {
             <Grid item xs={4} md={3}>
               <TieuDeCot>Khoa</TieuDeCot>
             </Grid>
-
             <Grid item xs={8} md={9}>
               <NoiDung>{staff.departmentName}</NoiDung>
             </Grid>

@@ -69,6 +69,10 @@ public interface IScheduleDoctorServices {
             int roomId
     );
 
+    List<Date> getDateHasDoctorSchedule(UUID staffId);
+
+    List<Date> getDateHasDoctorScheduleRoom(int roomId);
+
     List<Doctor> getActiveDoctorsInDepartment(String authorization);
 
     DoctorSchedule updateDoctorSchedule(

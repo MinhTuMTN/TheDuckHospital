@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { getRoomById } from "../../../services/admin/RoomServices";
-import { getSchedulesByRoomIdAndDate } from "../../../services/admin/DoctorScheduleServices";
+import { getDateHasDoctorScheduleRoom, getSchedulesByRoomIdAndDate } from "../../../services/admin/DoctorScheduleServices";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -48,6 +48,7 @@ function RoomDetailPage() {
   const [dateSelected, setDateSelected] = useState(dayjs());
   const [room, setRoom] = useState({});
   const [schedules, setSchedules] = useState([]);
+  const [dateSchedule, setDateSchedule] = useState([]);
 
   const handleGetRoom = useCallback(async () => {
     const response = await getRoomById(roomId);
@@ -85,6 +86,25 @@ function RoomDetailPage() {
       return () => clearInterval(interval);
     }
   }, [handleGetSchedules, schedules]);
+
+  useEffect(() => {
+    const handleGetDateHasSchedule = async () => {
+      const response = await getDateHasDoctorScheduleRoom(roomId);
+      if (response.success) {
+        setDateSchedule(
+          response.data.data.map(
+            (date) => dayjs(date).format("YYYY/MM/DD")
+          )
+        );
+      }
+    };
+   
+    handleGetDateHasSchedule();
+  }, [roomId]);
+
+  function disableDateNotHasSchedule(date) {
+    return !dateSchedule?.includes(date.format("YYYY/MM/DD"));
+  }
 
   return (
     <Box
@@ -188,6 +208,7 @@ function RoomDetailPage() {
                         <CustomDatePicker
                           label="Ngày làm việc"
                           value={dayjs(dateSelected)}
+                          shouldDisableDate={disableDateNotHasSchedule}
                           onChange={(newDate) => {
                             setDateSelected(newDate);
                           }}
