@@ -69,7 +69,7 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row, handleGetMedicines, setMedicine, setAddNew, setOpenDialogForm } = props;
+  const { row, setEnterPressed, setMedicine, setAddNew, setOpenDialogForm } = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const [medicineId, setMedicineId] = useState();
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -94,7 +94,7 @@ function Row(props) {
       response = await restoreMedicine(medicineId);
       if (response.success) {
         enqueueSnackbar("Mở khóa thuốc thành công!", { variant: "success" });
-        handleGetMedicines();
+        setEnterPressed(true);
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -102,7 +102,7 @@ function Row(props) {
       response = await deleteMedicine(medicineId);
       if (response.success) {
         enqueueSnackbar("Khóa thuốc thành công!", { variant: "success" });
-        handleGetMedicines();
+        setEnterPressed(true);
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
       }
@@ -306,7 +306,7 @@ function MedicineTable(props) {
     page,
     rowsPerPage,
     items,
-    handleGetMedicines,
+    setEnterPressed,
     setMedicine,
     setAddNew,
     setOpenDialogForm
@@ -384,7 +384,7 @@ function MedicineTable(props) {
                 <Row
                   key={index}
                   row={row}
-                  handleGetMedicines={handleGetMedicines}
+                  setEnterPressed={setEnterPressed}
                   setMedicine={setMedicine}
                   setAddNew={setAddNew}
                   setOpenDialogForm={setOpenDialogForm}

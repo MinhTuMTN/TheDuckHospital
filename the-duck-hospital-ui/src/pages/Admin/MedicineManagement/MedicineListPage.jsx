@@ -219,7 +219,7 @@ function MedicineListPage(props) {
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
                 rowsPerPage={limit}
-                handleGetMedicines={handleGetMedicines}
+                setEnterPressed={setEnterPressed}
                 setMedicine={setMedicine}
                 setAddNew={setAddNew}
                 setOpenDialogForm={setOpenDialogForm}
