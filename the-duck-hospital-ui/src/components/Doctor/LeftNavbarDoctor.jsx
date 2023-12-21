@@ -94,7 +94,10 @@ function LeftNavBarDoctor(props) {
   const navigate = useNavigate();
   const { role } = useAuth();
 
-  const mainItems = role === "Doctor" ? sidebarItems : technicianSidebarItems;
+  const mainItems =
+    role === "Doctor" || role === "HeadDoctor"
+      ? sidebarItems
+      : technicianSidebarItems;
   const content = (
     <Box
       sx={{
