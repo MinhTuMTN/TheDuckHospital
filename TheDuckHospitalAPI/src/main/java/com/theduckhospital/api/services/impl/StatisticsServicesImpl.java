@@ -116,7 +116,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         List<Long> values = bookings.stream()
-                .map(entry -> (Long) entry[0])
+                .map(entry -> (Long) entry[1])
                 .collect(Collectors.toList());
 
         List<String> labels = bookings.stream()
