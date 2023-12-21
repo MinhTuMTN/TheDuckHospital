@@ -139,7 +139,7 @@ function LeftNavBarDoctor(props) {
               fontSize: "18px",
             }}
           >
-            Bác sĩ
+            {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
           </Typography>
         </Box>
         <List>
@@ -255,7 +255,7 @@ function LeftNavBarDoctor(props) {
                 textAlign: "left",
               }}
             >
-              Bác sĩ
+              {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
             </Typography>
             <Typography
               sx={{
