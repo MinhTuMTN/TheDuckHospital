@@ -71,7 +71,7 @@ function VerifyInformation(props) {
     if (response.success) {
       navigate("/user");
     } else {
-      enqueueSnackbar("Số đien thoại không hợp lệ", {
+      enqueueSnackbar("Số điện thoại không hợp lệ", {
         variant: "error",
       });
     }
