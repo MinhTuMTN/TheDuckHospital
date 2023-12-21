@@ -3,6 +3,7 @@ import { enqueueSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import MedicalBillProfileItem from "../../components/Customer/MedicalBill/MedicalBillProfileItem";
 import { getBookings } from "../../services/customer/BookingServices";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
 
 function MedicalBillsPage(props) {
   const [bookings, setBookings] = React.useState([]);
@@ -37,6 +38,10 @@ function MedicalBillsPage(props) {
             booking={booking}
           />
         ))}
+
+        {bookings?.length === 0 && (
+          <SearchNotFound text="Không có phiếu khám bệnh nào" />
+        )}
       </Box>
     </Box>
   );

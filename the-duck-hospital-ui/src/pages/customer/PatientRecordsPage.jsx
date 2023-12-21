@@ -3,6 +3,7 @@ import React, { useCallback, useEffect } from "react";
 import PatientRecordItem from "../../components/Customer/PatientRecord/PatientRecordItem";
 import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
 import { enqueueSnackbar } from "notistack";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
 
 function PatientRecordsPage(props) {
   const [profiles, setProfiles] = React.useState([]);
@@ -41,6 +42,10 @@ function PatientRecordsPage(props) {
             />
           </Grid>
         ))}
+
+        {profiles?.length === 0 && (
+          <SearchNotFound text="Không có hồ sơ bệnh nhân nào" />
+        )}
       </Grid>
     </Box>
   );

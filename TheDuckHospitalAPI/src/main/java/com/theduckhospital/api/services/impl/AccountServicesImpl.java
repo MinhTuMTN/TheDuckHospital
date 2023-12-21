@@ -194,7 +194,7 @@ public class AccountServicesImpl implements IAccountServices {
             boolean result = graphServices.sendEmail(
                     emailOrPhone,
                     "Mã xác nhận đăng nhập",
-                    "Mã xác nhận đăng nhập The Duck Mobile của bạn là: "
+                    "Mã xác nhận đăng nhập The Duck Hospital của bạn là: "
                             + otp
             );
             if (!result) {
