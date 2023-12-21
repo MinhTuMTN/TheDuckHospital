@@ -102,9 +102,9 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public HomeStatisticsResponse getHomeStatistics() {
-        long totalDepartments = departmentRepository.count();
+        long totalDepartments = departmentRepository.countByDeletedFalse();
 
-        long totalDoctors = doctorRepository.count();
+        long totalDoctors = doctorRepository.countByDeletedFalse();
 
         return new HomeStatisticsResponse(totalDoctors, totalDepartments);
     }

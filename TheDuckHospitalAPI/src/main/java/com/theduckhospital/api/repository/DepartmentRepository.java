@@ -15,4 +15,5 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
     Page<Department> findPaginationByOrderByDeleted(Pageable pageable);
     List<Department> findDepartmentByMedicalServicesEmpty();
     List<Department> findByDepartmentNameContaining(String departmentName);
+    long countByDeletedFalse();
 }
