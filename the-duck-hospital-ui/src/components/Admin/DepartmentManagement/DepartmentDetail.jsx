@@ -414,6 +414,7 @@ function DepartmentDetail(props) {
                   style={{
                     fontSize: "14px",
                     marginBottom: "4px",
+                    color: departmentEdit.departmentName?.trim() === "" ? "red" : "",
                   }}
                 >
                   Tên khoa
@@ -427,6 +428,11 @@ function DepartmentDetail(props) {
                   autoFocus
                   required
                   fullWidth
+                  error={departmentEdit.departmentName?.trim() === ""}
+                  helperText={
+                    departmentEdit.departmentName?.trim() === "" &&
+                    "Tên khoa không được để trống"
+                  }
                   value={departmentEdit.departmentName}
                   onChange={(e) =>
                     setDepartmentEdit((prev) => {

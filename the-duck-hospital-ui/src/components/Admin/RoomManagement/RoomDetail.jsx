@@ -400,7 +400,7 @@ function RoomDetail(props) {
                   style={{
                     fontSize: "14px",
                     marginBottom: "4px",
-                    color: roomEdit.roomName?.trim() === "" ? "red" : "",
+                    color: roomEdit.departmentId === -1 ? "red" : "",
                   }}
                 >
                   Khoa
