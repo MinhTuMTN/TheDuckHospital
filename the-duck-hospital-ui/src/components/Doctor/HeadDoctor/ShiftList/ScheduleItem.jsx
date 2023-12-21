@@ -292,7 +292,7 @@ function ScheduleItem(props) {
 
       <DialogForm
         cancelText={"Hủy"}
-        okText={"Thêm"}
+        okText={"Cập nhật"}
         onCancel={() => {
           setOpenDialogForm(false);
           setUpdateButtonClicked(false);
