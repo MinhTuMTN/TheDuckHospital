@@ -265,6 +265,7 @@ function ListTestToDo(props) {
                   sx={{
                     textTransform: "none",
                   }}
+                  disabled={!selectedTest.service}
                   onClick={handleAddTest}
                 >
                   Thêm

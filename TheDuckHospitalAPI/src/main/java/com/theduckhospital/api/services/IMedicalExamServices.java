@@ -23,16 +23,16 @@ import java.util.UUID;
 public interface IMedicalExamServices {
     MedicalExaminationRecord createNonPatientMedicalExamRecord(
             NonPatientMedicalExamRequest request
-    );
+    ) throws ParseException;
 
     MedicalExaminationRecord createPatientMedicalExamRecord(
             PatientMedicalExamRequest request
-    );
+    ) throws ParseException;
 
     List<MedicalRecordResponse> getMedicalRecordsByPatientProfile(UUID patientProfileId);
     MedicalRecordItemResponse nurseCreateMedicalExamRecord(
             NurseCreateBookingRequest request
-    );
+    ) throws ParseException;
 
     MedicalExaminationRecord acceptMedicalExamination(String authorization, UUID medicalExaminationId);
 
@@ -44,7 +44,7 @@ public interface IMedicalExamServices {
 
     List<DoctorMedicalTestResponse> doctorDeleteMedicalTest(String authorization, UUID medicalExaminationId, UUID medicalTestId);
 
-    DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request);
+    DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request) throws ParseException;
 
     List<PrescriptionItem> doctorAddMedicine(String authorization, UUID medicalExaminationId, AddMedicine request);
 

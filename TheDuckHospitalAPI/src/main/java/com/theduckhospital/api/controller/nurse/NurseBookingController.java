@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.Map;
 
 @RestController
@@ -27,7 +28,7 @@ public class NurseBookingController {
     public ResponseEntity<?> checkBooking(
             @RequestParam(name = "bookingCode") String bookingCode,
             @RequestParam(name = "roomId") int roomId
-    ) {
+    ) throws ParseException {
         NurseBookingItemResponse booking = bookingServices
                 .checkBooking(bookingCode, roomId);
 
@@ -57,7 +58,7 @@ public class NurseBookingController {
     @PostMapping
     public ResponseEntity<?> createBookingAndMedicalExamRecord(
             @RequestBody NurseCreateBookingRequest request
-    ) {
+    ) throws ParseException {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Create booking and payment successfully")

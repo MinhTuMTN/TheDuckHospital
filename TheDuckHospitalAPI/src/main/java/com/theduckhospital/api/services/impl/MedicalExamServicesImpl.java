@@ -73,7 +73,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     @Override
     public MedicalExaminationRecord createNonPatientMedicalExamRecord(
             NonPatientMedicalExamRequest request
-    ) {
+    ) throws ParseException {
         Booking booking = bookingServices.bookingIsValid(
                 request.getBookingCode(),
                 request.getRoomId()
@@ -101,7 +101,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
 
 
     @Override
-    public MedicalExaminationRecord createPatientMedicalExamRecord(PatientMedicalExamRequest request) {
+    public MedicalExaminationRecord createPatientMedicalExamRecord(PatientMedicalExamRequest request) throws ParseException {
         Booking booking = bookingServices.bookingIsValid(
                 request.getBookingCode(),
                 request.getRoomId()
@@ -126,7 +126,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     }
 
     @Override
-    public MedicalRecordItemResponse nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) {
+    public MedicalRecordItemResponse nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException {
         Optional<Booking> bookingOptional = bookingRepository
                 .nurseFindBooking(
                         request.getPatientProfileId(),
@@ -283,11 +283,18 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     }
 
     @Override
-    public DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request) {
+    public DoctorMedicalRecordResponse doctorUpdateMedicalRecord(String authorization, UUID medicalExaminationId, UpdateMedicalRecord request) throws ParseException {
         MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
                 authorization,
                 medicalExaminationId
         );
+
+        // Check re-examination date is valid
+        if (request.getDateOfReExamination() != null) {
+            if (request.getDateOfReExamination().before(DateCommon.getToday())) {
+                throw new BadRequestException("Re-examination date is invalid");
+            }
+        }
 
         medicalExaminationRecord.setSymptom(request.getSymptom());
         medicalExaminationRecord.setDiagnosis(request.getDiagnosis());

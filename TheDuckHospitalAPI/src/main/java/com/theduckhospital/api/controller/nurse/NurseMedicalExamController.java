@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/api/nurse/medical-exams")
 @PreAuthorize("hasRole('ROLE_NURSE')")
@@ -25,7 +27,7 @@ public class NurseMedicalExamController {
     @PostMapping("/non-patient")
     public ResponseEntity<?> createNonPatientMedicalExamRecord(
             @RequestBody @Valid NonPatientMedicalExamRequest request
-    ) {
+    ) throws ParseException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
@@ -40,7 +42,7 @@ public class NurseMedicalExamController {
     @PostMapping("/patient")
     public ResponseEntity<?> createPatientMedicalExamRecord(
             @RequestBody @Valid PatientMedicalExamRequest request
-    ) {
+    ) throws ParseException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

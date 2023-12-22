@@ -38,7 +38,9 @@ function TopNavBarDoctor(props) {
           top: 0,
           width: {
             lg: `calc(100vw - ${SIDE_NAV_WIDTH}px)`,
+            md: "100vw",
             sm: "100vw",
+            xs: "100vw",
           },
           zIndex: (theme) => theme.zIndex.appBar,
         }}

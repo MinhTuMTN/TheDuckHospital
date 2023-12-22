@@ -4,6 +4,7 @@ import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileReques
 import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +64,7 @@ public class NursePatientProfileController {
 
     @PostMapping
     public ResponseEntity<?> createPatientProfile(
-            @RequestBody NurseCreatePatientProfileRequest request
+            @RequestBody @Valid NurseCreatePatientProfileRequest request
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
