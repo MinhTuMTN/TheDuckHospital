@@ -73,6 +73,8 @@ function MedicalTestRecord(props) {
     if (response.success) {
       enqueueSnackbar("Cập nhật thành công", { variant: "success" });
       navigate("/doctor/doctor-test");
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra với file báo cáo", { variant: "error" });
     }
   };
 
