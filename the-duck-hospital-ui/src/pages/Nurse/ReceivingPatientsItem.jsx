@@ -45,7 +45,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function ReceivingPatientsItem(props) {
-  const { booking } = props;
+  const { booking, onReload } = props;
   const [open, setOpen] = React.useState(false);
   const [patient, setPatient] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -61,6 +61,7 @@ function ReceivingPatientsItem(props) {
     if (response.success) {
       enqueueSnackbar("Tiếp nhận bệnh nhân thành công", { variant: "success" });
       setOpen(false);
+      onReload();
     } else {
       let message = "Đã có lỗi xảy ra";
       if (response.statusCode === 404) {

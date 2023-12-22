@@ -189,7 +189,6 @@ function DialogSearchRoom(props) {
 
   useEffect(() => {
     const handleSearchRoom = async () => {
-      if (roomNameSearch.trim() === "") return;
       setIsLoading(true);
       const response = await findRoom(roomNameSearch);
       if (response.success) setRooms(response.data.data);

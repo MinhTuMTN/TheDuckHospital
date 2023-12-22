@@ -132,7 +132,12 @@ function ReceivingPatients(props) {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
-                <ReceivingPatientsItem booking={booking} />
+                <ReceivingPatientsItem
+                  booking={booking}
+                  onReload={() => {
+                    setSearchString("");
+                  }}
+                />
               </Box>
             </Stack>
           )
