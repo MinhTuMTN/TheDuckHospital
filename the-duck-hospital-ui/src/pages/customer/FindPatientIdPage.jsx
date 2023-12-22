@@ -101,7 +101,7 @@ function FindPatientIdPage(props) {
     if (response.success) {
       const data = response.data.data;
       if (data.length === 0) {
-        enqueueSnackbar("Không tìm thấy bệnh nhân", {
+        enqueueSnackbar("Không tìm thấy mã bệnh nhân", {
           variant: "error",
         });
         return;

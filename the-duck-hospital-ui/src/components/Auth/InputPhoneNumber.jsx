@@ -111,6 +111,7 @@ function InputPhoneNumber(props) {
         <CustomTextField
           autoFocus
           variant="outlined"
+          placeholder="Số điện thoại"
           size="large"
           onChange={(e) => setPhone(e.target.value)}
           onKeyDown={(e) => {

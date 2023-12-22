@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.request.BookingRequest;
@@ -22,6 +23,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -226,14 +228,14 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public NurseBookingItemResponse checkBooking(String bookingCode, int roomId) {
+    public NurseBookingItemResponse checkBooking(String bookingCode, int roomId) throws ParseException {
         Booking booking = bookingIsValid(bookingCode, roomId);
 
         return new NurseBookingItemResponse(booking);
     }
 
     @Override
-    public Booking bookingIsValid(String bookingCode, int roomId) {
+    public Booking bookingIsValid(String bookingCode, int roomId) throws ParseException {
         Booking booking = bookingRepository
                 .findByBookingCodeAndDeletedIsFalse(
                         bookingCode
@@ -242,13 +244,13 @@ public class BookingServicesImpl implements IBookingServices {
         if (booking == null)
             throw new NotFoundException("Booking not found");
 
-        /*
-        Check date booking with current date
+
+        // Check date booking with current date
         Date date = booking.getDoctorSchedule().getDate();
-        Date currentDate = new Date();
+        Date currentDate = DateCommon.getToday();
         if (DateCommon.compareDate(date, currentDate) != 0 )
             throw new StatusCodeException("Invalid examination date", 409);
-        */
+
 
         if (booking.getDoctorSchedule().getRoom().getRoomId() != roomId)
             throw new StatusCodeException("Room not valid", 410);

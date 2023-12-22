@@ -33,11 +33,10 @@ public class HistoryMedicalRecord {
                 .filter(medicalTest -> !medicalTest.isDeleted())
                 .map(DoctorMedicalTestResponse::new)
                 .toList();
-        this.prescriptionItems = medicalExaminationRecord.getPrescription()
-                .getPrescriptionItems()
-                .stream()
-                .filter(prescriptionItem -> !prescriptionItem.isDeleted())
-                .toList();
+        if (medicalExaminationRecord.getPrescription() != null)
+            this.prescriptionItems = medicalExaminationRecord.getPrescription().getPrescriptionItems().stream()
+                    .filter(prescriptionItem -> !prescriptionItem.isDeleted())
+                    .toList();
         this.reExaminationDate = medicalExaminationRecord.getReExaminationDate();
     }
 }

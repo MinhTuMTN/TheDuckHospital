@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.Booking;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,8 +20,8 @@ public interface IBookingServices {
 
     MedicalRecordItemResponse getBooking(String token, UUID bookingId);
 
-    NurseBookingItemResponse checkBooking(String bookingCode, int roomId);
-    Booking bookingIsValid(String bookingCode, int roomId);
+    NurseBookingItemResponse checkBooking(String bookingCode, int roomId) throws ParseException;
+    Booking bookingIsValid(String bookingCode, int roomId) throws ParseException;
     Map<String, String> checkPatientCode(String identityNumber);
     Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request);
 }

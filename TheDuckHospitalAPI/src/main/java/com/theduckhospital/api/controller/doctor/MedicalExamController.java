@@ -89,7 +89,7 @@ public class MedicalExamController {
             @RequestHeader("Authorization") String authorization,
             @PathVariable("medicalExaminationId") UUID medicalExaminationId,
             @RequestBody UpdateMedicalRecord request
-    ) {
+    ) throws ParseException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

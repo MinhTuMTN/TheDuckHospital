@@ -138,6 +138,18 @@ function MedicalExaminationRecord(props) {
   }, [medicalRecordId]);
 
   const handleUpdateMedicalRecord = async () => {
+    console.log(
+      isCheck &&
+        (!dateOfReExamination || dayjs(dateOfReExamination).isBefore(dayjs()))
+    );
+    if (
+      isCheck &&
+      (!dateOfReExamination || dayjs(dateOfReExamination).isBefore(dayjs()))
+    ) {
+      enqueueSnackbar("Ngày tái khám không hợp lệ", { variant: "error" });
+      return;
+    }
+
     const response = await updateMedicalRecord(
       medicalRecordId,
       symptom,
