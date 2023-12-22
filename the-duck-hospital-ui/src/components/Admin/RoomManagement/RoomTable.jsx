@@ -87,7 +87,7 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.departmentName}
+            {row.departmentName ? row.departmentName : "Đang cập nhật"}
           </CustomText>
         </TableCell>
         <TableCell align="right">

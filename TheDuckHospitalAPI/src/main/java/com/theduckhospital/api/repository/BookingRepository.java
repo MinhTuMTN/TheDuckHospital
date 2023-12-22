@@ -2,6 +2,7 @@ package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.DoctorSchedule;
+import com.theduckhospital.api.entity.PatientProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,4 +47,9 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             "GROUP BY ds.date " +
             "ORDER BY ds.date ASC")
     List<Object[]> countBookingsByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    Optional<Booking> findByPatientProfileAndDoctorScheduleAndDeletedIsFalse(
+            PatientProfile patientProfile,
+            DoctorSchedule doctorSchedule
+    );
 }

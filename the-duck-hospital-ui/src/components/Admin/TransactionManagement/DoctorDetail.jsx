@@ -92,7 +92,7 @@ function DoctorDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{doctorDepartment}</NoiDung>
+              <NoiDung>{doctorDepartment ? doctorDepartment : "Đang cập nhật"}</NoiDung>
             </Stack>
           </Grid>
         </Grid>

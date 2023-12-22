@@ -8,7 +8,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import DnsIcon from "@mui/icons-material/Dns";
 import VaccinesIcon from "@mui/icons-material/Vaccines";
-// import pic from "../assets/logo-removebg-preview.jpg";
 
 import {
   Box,

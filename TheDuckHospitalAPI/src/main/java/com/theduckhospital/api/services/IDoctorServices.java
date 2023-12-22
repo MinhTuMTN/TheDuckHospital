@@ -15,8 +15,13 @@ public interface IDoctorServices {
 
     List<Doctor> getDoctorNotInDepartment();
     Doctor getDoctorByToken(String token);
-
-    FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(String authorization, int page, int limit);
+    
+    FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(
+            String authorization,
+            String search,
+            int page,
+            int limit
+    );
 
     PaginationResponse getMedicalExaminationDoctors(
             String fullName,

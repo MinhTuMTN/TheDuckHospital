@@ -2,7 +2,9 @@ package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
+import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
+import com.theduckhospital.api.entity.Staff;
 import com.theduckhospital.api.services.IStaffServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/staffs")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class StaffAdminController {
     private final IStaffServices staffServices;
 
@@ -44,6 +46,27 @@ public class StaffAdminController {
                 );
     }
 
+    @PutMapping("/{staffId}")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateStaff(@PathVariable UUID staffId, @RequestBody @Valid UpdateStaffRequest request) {
+        Staff result = staffServices.updateStaff(staffId, request);
+        if (result == null) {
+            return ResponseEntity.badRequest().body(
+                    GeneralResponse.builder()
+                            .success(false)
+                            .message("Cannot update staff")
+                            .build()
+            );
+        }
+        return ResponseEntity.ok()
+                .body(GeneralResponse.builder()
+                        .success(true)
+                        .message("Update staff successfully")
+                        .data(result)
+                        .build()
+                );
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllStaffs() {
         return ResponseEntity.ok(
@@ -60,7 +83,7 @@ public class StaffAdminController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "") List<Role> staffRole,
+            @RequestParam(defaultValue = "DOCTOR, NURSE, PHARMACIST, CASHIER, LABORATORY_TECHNICIAN") List<Role> staffRole,
             @RequestParam(defaultValue = "false, true") List<Boolean> staffStatus
     ) {
         return ResponseEntity.ok(

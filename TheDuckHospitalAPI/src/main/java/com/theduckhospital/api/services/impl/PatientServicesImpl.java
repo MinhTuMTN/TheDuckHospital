@@ -1,6 +1,5 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredPatientsResponse;
 import com.theduckhospital.api.dto.response.admin.PatientResponse;
 import com.theduckhospital.api.entity.*;
@@ -8,7 +7,6 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.PatientRepository;
 import com.theduckhospital.api.services.IPatientServices;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

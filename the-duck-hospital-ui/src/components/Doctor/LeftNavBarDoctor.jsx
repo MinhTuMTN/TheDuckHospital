@@ -94,7 +94,10 @@ function LeftNavBarDoctor(props) {
   const navigate = useNavigate();
   const { role } = useAuth();
 
-  const mainItems = role === "Doctor" ? sidebarItems : technicianSidebarItems;
+  const mainItems =
+    role === "Doctor" || role === "HeadDoctor"
+      ? sidebarItems
+      : technicianSidebarItems;
   const content = (
     <Box
       sx={{
@@ -136,7 +139,7 @@ function LeftNavBarDoctor(props) {
               fontSize: "18px",
             }}
           >
-            Bác sĩ
+            {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
           </Typography>
         </Box>
         <List>
@@ -252,7 +255,7 @@ function LeftNavBarDoctor(props) {
                 textAlign: "left",
               }}
             >
-              Bác sĩ
+              {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
             </Typography>
             <Typography
               sx={{

@@ -18,7 +18,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import ScheduleTable from "../../../components/Admin/ScheduleTable";
-import { getSchedulesByStaffIdAndDate } from "../../../services/admin/DoctorScheduleServices";
+import { getDateHasDoctorSchedule, getSchedulesByStaffIdAndDate } from "../../../services/admin/DoctorScheduleServices";
 
 const StaffId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -61,6 +61,7 @@ function StaffDetailPage() {
   const [isDoctor, setIsDoctor] = useState(false);
   const [dateSelected, setDateSelected] = useState(dayjs());
   const [schedules, setSchedules] = useState([]);
+  const [dateSchedule, setDateSchedule] = useState([]);
 
   const handleGetSchedules = useCallback(async () => {
     if(!isDoctor) return;
@@ -91,6 +92,25 @@ function StaffDetailPage() {
   useEffect(() => {
     handleGetStaff();
   }, [handleGetStaff]);
+
+  useEffect(() => {
+    const handleGetDateHasSchedule = async () => {
+      const response = await getDateHasDoctorSchedule(staffId);
+      if (response.success) {
+        setDateSchedule(
+          response.data.data.map(
+            (date) => dayjs(date).format("YYYY/MM/DD")
+          )
+        );
+      }
+    };
+   
+    handleGetDateHasSchedule();
+  }, [staffId]);
+ 
+  function disableDateNotHasSchedule(date) {
+    return !dateSchedule?.includes(date.format("YYYY/MM/DD"));
+  }
 
   return (
     <Box
@@ -207,6 +227,7 @@ function StaffDetailPage() {
                         <CustomDatePicker
                           label="Ngày làm việc"
                           value={dayjs(dateSelected)}
+                          shouldDisableDate={disableDateNotHasSchedule}
                           onChange={(newDate) => {
                             setDateSelected(newDate);
                           }}

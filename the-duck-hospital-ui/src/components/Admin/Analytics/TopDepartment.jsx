@@ -64,7 +64,7 @@ function TopDepartment(props) {
             marginTop: "8px",
           }}
         />
-        <TieuDe>Khoa có nhiều bệnh nhân</TieuDe>
+        <TieuDe>Khoa có nhiều lượt khám</TieuDe>
       </BoxStyle>
       <BoxStyle2 className="Hello">
         <Stack direction={"row"} spacing={1} alignItems={"center"}>
@@ -85,35 +85,6 @@ function TopDepartment(props) {
                   <TopDepartmentItem department={department} index={index} />
                 </CustomListItem>
               ))}
-              {/* 
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem>
-              <CustomListItem
-                sx={{
-                  padding: 0,
-                }}
-              >
-                <TopProductItem />
-              </CustomListItem> */}
             </Stack>
           </List>
         </Stack>

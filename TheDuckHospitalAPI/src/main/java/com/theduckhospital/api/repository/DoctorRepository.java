@@ -15,11 +15,12 @@ import java.util.UUID;
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     List<Doctor> findByDepartmentIsNull();
+    long countByDeletedFalse();
     Optional<Doctor> findByStaffIdAndDepartment(UUID doctorId, Department department);
     Page<Doctor> findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, Degree degree, String department_departmentName, Pageable pageable
     );
-    Page<Doctor> findByDeletedFalseAndDepartment(Pageable pageable, Department department);
+    Page<Doctor> findByFullNameContainingAndDeletedFalseAndDepartment(String fullName, Department department, Pageable pageable);
     long countByDeletedFalseAndDepartment(Department department);
     Page<Doctor> findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, String department_departmentName, Pageable pageable

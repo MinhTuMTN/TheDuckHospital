@@ -38,16 +38,13 @@ public class AccountResponse {
                 this.role = "Thu ngân";
             } else if (staff instanceof Pharmacist) {
                 this.role = "Dược sĩ";
+            } else if (staff instanceof LaboratoryTechnician) {
+                this.role = "Bác sĩ xét nghiệm";
             } else {
                 this.role = "Quản lý";
             }
         } else {
-            if(account.getPatientProfile().stream()
-                    .anyMatch(profile -> profile.getPatient() != null)) {
-                this.role = "Bệnh nhân";
-            } else {
-                this.role = "Bệnh nhân (chưa từng khám)";
-            }
+            this.role = "Bệnh nhân";
             this.patientProfiles = account.getPatientProfile();
         }
     }

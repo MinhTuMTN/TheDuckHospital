@@ -209,9 +209,6 @@ function DepartmentDetail(props) {
       <BoxStyle
         component={Grid}
         alignItems={"center"}
-        sx={{
-          borderBottom: "1px solid #E0E0E0",
-        }}
         container
       >
         <Grid item xs={6}>
@@ -253,7 +250,7 @@ function DepartmentDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{department.description}</NoiDung>
+            <NoiDung>{department.description ? department.description : "Đang cập nhật"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -417,6 +414,7 @@ function DepartmentDetail(props) {
                   style={{
                     fontSize: "14px",
                     marginBottom: "4px",
+                    color: departmentEdit.departmentName?.trim() === "" ? "red" : "",
                   }}
                 >
                   Tên khoa
@@ -430,6 +428,11 @@ function DepartmentDetail(props) {
                   autoFocus
                   required
                   fullWidth
+                  error={departmentEdit.departmentName?.trim() === ""}
+                  helperText={
+                    departmentEdit.departmentName?.trim() === "" &&
+                    "Tên khoa không được để trống"
+                  }
                   value={departmentEdit.departmentName}
                   onChange={(e) =>
                     setDepartmentEdit((prev) => {

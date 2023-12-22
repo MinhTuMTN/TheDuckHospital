@@ -194,7 +194,7 @@ public class AccountServicesImpl implements IAccountServices {
             boolean result = graphServices.sendEmail(
                     emailOrPhone,
                     "Mã xác nhận đăng nhập",
-                    "Mã xác nhận đăng nhập The Duck Mobile của bạn là: "
+                    "Mã xác nhận đăng nhập The Duck Hospital của bạn là: "
                             + otp
             );
             if (!result) {
@@ -308,13 +308,9 @@ public class AccountServicesImpl implements IAccountServices {
                         || (accountRole.contains(DOCTOR) && account.getStaff() instanceof Doctor)
                         || (accountRole.contains(NURSE) && account.getStaff() instanceof Nurse)
                         || (accountRole.contains(CASHIER) && account.getStaff() instanceof Cashier)
-                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist))
-                .distinct()
+                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist)
+                        || (accountRole.contains(LABORATORY_TECHNICIAN) && account.getStaff() instanceof LaboratoryTechnician))
                 .collect(Collectors.toList());
-
-        if(filteredAccounts.isEmpty()){
-            filteredAccounts = accounts;
-        }
 
         Pageable pageable = PageRequest.of(page, limit);
 
@@ -400,15 +396,6 @@ public class AccountServicesImpl implements IAccountServices {
         if (staff != null) {
             staff.setDeleted(false);
             staffRepository.save(staff);
-            if (staff instanceof Doctor) {
-                List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
-                if(!schedules.isEmpty()) {
-                    schedules.forEach(schedule -> {
-                        schedule.setDeleted(false);
-                        doctorScheduleRepository.save(schedule);
-                    });
-                }
-            }
         }
 
         List<PatientProfile> patientProfile = account.getPatientProfile();

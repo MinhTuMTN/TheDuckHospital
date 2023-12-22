@@ -1,19 +1,17 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalExamServices;
 import com.theduckhospital.api.services.IPatientProfileServices;
-import com.theduckhospital.api.services.IRoomServices;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/patient-profiles")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class PatientProfileAdminController {
     private final IPatientProfileServices patientProfileServices;
     private final IMedicalExamServices medicalExamServices;

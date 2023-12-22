@@ -1,6 +1,7 @@
 package com.theduckhospital.api.controller.headdoctor;
 
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
+import com.theduckhospital.api.dto.request.headdoctor.UpdateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IRoomServices;
@@ -64,6 +65,38 @@ public class ScheduleHeadDoctorController {
         );
     }
 
+    @GetMapping("/date-has-schedule")
+    public ResponseEntity<?> getDateHasSchedule(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam int roomId
+    ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get days has schedule successfully")
+                        .data(scheduleDoctorServices
+                                .getDateHasSchedule(authorizationHeader, roomId)
+                        )
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{doctorScheduleId}")
+    public ResponseEntity<?> deletedDoctorSchedule(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable UUID doctorScheduleId
+    ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Doctor schedule deleted successfully")
+                        .data(scheduleDoctorServices
+                                .deleteDoctorSchedule(authorizationHeader, doctorScheduleId)
+                        )
+                        .build()
+        );
+    }
+
     @GetMapping("/rooms")
     public ResponseEntity<?> getRoomsDepartment(@RequestHeader("Authorization") String authorizationHeader) {
         return ResponseEntity.ok(
@@ -75,9 +108,53 @@ public class ScheduleHeadDoctorController {
         );
     }
 
+    @GetMapping
+    public ResponseEntity<?> getScheduleHeadDoctor(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam int roomId,
+            @RequestParam Date date
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedules successfully")
+                        .data(scheduleDoctorServices.getScheduleHeadDoctor(authorizationHeader, roomId, date))
+                        .build()
+        );
+    }
+
+    @GetMapping("/active-doctors")
+    public ResponseEntity<?> getActiveDoctors(@RequestHeader("Authorization") String authorizationHeader) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get doctors successfully")
+                        .data(scheduleDoctorServices.getActiveDoctorsInDepartment(authorizationHeader))
+                        .build()
+        );
+    }
+
+    @GetMapping("/rooms-pagination")
+    public ResponseEntity<?> getPaginationRoomsDepartment(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get rooms in department successfully")
+                        .data(roomServices.getPaginationRooms(authorizationHeader, page, limit))
+                        .build()
+        );
+    }
+
+
     @GetMapping("/doctors/filter")
     public ResponseEntity<?> getActiveDoctorsPagination(
             @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int limit
     ){
@@ -85,7 +162,22 @@ public class ScheduleHeadDoctorController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get active doctors pagination successfully")
-                        .data(doctorServices.getPaginationActiveDoctorsDepartment(authorizationHeader, page, limit))
+                        .data(doctorServices.getPaginationActiveDoctorsDepartment(authorizationHeader, search, page, limit))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{doctorScheduleId}")
+    public ResponseEntity<?> updateDoctorSchedule(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable UUID doctorScheduleId,
+            @RequestBody UpdateDoctorScheduleRequest request
+            ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Update doctor schedule successfully")
+                        .data(scheduleDoctorServices.updateDoctorSchedule(authorizationHeader, doctorScheduleId, request))
                         .build()
         );
     }

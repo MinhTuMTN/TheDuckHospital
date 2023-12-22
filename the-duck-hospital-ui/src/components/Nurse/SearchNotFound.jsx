@@ -12,6 +12,7 @@ const StyledContainer = styled(Box)(({ theme }) => ({
 }));
 
 function SearchNotFound(props) {
+  const { text = "Không tìm thấy kết quả nào phù hợp" } = props;
   return (
     <StyledContainer>
       <Avatar
@@ -21,9 +22,7 @@ function SearchNotFound(props) {
           height: "200px",
         }}
       />
-      <Typography fontWeight={500}>
-        Không tìm thấy kết quả nào phù hợp
-      </Typography>
+      <Typography fontWeight={500}>{text}</Typography>
     </StyledContainer>
   );
 }

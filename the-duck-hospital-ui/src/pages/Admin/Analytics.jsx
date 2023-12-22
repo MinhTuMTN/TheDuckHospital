@@ -67,7 +67,7 @@ function Analytics(props) {
                       paddingTop: 0,
                     }}
                   >
-                    <RevenueChart />
+                    <BookingChart />
                   </Stack>
                 </Stack>
                 <Stack component={Paper} elevation={3} sx={paperStyle}>
@@ -77,7 +77,7 @@ function Analytics(props) {
                       paddingTop: 0,
                     }}
                   >
-                    <BookingChart />
+                    <RevenueChart />
                   </Stack>
                 </Stack>
               </Grid>

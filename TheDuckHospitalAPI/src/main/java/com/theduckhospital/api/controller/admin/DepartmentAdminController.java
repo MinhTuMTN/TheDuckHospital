@@ -6,13 +6,14 @@ import com.theduckhospital.api.dto.request.admin.UpdateDepartmentRequest;
 import com.theduckhospital.api.services.IDepartmentServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/departments")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class DepartmentAdminController {
     private final IDepartmentServices departmentServices;
 

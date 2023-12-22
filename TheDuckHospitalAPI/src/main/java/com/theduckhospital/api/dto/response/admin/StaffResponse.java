@@ -14,6 +14,7 @@ public class StaffResponse {
     private String phoneNumber;
     private String identityNumber;
     private String role;
+    private int gender;
     private String departmentName;
     private Date dateOfBirth;
     private boolean headOfDepartment;
@@ -26,6 +27,7 @@ public class StaffResponse {
         this.phoneNumber = staff.getPhoneNumber();
         this.identityNumber = staff.getIdentityNumber();
         this.dateOfBirth = staff.getDateOfBirth();
+        this.gender = staff.getGender().ordinal();
         this.deleted = staff.isDeleted();
 
         if (staff instanceof Doctor) {
@@ -39,6 +41,8 @@ public class StaffResponse {
             this.role = "Thu ngân";
         } else if (staff instanceof Pharmacist) {
             this.role = "Dược sĩ";
+        } else if (staff instanceof LaboratoryTechnician) {
+            this.role = "Bác sĩ xét nghiệm";
         } else {
             this.role = "Quản lý";
         }

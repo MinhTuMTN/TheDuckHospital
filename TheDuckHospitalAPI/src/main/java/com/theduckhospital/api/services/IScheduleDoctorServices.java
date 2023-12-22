@@ -2,12 +2,15 @@ package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
+import com.theduckhospital.api.dto.request.headdoctor.UpdateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
-import com.theduckhospital.api.dto.response.admin.InvalidDateResponse;
+import com.theduckhospital.api.dto.response.doctor.InvalidDateResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorScheduleItemResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorScheduleResponse;
+import com.theduckhospital.api.dto.response.doctor.ScheduleRoomHeadDoctorResponse;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
+import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 
 import java.text.ParseException;
@@ -28,6 +31,13 @@ public interface IScheduleDoctorServices {
 
     QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException;
     QueueBookingResponse getQueueNumber(UUID doctorScheduleId) throws ParseException;
+
+    ScheduleRoomHeadDoctorResponse getScheduleHeadDoctor(
+            String authorization,
+            int roomId,
+            Date date
+    );
+
     InvalidDateResponse getInvalidDateSchedule(
             String authorization,
             int roomId,
@@ -48,4 +58,26 @@ public interface IScheduleDoctorServices {
     Map<String, String> countMedicalExaminationRecord(String authorization, UUID doctorScheduleId);
 
     List<DoctorScheduleItemResponse> getDoctorTimeTable(String authorization);
+
+    boolean deleteDoctorSchedule(
+            String authorization,
+            UUID doctorScheduleId
+    );
+
+    List<Date> getDateHasSchedule(
+            String authorization,
+            int roomId
+    );
+
+    List<Date> getDateHasDoctorSchedule(UUID staffId);
+
+    List<Date> getDateHasDoctorScheduleRoom(int roomId);
+
+    List<Doctor> getActiveDoctorsInDepartment(String authorization);
+
+    DoctorSchedule updateDoctorSchedule(
+            String authorization,
+            UUID doctorScheduleId,
+            UpdateDoctorScheduleRequest request
+    );
 }

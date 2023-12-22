@@ -1,10 +1,9 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -12,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/doctor-schedules")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class DoctorScheduleAdminController {
     private final IScheduleDoctorServices scheduleDoctorServices;
 
@@ -38,6 +37,28 @@ public class DoctorScheduleAdminController {
                         .success(true)
                         .message("Get schedule successfully")
                         .data(scheduleDoctorServices.getDoctorSchedulesByDoctorAndDateAdmin(staffId, date))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{staffId}/date-has-schedule")
+    public ResponseEntity<?> getDateHasDoctorSchedule(@PathVariable UUID staffId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedule successfully")
+                        .data(scheduleDoctorServices.getDateHasDoctorSchedule(staffId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/room/{roomId}/date-has-schedule")
+    public ResponseEntity<?> getDateHasDoctorScheduleRoom(@PathVariable int roomId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get schedule successfully")
+                        .data(scheduleDoctorServices.getDateHasDoctorScheduleRoom(roomId))
                         .build()
         );
     }

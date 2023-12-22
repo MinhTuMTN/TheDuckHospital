@@ -129,7 +129,7 @@ function BookingChart(props) {
             objectFit: "contain",
           }}
         />
-        <TieuDe>Biểu đồ đặt khám theo ngày</TieuDe>
+        <TieuDe>Biểu đồ lượt đặt khám theo ngày</TieuDe>
       </BoxStyle>
       <BoxStyle>
         {labels && labels.length > 0 && (

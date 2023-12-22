@@ -1,17 +1,16 @@
 package com.theduckhospital.api.controller.admin;
 
-import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IStatisticsServices;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
 @RestController
 @RequestMapping("/api/admin/statistics")
-//@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class StatisticsAdminController {
     private final IStatisticsServices statisticsServices;
 

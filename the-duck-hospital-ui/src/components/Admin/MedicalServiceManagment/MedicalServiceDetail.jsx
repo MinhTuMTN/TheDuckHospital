@@ -208,7 +208,7 @@ function MedicalServiceDetail(props) {
             <TieuDeCot>Mô tả</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
-            <NoiDung>{service.description}</NoiDung>
+            <NoiDung>{service.description ? service.description : "Đang cập nhật"}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>

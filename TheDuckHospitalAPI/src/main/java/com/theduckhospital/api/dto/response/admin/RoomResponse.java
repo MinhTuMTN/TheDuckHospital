@@ -8,7 +8,7 @@ public class RoomResponse {
     private int roomId;
     private String roomName;
     private String description;
-    private int departmentId;
+    private Integer departmentId;
     private String departmentName;
     private boolean deleted;
 
@@ -16,8 +16,8 @@ public class RoomResponse {
         this.roomId = room.getRoomId();
         this.roomName = room.getRoomName();
         this.description = room.getDescription();
-        this.departmentId = room.getDepartment().getDepartmentId();
-        this.departmentName = room.getDepartment().getDepartmentName();
+        this.departmentId = room.getDepartment() == null ? null : room.getDepartment().getDepartmentId();
+        this.departmentName = room.getDepartment() == null ? null : room.getDepartment().getDepartmentName();
         this.deleted = room.isDeleted();
     }
 }

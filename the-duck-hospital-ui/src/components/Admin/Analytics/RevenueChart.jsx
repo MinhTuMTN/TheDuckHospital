@@ -46,7 +46,7 @@ function RevenueChart(props) {
   const handleStatistics = useCallback(async () => {
     const response = await getRevenueStatistics({
       startDate: statisticRequest.startDate.format("YYYY/MM/DD"),
-      endDate: statisticRequest.endDate.format("YYYY/MM/DD"),
+      endDate: statisticRequest.endDate.add(1, "day").format("YYYY/MM/DD"),
     });
 
     if (response.success) {

@@ -3,8 +3,6 @@ package com.theduckhospital.api.security;
 import com.theduckhospital.api.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -35,6 +33,8 @@ public class CustomUserDetails implements UserDetails {
                 role = "CASHIER";
             else if (staff instanceof Nurse)
                 role = "NURSE";
+            else if (staff instanceof LaboratoryTechnician)
+                role = "LABORATORY_TECHNICIAN";
             else
                 role = "USER";
         } else

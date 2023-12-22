@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import HistoryRecord from "../../components/Customer/History/HistoryRecord";
 import { getHistoryMedicalRecord } from "../../services/customer/MedicalRecordServices";
 import { enqueueSnackbar } from "notistack";
+import SearchNotFound from "../../components/Nurse/SearchNotFound";
 
 function PaymentHistoryPage(props) {
   const [historyRecords, setHistoryRecords] = React.useState([]);
@@ -39,6 +40,10 @@ function PaymentHistoryPage(props) {
             historyRecord={history}
           />
         ))}
+
+        {historyRecords?.length === 0 && (
+          <SearchNotFound text="Không có lịch sử khám bệnh nào" />
+        )}
       </Box>
     </Box>
   );

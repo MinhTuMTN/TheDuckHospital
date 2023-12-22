@@ -49,6 +49,10 @@ const roles = [
     value: "CASHIER",
     label: "Thu ngân",
   },
+  {
+    value: "LABORATORY_TECHNICIAN",
+    label: "Bác sĩ xét nghiệm",
+  },
 ];
 
 const degrees = ["BS", "ThS", "TS", "PGS", "GS"];
@@ -80,6 +84,10 @@ const roleOptions = [
   {
     value: "PHARMACIST",
     name: "Dược sĩ",
+  },
+  {
+    value: "LABORATORY_TECHNICIAN",
+    name: "Bác sĩ xét nghiệm",
   },
 ];
 
@@ -215,6 +223,7 @@ function StaffListPage(props) {
         return;
       }
     }
+    
     let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
     const response = await createStaff({
       fullName: staff.fullName,

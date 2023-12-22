@@ -134,6 +134,19 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
+            {row.slot - row.numberOfBookings}
+          </CustomText>
+        </TableCell>
+        <TableCell>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
             {row.queueNumber}
           </CustomText>
         </TableCell>
@@ -229,7 +242,7 @@ function ScheduleTable(props) {
               }}
             >
               <TableRow>
-                <TableCell style={{ width: "30%" }}>
+                <TableCell style={{ width: "25%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Họ tên
                   </CustomText>
@@ -239,7 +252,7 @@ function ScheduleTable(props) {
                     Số điện thoại
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }}>
+                <TableCell style={{ width: "15%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Buổi trực
                   </CustomText>
@@ -247,6 +260,11 @@ function ScheduleTable(props) {
                 <TableCell style={{ width: "10%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Đặt trước
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "10%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Chỗ còn lại
                   </CustomText>
                 </TableCell>
                 <TableCell style={{ width: "10%" }}>

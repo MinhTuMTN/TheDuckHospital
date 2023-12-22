@@ -41,6 +41,11 @@ public class DoctorSchedule {
     @ToStringExclude
     private MedicalService medicalService;
 
+    @OneToMany(mappedBy = "doctorSchedule", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private List<Booking> bookings;
+
     private int slot;
     private int queueNumber = 0;
     private int dayOfWeek;

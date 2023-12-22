@@ -1,13 +1,13 @@
 import { get } from "../AxiosInstance";
 
 export const getAllStatistics = () => {
-  return get("/admin/statistics", null, { Authorization: "" });
+  return get("/admin/statistics");
 };
 
 export const getRevenueStatistics = (params) => {
-  return get("/admin/statistics/revenue", params, { Authorization: "" });
+  return get("/admin/statistics/revenue", params);
 };
 
 export const getBookingStatistics = (params) => {
-  return get("/admin/statistics/booking", params, { Authorization: "" });
+  return get("/admin/statistics/booking", params);
 };
