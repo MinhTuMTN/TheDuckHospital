@@ -270,7 +270,7 @@ function MedicalTestPage(props) {
                         alignItems: "center",
                       }}
                     >
-                      Đang khám
+                      Đang xét nghiệm
                       <StyledBadge
                         badgeContent={counter.processing}
                         color="info"
