@@ -149,8 +149,12 @@ function NavBar(props) {
                 height: "40px",
               }}
             >
-              <CustomMenuItem>Trang chủ</CustomMenuItem>
-              <CustomMenuItem>Giới thiệu</CustomMenuItem>
+              <CustomMenuItem onClick={() => navigate("/")}>
+                Trang chủ
+              </CustomMenuItem>
+              <CustomMenuItem onClick={() => navigate("introduce")}>
+                Giới thiệu
+              </CustomMenuItem>
               <CustomMenuItem>Quy trình</CustomMenuItem>
               <CustomMenuItem>Thắc mắc</CustomMenuItem>
               <CustomMenuItem>Liên hệ</CustomMenuItem>

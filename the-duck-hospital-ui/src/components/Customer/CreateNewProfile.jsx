@@ -228,7 +228,6 @@ function CreateNewProfile(props) {
   };
   const [phoneNumberError, setPhoneNumberError] = useState("");
   const validatePhoneNumber = () => {
-    // Biểu thức chính quy để kiểm tra số điện thoại (định dạng: +12 345-6789)
     const phoneRegex = /^0\d{9}$/;
 
     if (!phoneRegex.test(phoneNumber)) {
@@ -239,7 +238,7 @@ function CreateNewProfile(props) {
   };
 
   const isValidPhoneNumber = (input) => {
-    const phoneNumberRegex = /^0[0-9]{0,9}$/; // Giả sử số điện thoại có tối đa 10 số
+    const phoneNumberRegex = /^0[0-9]{0,9}$/;
     return phoneNumberRegex.test(input);
   };
 
