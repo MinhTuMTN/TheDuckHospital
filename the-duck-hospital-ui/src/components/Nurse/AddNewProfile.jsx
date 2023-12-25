@@ -49,6 +49,15 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
     height: "55px",
   },
 }));
+
+const convertToTitleCase = (input) => {
+  return input
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 function AddNewProfile(props) {
   const [open, setOpen] = React.useState(false);
 
@@ -61,7 +70,7 @@ function AddNewProfile(props) {
   const [fullName, setFullName] = React.useState("");
   const [dateOfBirth, setDateOfBirth] = React.useState(dayjs());
   const [phoneNumber, setPhoneNumber] = React.useState("");
-  const [gender, setGender] = React.useState("MALE");
+  const [gender, setGender] = React.useState(-1);
   const [identityNumber, setIdentityNumber] = React.useState("");
   const [streetName, setStreetName] = React.useState("");
   // Nations
@@ -141,6 +150,10 @@ function AddNewProfile(props) {
       message = "Vui lòng nhập địa chỉ";
     }
 
+    if (gender === -1) {
+      message = "Vui lòng chọn giới tính";
+    }
+
     if (dayjs(dateOfBirth).isAfter(dayjs())) {
       message = "Ngày sinh không hợp lệ";
     }
@@ -163,7 +176,7 @@ function AddNewProfile(props) {
     });
     if (response.success) {
       setOpen(false);
-      enqueueSnackbar("Tạo hồ sơ thành công", {
+      enqueueSnackbar("Tạo hồ sơ bệnh nhân thành công", {
         variant: "success",
       });
       navigate("/nurse-counter/choose-doctor-and-time", {
@@ -173,6 +186,22 @@ function AddNewProfile(props) {
       enqueueSnackbar("Đã xảy ra lỗi khi tạo hồ sơ", {
         variant: "error",
       });
+  };
+
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const validatePhoneNumber = () => {
+    const phoneRegex = /^0\d{9}$/;
+
+    if (!phoneRegex.test(phoneNumber)) {
+      setPhoneNumberError("Số điện thoại không hợp lệ");
+    } else {
+      setPhoneNumberError("");
+    }
+  };
+
+  const isValidPhoneNumber = (input) => {
+    const phoneNumberRegex = /^0[0-9]{0,9}$/;
+    return phoneNumberRegex.test(input);
   };
 
   return (
@@ -229,7 +258,7 @@ function AddNewProfile(props) {
               placeholder="Nguyễn Gia Văn"
               value={fullName}
               autoComplete="off"
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => setFullName(convertToTitleCase(e.target.value))}
             />
           </Stack>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -257,9 +286,19 @@ function AddNewProfile(props) {
               id="outlined-basic"
               fullWidth
               required
+              autoComplete="off"
               placeholder="Nhập số điện thoại"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                if (isValidPhoneNumber(inputValue) || inputValue === "") {
+                  setPhoneNumber(inputValue);
+                }
+              }}
+              type="tel" // Sử dụng type="tel"
+              onBlur={validatePhoneNumber}
+              helperText={phoneNumberError}
+              error={!!phoneNumberError}
               sx={{
                 flex: 1,
               }}
@@ -270,7 +309,7 @@ function AddNewProfile(props) {
               variant="outlined"
               id="outlined-basic"
               fullWidth
-              required
+              autoComplete="off"
               placeholder="Nhập số CCCD/CMND"
               value={identityNumber}
               onChange={(e) => setIdentityNumber(e.target.value)}

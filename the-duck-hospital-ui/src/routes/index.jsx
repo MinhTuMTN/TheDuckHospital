@@ -57,13 +57,14 @@ import History from "../pages/Doctor/History";
 import HistoryPage from "../pages/customer/HistoryPage";
 import VerifyInformation from "../pages/customer/VerifyInformation";
 import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
+import IntroducePage from "../pages/customer/IntroducePage";
 
 const LoadComponent = (Component) => (props) =>
-(
-  <React.Suspense fallback={<Loading />}>
-    <Component {...props} />
-  </React.Suspense>
-);
+  (
+    <React.Suspense fallback={<Loading />}>
+      <Component {...props} />
+    </React.Suspense>
+  );
 
 const NotFound = LoadComponent(React.lazy(() => import("../pages/Page404")));
 
@@ -76,6 +77,10 @@ function Router(props) {
         {
           path: "/",
           element: <Home />,
+        },
+        {
+          path: "/introduce",
+          element: <IntroducePage />,
         },
 
         {
