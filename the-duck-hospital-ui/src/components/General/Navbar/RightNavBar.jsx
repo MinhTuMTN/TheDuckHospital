@@ -127,7 +127,7 @@ const basicItems = [
   {
     display: "Giới thiệu",
     icon: <InfoOutlinedIcon />,
-    to: "/",
+    to: "/introduce",
   },
 
   {
@@ -144,7 +144,7 @@ const basicItems = [
   {
     display: "Liên hệ",
     icon: <HelpOutlineOutlinedIcon />,
-    to: "/",
+    to: "/support",
   },
 ];
 

@@ -157,7 +157,9 @@ function NavBar(props) {
               </CustomMenuItem>
               <CustomMenuItem>Quy trình</CustomMenuItem>
               <CustomMenuItem>Thắc mắc</CustomMenuItem>
-              <CustomMenuItem>Liên hệ</CustomMenuItem>
+              <CustomMenuItem onClick={() => navigate("support")}>
+                Liên hệ
+              </CustomMenuItem>
             </Toolbar>
             <Box>
               {!token || !fullName ? (

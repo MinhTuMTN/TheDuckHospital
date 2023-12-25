@@ -58,6 +58,7 @@ import HistoryPage from "../pages/customer/HistoryPage";
 import VerifyInformation from "../pages/customer/VerifyInformation";
 import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
 import IntroducePage from "../pages/customer/IntroducePage";
+import SupportPage from "../pages/customer/SupportPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -82,7 +83,10 @@ function Router(props) {
           path: "/introduce",
           element: <IntroducePage />,
         },
-
+        {
+          path: "/support",
+          element: <SupportPage />,
+        },
         {
           path: "/choose-patient-profiles",
           element: <ChoosePatientProfiles />,
