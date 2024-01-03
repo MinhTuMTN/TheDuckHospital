@@ -19,6 +19,7 @@ DialogForm.propTypes = {
   onCancel: PropTypes.func,
   onClose: PropTypes.func,
   open: PropTypes.bool,
+  isLoading: PropTypes.bool,
 };
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -32,7 +33,7 @@ const CustomAddButton = styled(Button)(({ theme }) => ({
   height: "42px",
   "&:hover": {
     background: theme.palette.normal2.main,
-    color: "white"
+    color: "white",
   },
 }));
 
@@ -43,11 +44,12 @@ const CustomCancelButton = styled(Button)(({ theme }) => ({
   height: "42px",
   "&:hover": {
     background: theme.palette.delete.main,
-    color: "white"
+    color: "white",
   },
 }));
 
 function DialogForm(props) {
+  const { isLoading } = props;
   const [open, setOpen] = React.useState(props.open);
   useEffect(() => {
     setOpen(props.open); // Synchronize the open state with the prop
@@ -77,12 +79,21 @@ function DialogForm(props) {
       <DialogContent>{props.children || props.content}</DialogContent>
       <DialogActions style={{ padding: "16px 24px" }}>
         {props.cancelText && (
-          <CustomCancelButton onClick={handleCancel} variant="outlined" color="delete">
+          <CustomCancelButton
+            onClick={handleCancel}
+            variant="outlined"
+            color="delete"
+          >
             {props.cancelText}
           </CustomCancelButton>
         )}
         {props.okText && (
-          <CustomAddButton onClick={handleOk} variant="outlined" color="normal2">
+          <CustomAddButton
+            onClick={handleOk}
+            variant="outlined"
+            color="normal2"
+            disabled={isLoading}
+          >
             {props.okText}
           </CustomAddButton>
         )}

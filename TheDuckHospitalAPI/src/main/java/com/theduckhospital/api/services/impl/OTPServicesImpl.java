@@ -32,6 +32,7 @@ public class OTPServicesImpl implements IOTPServices {
 
         // Random OTP 6 digits
         int otp = (int) (Math.random() * 900000) + 100000;
+//        int otp = 123456;
 
         account.setOtp(otp);
         account.setOtpCount(0);
@@ -51,6 +52,7 @@ public class OTPServicesImpl implements IOTPServices {
 
         // Random OTP 6 digits
         int otp = (int) (Math.random() * 900000) + 100001;
+//        int otp = 123456;
 
         temporaryUser.setOtp(otp);
         temporaryUser.setOtpCount(0);

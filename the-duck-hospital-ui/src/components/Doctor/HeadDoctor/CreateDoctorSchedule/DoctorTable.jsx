@@ -292,6 +292,7 @@ function DoctorTable(props) {
                       medicalServiceId: item.medicalServices[0].serviceId,
                       startTime: dayjs().add(1, "day"),
                       endTime: dayjs().add(1, "day"),
+                      slot: 30,
                     });
                     setOpenPopup(true);
                     setHighlightedMorningDays([]);
@@ -375,8 +376,10 @@ function DoctorTable(props) {
                 onChange={(e) => {
                   setDoctorSchedule((prev) => ({
                     ...prev,
-                    slot: e.target.value && parseInt(e.target.value) > 0 ?
-                    parseInt(e.target.value) : 1,
+                    slot:
+                      e.target.value && parseInt(e.target.value) > 0
+                        ? parseInt(e.target.value)
+                        : 1,
                   }));
                 }}
                 required
@@ -536,15 +539,13 @@ function DoctorTable(props) {
                         },
                       }}
                       sx={{
-                        display: scheduleSelected.morning.checked
-                          ? ""
-                          : "none",
+                        display: scheduleSelected.morning.checked ? "" : "none",
                         margin: "0 auto",
                         width: "100%",
                         "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
-                        {
-                          justifyContent: "space-around",
-                        },
+                          {
+                            justifyContent: "space-around",
+                          },
                       }}
                     />
                   </LocalizationProvider>
@@ -595,9 +596,9 @@ function DoctorTable(props) {
                         margin: "0 auto",
                         width: "100%",
                         "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
-                        {
-                          justifyContent: "space-around",
-                        },
+                          {
+                            justifyContent: "space-around",
+                          },
                       }}
                     />
                   </LocalizationProvider>
