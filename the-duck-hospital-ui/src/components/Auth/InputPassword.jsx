@@ -77,6 +77,7 @@ InputPassword.propTypes = {
 function InputPassword(props) {
   const { phone, setLoginType } = props;
   const { setToken } = useAuth();
+  const [isLoading, setIsLoading] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -97,9 +98,11 @@ function InputPassword(props) {
   };
 
   const handleLogin = async () => {
+    setIsLoading(true);
     if (password.trim() === "") {
       setErrorText("Vui lòng nhập mật khẩu!");
       setPassword("");
+      setIsLoading(false);
     } else {
       setErrorText("");
 
@@ -108,6 +111,7 @@ function InputPassword(props) {
         passwordOrOTP: password,
       });
 
+      setIsLoading(false);
       if (!response.success) {
         enqueueSnackbar(
           response.statusCode === 401
@@ -258,7 +262,11 @@ function InputPassword(props) {
         </Grid>
       </Box>
       <Box>
-        <CustomButton variant="contained" onClick={handleLogin}>
+        <CustomButton
+          variant="contained"
+          onClick={handleLogin}
+          disabled={isLoading}
+        >
           Đăng nhập
         </CustomButton>
         {errorText !== "" ? (

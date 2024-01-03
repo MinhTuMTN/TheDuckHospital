@@ -53,17 +53,21 @@ InputPhoneNumber.propTypes = {
 
 function InputPhoneNumber(props) {
   const { phone, setPhone, setStep, setLoginType } = props;
+  const [isLoading, setIsLoading] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const handleCheckPhone = async () => {
+    setIsLoading(true);
     const phoneTrim = phone.trim();
     if (!phoneTrim.includes("@")) {
       if (phoneTrim === "") {
         enqueueSnackbar("Vui lòng nhập số điện thoại!", { variant: "error" });
+        setIsLoading(false);
         return false;
       }
 
       if (phoneTrim.length !== 10 || phoneTrim.startsWith("0") === false) {
         enqueueSnackbar("Số điện thoại không hợp lệ!", { variant: "error" });
+        setIsLoading(false);
         return false;
       }
     }
@@ -71,6 +75,7 @@ function InputPhoneNumber(props) {
     const response = await checkPhoneOrEmail({
       emailOrPhoneNumber: phoneTrim,
     });
+    setIsLoading(false);
 
     if (!response.success) {
       enqueueSnackbar(
@@ -141,7 +146,11 @@ function InputPhoneNumber(props) {
           </FormHelperText>
         ) : null}
       </Box>
-      <CustomButton variant="contained" onClick={handleCheckPhone}>
+      <CustomButton
+        variant="contained"
+        onClick={handleCheckPhone}
+        disabled={isLoading}
+      >
         Tiết tục
       </CustomButton>
     </Stack>

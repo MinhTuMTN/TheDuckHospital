@@ -68,12 +68,14 @@ function InputOTP(props) {
   const { phone } = props;
   const [timeLeft, setTimeLeft] = React.useState(300);
   const [errorText, setErrorText] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { setToken } = useAuth();
 
   const [otp, setOtp] = React.useState(["", "", "", "", "", ""]);
 
   const handleLogin = async () => {
+    setIsLoading(true);
     if (timeLeft === 0) {
       return;
     }
@@ -84,6 +86,7 @@ function InputOTP(props) {
 
     if (isAnyEmpty) {
       setErrorText("Vui lòng nhập đầy đủ mã OTP!");
+      setIsLoading(false);
       return;
     }
     setErrorText("");
@@ -92,6 +95,7 @@ function InputOTP(props) {
       emailOrPhoneNumber: phone,
       passwordOrOTP: otp.join(""),
     });
+    setIsLoading(false);
 
     if (!response.success) {
       enqueueSnackbar(
@@ -142,6 +146,7 @@ function InputOTP(props) {
 
   useEffect(() => {
     if (timeLeft === 0) {
+      setIsLoading(true);
       return;
     }
     // Đếm ngược thời gian
@@ -228,7 +233,11 @@ function InputOTP(props) {
       </CustomBox>
 
       <Box>
-        <CustomButton variant="contained" onClick={handleLogin}>
+        <CustomButton
+          variant="contained"
+          onClick={handleLogin}
+          disabled={isLoading}
+        >
           Đăng nhập
         </CustomButton>
         {errorText !== "" ? (
