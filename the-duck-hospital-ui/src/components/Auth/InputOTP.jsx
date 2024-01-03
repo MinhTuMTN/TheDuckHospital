@@ -105,6 +105,7 @@ function InputOTP(props) {
 
     enqueueSnackbar("Đăng nhập thành công", { variant: "success" });
     setToken(response.data.data);
+    window.location.href = "/";
   };
 
   const handleChange = (index, e) => {
