@@ -229,7 +229,11 @@ function Prescription(props) {
                         disablePortal
                         id="combo-box-demo"
                         options={medicines}
-                        getOptionLabel={(option) => option.medicineName}
+                        getOptionLabel={(option) =>
+                          `${option.medicineName} (${getMedicineUnit(
+                            option.unit
+                          )})`
+                        }
                         isOptionEqualToValue={(option, value) =>
                           option.medicineId === value.medicineId
                         }
@@ -259,6 +263,7 @@ function Prescription(props) {
                         variant="outlined"
                         id="outlined-basic"
                         placeholder="Số lượng"
+                        autoComplete="off"
                         value={Number(totalForOneMedicine) || ""}
                         onChange={(e) =>
                           setTotalForOneMedicine(Number(e.target.value))
@@ -273,6 +278,7 @@ function Prescription(props) {
                       variant="outlined"
                       id="outlined-basic"
                       placeholder="Ghi chú"
+                      autoComplete="off"
                       value={noteForOneMedicine}
                       onChange={(e) => setNoteForOneMedicine(e.target.value)}
                     />
