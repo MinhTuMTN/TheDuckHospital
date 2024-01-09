@@ -129,6 +129,6 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     public PieChartItemResponse getPaymentMethodCount(int id, String paymentMethod) {
         long count = transactionRepository.countByPaymentMethod(paymentMethod);
-        return new PieChartItemResponse(id, count, Objects.equals(paymentMethod, "CASH") ? "Online" : "Tại quầy");
+        return new PieChartItemResponse(id, count, !Objects.equals(paymentMethod, "CASH") ? "Online" : "Tại quầy");
     }
 }

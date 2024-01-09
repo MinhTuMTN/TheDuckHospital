@@ -4,6 +4,7 @@ import Router from "./routes";
 import CustomThemeProvider from "./theme";
 import { NurseProvider } from "./auth/NurseProvider";
 import { DoctorProvider } from "./auth/DoctorProvider";
+import React from "react";
 
 function App() {
   return (

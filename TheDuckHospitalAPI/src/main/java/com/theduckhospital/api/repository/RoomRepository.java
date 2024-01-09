@@ -12,9 +12,9 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     Page<Room> findPaginationByOrderByDeleted(Pageable pageable);
     Page<Room> findByDepartmentAndDeletedIsFalse(Department department, Pageable pageable);
     long countByDepartmentAndDeletedIsFalse(Department department);
-    List<Room> findAllByOrderByDeleted();
+    List<Room> findAllByOrderByDeletedAscRoomNameAsc();
     List<Room> findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
             String roomName
     );
-    List<Room> findByRoomNameContainingOrDepartmentIn(String roomName, List<Department> departments);
+    List<Room> findByRoomNameContainingOrDepartmentInOrderByRoomName(String roomName, List<Department> departments);
 }

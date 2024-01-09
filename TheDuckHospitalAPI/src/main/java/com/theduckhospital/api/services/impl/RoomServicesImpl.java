@@ -126,7 +126,7 @@ public class RoomServicesImpl implements IRoomServices {
     ) {
         List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
 
-        List<Room> rooms = roomRepository.findByRoomNameContainingOrDepartmentIn(search, departments);
+        List<Room> rooms = roomRepository.findByRoomNameContainingOrDepartmentInOrderByRoomName(search, departments);
 
         Pageable pageable = PageRequest.of(page, limit);
 
@@ -146,7 +146,7 @@ public class RoomServicesImpl implements IRoomServices {
     public List<RoomResponse> getAllRoomsDeleted() {
         List<RoomResponse> responses = new ArrayList<>();
 
-        for (Room room : roomRepository.findAllByOrderByDeleted()) {
+        for (Room room : roomRepository.findAllByOrderByDeletedAscRoomNameAsc()) {
             responses.add(new RoomResponse(room));
         }
 
