@@ -88,6 +88,7 @@ function ReceivingPatientsItem(props) {
       roomId
     );
     if (response.success) {
+      onReload();
       enqueueSnackbar("Tiếp nhận bệnh nhân thành công", { variant: "success" });
       setOpen(false);
     } else {
