@@ -118,7 +118,7 @@ public class StaffAdminController {
     }
 
     @PutMapping("/{staffId}/restore")
-    public ResponseEntity<?> restoreRoom(@PathVariable UUID staffId) {
+    public ResponseEntity<?> restoreStaff(@PathVariable UUID staffId) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

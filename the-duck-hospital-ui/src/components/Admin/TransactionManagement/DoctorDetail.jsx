@@ -1,12 +1,6 @@
 import styled from "@emotion/styled";
-import {
-  Box,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Box, Grid, Paper, Stack, Typography } from "@mui/material";
+import React from "react";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -37,13 +31,13 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 
 function DoctorDetail(props) {
   const { doctorSchedule } = props;
-  const [doctorDepartment, setDoctorDepartment] = useState("");
+  // const [doctorDepartment, setDoctorDepartment] = useState("");
 
-  useEffect(() => {
-    const words = doctorSchedule.departmentName.split(" ");
-    const name = words.slice(1).join(" ");
-    setDoctorDepartment(name.charAt(0).toUpperCase() + name.slice(1));
-  }, [doctorSchedule]);
+  // useEffect(() => {
+  //   const words = doctorSchedule.departmentName.split(" ");
+  //   const name = words.slice(1).join(" ");
+  //   setDoctorDepartment(name.charAt(0).toUpperCase() + name.slice(1));
+  // }, [doctorSchedule]);
 
   return (
     <Stack
@@ -64,7 +58,9 @@ function DoctorDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <TieuDeCot>{doctorSchedule.doctorDegree}. {doctorSchedule.doctorName}</TieuDeCot>
+              <TieuDeCot>
+                {doctorSchedule.doctorDegree}. {doctorSchedule.doctorName}
+              </TieuDeCot>
             </Stack>
           </Grid>
         </Grid>
@@ -92,12 +88,15 @@ function DoctorDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{doctorDepartment ? doctorDepartment : "Đang cập nhật"}</NoiDung>
+              <NoiDung>
+                {doctorSchedule.departmentName
+                  ? doctorSchedule.departmentName
+                  : "Đang cập nhật"}
+              </NoiDung>
             </Stack>
           </Grid>
         </Grid>
       </BoxStyle>
-
     </Stack>
   );
 }

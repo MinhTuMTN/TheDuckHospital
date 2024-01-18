@@ -7,7 +7,7 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BorderTextBox from "./BorderTextBox";
 import dayjs from "dayjs";
 import FormatCurrency from "../../General/FormatCurrency";
@@ -72,13 +72,13 @@ const MuiAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
 function MedicalExamRecordItem(props) {
   const { item, panel, expanded, handleChange } = props;
   const theme = createTheme();
-  const [doctorDepartment, setDoctorDepartment] = useState("");
+  // const [doctorDepartment, setDoctorDepartment] = useState("");
 
-  useEffect(() => {
-    const words = item.departmentName.split(" ");
-    const name = words.slice(1).join(" ");
-    setDoctorDepartment(name.charAt(0).toUpperCase() + name.slice(1));
-  }, [item]);
+  // useEffect(() => {
+  //   const words = item.departmentName.split(" ");
+  //   const name = words.slice(1).join(" ");
+  //   setDoctorDepartment(name.charAt(0).toUpperCase() + name.slice(1));
+  // }, [item]);
 
   return (
     <MuiAccordion
@@ -189,7 +189,7 @@ function MedicalExamRecordItem(props) {
                     width: "80%"
                   }}
                 >
-                  {doctorDepartment}
+                  {item.departmentName}
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={2}>
@@ -268,7 +268,7 @@ function MedicalExamRecordItem(props) {
                     width: "70%"
                   }}
                 >
-                  {doctorDepartment}
+                  {item.departmentName}
                 </Typography>
               </Stack>
               <Stack direction="row" spacing={2}>

@@ -57,20 +57,6 @@ function ReceivePatientsTest(props) {
   const [patients, setPatients] = React.useState([]);
   const navigate = useNavigate();
 
-  // const acceptPatient = async (medicalTestId) => {
-  //   const response = await acceptMedicalTest(medicalTestId);
-  //   if (response.success) {
-  //     enqueueSnackbar("Tiếp nhận bệnh nhân thành công", {
-  //       variant: "success",
-  //     });
-  //     handleGetCounterMedicalTest();
-  //   } else {
-  //     enqueueSnackbar("Tiếp nhận bệnh nhân thất bại", {
-  //       variant: "error",
-  //     });
-  //   }
-  // };
-
   useEffect(() => {
     const handleGetPatients = async () => {
       const response = await getMedicalTestByMedicalServiceAndState({
@@ -243,7 +229,6 @@ function ReceivePatientsTest(props) {
                             color: "#ffffff",
                           },
                         }}
-                        // onClick={() => acceptPatient(row.medicalTestId)}
                       >
                         <CheckCircleOutlineIcon
                           sx={{

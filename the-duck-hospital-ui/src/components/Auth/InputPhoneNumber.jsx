@@ -151,7 +151,7 @@ function InputPhoneNumber(props) {
         onClick={handleCheckPhone}
         disabled={isLoading}
       >
-        Tiết tục
+        Tiếp tục
       </CustomButton>
     </Stack>
   );
