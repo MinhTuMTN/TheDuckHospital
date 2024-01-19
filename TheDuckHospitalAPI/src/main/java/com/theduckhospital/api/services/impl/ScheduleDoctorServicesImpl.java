@@ -111,7 +111,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     @Override
-    public DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId) {
+    public DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId) throws ParseException {
         DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
                 .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
 
@@ -119,7 +119,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Doctor schedule not found");
         }
 
-        if (doctorSchedule.getDate().before(new Date())) {
+        if (doctorSchedule.getDate().before(DateCommon.getToday())) {
             throw new BadRequestException("Doctor schedule is not available");
         }
 

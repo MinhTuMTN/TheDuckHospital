@@ -26,9 +26,13 @@ public class DateCommon {
     }
 
     public static Date getToday() throws ParseException {
-        String todayString = environment.getProperty("settings.date");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        return formatter.parse(todayString);
+        try {
+            String todayString = environment.getProperty("settings.date");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            return formatter.parse(todayString);
+        } catch (Exception e) {
+            return new Date();
+        }
     }
 
     public static Calendar getCalendar(Date date) {

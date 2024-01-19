@@ -277,6 +277,22 @@ public class AccountServicesImpl implements IAccountServices {
         return data;
     }
 
+    @Override
+    public String otpTest(String phone) {
+        try {
+            if (phone.contains("@")) {
+                Account account = accountRepository.findAccountByEmailAndDeletedIsFalse(phone);
+                return String.valueOf(account.getOtp());
+            }
+            Account account = accountRepository.findUserByPhoneNumber(phone);
+            return String.valueOf(account.getOtp());
+        } catch(Exception e) {
+            Optional<TemporaryUser> temporaryUser = temporaryUserRepository.findTemporaryUserByPhoneNumber(phone);
+            return temporaryUser.map(user -> String.valueOf(user.getOtp())).orElse("Not found");
+        }
+
+    }
+
     private String getRoleFromAccount(Account account) {
         String role = "User";
         if (account.getStaff() != null) {

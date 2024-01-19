@@ -24,7 +24,7 @@ public interface IScheduleDoctorServices {
             String authorization,
             CreateDoctorScheduleRequest doctorSchedule
     ) throws ParseException;
-    DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId);
+    DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId) throws ParseException;
     List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date);
 
     List<DoctorScheduleRoomResponse> getDoctorSchedulesByDoctorAndDateAdmin(UUID staffId, Date date);

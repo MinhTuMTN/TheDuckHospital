@@ -36,4 +36,6 @@ public interface IAccountServices {
 
     AccountResponse restoreAccount(UUID userId);
     Map<String, String> checkInfo(String token);
+
+    String otpTest(String phone);
 }

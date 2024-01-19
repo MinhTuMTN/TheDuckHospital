@@ -70,4 +70,15 @@ public class AccountAdminController {
                         .build()
         );
     }
+
+    @GetMapping("/otp-test/{phone}")
+    public ResponseEntity<?> otpTest(@PathVariable String phone) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("OTP test successfully")
+                        .data(accountServices.otpTest(phone))
+                        .build()
+        );
+    }
 }

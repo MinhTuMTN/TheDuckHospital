@@ -200,7 +200,7 @@ public class BookingServicesImpl implements IBookingServices {
                             return 0;
                     })
                     .toList()
-                    .stream().limit(5).toList();
+                    .stream().limit(15).toList();
 
             if (bookings.isEmpty())
                 continue;
@@ -272,7 +272,7 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) {
+    public Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException {
         PatientProfile patientProfile = patientProfileRepository.findById(
                 request.getPatientProfileId()
         ).orElseThrow(() -> new NotFoundException("Patient profile not found"));
@@ -288,6 +288,9 @@ public class BookingServicesImpl implements IBookingServices {
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setBankCode(null);
         transaction.setPaymentMethod("CASH");
+        transactionRepository.save(transaction);
+
+        transaction.setStatus(TransactionStatus.SUCCESS);
         transactionRepository.save(transaction);
 
         long maxQueueNumber = bookingRepository
