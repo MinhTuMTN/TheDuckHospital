@@ -36,6 +36,9 @@
 4. [Github](https://github.com/MinhTuMTN/TheDuckHospital)
 5. [Test case](https://minhtunguyen-my.sharepoint.com/:x:/g/personal/tuyetvi_minhtunguyen_onmicrosoft_com/Ebibym9lZ6FOo2lzRCIy3BEB-hj1H5nBzu9snPC3-TR8vQ?e=7nwyzc)
 6. [Automation test code](https://github.com/MinhTuMTN/TheDuckHospital/tree/main/automation-test)
+7. [Video demo](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EYm0k_BFIAtPt15zGWi3wDoBkQOCJooHPKp8nHQmkPVMPQ)
+8. [Video giải thích code - Phần 1](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EdlbNOKyBA1Av6UQD9yN1yEBCHEUGZfJtyD2Ce5tYxGMNA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=DgBSO2)
+9. [Video giải thích code - Phần 2](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EXr9hAoOqx1Ck96HJ-Nz1_gBPisb7WqOqG8HmkAeCttoJQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=nFvhLf)  
 
 ## Cài đặt và cấu hình
 
