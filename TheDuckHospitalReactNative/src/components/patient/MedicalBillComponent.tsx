@@ -4,6 +4,7 @@ import {Pressable} from 'react-native';
 import * as Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {appColors} from '../../constants/appColors';
+import {useTranslation} from 'react-i18next';
 
 interface RowProps {
   icon: React.ReactNode;
@@ -55,6 +56,8 @@ interface MedicalBillComponentProps {
 
 const MedicalBillComponent = (props: MedicalBillComponentProps) => {
   const {profile, onPress} = props;
+
+  const {t} = useTranslation();
   return (
     <View style={{paddingBottom: 10}}>
       <Box borderWidth={4} borderColor={appColors.gray} rounded={'md'} p={5}>
@@ -87,7 +90,7 @@ const MedicalBillComponent = (props: MedicalBillComponentProps) => {
                 }}
                 onPress={() => {}}>
                 <Text color={appColors.white} bold>
-                  Xem chi tiết
+                  {t('medicalRecord.item.details')}
                 </Text>
               </Pressable>
             }
