@@ -6,10 +6,12 @@ import MedicalBillScreen from '../screens/patient/MainScreen/MedicalBillScreen';
 import NotificationScreen from '../screens/patient/MainScreen/NotificationScreen';
 import ProfileScreen from '../screens/patient/MainScreen/ProfileScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTranslation} from 'react-i18next';
 
 const Tab = createBottomTabNavigator();
 
 const MainPatientNavigatior = () => {
+  const {t} = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -20,7 +22,7 @@ const MainPatientNavigatior = () => {
         name="HomeScreen"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Trang chủ',
+          tabBarLabel: t('bottomTab.home'),
           tabBarIcon: ({color, size}) => (
             <Icon name="home-outline" color={color} size={size} />
           ),
@@ -30,7 +32,7 @@ const MainPatientNavigatior = () => {
         name="ProfileScreen"
         component={ProfileScreen}
         options={{
-          tabBarLabel: 'Hồ sơ',
+          tabBarLabel: t('bottomTab.medicalRecord'),
           tabBarIcon: ({color, size}) => (
             <Icon name="file-account-outline" color={color} size={size} />
           ),
@@ -40,7 +42,7 @@ const MainPatientNavigatior = () => {
         name="MedicalBillScreen"
         component={MedicalBillScreen}
         options={{
-          tabBarLabel: 'Phiếu khám',
+          tabBarLabel: t('bottomTab.medicalBill'),
           tabBarIcon: ({color, size}) => (
             <Icon
               name="ticket-confirmation-outline"
@@ -54,7 +56,7 @@ const MainPatientNavigatior = () => {
         name="NotificationScreen"
         component={NotificationScreen}
         options={{
-          tabBarLabel: 'Thông báo',
+          tabBarLabel: t('bottomTab.notification'),
           tabBarIcon: ({color, size}) => (
             <Icon name="bell-ring-outline" color={color} size={size} />
           ),
@@ -64,7 +66,7 @@ const MainPatientNavigatior = () => {
         name="AccountScreen"
         component={AccountScreen}
         options={{
-          tabBarLabel: 'Tài khoản',
+          tabBarLabel: t('bottomTab.account'),
           tabBarIcon: ({color, size}) => (
             <Icon name="account-settings-outline" color={color} size={size} />
           ),

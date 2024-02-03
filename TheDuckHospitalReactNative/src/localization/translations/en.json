@@ -1,0 +1,21 @@
+{
+  "bottomTab": {
+    "home": "Home",
+    "medicalRecord": "Medical Records",
+    "medicalBill": "Medical Bills",
+    "notification": "Notifications",
+    "account": "Account"
+  },
+  "medicalBill": {
+    "title": "Medical Bills"
+  },
+  "medicalRecord": {
+    "title": "Medical Records",
+    "item": {
+      "details": "View Details"
+    }
+  },
+  "account": {
+    "language": "Language"
+  }
+}

@@ -3,8 +3,10 @@ import {FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {Container, Header, MedicalBillComponent} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
+import {useTranslation} from 'react-i18next';
 
 const ProfileScreen = () => {
+  const {t} = useTranslation();
   const data = [
     {
       name: 'Nguyễn Văn A',
@@ -41,7 +43,7 @@ const ProfileScreen = () => {
   return (
     <Container paddingTop={0}>
       <Header
-        title="Hồ sơ khám bệnh"
+        title={t('medicalRecord.title')}
         titleSize={19}
         icon={<Icon name="adduser" color={'white'} size={30} />}
       />

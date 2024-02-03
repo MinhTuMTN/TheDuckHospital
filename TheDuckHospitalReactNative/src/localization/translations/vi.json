@@ -1,0 +1,24 @@
+{
+  "bottomTab": {
+    "home": "Trang chủ",
+    "medicalRecord": "Hồ sơ",
+    "medicalBill": "Phiếu khám",
+    "notification": "Thông báo",
+    "account": "Tài khoản"
+  },
+  "medicalBill": {
+    "title": "Danh sách phiếu khám"
+  },
+  "medicalRecord": {
+    "title": "Hồ sơ khám bệnh",
+    "item": {
+      "details": "Xem chi tiết"
+    }
+  },
+  "notification": {
+    "title": "Thông báo"
+  },
+  "account": {
+    "language": "Ngôn ngữ"
+  }
+}
