@@ -1,13 +1,14 @@
 import React from 'react';
-import {View} from 'react-native';
+import {StyleProp, View, ViewStyle} from 'react-native';
 import {globalStyles} from '../styles/globalStyles';
 
 interface Props {
   children: React.ReactNode;
   paddingTop?: number;
+  style?: StyleProp<ViewStyle>;
 }
 
-const Container = (props: Props) => {
+const ContainerComponent = (props: Props) => {
   const {paddingTop = 35} = props;
   return (
     <View
@@ -16,10 +17,11 @@ const Container = (props: Props) => {
         {
           paddingTop,
         },
+        props.style,
       ]}>
       {props.children}
     </View>
   );
 };
 
-export default Container;
+export default ContainerComponent;

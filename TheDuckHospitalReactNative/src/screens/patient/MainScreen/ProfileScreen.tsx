@@ -1,7 +1,12 @@
 import React from 'react';
 import {FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {Container, Header, MedicalBillComponent} from '../../../components';
+import {
+  ContainerComponent,
+  Header,
+  MedicalBillComponent,
+  PatientProfileComponent,
+} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {useTranslation} from 'react-i18next';
 
@@ -41,9 +46,9 @@ const ProfileScreen = () => {
   ];
 
   return (
-    <Container paddingTop={0}>
+    <ContainerComponent paddingTop={0}>
       <Header
-        title={t('medicalRecord.title')}
+        title={t('patientProfile.title')}
         titleSize={19}
         icon={<Icon name="adduser" color={'white'} size={30} />}
       />
@@ -52,10 +57,10 @@ const ProfileScreen = () => {
           showsVerticalScrollIndicator={false}
           data={data}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({item}) => <MedicalBillComponent profile={item} />}
+          renderItem={({item}) => <PatientProfileComponent profile={item} />}
         />
       </ContentComponent>
-    </Container>
+    </ContainerComponent>
   );
 };
 

@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {Pressable, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {English, Vietnamese} from '../../../assets/svgs';
-import {Container} from '../../../components';
+import {ContainerComponent} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
@@ -31,7 +31,7 @@ const AccountScreen = () => {
 
   const {i18n} = useTranslation();
   return (
-    <Container paddingTop={50}>
+    <ContainerComponent paddingTop={50}>
       <Pressable
         onPress={() => {
           bottomModalRef.current?.close();
@@ -52,7 +52,7 @@ const AccountScreen = () => {
           <BottomSheetModal
             ref={bottomModalRef}
             index={0}
-            snapPoints={['45%']}
+            snapPoints={['40%']}
             backgroundStyle={{
               borderColor: 'rgba(0,0,0,.5)',
               borderWidth: 1,
@@ -89,7 +89,7 @@ const AccountScreen = () => {
           </BottomSheetModal>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
-    </Container>
+    </ContainerComponent>
   );
 };
 

@@ -1,21 +1,29 @@
 {
   "bottomTab": {
     "home": "Home",
-    "medicalRecord": "Medical Records",
-    "medicalBill": "Medical Bills",
-    "notification": "Notifications",
+    "patientProfile": "Profile",
+    "medicalBill": "Medical Bill",
+    "notification": "Notification",
     "account": "Account"
   },
   "medicalBill": {
     "title": "Medical Bills"
   },
-  "medicalRecord": {
-    "title": "Medical Records",
+  "patientProfile": {
+    "title": "Profile",
     "item": {
       "details": "View Details"
     }
   },
   "account": {
     "language": "Language"
+  },
+  "notification": {
+    "title": "Notification"
+  },
+  "notFoundScreen": {
+    "title": "Page Not Found",
+    "desc": "Sorry. The page you are looking for does not exist or has been deleted. Please return to the home page!",
+    "backToHome": "Back to Home"
   }
 }

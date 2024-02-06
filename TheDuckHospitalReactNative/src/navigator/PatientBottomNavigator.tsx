@@ -10,7 +10,7 @@ import {useTranslation} from 'react-i18next';
 
 const Tab = createBottomTabNavigator();
 
-const MainPatientNavigatior = () => {
+const PatientBottomNavigator = () => {
   const {t} = useTranslation();
   return (
     <Tab.Navigator
@@ -32,7 +32,7 @@ const MainPatientNavigatior = () => {
         name="ProfileScreen"
         component={ProfileScreen}
         options={{
-          tabBarLabel: t('bottomTab.medicalRecord'),
+          tabBarLabel: t('bottomTab.patientProfile'),
           tabBarIcon: ({color, size}) => (
             <Icon name="file-account-outline" color={color} size={size} />
           ),
@@ -76,4 +76,4 @@ const MainPatientNavigatior = () => {
   );
 };
 
-export default MainPatientNavigatior;
+export default PatientBottomNavigator;

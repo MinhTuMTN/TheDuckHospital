@@ -1,7 +1,7 @@
 {
   "bottomTab": {
     "home": "Trang chủ",
-    "medicalRecord": "Hồ sơ",
+    "patientProfile": "Hồ sơ",
     "medicalBill": "Phiếu khám",
     "notification": "Thông báo",
     "account": "Tài khoản"
@@ -9,8 +9,8 @@
   "medicalBill": {
     "title": "Danh sách phiếu khám"
   },
-  "medicalRecord": {
-    "title": "Hồ sơ khám bệnh",
+  "patientProfile": {
+    "title": "Hồ sơ bệnh nhân",
     "item": {
       "details": "Xem chi tiết"
     }
@@ -20,5 +20,10 @@
   },
   "account": {
     "language": "Ngôn ngữ"
+  },
+  "notFoundScreen": {
+    "title": "Trang không tồn tại",
+    "desc": "Xin lỗi. Trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa. Vui lòng quay về trang chủ!",
+    "backToHome": "Quay về trang chủ"
   }
 }
