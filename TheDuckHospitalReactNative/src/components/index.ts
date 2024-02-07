@@ -2,6 +2,7 @@ import ContainerComponent from './ContainerComponent';
 import ContentComponent from './ContentComponent';
 import FlexComponent from './FlexComponent';
 import Header from './Header';
+import InputComponent from './InputComponent';
 import SectionComponent from './SectionComponent';
 import Space from './Space';
 import TextComponent from './TextComponent';
@@ -22,4 +23,5 @@ export {
   SectionComponent,
   FlexComponent,
   TextComponent,
+  InputComponent,
 };

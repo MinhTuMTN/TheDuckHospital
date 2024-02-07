@@ -1,10 +1,12 @@
-import {StyleSheet, View} from 'react-native';
+import {StyleProp, StyleSheet, TextStyle, View} from 'react-native';
 import React from 'react';
 import {Text} from '@gluestack-ui/themed';
+import {appColors} from '../constants/appColors';
 
 interface SectionComponentProps {
   children: React.ReactNode;
   title?: string;
+  tilteStyle?: StyleProp<TextStyle>;
   paddingTop?: number;
   paddingBottom?: number;
   paddingLeft?: number;
@@ -16,9 +18,10 @@ const SectionComponent = (props: SectionComponentProps) => {
     children,
     title,
     paddingLeft,
-    paddingBottom = 0,
+    paddingBottom = 10,
     paddingRight,
     paddingTop = 10,
+    tilteStyle,
   } = props;
   return (
     <View
@@ -28,7 +31,21 @@ const SectionComponent = (props: SectionComponentProps) => {
           paddingBottom,
         },
       ]}>
-      {title && <Text>{title}</Text>}
+      {title && (
+        <Text
+          style={[
+            {
+              fontSize: 19,
+              fontWeight: '600',
+              textTransform: 'capitalize',
+              color: appColors.black,
+              paddingBottom: 10,
+            },
+            tilteStyle,
+          ]}>
+          {title}
+        </Text>
+      )}
       {children}
     </View>
   );
