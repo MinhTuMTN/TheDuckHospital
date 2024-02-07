@@ -1,15 +1,15 @@
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {Flex, Text} from 'native-base';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {English, Vietnamese} from '../../../assets/svgs';
-import {ContainerComponent} from '../../../components';
+import {ContainerComponent, FlexComponent} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
 import {globalStyles} from '../../../styles/globalStyles';
+import {Text} from '@gluestack-ui/themed';
 
 const languages = [
   {
@@ -67,7 +67,7 @@ const AccountScreen = () => {
                     bottomModalRef.current?.close();
                     i18n.changeLanguage(language.code);
                   }}>
-                  <Flex
+                  <FlexComponent
                     direction="row"
                     alignItems={'center'}
                     style={{paddingVertical: 7}}>
@@ -82,7 +82,7 @@ const AccountScreen = () => {
                       }>
                       {language.name}
                     </Text>
-                  </Flex>
+                  </FlexComponent>
                 </Pressable>
               ))}
             </View>

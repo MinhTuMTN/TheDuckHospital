@@ -1,4 +1,4 @@
-import {Text} from 'native-base';
+import {Text} from '@gluestack-ui/themed';
 import {ContainerComponent, Header} from '../../../components';
 import {useTranslation} from 'react-i18next';
 

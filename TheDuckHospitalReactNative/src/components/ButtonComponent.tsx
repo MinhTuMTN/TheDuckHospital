@@ -1,7 +1,7 @@
 import {View, TouchableOpacity, StyleProp, ViewStyle} from 'react-native';
 import React from 'react';
-import {Text} from 'native-base';
 import {appColors} from '../constants/appColors';
+import {Text} from '@gluestack-ui/themed';
 
 interface ButtonComponentProps {
   children: React.ReactNode | string;
@@ -10,7 +10,19 @@ interface ButtonComponentProps {
   textColor?: string;
   textAlignment?: 'center' | 'left' | 'right';
   fontSize?: number;
-  fontWeight?: number | string;
+  fontWeight?:
+    | '$black'
+    | (string & {})
+    | '$normal'
+    | '$bold'
+    | '$light'
+    | '$hairline'
+    | '$thin'
+    | '$medium'
+    | '$semibold'
+    | '$extrabold'
+    | '$extraBlack'
+    | undefined;
   bold?: boolean;
   italic?: boolean;
   padding?: number;
@@ -27,7 +39,7 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     textColor = 'white',
     textAlignment = 'center',
     fontSize = 15,
-    fontWeight = 'normal',
+    fontWeight = '$normal',
     bold = false,
     italic = false,
     padding = 10,

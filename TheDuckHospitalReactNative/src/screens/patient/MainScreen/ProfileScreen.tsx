@@ -1,14 +1,9 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {
-  ContainerComponent,
-  Header,
-  MedicalBillComponent,
-  PatientProfileComponent,
-} from '../../../components';
+import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
-import {useTranslation} from 'react-i18next';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
@@ -57,7 +52,7 @@ const ProfileScreen = () => {
           showsVerticalScrollIndicator={false}
           data={data}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({item}) => <PatientProfileComponent profile={item} />}
+          renderItem={({item}) => <PatientProfile profile={item} />}
         />
       </ContentComponent>
     </ContainerComponent>

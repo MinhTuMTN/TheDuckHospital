@@ -1,10 +1,10 @@
 import {useNavigation} from '@react-navigation/native';
-import {Image, Spinner} from 'native-base';
 import React, {useEffect} from 'react';
 import {ImageBackground} from 'react-native';
 import {appColors} from '../constants/appColors';
 import {appInfo} from '../constants/appInfo';
 import {globalStyles} from '../styles/globalStyles';
+import {Image, Spinner} from '@gluestack-ui/themed';
 
 const SlashScreen = () => {
   const {reset} = useNavigation();
@@ -33,7 +33,7 @@ const SlashScreen = () => {
           resizeMode: 'cover',
         }}
       />
-      <Spinner color={appColors.darkGreen} size={'lg'} />
+      <Spinner color={appColors.darkGreen} size={'large'} />
     </ImageBackground>
   );
 };

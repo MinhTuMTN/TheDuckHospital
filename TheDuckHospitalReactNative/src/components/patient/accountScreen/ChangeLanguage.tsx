@@ -1,9 +1,10 @@
-import {Flex, Text} from 'native-base';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, StyleSheet, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {appColors} from '../../../constants/appColors';
+import {FlexComponent} from '../..';
+import {Text} from '@gluestack-ui/themed';
 
 interface ChangeLanguageProps {
   onPress: () => void;
@@ -13,11 +14,11 @@ const ChangeLanguage = (props: ChangeLanguageProps) => {
   const {t, i18n} = useTranslation();
   return (
     <View style={{backgroundColor: 'white'}}>
-      <Flex
+      <FlexComponent
         direction="row"
         alignItems={'center'}
         justifyContent={'space-between'}>
-        <Flex direction="row" alignItems={'center'}>
+        <FlexComponent direction="row" alignItems={'center'}>
           <Icon
             name="language-outline"
             size={20}
@@ -27,14 +28,14 @@ const ChangeLanguage = (props: ChangeLanguageProps) => {
           <Text color={'black'} fontSize={17}>
             {t('account.language')}
           </Text>
-        </Flex>
+        </FlexComponent>
 
         <Pressable style={styles.changeLanguageButton} onPress={props.onPress}>
           <Text color={'white'}>
             {i18n.language === 'vi' ? 'Tiếng Việt' : 'English'}
           </Text>
         </Pressable>
-      </Flex>
+      </FlexComponent>
     </View>
   );
 };

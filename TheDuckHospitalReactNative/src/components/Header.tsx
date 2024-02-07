@@ -1,9 +1,9 @@
 import React from 'react';
 import {appColors} from '../constants/appColors';
-import {Center, Flex, Text} from 'native-base';
-import {View} from 'react-native';
+import {ImageBackground, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
+import {FlexComponent, TextComponent} from '.';
 
 interface Props {
   title: string;
@@ -18,40 +18,37 @@ const Header = (props: Props) => {
   const navigation = useNavigation();
 
   return (
-    <View
-      style={{
-        backgroundColor: appColors.primary,
-        paddingTop: 35,
-        paddingBottom: 15,
-      }}>
-      <Flex
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        direction="row"
+    <ImageBackground source={require('../assets/images/background-header.jpg')}>
+      <View
         style={{
-          paddingTop: 10,
-          paddingHorizontal: 15,
+          paddingTop: 35,
+          paddingBottom: 15,
         }}>
-        <View>
-          {showBackButton && (
-            <Icon
-              name="arrow-back"
-              size={30}
-              color="white"
-              onPress={() => navigation.goBack()}
-            />
-          )}
-        </View>
-        <Text
-          style={{textTransform: 'uppercase'}}
-          color={'white'}
-          bold
-          fontSize={titleSize}>
-          {title}
-        </Text>
-        <View>{icon}</View>
-      </Flex>
-    </View>
+        <FlexComponent
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          style={{
+            paddingHorizontal: 15,
+            paddingTop: 10,
+          }}>
+          <View>
+            {showBackButton && (
+              <Icon
+                name="arrow-back"
+                size={30}
+                color="white"
+                onPress={() => navigation.goBack()}
+              />
+            )}
+          </View>
+          <TextComponent uppercase bold fontSize={18} color={appColors.white}>
+            {title}
+          </TextComponent>
+          <View>{icon}</View>
+        </FlexComponent>
+      </View>
+    </ImageBackground>
   );
 };
 
