@@ -43,7 +43,8 @@ const Row = (props: RowProps) => {
     <FlexComponent
       direction={'row'}
       alignItems={'center'}
-      justifyContent={'space-between'}>
+      justifyContent={'space-between'}
+      style={{paddingBottom: 10}}>
       <FlexComponent direction="row" alignItems={'center'}>
         {icon}
         <Text color={textColor} fontWeight={fontWeight}>

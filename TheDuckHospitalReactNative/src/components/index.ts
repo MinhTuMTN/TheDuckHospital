@@ -1,5 +1,6 @@
 import ContainerComponent from './ContainerComponent';
 import ContentComponent from './ContentComponent';
+import ContentLoaderComponent from './ContentLoaderComponent';
 import FlexComponent from './FlexComponent';
 import Header from './Header';
 import InputComponent from './InputComponent';
@@ -24,4 +25,5 @@ export {
   FlexComponent,
   TextComponent,
   InputComponent,
+  ContentLoaderComponent,
 };

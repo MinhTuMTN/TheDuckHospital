@@ -1,6 +1,12 @@
 import {Input, InputField} from '@gluestack-ui/themed';
 import React from 'react';
-import {StyleProp, TextStyle, View, ViewStyle} from 'react-native';
+import {
+  KeyboardTypeOptions,
+  StyleProp,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {appColors} from '../constants/appColors';
 import {TextComponent} from '.';
 
@@ -14,7 +20,8 @@ interface InputComponentProps {
   inputContainerFocusStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
   inputFocusStyle?: StyleProp<ViewStyle>;
-  type?: 'text' | 'number' | 'email' | 'password';
+  type?: 'text' | 'password';
+  keyboardType?: KeyboardTypeOptions;
   placeholder?: string;
   value?: string;
   onChangeText?: (text: string) => void;
@@ -52,6 +59,7 @@ const InputComponent = (props: InputComponentProps) => {
     onBlur,
     size = 'md',
     variant = 'outline',
+    keyboardType = 'default',
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
@@ -77,6 +85,7 @@ const InputComponent = (props: InputComponentProps) => {
           type={type === 'password' ? 'password' : 'text'}
           value={value}
           style={isFocus ? inputFocusStyle : inputStyle}
+          keyboardType={keyboardType}
           onChangeText={onChangeText}
           onFocus={() => {
             setIsFocus(true);
