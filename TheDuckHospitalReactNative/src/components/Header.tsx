@@ -4,6 +4,7 @@ import {ColorValue, ImageBackground, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {FlexComponent, TextComponent} from '.';
+import {ChevronLeft} from 'lucide-react-native';
 
 interface Props {
   title?: string;
@@ -12,7 +13,7 @@ interface Props {
   showBackButton?: boolean;
   icon?: React.ReactNode;
   noBackground?: boolean;
-  backButtonColor?: number | ColorValue | undefined;
+  backButtonColor?: ColorValue | undefined;
   paddingTop?: number;
   paddingBottom?: number;
   uppercase?: boolean;
@@ -50,8 +51,7 @@ const Header = (props: Props) => {
         }}>
         <View>
           {showBackButton && (
-            <Icon
-              name="arrow-back"
+            <ChevronLeft
               size={30}
               color={backButtonColor || 'white'}
               onPress={() => navigation.goBack()}

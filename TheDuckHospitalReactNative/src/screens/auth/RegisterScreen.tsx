@@ -61,9 +61,12 @@ const RegisterScreen = () => {
           <Image
             source={require('../../assets/images/logo-text-small.png')}
             alt="Logo"
-            width={200}
-            height={200}
+            style={{
+              width: 175,
+              height: 175,
+            }}
           />
+          <Space paddingTop={20} />
           <TextComponent bold fontSize={23}>
             {t('registerScreen.createAccount')}
           </TextComponent>
