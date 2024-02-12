@@ -1,4 +1,4 @@
-import {Input, InputField} from '@gluestack-ui/themed';
+import {Input, InputField, InputIcon, InputSlot} from '@gluestack-ui/themed';
 import React from 'react';
 import {
   KeyboardTypeOptions,
@@ -18,8 +18,8 @@ interface InputComponentProps {
   containerStyle?: StyleProp<ViewStyle>;
   inputContainerStyle?: StyleProp<ViewStyle>;
   inputContainerFocusStyle?: StyleProp<ViewStyle>;
-  inputStyle?: StyleProp<ViewStyle>;
-  inputFocusStyle?: StyleProp<ViewStyle>;
+  inputStyle?: StyleProp<TextStyle>;
+  inputFocusStyle?: StyleProp<TextStyle>;
   type?: 'text' | 'password';
   keyboardType?: KeyboardTypeOptions;
   placeholder?: string;
@@ -29,6 +29,8 @@ interface InputComponentProps {
   onBlur?: () => void;
   size?: 'sm' | 'md' | 'lg' | 'xl' | undefined;
   variant?: 'outline' | 'rounded' | 'underlined' | undefined;
+  startIcon?: any;
+  endIcon?: any;
 }
 
 const InputComponent = (props: InputComponentProps) => {
@@ -60,6 +62,8 @@ const InputComponent = (props: InputComponentProps) => {
     size = 'md',
     variant = 'outline',
     keyboardType = 'default',
+    startIcon,
+    endIcon,
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
@@ -77,14 +81,15 @@ const InputComponent = (props: InputComponentProps) => {
         size={size}
         variant={variant}
         style={[
-          isFocus ? inputContainerFocusStyle : inputContainerStyle,
           {height: 45},
+          isFocus ? inputContainerFocusStyle : inputContainerStyle,
         ]}>
+        {startIcon && <InputSlot pl={'$3'}>{startIcon}</InputSlot>}
         <InputField
           placeholder={placeholder}
           type={type === 'password' ? 'password' : 'text'}
           value={value}
-          style={isFocus ? inputFocusStyle : inputStyle}
+          style={isFocus ? inputFocusStyle : [inputStyle]}
           keyboardType={keyboardType}
           onChangeText={onChangeText}
           onFocus={() => {
@@ -96,6 +101,11 @@ const InputComponent = (props: InputComponentProps) => {
             onBlur && onBlur();
           }}
         />
+        {endIcon && (
+          <InputSlot pr={'$3'}>
+            <InputIcon as={endIcon} />
+          </InputSlot>
+        )}
       </Input>
     </View>
   );

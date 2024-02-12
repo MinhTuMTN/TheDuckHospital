@@ -21,6 +21,7 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "i18next": "^23.8.2",
+    "lucide-react-native": "^0.323.0",
     "react": "18.2.0",
     "react-content-loader": "^6.2.1",
     "react-i18next": "^14.0.1",

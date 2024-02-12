@@ -19,7 +19,7 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
   useEffect(() => {
     const id = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
+    }, 500);
     return () => clearTimeout(id);
   }, []);
 

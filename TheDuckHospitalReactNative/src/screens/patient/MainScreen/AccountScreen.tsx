@@ -10,6 +10,8 @@ import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLang
 import {appColors} from '../../../constants/appColors';
 import {globalStyles} from '../../../styles/globalStyles';
 import {Text} from '@gluestack-ui/themed';
+import ButtonComponent from '../../../components/ButtonComponent';
+import {useNavigation} from '@react-navigation/native';
 
 const languages = [
   {
@@ -30,8 +32,14 @@ const AccountScreen = () => {
   const bottomModalRef = React.useRef<BottomSheetModal>(null);
 
   const {i18n} = useTranslation();
+  const navigation = useNavigation();
+
+  const handleBtnLoginClick = () => {
+    navigation.navigate('LoginScreen' as never);
+  };
   return (
     <ContainerComponent paddingTop={50}>
+      <ButtonComponent onPress={handleBtnLoginClick}>Đăng nhập</ButtonComponent>
       <Pressable
         onPress={() => {
           bottomModalRef.current?.close();

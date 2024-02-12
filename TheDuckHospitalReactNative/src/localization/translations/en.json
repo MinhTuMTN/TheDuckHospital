@@ -25,5 +25,41 @@
     "title": "Page Not Found",
     "desc": "Sorry. The page you are looking for does not exist or has been deleted. Please return to the home page!",
     "backToHome": "Back to Home"
+  },
+  "loginScreen": {
+    "welcome": "Welcome back!",
+    "signInYourAccount": "Sign in to your account",
+    "email": "Email or phone number",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "signIn": "Sign in",
+    "dontHaveAccount": "Don't have an account? ",
+    "signUp": "Sign up"
+  },
+  "registerScreen": {
+    "createAccount": "Create account",
+    "quicklyCreateAccount": "Quickly create an account",
+    "fullName": "Full name",
+    "phoneNumber": "Phone number",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "alreadyHaveAccount": "Already have an account? ",
+    "signIn": "Sign in",
+    "register": "Register"
+  },
+  "forgotPasswordScreen": {
+    "forgotPassword": "Forgot password",
+    "enterPhone": "Please enter your email or phone number to reset your password",
+    "email": "Email or phone number",
+    "resetPassword": "Reset password"
+  },
+  "verifyPhoneScreen": {
+    "title": "Verify Phone Number",
+    "verifyPhone": "Verify your phone number",
+    "alreadySend": "We have sent the verification code to phone number",
+    "checkAndEnterCode": "Please check and enter the code in the box below.",
+    "notReceive": "Didn't receive the verification code?",
+    "resendCode": "Resend code"
   }
 }

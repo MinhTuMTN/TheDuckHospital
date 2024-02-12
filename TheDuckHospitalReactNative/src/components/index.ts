@@ -8,6 +8,7 @@ import SectionComponent from './SectionComponent';
 import Space from './Space';
 import TextComponent from './TextComponent';
 import MedicalBillComponent from './patient/MedicalBillComponent';
+import NotificationItem from './patient/notificationScreen/NotificationItem';
 import AvatarProfile from './patient/patientProfileScreen/AvatarProfile';
 import DetailsInfomation from './patient/patientProfileScreen/DetailsInfomation';
 import PatientProfile from './patient/patientProfileScreen/PatientProfile';
@@ -26,4 +27,5 @@ export {
   TextComponent,
   InputComponent,
   ContentLoaderComponent,
+  NotificationItem,
 };

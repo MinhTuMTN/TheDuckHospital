@@ -9,6 +9,11 @@ import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
 import NotFoundScreen from './src/screens/NotFoundScreen';
 import SlashScreen from './src/screens/SlashScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
+import AuthNavigator from './src/navigator/AuthNavigator';
+import RegisterScreen from './src/screens/auth/RegisterScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
+import LoginScreen from './src/screens/auth/LoginScreen';
+import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +40,16 @@ const App = () => {
           <Stack.Screen
             name="DetailsProfileScreen"
             component={DetailsProfileScreen}
+          />
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          <Stack.Screen
+            name="ForgotPasswordScreen"
+            component={ForgotPasswordScreen}
+          />
+          <Stack.Screen
+            name="VerifyPhoneScreen"
+            component={VerifyPhoneScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

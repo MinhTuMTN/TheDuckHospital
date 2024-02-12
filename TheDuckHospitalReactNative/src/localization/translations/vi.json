@@ -25,5 +25,41 @@
     "title": "Trang không tồn tại",
     "desc": "Xin lỗi. Trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa. Vui lòng quay về trang chủ!",
     "backToHome": "Quay về trang chủ"
+  },
+  "loginScreen": {
+    "welcome": "Chào mừng!",
+    "signInYourAccount": "Đăng nhập tài khoản của bạn",
+    "email": "Email hoặc số điện thoại",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Nhớ đăng nhập",
+    "signIn": "Đăng nhập",
+    "dontHaveAccount": "Chưa có tài khoản? ",
+    "signUp": "Đăng ký"
+  },
+  "registerScreen": {
+    "createAccount": "Tạo tài khoản",
+    "quicklyCreateAccount": "Tạo tài khoản nhanh chóng và dễ dàng",
+    "fullName": "Họ và tên",
+    "phoneNumber": "Số điện thoại",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "alreadyHaveAccount": "Bạn đã có tài khoản? ",
+    "signIn": "Đăng nhập",
+    "register": "Đăng ký"
+  },
+  "forgotPasswordScreen": {
+    "forgotPassword": "Quên mật khẩu",
+    "enterPhone": "Vui lòng nhập email hoặc số điện thoại của bạn để đặt lại mật khẩu",
+    "email": "Email hoặc số điện thoại",
+    "resetPassword": "Đặt lại mật khẩu"
+  },
+  "verifyPhoneScreen": {
+    "title": "Xác thực số điện thoại",
+    "verifyPhone": "Xác thực số điện thoại của bạn",
+    "alreadySend": "Chúng tôi đã gửi mã xác thực đến số điện thoại",
+    "checkAndEnterCode": "Vui lòng kiểm tra và nhập mã vào ô bên dưới.",
+    "notReceive": "Bạn không nhận được mã xác thực",
+    "resendCode": "Gửi lại mã xác thực"
   }
 }

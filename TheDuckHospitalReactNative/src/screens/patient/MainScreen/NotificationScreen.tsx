@@ -1,6 +1,11 @@
-import {Text} from '@gluestack-ui/themed';
-import {ContainerComponent, Header} from '../../../components';
 import {useTranslation} from 'react-i18next';
+import {
+  ContainerComponent,
+  ContentComponent,
+  Header,
+  NotificationItem,
+} from '../../../components';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const NotificationScreen = () => {
   const {t} = useTranslation();
@@ -11,7 +16,12 @@ const NotificationScreen = () => {
         titleSize={19}
         showBackButton={false}
       />
-      <Text>NotificationScreen</Text>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <NotificationItem />
+        <NotificationItem />
+        <NotificationItem />
+        <NotificationItem />
+      </GestureHandlerRootView>
     </ContainerComponent>
   );
 };

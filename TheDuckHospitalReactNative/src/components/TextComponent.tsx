@@ -23,6 +23,7 @@ interface TextComponentProps {
     | '900'
     | undefined;
   color?: ColorValue | undefined;
+  textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
   style?: StyleProp<TextStyle>;
 }
 
@@ -35,6 +36,7 @@ const TextComponent = (props: TextComponentProps) => {
     underline = false,
     fontWeight,
     color = appColors.black,
+    textAlign,
     style,
   } = props;
   return (
@@ -47,6 +49,7 @@ const TextComponent = (props: TextComponentProps) => {
           fontStyle: italic ? 'italic' : 'normal',
           textDecorationLine: underline ? 'underline' : 'none',
           color,
+          textAlign,
         },
         style,
       ]}>

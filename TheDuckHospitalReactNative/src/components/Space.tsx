@@ -1,9 +1,9 @@
 import React from 'react';
-import {View} from 'react-native';
+import {DimensionValue, View} from 'react-native';
 
 interface Props {
-  paddingTop?: number;
-  paddingBottom?: number;
+  paddingTop?: DimensionValue | undefined;
+  paddingBottom?: DimensionValue | undefined;
 }
 
 const Space = (props: Props) => {
