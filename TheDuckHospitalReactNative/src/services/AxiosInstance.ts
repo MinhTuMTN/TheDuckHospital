@@ -1,8 +1,15 @@
 import axios from 'axios';
 
+interface ResultProps {
+  success: boolean;
+  data: any;
+  error: any;
+  statusCode: number;
+}
+
 var qs = require('qs');
 const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
+  baseURL: 'https://tb7drp6q-8080.asse.devtunnels.ms/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -23,12 +30,14 @@ const handleRequest = async (
   params?: any,
   timeout?: number,
 ) => {
-  const result = {
+  const result: ResultProps = {
     success: false,
     data: null,
     error: null,
     statusCode: 200,
   };
+
+  console.log('url', url);
 
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;

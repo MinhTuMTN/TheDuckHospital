@@ -1,10 +1,14 @@
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {English, Vietnamese} from '../../../assets/svgs';
-import {ContainerComponent, FlexComponent} from '../../../components';
+import {
+  ContainerComponent,
+  FlexComponent,
+  TextComponent,
+} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
@@ -12,6 +16,8 @@ import {globalStyles} from '../../../styles/globalStyles';
 import {Text} from '@gluestack-ui/themed';
 import ButtonComponent from '../../../components/ButtonComponent';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useAuth} from '../../../auth/AuthProvider';
 
 const languages = [
   {
@@ -30,16 +36,47 @@ const languages = [
 
 const AccountScreen = () => {
   const bottomModalRef = React.useRef<BottomSheetModal>(null);
+  const [isLogged, setIsLogged] = React.useState(false);
 
   const {i18n} = useTranslation();
   const navigation = useNavigation();
+  const auth = useAuth();
 
   const handleBtnLoginClick = () => {
     navigation.navigate('LoginScreen' as never);
   };
+
+  useEffect(() => {
+    const checkLogin = () => {
+      const token = auth.token;
+      if (token) {
+        setIsLogged(true);
+      } else {
+        setIsLogged(false);
+      }
+    };
+    checkLogin();
+  }, [auth.token]);
   return (
     <ContainerComponent paddingTop={50}>
-      <ButtonComponent onPress={handleBtnLoginClick}>Đăng nhập</ButtonComponent>
+      {isLogged ? (
+        <View>
+          <TextComponent fontSize={20} fontWeight={'bold'}>
+            Xin chào bạn
+          </TextComponent>
+          <ButtonComponent
+            onPress={async () => {
+              await auth.logout();
+              setIsLogged(false);
+            }}>
+            Đăng xuất
+          </ButtonComponent>
+        </View>
+      ) : (
+        <ButtonComponent onPress={handleBtnLoginClick}>
+          Đăng nhập
+        </ButtonComponent>
+      )}
       <Pressable
         onPress={() => {
           bottomModalRef.current?.close();

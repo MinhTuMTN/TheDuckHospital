@@ -46,7 +46,11 @@
     "confirmPassword": "Confirm password",
     "alreadyHaveAccount": "Already have an account? ",
     "signIn": "Sign in",
-    "register": "Register"
+    "register": "Register",
+    "fullNameError": "Please enter full name",
+    "phoneNumberError": "Please enter phone number",
+    "passwordError": "Please enter password",
+    "confirmPasswordError": "Password does not match"
   },
   "forgotPasswordScreen": {
     "forgotPassword": "Forgot password",

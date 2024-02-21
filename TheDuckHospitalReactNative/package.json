@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "npx patch-package"
+    "postinstall": "npx patch-package",
+    "react-devtools": "react-devtools"
   },
   "dependencies": {
     "@gluestack-style/react": "^1.0.45",
@@ -23,6 +24,7 @@
     "axios": "^1.6.7",
     "i18next": "^23.8.2",
     "lucide-react-native": "^0.323.0",
+    "qs": "^6.11.2",
     "react": "18.2.0",
     "react-content-loader": "^6.2.1",
     "react-i18next": "^14.0.1",

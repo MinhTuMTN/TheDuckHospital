@@ -162,7 +162,7 @@ public class DoctorServicesImpl implements IDoctorServices {
             doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
                     || doctorSchedule.getDate().before(DateCommon.getToday())
             );
-            if (doctorSchedules.isEmpty()) {
+                if (doctorSchedules.isEmpty()) {
                 remove.getAndIncrement();
                 return;
             }

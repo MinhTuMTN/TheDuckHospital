@@ -4,6 +4,7 @@ import {
   ColorValue,
   KeyboardTypeOptions,
   NativeSyntheticEvent,
+  ReturnKeyTypeOptions,
   StyleProp,
   TextInput,
   TextInputTextInputEventData,
@@ -44,10 +45,17 @@ interface InputComponentProps {
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
   startIcon?: any;
   endIcon?: any;
+  error?: boolean;
+  errorMessage?: string;
+  returnKeyType?: ReturnKeyTypeOptions | undefined;
+  maxLength?: number;
+  autoFocus?: boolean;
+  onSubmitEditing?: () => void;
 }
 
 const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
   const {
+    autoFocus = false,
     editabled = true,
     disabled = false,
     label,
@@ -84,9 +92,20 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     keyboardType = 'default',
     startIcon,
     endIcon,
+    error,
+    errorMessage,
+    returnKeyType,
+    maxLength,
+    onSubmitEditing,
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
+  const [isFirst, setIsFirst] = React.useState(true);
+
+  const handleOnChangeText = (text: string) => {
+    setIsFirst(false);
+    onChangeText && onChangeText(text);
+  };
 
   return (
     <View style={containerStyle}>
@@ -108,8 +127,13 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
               : inputContainerStyle
             : _inputContainerStyle,
         ]}>
-        {startIcon && <InputSlot pl={'$3'}>{startIcon}</InputSlot>}
+        {startIcon && (
+          <InputSlot pl={'$3'} pr={'$3'}>
+            {startIcon}
+          </InputSlot>
+        )}
         <TextInput
+          autoFocus={autoFocus}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={type === 'password'}
@@ -124,7 +148,8 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           ]}
           autoCapitalize={autoCapitalize}
           keyboardType={keyboardType}
-          onChangeText={onChangeText}
+          returnKeyType={returnKeyType}
+          onChangeText={handleOnChangeText}
           onTextInput={onTextInput}
           onFocus={() => {
             setIsFocus(true);
@@ -135,6 +160,8 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
             onBlur && onBlur();
           }}
           ref={ref}
+          maxLength={maxLength}
+          onSubmitEditing={onSubmitEditing}
         />
         {endIcon && (
           <InputSlot pr={'$3'}>
@@ -142,6 +169,16 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           </InputSlot>
         )}
       </Input>
+      {error && errorMessage && !isFirst && (
+        <TextComponent
+          color={appColors.error}
+          fontSize={12}
+          style={{
+            paddingLeft: 5,
+          }}>
+          {errorMessage}
+        </TextComponent>
+      )}
     </View>
   );
 });
