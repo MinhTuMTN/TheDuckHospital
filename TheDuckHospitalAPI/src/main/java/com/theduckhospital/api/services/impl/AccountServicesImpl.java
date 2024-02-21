@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.dto.request.ChangePasswordRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
@@ -67,6 +68,7 @@ public class AccountServicesImpl implements IAccountServices {
         this.staffRepository = staffRepository;
         this.doctorRepository = doctorRepository;
     }
+
     @Override
     public Account findAccount(String emailOrPhone) {
         if (emailOrPhone.contains("@")) {
@@ -84,7 +86,7 @@ public class AccountServicesImpl implements IAccountServices {
             return false;
         }
 
-         return passwordEncoder.matches(password, account.getPassword());
+        return passwordEncoder.matches(password, account.getPassword());
     }
 
     @Override
@@ -249,7 +251,7 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         String userId = tokenProvider.getUserIdFromJwt(token);
-        Account account =  accountRepository
+        Account account = accountRepository
                 .findAccountByUserIdAndDeletedIsFalse(
                         UUID.fromString(userId)
                 );
@@ -286,7 +288,7 @@ public class AccountServicesImpl implements IAccountServices {
             }
             Account account = accountRepository.findUserByPhoneNumber(phone);
             return String.valueOf(account.getOtp());
-        } catch(Exception e) {
+        } catch (Exception e) {
             Optional<TemporaryUser> temporaryUser = temporaryUserRepository.findTemporaryUserByPhoneNumber(phone);
             return temporaryUser.map(user -> String.valueOf(user.getOtp())).orElse("Not found");
         }
@@ -300,7 +302,7 @@ public class AccountServicesImpl implements IAccountServices {
             role = roleNames[roleNames.length - 1];
 
             if (Objects.equals(role, "Doctor")) {
-                if (((Doctor)account.getStaff()).isHeadOfDepartment()) {
+                if (((Doctor) account.getStaff()).isHeadOfDepartment()) {
                     role = "HeadDoctor";
                 }
             }
@@ -346,7 +348,7 @@ public class AccountServicesImpl implements IAccountServices {
     public AccountResponse getAccountById(UUID userId) {
         Optional<Account> optional = accountRepository.findById(userId);
 
-        if(optional.isEmpty()) {
+        if (optional.isEmpty()) {
             throw new NotFoundException("Account not found");
         }
 
@@ -368,15 +370,15 @@ public class AccountServicesImpl implements IAccountServices {
             staff.setDeleted(true);
             staffRepository.save(staff);
             if (staff instanceof Doctor) {
-                Doctor doctor = ((Doctor)staff);
+                Doctor doctor = ((Doctor) staff);
 
-                if(doctor.isHeadOfDepartment()){
+                if (doctor.isHeadOfDepartment()) {
                     doctor.setHeadOfDepartment(false);
                     doctorRepository.save(doctor);
                 }
 
-                List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
-                if(!schedules.isEmpty()) {
+                List<DoctorSchedule> schedules = ((Doctor) staff).getDoctorSchedules();
+                if (!schedules.isEmpty()) {
                     schedules.forEach(schedule -> {
                         schedule.setDeleted(true);
                         doctorScheduleRepository.save(schedule);
@@ -386,7 +388,7 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         List<PatientProfile> patientProfile = account.getPatientProfile();
-        if(!patientProfile.isEmpty()) {
+        if (!patientProfile.isEmpty()) {
             patientProfile.forEach(profile -> {
                 profile.setDeleted(true);
                 patientProfileRepository.save(profile);
@@ -415,7 +417,7 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         List<PatientProfile> patientProfile = account.getPatientProfile();
-        if(!patientProfile.isEmpty()) {
+        if (!patientProfile.isEmpty()) {
             patientProfile.forEach(profile -> {
                 profile.setDeleted(false);
                 patientProfileRepository.save(profile);
@@ -424,4 +426,53 @@ public class AccountServicesImpl implements IAccountServices {
 
         return new AccountResponse(accountRepository.save(account));
     }
+
+    @Override
+    public boolean forgetPassword(String phoneNumber) throws FirebaseMessagingException {
+        Account account = findAccount(phoneNumber);
+
+        if (account == null) {
+            throw new NotFoundException("Account not found" + phoneNumber);
+        }
+
+        int otp = otpServices.generateOTP(account);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("phoneNumber", phoneNumber);
+        data.put("message", "Mã xác nhận của bạn là: " + otp);
+        firebaseServices.sendNotification(
+                fcmToken,
+                "OTP",
+                "Mã xác nhận của bạn là: " + otp,
+                data
+        );
+
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordRequest request) {
+        Account account = findAccount(request.getPhoneNumber());
+
+        int otp = 0;
+        try {
+            otp = Integer.parseInt(request.getOtp());
+        } catch (Exception e) {
+            throw new BadRequestException("OTP is not valid");
+        }
+
+        if (!otpServices.verifyOTP(account, otp)) {
+            throw new BadRequestException("OTP is not valid");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadRequestException("Password not matched");
+        }
+
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account);
+
+        return true;
+    }
+
 }

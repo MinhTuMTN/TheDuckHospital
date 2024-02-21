@@ -14,8 +14,14 @@ import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
+import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 
-const Stack = createNativeStackNavigator();
+export type RootStackParamList = {
+  ForgetPasswordScreen: undefined;
+  ChangePasswordScreen: { phoneNumber: string };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
   return (
@@ -46,6 +52,10 @@ const App = () => {
           <Stack.Screen
             name="ForgotPasswordScreen"
             component={ForgotPasswordScreen}
+          />
+          <Stack.Screen
+            name="ChangePasswordScreen"
+            component={ChangePasswordScreen}
           />
           <Stack.Screen
             name="VerifyPhoneScreen"
