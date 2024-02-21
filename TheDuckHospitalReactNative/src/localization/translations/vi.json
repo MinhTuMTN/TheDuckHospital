@@ -35,7 +35,9 @@
     "rememberMe": "Nhớ đăng nhập",
     "signIn": "Đăng nhập",
     "dontHaveAccount": "Chưa có tài khoản? ",
-    "signUp": "Đăng ký"
+    "signUp": "Đăng ký",
+    "phoneNumberError": "Vui lòng nhập email hoặc số điện thoại",
+    "passwordError": "Vui lòng nhập mật khẩu"
   },
   "registerScreen": {
     "createAccount": "Tạo tài khoản",
@@ -46,7 +48,14 @@
     "confirmPassword": "Xác nhận mật khẩu",
     "alreadyHaveAccount": "Bạn đã có tài khoản? ",
     "signIn": "Đăng nhập",
-    "register": "Đăng ký"
+    "register": "Đăng ký",
+    "fullNameError": "Vui lòng nhập họ và tên",
+    "phoneNumberError": "Vui lòng nhập số điện thoại",
+    "phoneNumberLengthError": "Số điện thoại phải có 10 chữ số",
+    "passwordError": "Vui lòng nhập mật khẩu",
+    "passwordLengthError": "Mật khẩu phải có ít nhất 8 ký tự, chứa cả chữ và số",
+    "confirmPasswordError": "Vui lòng xác nhận mật khẩu",
+    "confirmPasswordMatchError": "Mật khẩu xác nhận không khớp"
   },
   "forgotPasswordScreen": {
     "forgotPassword": "Quên mật khẩu",

@@ -10,13 +10,29 @@ import {
   TextComponent,
 } from '../../components';
 import {appColors} from '../../constants/appColors';
+import {register} from '../../services/authServices';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../types';
+import {useAuth} from '../../auth/AuthProvider';
+import {
+  Toast,
+  ToastDescription,
+  ToastTitle,
+  VStack,
+  useToast,
+} from '@gluestack-ui/themed';
 
-const VerifyPhoneScreen = () => {
+const VerifyPhoneScreen = ({route}: {route: any}) => {
   const [remainingTime, setRemainingTime] = useState<number>(120);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const otpInputRefs = useRef<any>([]);
 
   const {t} = useTranslation();
+  const info = route.params;
+  const navigation = useNavigation<navigationProps>();
+  const auth = useAuth();
+  const toast = useToast();
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -40,7 +56,100 @@ const VerifyPhoneScreen = () => {
     }
 
     if (text !== '' && index === otp.length - 1) {
-      // verifyPhoneNumber(newOtp.join(''));
+      handleRegister(newOtp.join(''));
+    }
+  };
+  const handleRegister = async (otp: string) => {
+    const response = await register({
+      fullName: info.fullName,
+      phoneNumber: info.phoneNumber,
+      password: info.password,
+      otp,
+    });
+
+    console.log(response);
+    if (response.success) {
+      console.log('Data', response.data);
+
+      const token = response.data.data;
+
+      if (token) {
+        toast.show({
+          placement: 'top',
+          duration: 3000,
+          render: ({id}) => {
+            const toastId = 'toast-' + id;
+            return (
+              <Toast
+                nativeID={toastId}
+                variant="accent"
+                action="success"
+                style={{
+                  marginTop: 40,
+                }}>
+                <VStack space="xs">
+                  <ToastTitle>Thành công!</ToastTitle>
+                  <ToastDescription>Đăng ký thành công.</ToastDescription>
+                </VStack>
+              </Toast>
+            );
+          },
+        });
+
+        await auth.login(token);
+
+        navigation.navigate('HomeScreen');
+      }
+    } else {
+      if (response.statusCode === 400) {
+        toast.show({
+          placement: 'top',
+          duration: 3000,
+          render: ({id}) => {
+            const toastId = 'toast-' + id;
+            return (
+              <Toast
+                nativeID={toastId}
+                variant="accent"
+                action="error"
+                style={{
+                  marginTop: 40,
+                }}>
+                <VStack space="xs">
+                  <ToastTitle>Lỗi!</ToastTitle>
+                  <ToastDescription>
+                    Mã OTP không chính xác. Vui lòng kiểm tra và thử lại sau.
+                  </ToastDescription>
+                </VStack>
+              </Toast>
+            );
+          },
+        });
+      } else {
+        toast.show({
+          placement: 'top',
+          duration: 3000,
+          render: ({id}) => {
+            const toastId = 'toast-' + id;
+            return (
+              <Toast
+                nativeID={toastId}
+                variant="accent"
+                action="error"
+                style={{
+                  marginTop: 40,
+                }}>
+                <VStack space="xs">
+                  <ToastTitle>Lỗi!</ToastTitle>
+                  <ToastDescription>
+                    Đã xảy ra lỗi. Vui lòng kiểm tra lại kết nối và thử lại sau.
+                  </ToastDescription>
+                </VStack>
+              </Toast>
+            );
+          },
+        });
+      }
     }
   };
 
@@ -79,7 +188,8 @@ const VerifyPhoneScreen = () => {
             textAlign="center">
             {t(`verifyPhoneScreen.alreadySend`)}{' '}
             <TextComponent color={appColors.primary} bold>
-              (+84) 123 567 890
+              (+84) {info.phoneNumber.slice(1, 4)}{' '}
+              {info.phoneNumber.slice(4, 7)} {info.phoneNumber.slice(7, 10)}
             </TextComponent>
             . {t(`verifyPhoneScreen.checkAndEnterCode`)}
           </TextComponent>
@@ -89,6 +199,7 @@ const VerifyPhoneScreen = () => {
             {otp.map((value, index) => (
               <InputComponent
                 ref={ref => (otpInputRefs.current[index] = ref)}
+                autoFocus={index === 0}
                 keyboardType="number-pad"
                 key={`otp-${index}`}
                 _inputContainerStyle={{

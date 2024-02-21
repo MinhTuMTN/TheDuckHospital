@@ -15,6 +15,7 @@ import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
+import {AuthProvider} from './src/auth/AuthProvider';
 
 export type RootStackParamList = {
   ForgetPasswordScreen: undefined;

@@ -7,4 +7,5 @@ export const appColors = {
   textDescription: '#7c7c7c',
   white: '#ffffff',
   black: '#000000',
+  error: '#ff3333',
 };

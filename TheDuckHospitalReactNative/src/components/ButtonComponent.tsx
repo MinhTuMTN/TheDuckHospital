@@ -1,4 +1,12 @@
-import {View, TouchableOpacity, StyleProp, ViewStyle} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+  GestureResponderEvent,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import React from 'react';
 import {appColors} from '../constants/appColors';
 import {Text} from '@gluestack-ui/themed';
@@ -28,7 +36,9 @@ interface ButtonComponentProps {
   padding?: number;
   containerStyles?: StyleProp<ViewStyle>;
   textStyles?: StyleProp<ViewStyle>;
-  onPress?: () => void;
+  enabled?: boolean;
+  onPress?: () => void | any;
+  isLoading?: boolean;
 }
 
 const ButtonComponent = (props: ButtonComponentProps) => {
@@ -45,32 +55,65 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     padding = 10,
     containerStyles,
     textStyles,
+    enabled = true,
     onPress,
+    isLoading,
   } = props;
   return (
     <View
-      style={[
-        {
-          backgroundColor,
-          borderRadius,
-          padding,
-        },
-        containerStyles,
-      ]}>
-      <TouchableOpacity onPress={onPress}>
-        <Text
-          style={textStyles}
-          color={textColor}
-          textAlign={textAlignment}
-          bold={bold}
-          italic={italic}
-          fontSize={fontSize}
-          fontWeight={fontWeight}>
-          {children}
-        </Text>
+      style={
+        enabled
+          ? [
+              {
+                backgroundColor,
+                borderRadius,
+                padding,
+              },
+              containerStyles,
+            ]
+          : [
+              containerStyles,
+              {
+                ...styles.disableStyle,
+                padding,
+              },
+            ]
+      }>
+      <TouchableOpacity
+        onPress={() => {
+          if (!isLoading && enabled && onPress) onPress();
+        }}
+        disabled={!enabled}>
+        <View style={isLoading && styles.loadingStyle}>
+          {isLoading && <ActivityIndicator size="small" color="#ffffff" />}
+          <Text
+            style={textStyles}
+            color={textColor}
+            textAlign={textAlignment}
+            bold={bold}
+            italic={italic}
+            fontSize={fontSize}
+            fontWeight={fontWeight}>
+            {children}
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  disableStyle: {
+    backgroundColor: appColors.gray,
+    borderRadius: 20,
+  },
+  loadingStyle: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    columnGap: 10,
+  },
+});
 
 export default ButtonComponent;
