@@ -17,12 +17,7 @@ import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import {AuthProvider} from './src/auth/AuthProvider';
 
-export type RootStackParamList = {
-  ForgetPasswordScreen: undefined;
-  ChangePasswordScreen: { phoneNumber: string };
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
@@ -32,6 +27,7 @@ const App = () => {
         backgroundColor={'transparent'}
         translucent={true}
       />
+      <AuthProvider>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="SlashScreen"
@@ -64,6 +60,7 @@ const App = () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      </AuthProvider>
     </GluestackUIProvider>
   );
 };

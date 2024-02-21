@@ -2,6 +2,8 @@ import {
   checkPhoneOrEmailDataProps,
   loginDataProps,
   registerDataProps,
+  forgetPasswordDataProps,
+  changePasswordDataProps,
 } from '../types';
 import {get, postNonAuth} from './AxiosInstance';
 
@@ -31,4 +33,12 @@ export const checkToken = async () => {
 
 export const checkInfo = async () => {
   return get('/auth/check-info');
+};
+
+export const forgetPassword = async (data: forgetPasswordDataProps) => {
+  return postNonAuth("/auth/forget-password", data);
+};
+
+export const changePassword = async (data: changePasswordDataProps) => {
+  return postNonAuth("/auth/forget-password/verify-change-password", data);
 };

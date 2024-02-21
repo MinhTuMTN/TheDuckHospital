@@ -12,14 +12,14 @@ import {Mail} from 'lucide-react-native';
 import {appColors} from '../../constants/appColors';
 import {useTranslation} from 'react-i18next';
 import ButtonComponent from '../../components/ButtonComponent';
-import { forgetPassword } from '../../services/patient/AuthServices';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../../App';
+import { forgetPassword } from '../../services/authServices';
+import { navigationProps } from '../../types';
 
 const ForgotPasswordScreen = () => {
   const {t} = useTranslation();
   const [emailOrPhoneNumber, setEmailOrPhoneNumber] = useState('');
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<navigationProps>();
   
   const handleResetPassword = async () => {
     try {

@@ -16,7 +16,7 @@ import {
 import ButtonComponent from '../../components/ButtonComponent';
 import {appColors} from '../../constants/appColors';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import { changePassword } from '../../services/patient/AuthServices';
+import { changePassword } from '../../services/authServices';
 
 const ChangePasswordScreen = () => {
   const route = useRoute();
@@ -122,6 +122,7 @@ const ChangePasswordScreen = () => {
               borderColor: appColors.white,
             }}
             variant="rounded"
+            type="password"
             onChangeText={(text) => setNewPassword(text)}
           />
           <Space paddingTop={15} />
@@ -143,6 +144,7 @@ const ChangePasswordScreen = () => {
               borderColor: appColors.white,
             }}
             variant="rounded"
+            type="password"
             onChangeText={(text) => setConfirmNewPassword(text)}
           />
           <Space paddingTop={30} />
