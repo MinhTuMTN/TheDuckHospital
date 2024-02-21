@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  CheckboxGroup,
   CheckboxIcon,
   CheckboxIndicator,
   CheckboxLabel,
@@ -21,7 +22,7 @@ import {appColors} from '../../constants/appColors';
 import {useNavigation} from '@react-navigation/native';
 
 const LoginScreen = () => {
-  const [rememberMe, setRememberMe] = React.useState(true);
+  const [rememberMe, setRememberMe] = React.useState(['rememberMe']);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const {t} = useTranslation();
@@ -77,14 +78,11 @@ const LoginScreen = () => {
             containerStyle={{
               width: '90%',
             }}
-            inputContainerStyle={{
+            _inputContainerStyle={{
               backgroundColor: appColors.white,
               borderColor: appColors.white,
             }}
-            inputContainerFocusStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
+            autoCapitalize="none"
             variant="rounded"
           />
           <Space paddingTop={20} />
@@ -97,14 +95,12 @@ const LoginScreen = () => {
             containerStyle={{
               width: '90%',
             }}
-            inputContainerStyle={{
+            _inputContainerStyle={{
               backgroundColor: appColors.white,
               borderColor: appColors.white,
             }}
-            inputContainerFocusStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
+            autoCapitalize="none"
+            type="password"
             variant="rounded"
           />
           <Space paddingTop={10} />
@@ -112,18 +108,26 @@ const LoginScreen = () => {
             direction="row"
             justifyContent="space-between"
             style={{width: '90%'}}>
-            <Checkbox value="rememberMe" size="md" aria-label="Remember me">
-              <CheckboxIndicator mr="$2" style={{borderRadius: 10}}>
-                <CheckboxIcon as={Check} />
-              </CheckboxIndicator>
-              <CheckboxLabel>
-                <TextComponent
-                  fontWeight="500"
-                  color={appColors.textDescription}>
-                  {t('loginScreen.rememberMe')}
-                </TextComponent>
-              </CheckboxLabel>
-            </Checkbox>
+            <CheckboxGroup value={rememberMe}>
+              <Checkbox
+                value="rememberMe"
+                size="md"
+                aria-label="Remember me"
+                onChange={isSelected => {
+                  setRememberMe(isSelected ? ['rememberMe'] : []);
+                }}>
+                <CheckboxIndicator mr="$2" style={{borderRadius: 10}}>
+                  <CheckboxIcon as={Check} />
+                </CheckboxIndicator>
+                <CheckboxLabel>
+                  <TextComponent
+                    fontWeight="500"
+                    color={appColors.textDescription}>
+                    {t('loginScreen.rememberMe')}
+                  </TextComponent>
+                </CheckboxLabel>
+              </Checkbox>
+            </CheckboxGroup>
             <Pressable onPress={handlForgotPasswordClick}>
               <TextComponent bold underline>
                 {t('loginScreen.forgotPassword')}

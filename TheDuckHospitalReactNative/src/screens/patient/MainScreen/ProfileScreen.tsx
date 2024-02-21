@@ -1,6 +1,6 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {FlatList} from 'react-native';
+import {ActivityIndicator, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {
   ContainerComponent,
@@ -9,6 +9,7 @@ import {
   PatientProfile,
 } from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
+import {appColors} from '../../../constants/appColors';
 
 const data = [
   {
@@ -64,9 +65,7 @@ const ProfileScreen = () => {
       <ContentComponent>
         {isLoading ? (
           <>
-            <ContentLoaderComponent />
-            <ContentLoaderComponent />
-            <ContentLoaderComponent />
+            <ActivityIndicator size="large" color={appColors.primary} />
           </>
         ) : (
           <FlatList

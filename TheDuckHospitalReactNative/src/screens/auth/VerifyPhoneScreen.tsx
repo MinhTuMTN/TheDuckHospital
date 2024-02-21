@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {StyleSheet, View} from 'react-native';
 import {
   ContainerComponent,
   ContentComponent,
@@ -8,15 +10,11 @@ import {
   TextComponent,
 } from '../../components';
 import {appColors} from '../../constants/appColors';
-import {StyleSheet} from 'react-native';
-import {View} from 'react-native';
-import {globalStyles} from '../../styles/globalStyles';
-import ButtonComponent from '../../components/ButtonComponent';
-import {useTranslation} from 'react-i18next';
 
 const VerifyPhoneScreen = () => {
   const [remainingTime, setRemainingTime] = useState<number>(120);
-  const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const otpInputRefs = useRef<any>([]);
 
   const {t} = useTranslation();
 
@@ -29,6 +27,23 @@ const VerifyPhoneScreen = () => {
       clearInterval(id);
     };
   }, []);
+
+  const handleOtpChange = (text: string, index: number) => {
+    const newOtp = [...otp];
+    newOtp[index] = text.charAt(text.length - 1);
+    setOtp(newOtp);
+
+    if (text !== '' && index < otp.length - 1) {
+      otpInputRefs.current[index + 1].focus();
+    } else if (text === '' && index > 0) {
+      otpInputRefs.current[index - 1].focus();
+    }
+
+    if (text !== '' && index === otp.length - 1) {
+      // verifyPhoneNumber(newOtp.join(''));
+    }
+  };
+
   return (
     <ContainerComponent
       paddingTop={0}
@@ -73,36 +88,27 @@ const VerifyPhoneScreen = () => {
           <View style={styles.otpInputContainer}>
             {otp.map((value, index) => (
               <InputComponent
+                ref={ref => (otpInputRefs.current[index] = ref)}
                 keyboardType="number-pad"
                 key={`otp-${index}`}
-                containerStyle={{
-                  aspectRatio: 1,
-                }}
-                inputContainerStyle={{
+                _inputContainerStyle={{
                   height: 45,
                   aspectRatio: 1,
                   borderRadius: 30,
                 }}
-                inputContainerFocusStyle={{
-                  height: 45,
-                  aspectRatio: 1,
-                  borderRadius: 30,
-                }}
-                inputStyle={{
+                _inputStyle={{
                   textAlign: 'center',
                   backgroundColor: appColors.primary,
                   color: appColors.white,
                   fontWeight: 'bold',
-                  fontSize: 20,
-                }}
-                inputFocusStyle={{
-                  textAlign: 'center',
-                  backgroundColor: appColors.primary,
-                  color: appColors.white,
-                  fontWeight: 'bold',
-                  fontSize: 20,
+                  fontSize: 18,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
                 value={value}
+                // onChangeText={(text: string) => handleOtpChange(text, index)}
+                onTextInput={e => handleOtpChange(e.nativeEvent.text, index)}
               />
             ))}
           </View>

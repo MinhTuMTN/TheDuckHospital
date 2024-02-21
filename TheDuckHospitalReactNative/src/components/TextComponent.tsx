@@ -3,7 +3,7 @@ import React from 'react';
 import {appColors} from '../constants/appColors';
 
 interface TextComponentProps {
-  children: React.ReactNode;
+  children: string | React.ReactNode;
   fontSize?: number;
   uppercase?: boolean;
   bold?: boolean;

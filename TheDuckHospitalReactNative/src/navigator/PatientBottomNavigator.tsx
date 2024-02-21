@@ -1,4 +1,7 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBarProps,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import AccountScreen from '../screens/patient/MainScreen/AccountScreen';
 import HomeScreen from '../screens/patient/MainScreen/HomeScreen';
@@ -7,6 +10,8 @@ import NotificationScreen from '../screens/patient/MainScreen/NotificationScreen
 import ProfileScreen from '../screens/patient/MainScreen/ProfileScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTranslation} from 'react-i18next';
+import {TextComponent} from '../components';
+import {Text, TouchableOpacity, View} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,6 +21,7 @@ const PatientBottomNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        lazy: false,
       }}
       initialRouteName="HomeScreen">
       <Tab.Screen

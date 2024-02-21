@@ -1,8 +1,12 @@
 import {Input, InputField, InputIcon, InputSlot} from '@gluestack-ui/themed';
-import React from 'react';
+import React, {forwardRef} from 'react';
 import {
+  ColorValue,
   KeyboardTypeOptions,
+  NativeSyntheticEvent,
   StyleProp,
+  TextInput,
+  TextInputTextInputEventData,
   TextStyle,
   View,
   ViewStyle,
@@ -16,24 +20,33 @@ interface InputComponentProps {
   label?: string;
   labelStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
+  _inputContainerStyle?: StyleProp<ViewStyle>;
   inputContainerStyle?: StyleProp<ViewStyle>;
   inputContainerFocusStyle?: StyleProp<ViewStyle>;
+  _inputStyle?: StyleProp<TextStyle>;
   inputStyle?: StyleProp<TextStyle>;
   inputFocusStyle?: StyleProp<TextStyle>;
   type?: 'text' | 'password';
   keyboardType?: KeyboardTypeOptions;
   placeholder?: string;
+  placeholderTextColor?: ColorValue | undefined;
   value?: string;
+  textColor?: ColorValue;
+  textSize?: number;
   onChangeText?: (text: string) => void;
+  onTextInput?:
+    | ((e: NativeSyntheticEvent<TextInputTextInputEventData>) => void)
+    | undefined;
   onFocus?: () => void;
   onBlur?: () => void;
   size?: 'sm' | 'md' | 'lg' | 'xl' | undefined;
   variant?: 'outline' | 'rounded' | 'underlined' | undefined;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
   startIcon?: any;
   endIcon?: any;
 }
 
-const InputComponent = (props: InputComponentProps) => {
+const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
   const {
     editabled = true,
     disabled = false,
@@ -47,16 +60,23 @@ const InputComponent = (props: InputComponentProps) => {
       rowGap: 5,
       marginBottom: 10,
     },
+    _inputContainerStyle,
     inputContainerStyle,
     inputContainerFocusStyle = {
       borderColor: appColors.primary,
     },
+    _inputStyle,
     inputStyle,
     inputFocusStyle,
     type = 'text',
     placeholder,
+    placeholderTextColor = appColors.textDescription,
     value,
+    textColor = appColors.textGray,
+    textSize = 16,
+    autoCapitalize,
     onChangeText,
+    onTextInput,
     onFocus,
     onBlur,
     size = 'md',
@@ -82,16 +102,30 @@ const InputComponent = (props: InputComponentProps) => {
         variant={variant}
         style={[
           {height: 45},
-          isFocus ? inputContainerFocusStyle : inputContainerStyle,
+          !_inputContainerStyle
+            ? isFocus
+              ? inputContainerFocusStyle
+              : inputContainerStyle
+            : _inputContainerStyle,
         ]}>
         {startIcon && <InputSlot pl={'$3'}>{startIcon}</InputSlot>}
-        <InputField
+        <TextInput
           placeholder={placeholder}
-          type={type === 'password' ? 'password' : 'text'}
+          placeholderTextColor={placeholderTextColor}
+          secureTextEntry={type === 'password'}
           value={value}
-          style={isFocus ? inputFocusStyle : [inputStyle]}
+          style={[
+            {
+              flex: 1,
+              color: textColor,
+              fontSize: textSize,
+            },
+            _inputStyle ? _inputStyle : isFocus ? inputFocusStyle : inputStyle,
+          ]}
+          autoCapitalize={autoCapitalize}
           keyboardType={keyboardType}
           onChangeText={onChangeText}
+          onTextInput={onTextInput}
           onFocus={() => {
             setIsFocus(true);
             onFocus && onFocus();
@@ -100,6 +134,7 @@ const InputComponent = (props: InputComponentProps) => {
             setIsFocus(false);
             onBlur && onBlur();
           }}
+          ref={ref}
         />
         {endIcon && (
           <InputSlot pr={'$3'}>
@@ -109,6 +144,6 @@ const InputComponent = (props: InputComponentProps) => {
       </Input>
     </View>
   );
-};
+});
 
 export default InputComponent;

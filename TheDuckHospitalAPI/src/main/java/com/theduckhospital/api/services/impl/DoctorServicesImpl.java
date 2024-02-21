@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
@@ -20,7 +21,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -150,9 +154,13 @@ public class DoctorServicesImpl implements IDoctorServices {
         List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
         AtomicInteger remove = new AtomicInteger();
         doctors.forEach(doctor -> {
+            if (doctor.getStaffId() == UUID.fromString("488B1568-0A0C-43FB-8E1D-812C022E766B"))
+            {
+                System.out.println("Doctor: " + doctor.getFullName());
+            }
             List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
             doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
-                    || doctorSchedule.getDate().before(new Date())
+                    || doctorSchedule.getDate().before(DateCommon.getToday())
             );
             if (doctorSchedules.isEmpty()) {
                 remove.getAndIncrement();
