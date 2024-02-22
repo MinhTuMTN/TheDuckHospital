@@ -46,21 +46,21 @@ const LoginScreen = () => {
   const handlForgotPasswordClick = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
-  const handleLogin = async () => {
-    setIsLoadingAPI(true);
-    const response = await loginWithPassword(info);
-    setIsLoadingAPI(false);
+  // const handleLogin = async () => {
+  //   setIsLoadingAPI(true);
+  //   const response = await loginWithPassword(info);
+  //   setIsLoadingAPI(false);
 
-    if (response.success) {
-      const token = response.data.data;
-      await auth.login(token);
+  //   if (response.success) {
+  //     const token = response.data.data;
+  //     await auth.login(token);
 
-      navigation.navigate('HomeScreen');
-    } else {
-      setIsLoadingAPI(false);
-      console.log('Error', response);
-    }
-  };
+  //     navigation.navigate('HomeScreen');
+  //   } else {
+  //     setIsLoadingAPI(false);
+  //     console.log('Error', response);
+  //   }
+  // };
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -68,6 +68,23 @@ const LoginScreen = () => {
     }, 50);
     return () => clearTimeout(id);
   }, []);
+
+  const handleLogin = async () => {
+    setIsLoadingAPI(true);
+    const response = await loginWithPassword(info);
+    setIsLoadingAPI(false);
+  
+    if (response.success) {
+      const token = response.data.data;
+  
+      await auth.login(token, rememberMe.length > 0);
+  
+      navigation.navigate('HomeScreen');
+    } else {
+      setIsLoadingAPI(false);
+      console.log('Error', response);
+    }
+  };
 
   return (
     <ContainerComponent
