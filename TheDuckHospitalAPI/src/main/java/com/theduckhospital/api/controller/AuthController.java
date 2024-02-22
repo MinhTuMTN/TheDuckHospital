@@ -1,12 +1,11 @@
 package com.theduckhospital.api.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.theduckhospital.api.dto.request.CheckAccountExistRequest;
-import com.theduckhospital.api.dto.request.LoginRequest;
-import com.theduckhospital.api.dto.request.RegisterRequest;
+import com.theduckhospital.api.dto.request.*;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
@@ -157,6 +156,26 @@ public class AuthController {
                 .success(true)
                 .message("Get info success")
                 .data(data)
+                .build()
+        );
+    }
+
+    @PostMapping("/forget-password")
+    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordRequest request) throws FirebaseMessagingException {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Send OTP success")
+                .data(accountServices.forgetPassword(request.getPhoneNumber()))
+                .build()
+        );
+    }
+
+    @PostMapping("/forget-password/verify-change-password")
+    public ResponseEntity<?> verifyChangePassword(@RequestBody ChangePasswordRequest request) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Reset password success")
+                .data(accountServices.changePassword(request))
                 .build()
         );
     }

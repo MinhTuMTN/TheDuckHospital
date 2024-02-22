@@ -14,6 +14,7 @@ import RegisterScreen from './src/screens/auth/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
+import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import {AuthProvider} from './src/auth/AuthProvider';
 
 const Stack = createNativeStackNavigator();
@@ -27,34 +28,38 @@ const App = () => {
         translucent={true}
       />
       <AuthProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="SlashScreen"
-            screenOptions={{
-              headerShown: false,
-            }}>
-            <Stack.Screen name="SlashScreen" component={SlashScreen} />
-            <Stack.Screen
-              name="PatientBottom"
-              component={PatientBottomNavigator}
-            />
-            <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
-            <Stack.Screen
-              name="DetailsProfileScreen"
-              component={DetailsProfileScreen}
-            />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} />
-            <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-            <Stack.Screen
-              name="ForgotPasswordScreen"
-              component={ForgotPasswordScreen}
-            />
-            <Stack.Screen
-              name="VerifyPhoneScreen"
-              component={VerifyPhoneScreen}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="SlashScreen"
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <Stack.Screen name="SlashScreen" component={SlashScreen} />
+          <Stack.Screen
+            name="PatientBottom"
+            component={PatientBottomNavigator}
+          />
+          <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
+          <Stack.Screen
+            name="DetailsProfileScreen"
+            component={DetailsProfileScreen}
+          />
+          <Stack.Screen name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          <Stack.Screen
+            name="ForgotPasswordScreen"
+            component={ForgotPasswordScreen}
+          />
+          <Stack.Screen
+            name="ChangePasswordScreen"
+            component={ChangePasswordScreen}
+          />
+          <Stack.Screen
+            name="VerifyPhoneScreen"
+            component={VerifyPhoneScreen}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
       </AuthProvider>
     </GluestackUIProvider>
   );

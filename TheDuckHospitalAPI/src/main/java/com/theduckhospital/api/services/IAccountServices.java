@@ -2,6 +2,7 @@ package com.theduckhospital.api.services;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.dto.request.ChangePasswordRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
@@ -38,4 +39,8 @@ public interface IAccountServices {
     Map<String, String> checkInfo(String token);
 
     String otpTest(String phone);
+
+    boolean forgetPassword(String phoneNumber) throws FirebaseMessagingException;
+
+    boolean changePassword(ChangePasswordRequest request);
 }
