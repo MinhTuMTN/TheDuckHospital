@@ -8,8 +8,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import React from 'react';
-import {appColors} from '../constants/appColors';
 import {Text} from '@gluestack-ui/themed';
+import {appColors} from '../constants/appColors';
 
 interface ButtonComponentProps {
   children: React.ReactNode | string;
