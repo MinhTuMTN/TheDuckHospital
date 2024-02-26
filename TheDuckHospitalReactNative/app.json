@@ -1,4 +1,5 @@
 {
   "name": "TheDuckHospitalReactNative",
-  "displayName": "The Duck Hospital"
+  "displayName": "The Duck Hospital",
+  "jsEngine": "jsc"
 }

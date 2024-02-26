@@ -141,7 +141,6 @@ const HomeScreen = () => {
           layout={'stack'}
           vertical={false}
           loop={true}
-          autoplay={true}
           onSnapToItem={index => setIndex(index)}
         />
         <Pagination
@@ -149,8 +148,8 @@ const HomeScreen = () => {
           activeDotIndex={index}
           carouselRef={isCarousel}
           dotStyle={{
-            width: 16,
-            height: 16,
+            width: 8,
+            height: 8,
             borderRadius: 8,
             marginHorizontal: 1,
             backgroundColor: appColors.primary,
