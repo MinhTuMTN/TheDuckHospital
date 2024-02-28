@@ -25,6 +25,7 @@ interface TextComponentProps {
   color?: ColorValue | undefined;
   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
   style?: StyleProp<TextStyle>;
+  numberOfLines?: number | undefined;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -38,9 +39,11 @@ const TextComponent = (props: TextComponentProps) => {
     color = appColors.black,
     textAlign,
     style,
+    numberOfLines,
   } = props;
   return (
     <Text
+      numberOfLines={numberOfLines}
       style={[
         {
           fontSize,

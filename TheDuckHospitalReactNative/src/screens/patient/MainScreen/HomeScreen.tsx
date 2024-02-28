@@ -49,7 +49,6 @@ const HomeScreen = () => {
         <View className="pt-12 flex-row items-center justify-between">
           <View className="flex-row items-center flex-auto w-72">
             <Image
-              alt="avatar-meo"
               source={require('../../../assets/images/avatar-meo.jpg')}
               className="w-14 h-14 rounded-full"
             />
@@ -81,7 +80,7 @@ const HomeScreen = () => {
               source={require('../../../assets/images/appointment.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
+            <TextComponent textAlign="center" fontSize={14}>
               Đặt khám theo bác sĩ
             </TextComponent>
           </View>
@@ -90,7 +89,7 @@ const HomeScreen = () => {
               source={require('../../../assets/images/loupe.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
+            <TextComponent textAlign="center" fontSize={14}>
               Tra cứu kết quả khám bệnh
             </TextComponent>
           </View>
@@ -99,7 +98,7 @@ const HomeScreen = () => {
               source={require('../../../assets/images/payment.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
+            <TextComponent textAlign="center" fontSize={14}>
               Thanh toán {'\n'} viện phí
             </TextComponent>
           </View>
@@ -108,14 +107,16 @@ const HomeScreen = () => {
               source={require('../../../assets/images/chat.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">Hỗ trợ nhanh</TextComponent>
+            <TextComponent textAlign="center" fontSize={14}>
+              Hỗ trợ nhanh
+            </TextComponent>
           </View>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/instructions.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
+            <TextComponent textAlign="center" fontSize={14}>
               Hướng dẫn {'\n'} đặt khám
             </TextComponent>
           </View>
@@ -124,7 +125,7 @@ const HomeScreen = () => {
               source={require('../../../assets/images/customer-support.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
+            <TextComponent textAlign="center" fontSize={14}>
               Đặt khám ngay 1900-1230
             </TextComponent>
           </View>
@@ -133,6 +134,7 @@ const HomeScreen = () => {
 
       <View className="mt-40 px-5 overflow-hidden">
         <Carousel
+          autoplay
           ref={isCarousel}
           data={entries}
           renderItem={_renderItem}

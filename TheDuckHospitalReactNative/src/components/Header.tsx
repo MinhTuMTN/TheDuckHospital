@@ -10,6 +10,7 @@ interface Props {
   title?: string;
   titleSize?: number;
   titleColor?: ColorValue | undefined;
+  backgroundColor?: ColorValue | undefined;
   showBackButton?: boolean;
   icon?: React.ReactNode;
   noBackground?: boolean;
@@ -22,7 +23,7 @@ interface Props {
 const Header = (props: Props) => {
   const {
     title,
-    titleSize = 19,
+    titleSize = 18,
     showBackButton = true,
     icon,
     noBackground,
@@ -31,6 +32,7 @@ const Header = (props: Props) => {
     paddingBottom,
     titleColor,
     uppercase = true,
+    backgroundColor,
   } = props;
 
   const navigation = useNavigation();
@@ -49,7 +51,7 @@ const Header = (props: Props) => {
           paddingHorizontal: 15,
           paddingTop: 10,
         }}>
-        <View>
+        <View style={{flex: 1}}>
           {showBackButton && (
             <ChevronLeft
               size={30}
@@ -60,14 +62,15 @@ const Header = (props: Props) => {
         </View>
         {title && (
           <TextComponent
+            style={{flex: 4, textAlign: 'center'}}
             uppercase={uppercase}
             bold
-            fontSize={18}
+            fontSize={titleSize}
             color={titleColor || appColors.white}>
             {title}
           </TextComponent>
         )}
-        <View>{icon}</View>
+        <View style={{flex: 1, alignItems: 'flex-end'}}>{icon}</View>
       </FlexComponent>
     </View>
   );
@@ -77,7 +80,7 @@ const Header = (props: Props) => {
       {renderItems}
     </ImageBackground>
   ) : (
-    <View>{renderItems}</View>
+    <View style={{backgroundColor}}>{renderItems}</View>
   );
 };
 

@@ -1,6 +1,12 @@
+type resetProps = {
+  index: number;
+  routes: [{name: string}];
+};
+
 export type navigationProps = {
   navigate: (screen: string, params?: any) => void;
   goBack: () => void;
+  reset: (props: resetProps) => void;
 };
 
 export type checkPhoneOrEmailDataProps = {

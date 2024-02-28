@@ -1,11 +1,11 @@
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Card} from '@gluestack-ui/themed';
+import {BellRing} from 'lucide-react-native';
 import React, {useState} from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
+import {Swipeable} from 'react-native-gesture-handler';
+import OcticonIcon from 'react-native-vector-icons/Octicons';
 import {TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
-import {Card, set} from '@gluestack-ui/themed';
-import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
-import OcticonIcon from 'react-native-vector-icons/Octicons';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface NotificationItemProps {
   title?: string;
@@ -52,11 +52,11 @@ const NotificationItem = (props: NotificationItemProps) => {
   return (
     <Swipeable
       ref={ref}
-      onSwipeableClose={() => {
+      onSwipeableWillClose={() => {
         setIsOpenRightAction(false);
         onRightActionClose && onRightActionClose();
       }}
-      onSwipeableOpen={() => {
+      onSwipeableWillOpen={() => {
         setIsOpenRightAction(true);
         onRightActionOpen && onRightActionOpen();
       }}
@@ -71,16 +71,21 @@ const NotificationItem = (props: NotificationItemProps) => {
             borderBottomRightRadius: 0,
           },
         ]}>
-        <Icon name="notifications" size={30} color={appColors.primary} />
-        <View style={{flex: 1}}>
-          <TextComponent color={appColors.black} bold fontSize={18}>
-            {title || 'Thông báo'}
+        <BellRing size={30} color={appColors.textDarker} />
+        <View style={{flex: 1, rowGap: 2}}>
+          <TextComponent color={appColors.textDarker} bold fontSize={18}>
+            {title || 'Tiêu đề thông báo'}
           </TextComponent>
-          <TextComponent textAlign="justify" color={appColors.textDescription}>
-            {content || 'Nội dung thông báo'}
+          <TextComponent
+            textAlign="justify"
+            color={appColors.black}
+            fontSize={14}
+            numberOfLines={2}>
+            {content ||
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam dolor enim, bibendum eu dolor vitae, eleifend dapibus arcu. Mauris dapibus.'}
           </TextComponent>
-          <TextComponent color={appColors.textPrimary} fontSize={15}>
-            {time || 'Thời gian'}
+          <TextComponent color={appColors.textDescription} fontSize={14}>
+            {time || '10 giờ trước'}
           </TextComponent>
         </View>
       </Card>
@@ -95,9 +100,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     columnGap: 10,
-    marginTop: 10,
-    marginHorizontal: 10,
+    marginBottom: 10,
+    marginHorizontal: 16,
     paddingVertical: 7,
+    borderRadius: 15,
+    elevation: 5,
   },
 });
 
