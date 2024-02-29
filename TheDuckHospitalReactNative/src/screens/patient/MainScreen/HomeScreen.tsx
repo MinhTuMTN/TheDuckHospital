@@ -1,12 +1,13 @@
+import {Fab} from '@gluestack-ui/themed';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, Pressable, TouchableOpacity, View} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {Search, Typing} from '../../../assets/svgs';
+import {Headset, Search, Typing} from '../../../assets/svgs';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -15,7 +16,6 @@ const HomeScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation();
-
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -27,7 +27,6 @@ const HomeScreen = () => {
       image: require('../../../assets/images/slide_2.jpg'),
     },
   ];
-
   const _renderItem = ({item, index}: {item: any; index: number}) => {
     return (
       <View>
@@ -43,13 +42,24 @@ const HomeScreen = () => {
     );
   };
 
+  const handleChooseDoctor = () => {
+    navigation.navigate('ChooseDoctorsScreen' as never);
+  };
+
   useEffect(() => {
-    navigation.setOptions({
-      screenOptions: {
-        tabBarStyle: showMoreMenu ? 'none' : 'flex',
+    navigation.getParent()?.setOptions({
+      tabBarStyle: {
+        display: 'none',
       },
     });
-  }, [showMoreMenu]);
+    return () => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {
+          display: 'flex',
+        },
+      });
+    };
+  }, []);
 
   return (
     <View className={'flex-1 bg-white'}>
@@ -86,7 +96,9 @@ const HomeScreen = () => {
           style={{
             elevation: 10,
           }}>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={handleChooseDoctor}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/appointment.png')}
               className="w-12 h-12"
@@ -94,7 +106,7 @@ const HomeScreen = () => {
             <TextComponent textAlign="center" fontSize={14}>
               Đặt khám theo bác sĩ
             </TextComponent>
-          </View>
+          </TouchableOpacity>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/loupe.png')}
@@ -187,6 +199,13 @@ const HomeScreen = () => {
         show={showMoreMenu}
         onClose={() => setShowMoreMenu(false)}
       />
+
+      <Fab
+        size="md"
+        placement="bottom right"
+        style={{backgroundColor: appColors.primary}}>
+        <Headset width={35} height={35} />
+      </Fab>
     </View>
   );
 };
