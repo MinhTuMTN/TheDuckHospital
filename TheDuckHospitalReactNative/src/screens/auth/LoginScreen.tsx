@@ -46,29 +46,6 @@ const LoginScreen = () => {
   const handlForgotPasswordClick = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
-  // const handleLogin = async () => {
-  //   setIsLoadingAPI(true);
-  //   const response = await loginWithPassword(info);
-  //   setIsLoadingAPI(false);
-
-  //   if (response.success) {
-  //     const token = response.data.data;
-  //     await auth.login(token);
-
-  //     navigation.navigate('HomeScreen');
-  //   } else {
-  //     setIsLoadingAPI(false);
-  //     console.log('Error', response);
-  //   }
-  // };
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setIsLoading(false);
-    }, 50);
-    return () => clearTimeout(id);
-  }, []);
-
   const handleLogin = async () => {
     setIsLoadingAPI(true);
     const response = await loginWithPassword(info);
@@ -85,6 +62,13 @@ const LoginScreen = () => {
       console.log('Error', response);
     }
   };
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setIsLoading(false);
+    }, 50);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <ContainerComponent

@@ -9,6 +9,7 @@ import SectionComponent from './SectionComponent';
 import Space from './Space';
 import TextComponent from './TextComponent';
 import DetailsMedicalBillComponent from './patient/detailsMedicalBillScreen/DetailsMedicalBillComponent';
+import MoreMenuComponent from './patient/homeScreen/MoreMenuComponent';
 import MedicalBillComponent from './patient/medicalBillScreen/MedicalBillComponent';
 import NotificationItem from './patient/notificationScreen/NotificationItem';
 import AvatarProfile from './patient/patientProfileScreen/AvatarProfile';
@@ -32,4 +33,5 @@ export {
   NotificationItem,
   NotFoundComponent,
   DetailsMedicalBillComponent,
+  MoreMenuComponent,
 };
