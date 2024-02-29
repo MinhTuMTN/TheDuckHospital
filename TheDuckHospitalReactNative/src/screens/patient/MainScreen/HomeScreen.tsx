@@ -6,13 +6,20 @@ import {TextComponent} from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {appInfo} from '../../../constants/appInfo';
+import {navigationProps} from '../../../types';
+import {useNavigation} from '@react-navigation/native';
+import {TouchableOpacity} from 'react-native';
 
 const HomeScreen = () => {
+  //useState
   const [index, setIndex] = useState(0);
-  const isCarousel = useRef(null);
 
+  //constants
+  const isCarousel = useRef(null);
+  const navigation = useNavigation<navigationProps>();
   const {t} = useTranslation();
 
+  //data
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -25,6 +32,12 @@ const HomeScreen = () => {
     },
   ];
 
+  //functions
+  const handleChooseDoctor = () => {
+    navigation.navigate('ChooseDoctorsScreen');
+  };
+
+  //render
   const _renderItem = ({item, index}: {item: any; index: number}) => {
     return (
       <View>
@@ -75,7 +88,9 @@ const HomeScreen = () => {
           style={{
             elevation: 10,
           }}>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          <TouchableOpacity
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]"
+            onPress={handleChooseDoctor}>
             <Image
               source={require('../../../assets/images/appointment.png')}
               className="w-12 h-12"
@@ -83,7 +98,7 @@ const HomeScreen = () => {
             <TextComponent textAlign="center" fontSize={14}>
               Đặt khám theo bác sĩ
             </TextComponent>
-          </View>
+          </TouchableOpacity>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/loupe.png')}

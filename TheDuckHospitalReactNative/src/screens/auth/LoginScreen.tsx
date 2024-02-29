@@ -73,12 +73,12 @@ const LoginScreen = () => {
     setIsLoadingAPI(true);
     const response = await loginWithPassword(info);
     setIsLoadingAPI(false);
-  
+
     if (response.success) {
       const token = response.data.data;
-  
+
       await auth.login(token, rememberMe.length > 0);
-  
+
       navigation.navigate('HomeScreen');
     } else {
       setIsLoadingAPI(false);
@@ -89,7 +89,7 @@ const LoginScreen = () => {
   return (
     <ContainerComponent
       style={[
-        {backgroundColor: 'fafafa'},
+        {backgroundColor: appColors.backgroundGray},
         isLoading && {justifyContent: 'center', alignItems: 'center'},
       ]}>
       {isLoading ? (
