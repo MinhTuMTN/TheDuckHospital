@@ -1,17 +1,20 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, View} from 'react-native';
-import {Search, Typing} from '../../../assets/svgs';
-import {TextComponent} from '../../../components';
-import {appColors} from '../../../constants/appColors';
+import {Image, Pressable, TouchableOpacity, View} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {Search, Typing} from '../../../assets/svgs';
+import {MoreMenuComponent, TextComponent} from '../../../components';
+import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const isCarousel = useRef(null);
 
   const {t} = useTranslation();
+  const navigation = useNavigation();
 
   const entries: unknown[] = [
     {
@@ -39,6 +42,14 @@ const HomeScreen = () => {
       </View>
     );
   };
+
+  useEffect(() => {
+    navigation.setOptions({
+      screenOptions: {
+        tabBarStyle: showMoreMenu ? 'none' : 'flex',
+      },
+    });
+  }, [showMoreMenu]);
 
   return (
     <View className={'flex-1 bg-white'}>
@@ -120,15 +131,17 @@ const HomeScreen = () => {
               Hướng dẫn {'\n'} đặt khám
             </TextComponent>
           </View>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={() => setShowMoreMenu(!showMoreMenu)}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-[#D5CFCF]">
             <Image
-              source={require('../../../assets/images/customer-support.png')}
+              source={require('../../../assets/images/more.png')}
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Đặt khám ngay 1900-1230
+              Xem thêm
             </TextComponent>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -169,6 +182,11 @@ const HomeScreen = () => {
           }}
         />
       </View>
+
+      <MoreMenuComponent
+        show={showMoreMenu}
+        onClose={() => setShowMoreMenu(false)}
+      />
     </View>
   );
 };

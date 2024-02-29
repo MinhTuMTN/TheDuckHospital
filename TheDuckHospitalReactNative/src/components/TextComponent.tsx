@@ -27,6 +27,7 @@ interface TextComponentProps {
   style?: StyleProp<TextStyle>;
   numberOfLines?: number | undefined;
   flex?: number;
+  flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -42,6 +43,7 @@ const TextComponent = (props: TextComponentProps) => {
     style,
     numberOfLines,
     flex,
+    flexWrap,
   } = props;
   return (
     <Text
@@ -56,6 +58,7 @@ const TextComponent = (props: TextComponentProps) => {
           color,
           textAlign,
           flex,
+          flexWrap,
         },
         style,
       ]}>
