@@ -1,6 +1,8 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
-import {TextComponent} from '../..';
+import {Space, TextComponent} from '../..';
+import LineInfoComponent from '../../LineInfoComponent';
+import {CaseUpper} from 'lucide-react-native';
 
 const DoctorInfoComponent = () => {
   return (
@@ -14,7 +16,21 @@ const DoctorInfoComponent = () => {
           borderRadius: 50,
         }}
       />
-      <TextComponent uppercase>pgs ts bs. Bùi Hồng Thiên Anh</TextComponent>
+      <View style={styles.textView}>
+        <TextComponent
+          uppercase
+          flexWrap="wrap"
+          fontWeight="500"
+          textAlign="justify">
+          pgs ts bs. Bùi Hồng Thiên Anh
+        </TextComponent>
+        <LineInfoComponent
+          label="Chuyên khoa:"
+          labelColor={'#8F8F8F'}
+          value="Nhi khoa"
+          valueStyles={{textTransform: 'uppercase', fontWeight: '500'}}
+        />
+      </View>
     </View>
   );
 };
@@ -22,12 +38,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     width: '90%',
-    height: 'auto',
     borderRadius: 10,
-    backgroundColor: '#d35555',
-    elevation: 10,
+    elevation: 1,
+    marginBottom: 16,
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 15,
+  },
+  textView: {
+    flex: 1,
+    flexDirection: 'column',
+    marginLeft: 10,
   },
 });
 

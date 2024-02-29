@@ -7,19 +7,14 @@ import {MoreMenuComponent, TextComponent} from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
 
 const HomeScreen = () => {
-  //useState
   const [index, setIndex] = useState(0);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
-
-  //constants
   const isCarousel = useRef(null);
-  const navigation = useNavigation();
-  const {t} = useTranslation();
 
-  //data
+  const {t} = useTranslation();
+  const navigation = useNavigation();
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -31,13 +26,6 @@ const HomeScreen = () => {
       image: require('../../../assets/images/slide_2.jpg'),
     },
   ];
-
-  //functions
-  const handleChooseDoctor = () => {
-    navigation.navigate('ChooseDoctorsScreen' as never);
-  };
-
-  //render
   const _renderItem = ({item, index}: {item: any; index: number}) => {
     return (
       <View>
@@ -51,6 +39,10 @@ const HomeScreen = () => {
         />
       </View>
     );
+  };
+
+  const handleChooseDoctor = () => {
+    navigation.navigate('ChooseDoctorsScreen' as never);
   };
 
   useEffect(() => {
@@ -97,8 +89,8 @@ const HomeScreen = () => {
             elevation: 10,
           }}>
           <TouchableOpacity
-            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]"
-            onPress={handleChooseDoctor}>
+            onPress={handleChooseDoctor}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/appointment.png')}
               className="w-12 h-12"
