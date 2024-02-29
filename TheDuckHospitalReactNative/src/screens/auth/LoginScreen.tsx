@@ -73,7 +73,7 @@ const LoginScreen = () => {
   return (
     <ContainerComponent
       style={[
-        {backgroundColor: 'fafafa'},
+        {backgroundColor: appColors.backgroundGray},
         isLoading && {justifyContent: 'center', alignItems: 'center'},
       ]}>
       {isLoading ? (

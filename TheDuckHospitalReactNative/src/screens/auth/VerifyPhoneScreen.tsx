@@ -96,7 +96,7 @@ const VerifyPhoneScreen = ({route}: {route: any}) => {
           },
         });
 
-        await auth.login(token);
+        await auth.login(token, true);
 
         navigation.navigate('HomeScreen');
       }
