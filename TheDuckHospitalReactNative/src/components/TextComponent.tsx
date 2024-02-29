@@ -26,6 +26,7 @@ interface TextComponentProps {
   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
   style?: StyleProp<TextStyle>;
   numberOfLines?: number | undefined;
+  flex?: number;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -40,6 +41,7 @@ const TextComponent = (props: TextComponentProps) => {
     textAlign,
     style,
     numberOfLines,
+    flex,
   } = props;
   return (
     <Text
@@ -53,6 +55,7 @@ const TextComponent = (props: TextComponentProps) => {
           textDecorationLine: underline ? 'underline' : 'none',
           color,
           textAlign,
+          flex,
         },
         style,
       ]}>
