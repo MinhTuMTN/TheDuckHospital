@@ -16,32 +16,32 @@ interface MoreMenuComponentProps {
 
 const items = [
   {
-    text: 'Đặt khám theo bác sĩ',
+    text: 'homeScreen.makeAppointment',
     image: require('../../../assets/images/appointment.png'),
     screenNavigate: 'ChooseDoctorsScreen',
   },
   {
-    text: 'Tra cứu kết quả khám bệnh',
+    text: 'homeScreen.lookupMedicalResult',
     image: require('../../../assets/images/loupe.png'),
   },
   {
-    text: 'Thanh toán viện phí',
+    text: 'homeScreen.payHospitalFee',
     image: require('../../../assets/images/payment.png'),
   },
   {
-    text: 'Đặt lịch uống thuốc',
+    text: 'homeScreen.medicineReminder',
     image: require('../../../assets/images/animal.png'),
   },
   {
-    text: 'Hỗ trợ nhanh',
+    text: 'homeScreen.quickSupport',
     image: require('../../../assets/images/chat.png'),
   },
   {
-    text: 'Hướng dẫn đặt khám',
+    text: 'homeScreen.instructionBooking',
     image: require('../../../assets/images/instructions.png'),
   },
   {
-    text: 'Đặt khám qua tổng đài 1900-1234',
+    text: 'homeScreen.bookingViaHotline',
     image: require('../../../assets/images/customer-support.png'),
   },
 ];
