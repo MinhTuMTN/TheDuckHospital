@@ -5,6 +5,7 @@ import {
   StyleProp,
   ColorValue,
   StyleSheet,
+  FlexAlignType,
 } from 'react-native';
 import React from 'react';
 import {TextComponent} from '.';
@@ -20,6 +21,7 @@ interface Props {
   flexLabel?: number;
   flexValue?: number;
   justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between';
+  alignItems?: FlexAlignType | undefined;
 }
 
 const LineInfoComponent = (props: Props) => {
@@ -42,13 +44,16 @@ const LineInfoComponent = (props: Props) => {
     flexLabel = 1,
     flexValue = 1,
     justifyContent = 'flex-start',
+    alignItems = 'center',
   } = props;
   return (
     <View
       style={{
         ...styles.container,
         justifyContent: justifyContent,
+        alignItems,
       }}>
+      {startIcon && startIcon}
       <TextComponent color={labelColor} style={labelStyles} flex={flexLabel}>
         {label}
       </TextComponent>

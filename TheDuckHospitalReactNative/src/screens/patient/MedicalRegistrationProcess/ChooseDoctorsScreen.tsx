@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 80,
     alignItems: 'center',
-    backgroundColor: appColors.backgroundGray,
+    backgroundColor: '#F1F9FC',
   },
 });
 
