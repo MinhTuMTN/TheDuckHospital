@@ -45,6 +45,9 @@ const HomeScreen = () => {
   const handleChooseDoctor = () => {
     navigation.navigate('ChooseDoctorsScreen' as never);
   };
+  const handleNavigateTestScreen = () => {
+    navigation.navigate('TestScreen' as never);
+  };
 
   useEffect(() => {
     if (showMoreMenu) {
@@ -108,7 +111,9 @@ const HomeScreen = () => {
               {t('homeScreen.makeAppointment')}
             </TextComponent>
           </TouchableOpacity>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={handleNavigateTestScreen}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/loupe.png')}
               className="w-12 h-12"
@@ -116,7 +121,7 @@ const HomeScreen = () => {
             <TextComponent textAlign="center" fontSize={14}>
               {t('homeScreen.lookupMedicalResult')}
             </TextComponent>
-          </View>
+          </TouchableOpacity>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/payment.png')}

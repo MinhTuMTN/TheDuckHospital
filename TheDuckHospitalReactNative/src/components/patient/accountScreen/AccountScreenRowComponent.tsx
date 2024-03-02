@@ -5,7 +5,7 @@ import {ChevronRight} from 'lucide-react-native';
 import {appColors} from '../../../constants/appColors';
 
 interface AccountScreenRowComponentProps {
-  icon: any;
+  icon?: any;
   title: string | React.ReactNode;
   onPress: () => void;
 }
@@ -26,7 +26,7 @@ const AccountScreenRowComponent = (props: AccountScreenRowComponentProps) => {
           alignItems={'center'}
           justifyContent="space-between">
           <FlexComponent direction="row" alignItems={'center'}>
-            <View style={{paddingEnd: 10}}>{icon}</View>
+            {icon && <View style={{paddingEnd: 10}}>{icon}</View>}
             <TextComponent color={'black'} fontSize={17}>
               {title}
             </TextComponent>

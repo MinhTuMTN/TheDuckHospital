@@ -6,6 +6,7 @@ import Header from './Header';
 import InputComponent from './InputComponent';
 import NotFoundComponent from './NotFoundComponent';
 import SectionComponent from './SectionComponent';
+import SelectComponent from './SelectComponent';
 import Space from './Space';
 import TextComponent from './TextComponent';
 import AccountScreenRowComponent from './patient/accountScreen/AccountScreenRowComponent';
@@ -36,4 +37,5 @@ export {
   DetailsMedicalBillComponent,
   MoreMenuComponent,
   AccountScreenRowComponent,
+  SelectComponent,
 };
