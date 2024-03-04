@@ -17,15 +17,16 @@ import {
   FlatList,
   StyleProp,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from 'react-native';
 import {FlexComponent, InputComponent, TextComponent} from '.';
 import {appColors} from '../constants/appColors';
 import {appInfo} from '../constants/appInfo';
-import {View} from 'react-native';
 
 interface SelectComponentProps {
-  options: string[];
+  options: string[] | any[];
+  keyTitle?: string;
   value: string;
   onChange: (value: string) => void;
   isLoading?: boolean;
@@ -55,17 +56,18 @@ interface SelectComponentProps {
 }
 
 interface CustomSelectItemComponentProps {
-  value: string;
+  option: any;
+  title?: string;
   onPress?: (value: string) => void;
 }
 
 const CustomSelectItemComponent = memo(
   (props: CustomSelectItemComponentProps) => {
-    const {value, onPress} = props;
+    const {option, title, onPress} = props;
 
     return (
       <TouchableOpacity
-        onPress={() => onPress && onPress(value)}
+        onPress={() => onPress && onPress(option)}
         style={{
           flex: 1,
           flexDirection: 'row',
@@ -73,7 +75,7 @@ const CustomSelectItemComponent = memo(
           paddingVertical: 8,
           paddingHorizontal: 8,
         }}>
-        <TextComponent>{value}</TextComponent>
+        <TextComponent>{title}</TextComponent>
         <ChevronRight color={appColors.black} />
       </TouchableOpacity>
     );
@@ -86,6 +88,7 @@ const SelectComponent = (props: SelectComponentProps) => {
   const [searchText, setSearchText] = useState('');
   const {
     options,
+    keyTitle = 'title',
     value,
     onChange,
     isLoading,
@@ -115,7 +118,7 @@ const SelectComponent = (props: SelectComponentProps) => {
   } = props;
 
   const handleOnChange = useCallback(
-    (value: string) => {
+    (value: any) => {
       onChange && onChange(value);
       setIsOpen(false);
     },
@@ -123,12 +126,19 @@ const SelectComponent = (props: SelectComponentProps) => {
   );
   const renderItem = useCallback(
     ({item}: {item: any}) => (
-      <CustomSelectItemComponent value={item} onPress={handleOnChange} />
+      <CustomSelectItemComponent
+        option={item}
+        title={typeof item === 'string' ? item : item[keyTitle]}
+        onPress={handleOnChange}
+      />
     ),
     [],
   );
   const keyExtractor = useCallback(
-    (item: any, index: any) => `${item}-${index}`,
+    (item: any, index: any) =>
+      typeof item === 'string'
+        ? `${item}-${index}`
+        : `${item[keyTitle]}-${index}`,
     [],
   );
 
@@ -136,16 +146,23 @@ const SelectComponent = (props: SelectComponentProps) => {
     if (searchText === '') {
       setOptionsToShow(options);
     } else {
-      const filteredOptions = options.filter(option =>
-        option.toLowerCase().includes(searchText.toLowerCase()),
-      );
+      let filteredOptions;
+      if (typeof options[0] === 'string') {
+        filteredOptions = options.filter(option =>
+          option.toLowerCase().includes(searchText.toLowerCase()),
+        );
+      } else {
+        filteredOptions = options.filter(option =>
+          option[keyTitle].toLowerCase().includes(searchText.toLowerCase()),
+        );
+      }
       setOptionsToShow(filteredOptions);
     }
   }, [searchText, options]);
 
   return (
     <Select
-      selectedValue={value}
+      selectedValue={typeof value === 'string' ? value : value[keyTitle]}
       isDisabled={isDisabled}
       style={{
         marginTop,

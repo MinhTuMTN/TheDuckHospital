@@ -1,33 +1,15 @@
-import {
-  Icon,
-  Select,
-  SelectBackdrop,
-  SelectContent,
-  SelectIcon,
-  SelectInput,
-  SelectPortal,
-  SelectTrigger,
-} from '@gluestack-ui/themed';
-import {ChevronDownIcon, ChevronRight, Search} from 'lucide-react-native';
+import {ChevronDownIcon} from 'lucide-react-native';
 import React, {useEffect} from 'react';
-import {ScrollView, View} from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
 import {
   ContainerComponent,
   FlexComponent,
-  InputComponent,
   SelectComponent,
-  TextComponent,
 } from '../components';
 import {appColors} from '../constants/appColors';
 
 const initValue = -200;
 const TestScreen = () => {
-  const [departments, setDepartments] = React.useState<string[]>([]);
+  const [departments, setDepartments] = React.useState<object[]>([]);
   const [selectedDepartment, setSelectedDepartment] =
     React.useState<string>('');
   const [selectedGender, setSelectedGender] = React.useState<string>('');
@@ -46,18 +28,22 @@ const TestScreen = () => {
 
   useEffect(() => {
     const options = [
-      'Khoa tai mũi họng',
-      'Khoa da liễu',
-      'Khoa thần kinh',
-      'Khoa nội tiết',
-      'Khoa tim mạch',
-      'Khoa phụ sản',
-      'Khoa nhi',
-      'Khoa ngoại',
-      'Khoa nội',
-      'Khoa sản',
-      'Khoa mắt',
-      'Khoa tai mũi họng', // Lưu ý rằng giá trị này lặp lại, hãy xóa nếu không cần thiết
+      {
+        departmentId: 1,
+        departmentName: 'Nội tiết',
+      },
+      {
+        departmentId: 2,
+        departmentName: 'Nhi',
+      },
+      {
+        deparmentId: 3,
+        departmentName: 'Da liễu',
+      },
+      {
+        departmentId: 4,
+        departmentName: 'Tim mạch',
+      },
     ];
 
     setTimeout(() => {
@@ -79,10 +65,14 @@ const TestScreen = () => {
         style={{width: '100%', paddingHorizontal: 8}}>
         <SelectComponent
           options={departments}
+          keyTitle="departmentName"
           value={selectedDepartment}
           title="Chọn chuyên khoa"
           enableSearch={true}
-          onChange={value => setSelectedDepartment(value)}
+          onChange={value => {
+            console.log('value', value);
+            setSelectedDepartment(value);
+          }}
           placeholder="Chuyên khoa"
           placeholderSearch="Tìm kiếm chuyên khoa"
           selectInputStyle={{backgroundColor: appColors.primary}}
