@@ -10,49 +10,23 @@ import {
 } from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
-
-const data = [
-  {
-    name: 'Nguyễn Văn A',
-    phone: '0123456789',
-    dob: '01/01/1990',
-    address: '123 Đường ABC, Quận XYZ, TP HCM',
-  },
-  {
-    name: 'Nguyễn Văn B',
-    phone: '0123456789',
-    dob: '01/01/1990',
-    address: '123 Đường ABC, Quận XYZ, TP HCM',
-  },
-  {
-    name: 'Nguyễn Văn C',
-    phone: '0123456789',
-    dob: '01/01/1990',
-    address: '123 Đường ABC, Quận XYZ, TP HCM',
-  },
-  {
-    name: 'Nguyễn Văn D',
-    phone: '0123456789',
-    dob: '01/01/1990',
-    address: '123 Đường ABC, Quận XYZ, TP HCM',
-  },
-  {
-    name: 'Nguyễn Văn E',
-    phone: '0123456789',
-    dob: '01/01/1990',
-    address: '123 Đường ABC, Quận XYZ, TP HCM',
-  },
-];
+import {getAllPatientProfile} from '../../../services/patientProfileServices';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [patientProfiles, setPatientProfiles] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
-    const id = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(id);
+    const handleGetAllPatientProfile = async () => {
+      const response = await getAllPatientProfile();
+
+      if (response.success) {
+        setPatientProfiles(response.data.data);
+      } else console.log('Error: ', response.error);
+    };
+
+    handleGetAllPatientProfile();
   }, []);
 
   return (
@@ -70,7 +44,7 @@ const ProfileScreen = () => {
         ) : (
           <FlatList
             showsVerticalScrollIndicator={false}
-            data={data}
+            data={patientProfiles}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({item}) => <PatientProfile profile={item} />}
           />

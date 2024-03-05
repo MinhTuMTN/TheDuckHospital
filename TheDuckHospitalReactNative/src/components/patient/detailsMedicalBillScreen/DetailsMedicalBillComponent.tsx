@@ -5,6 +5,8 @@ import {appColors} from '../../../constants/appColors';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {formatDate} from '../../../utils/dateUtils';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
 const DividerItem = () => {
   return (
@@ -16,9 +18,14 @@ const DividerItem = () => {
   );
 };
 
-const DetailsMedicalBillComponent = () => {
-  const [status, setStatus] = React.useState(true);
+interface DetailsMedicalBillComponentProps {
+  booking: any;
+}
 
+const DetailsMedicalBillComponent = (
+  props: DetailsMedicalBillComponentProps,
+) => {
+  const {booking} = props;
   const navigation = useNavigation<navigationProps>();
 
   const handleClickViewDetails = () => {
@@ -32,25 +39,27 @@ const DetailsMedicalBillComponent = () => {
         <TextComponent fontWeight="600" uppercase fontSize={20}>
           Phiếu khám bệnh
         </TextComponent>
-        <TextComponent fontWeight="500">{`(Mã phiếu: A2306152305)`}</TextComponent>
-        <TextComponent fontWeight="500">Lầu 1 - Khu B</TextComponent>
-        <TextComponent fontWeight="500">Phòng khám: Phòng 77</TextComponent>
+        <TextComponent fontWeight="500">{`(Mã phiếu: ${booking?.bookingCode})`}</TextComponent>
+        <TextComponent fontWeight="500">{booking?.roomArea}</TextComponent>
+        <TextComponent fontWeight="500">
+          Phòng khám: Phòng {booking?.roomName}
+        </TextComponent>
         <TextComponent fontWeight="500">
           Chuyên khoa:{' '}
           <TextComponent uppercase fontWeight="500">
-            Tổng quát
+            {booking?.departmentName}
           </TextComponent>
         </TextComponent>
         <TextComponent
           fontSize={50}
           bold
-          color={status ? appColors.disabled : appColors.primary}>
-          07
+          color={booking.status ? appColors.disabled : appColors.primary}>
+          {(booking?.queueNumber as string)?.toString().padStart(2, '0')}
         </TextComponent>
         <TextComponent italic>
-          {status ? '(Đã khám)' : `(Chưa khám)`}
+          {booking.status ? '(Đã khám)' : `(Chưa khám)`}
         </TextComponent>
-        {status && (
+        {booking.status && (
           <Pressable onPress={handleClickViewDetails}>
             <TextComponent color={appColors.primary} italic>
               Xem chi tiết tại đây
@@ -68,7 +77,8 @@ const DetailsMedicalBillComponent = () => {
             Ngày khám:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            24-02-2024 (Buổi sáng)
+            {formatDate(booking?.date, '-')} (
+            {booking?.scheduleType === 'MORNING' ? 'Buổi sáng' : 'Buổi chiều'})
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -90,7 +100,7 @@ const DetailsMedicalBillComponent = () => {
             Họ tên:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3} uppercase>
-            Nguyễn Văn Minh A
+            {booking?.patientName}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -101,7 +111,7 @@ const DetailsMedicalBillComponent = () => {
             Giới tính:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            Nam
+            {booking?.patientGender === 'MALE' ? 'Nam' : 'Nữ'}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -112,7 +122,7 @@ const DetailsMedicalBillComponent = () => {
             Ngày sinh:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            24-01-1999
+            {formatDate(booking?.patientDateOfBirth, '-')}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -123,7 +133,7 @@ const DetailsMedicalBillComponent = () => {
             Tỉnh/TP:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            TP. Hồ Chí Minh
+            {booking?.patientProvince}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -134,7 +144,7 @@ const DetailsMedicalBillComponent = () => {
             Tiền khám:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            150.000 đ
+            {formatCurrency(booking?.price)} đ
           </TextComponent>
         </View>
         <TextComponent fontSize={14} color={appColors.textDescription} italic>
@@ -151,20 +161,22 @@ const DetailsMedicalBillComponent = () => {
             Số hồ sơ (Mã bệnh nhân)
           </TextComponent>
           <TextComponent fontWeight="500" fontSize={14}>
-            Đang cập nhật
+            {booking?.patientCode || 'Đang cập nhật'}
           </TextComponent>
         </View>
-        <Barcode
-          value="A2306152305"
-          text="A2306152305"
-          format="CODE128"
-          height={60}
-          maxWidth={120}
-          textStyle={{
-            color: appColors.black,
-            fontWeight: '500',
-          }}
-        />
+        {booking?.patientCode && (
+          <Barcode
+            value={booking?.patientCode}
+            text={booking?.patientCode}
+            format="CODE128"
+            height={60}
+            maxWidth={120}
+            textStyle={{
+              color: appColors.black,
+              fontWeight: '500',
+            }}
+          />
+        )}
       </View>
 
       <Space paddingTop={60} />

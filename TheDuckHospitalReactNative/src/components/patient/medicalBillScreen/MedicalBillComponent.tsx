@@ -7,16 +7,29 @@ import {
 } from 'react-native';
 import React from 'react';
 import {Space, TextComponent} from '../..';
-import {CircleDashed} from 'lucide-react-native';
+import {Check, CircleDashed} from 'lucide-react-native';
 import {appColors} from '../../../constants/appColors';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {getDateObject, getDayOfWeek} from '../../../utils/dateUtils';
 
-const MedicalBillComponent = () => {
+interface MedicalBillComponentProps {
+  booking: any;
+  patientName: string;
+}
+
+const MedicalBillComponent = (props: MedicalBillComponentProps) => {
+  const {booking, patientName} = props;
   const navigation = useNavigation<navigationProps>();
 
   const handleClick = () => {
-    navigation.navigate('DetailsMedicalBillScreen');
+    navigation.navigate('DetailsMedicalBillScreen', {
+      bookingId: booking.bookingId,
+      bookingCode: (booking.bookingId as string)
+        .toString()
+        .replace('-', '')
+        .slice(0, 12),
+    });
   };
   return (
     <Pressable onPress={handleClick}>
@@ -26,17 +39,26 @@ const MedicalBillComponent = () => {
             <View>
               <TextComponent fontWeight="600">The Duck Hospital</TextComponent>
               <TextComponent fontWeight="500" color={appColors.textDescription}>
-                Thứ sáu, 16 tháng 2 năm 2024
+                {getDayOfWeek(booking.date)},{' '}
+                {getDateObject(booking.date).getDate()} tháng{' '}
+                {getDateObject(booking.date).getMonth() + 1} năm{' '}
+                {getDateObject(booking.date).getFullYear()}
               </TextComponent>
             </View>
             <View
               style={[
                 {
-                  backgroundColor: appColors.yellow,
+                  backgroundColor: booking.status
+                    ? appColors.green
+                    : appColors.yellow,
                 },
                 styles.status,
               ]}>
-              <CircleDashed size={20} color={appColors.white} />
+              {booking.status ? (
+                <Check size={20} color={appColors.white} />
+              ) : (
+                <CircleDashed size={20} color={appColors.white} />
+              )}
             </View>
           </View>
           <View style={styles.patientDoctor}>
@@ -47,7 +69,7 @@ const MedicalBillComponent = () => {
               Bệnh nhân:
             </TextComponent>
             <TextComponent fontWeight="500" style={{flex: 4}}>
-              Nguyễn Văn A
+              {patientName}
             </TextComponent>
           </View>
           <View style={styles.patientDoctor}>
@@ -58,7 +80,7 @@ const MedicalBillComponent = () => {
               Bác sĩ
             </TextComponent>
             <TextComponent fontWeight="500" style={{flex: 4}}>
-              Nguyễn Văn B
+              {booking.doctorName}
             </TextComponent>
           </View>
           <View style={styles.additionalInfo}>
@@ -67,22 +89,28 @@ const MedicalBillComponent = () => {
                 Chuyên khoa
               </TextComponent>
               <Space paddingBottom={0} />
-              <TextComponent fontWeight="500">Phổi</TextComponent>
+              <TextComponent fontWeight="500">
+                {booking.departmentName}
+              </TextComponent>
             </View>
             <View style={{alignItems: 'center'}}>
               <TextComponent fontWeight="500" color={appColors.textDescription}>
                 Số thứ tự
               </TextComponent>
               <Space paddingBottom={0} />
-              <TextComponent fontWeight="500">77</TextComponent>
+              <TextComponent fontWeight="500">
+                {booking.queueNumber}
+              </TextComponent>
             </View>
             <View style={{alignItems: 'flex-end'}}>
               <TextComponent fontWeight="500" color={appColors.textDescription}>
                 Trạng thái
               </TextComponent>
               <Space paddingBottom={0} />
-              <TextComponent fontWeight="500" color={appColors.primary}>
-                Chưa khám
+              <TextComponent
+                fontWeight="500"
+                color={booking.status ? appColors.green : appColors.primary}>
+                {booking.status ? 'Đã khám' : 'Chưa khám'}
               </TextComponent>
             </View>
           </View>

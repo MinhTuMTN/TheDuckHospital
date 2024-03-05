@@ -69,9 +69,22 @@ const AccountScreen = () => {
             />
           </Avatar>
           <Space paddingBottom={8} />
-          <TextComponent fontSize={20} fontWeight="600">
-            Nguyễn Văn A
-          </TextComponent>
+          {isLogged ? (
+            <TextComponent fontSize={20} fontWeight="600">
+              Nguyễn Văn A
+            </TextComponent>
+          ) : (
+            <ButtonComponent
+              onPress={handleBtnLoginClick}
+              containerStyles={{
+                backgroundColor: appColors.primary,
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+              }}>
+              Đăng nhập
+            </ButtonComponent>
+          )}
         </View>
 
         <SectionComponent
