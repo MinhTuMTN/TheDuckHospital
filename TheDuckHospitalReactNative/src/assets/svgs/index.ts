@@ -4,5 +4,24 @@ import Search from './Search.svg';
 import Typing from './Typing.svg';
 import Headset from './Headset.svg';
 import Stethoscope from './Stethoscope.svg';
+import Calendar from './Calendar.svg';
+import Gender from './Gender.svg';
+import CashInHand from './CashInHand.svg';
+import Filter from './Filter.svg';
+import Expand from './Expand.svg';
+import ExpandInWhite from './ExpandInWhite.svg';
 
-export {English, Vietnamese, Search, Typing, Headset, Stethoscope};
+export {
+  English,
+  Vietnamese,
+  Search,
+  Typing,
+  Stethoscope,
+  Calendar,
+  Gender,
+  CashInHand,
+  Filter,
+  Headset,
+  Expand,
+  ExpandInWhite,
+};
