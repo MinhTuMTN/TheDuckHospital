@@ -18,6 +18,7 @@ import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillSc
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import TestScreen from './src/screens/TestScreen';
 import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDoctorsScreen';
+import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +69,10 @@ const App = () => {
             <Stack.Screen
               name="ChooseDoctorsScreen"
               component={ChooseDoctorsScreen}
+            />
+            <Stack.Screen
+              name="MedicalExaminationHistoryScreen"
+              component={MedicalExaminationHistoryScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

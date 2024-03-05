@@ -14,4 +14,5 @@ export const appColors = {
   backgroundGray: '#f4f4f4',
   yellow: '#f7e757',
   green: '#4cad61',
+  disabled: '#959595',
 };

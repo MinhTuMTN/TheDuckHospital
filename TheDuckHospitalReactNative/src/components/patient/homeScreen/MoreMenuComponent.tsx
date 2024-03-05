@@ -1,10 +1,13 @@
-import {View, Text, StyleSheet, FlatList} from 'react-native';
-import React from 'react';
-import {TextComponent} from '../..';
+import {X} from 'lucide-react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet, TouchableOpacity} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import {appInfo} from '../../../constants/appInfo';
 import MoreMenuItemComponent from './MoreMenuItemComponent';
-import {X} from 'lucide-react-native';
-import {TouchableOpacity} from 'react-native';
 
 interface MoreMenuComponentProps {
   onClose: () => void;
@@ -13,40 +16,71 @@ interface MoreMenuComponentProps {
 
 const items = [
   {
-    text: 'Đặt khám theo bác sĩ',
+    text: 'homeScreen.makeAppointment',
     image: require('../../../assets/images/appointment.png'),
+    screenNavigate: 'ChooseDoctorsScreen',
   },
   {
-    text: 'Tra cứu kết quả khám bệnh',
+    text: 'homeScreen.lookupMedicalResult',
     image: require('../../../assets/images/loupe.png'),
   },
   {
-    text: 'Thanh toán viện phí',
+    text: 'homeScreen.payHospitalFee',
     image: require('../../../assets/images/payment.png'),
   },
   {
-    text: 'Đặt lịch uống thuốc',
+    text: 'homeScreen.medicineReminder',
     image: require('../../../assets/images/animal.png'),
   },
   {
-    text: 'Hỗ trợ nhanh',
+    text: 'homeScreen.quickSupport',
     image: require('../../../assets/images/chat.png'),
   },
   {
-    text: 'Hướng dẫn đặt khám',
+    text: 'homeScreen.instructionBooking',
     image: require('../../../assets/images/instructions.png'),
   },
   {
-    text: 'Đặt khám qua tổng đài 1900-1234',
+    text: 'homeScreen.bookingViaHotline',
     image: require('../../../assets/images/customer-support.png'),
   },
 ];
 
+const initOffset = -200;
+
 const MoreMenuComponent = (props: MoreMenuComponentProps) => {
   const {onClose, show} = props;
+
+  const [showMoreMenu, setShowMoreMenu] = React.useState(false);
+
+  const offsetValue = useSharedValue(initOffset);
+  const animatedStyles = useAnimatedStyle(() => ({
+    transform: [{translateY: offsetValue.value}],
+  }));
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    if (show) {
+      setShowMoreMenu(true);
+      offsetValue.value = withSpring(0, {duration: 1000});
+    } else {
+      offsetValue.value = withSpring(initOffset, {duration: 2000});
+
+      timeoutId = setTimeout(() => {
+        setShowMoreMenu(false);
+      }, 200);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [show]);
+
   return (
-    show && (
-      <View style={styles.container}>
+    showMoreMenu && (
+      <Animated.View style={[styles.container, animatedStyles]}>
         {items.map((item, index) => {
           return (
             <MoreMenuItemComponent
@@ -64,7 +98,7 @@ const MoreMenuComponent = (props: MoreMenuComponentProps) => {
           }}>
           <X size={50} color={'#fff'} />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     )
   );
 };
@@ -81,7 +115,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: appInfo.size.width,
-    height: appInfo.size.height,
+    height: appInfo.size.height + 1000,
   },
 });
 

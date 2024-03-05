@@ -1,4 +1,16 @@
 {
+  "homeScreen": {
+    "hello": "Xin chào",
+    "welcome": "Mừng bạn quay trở lại",
+    "makeAppointment": "Đặt khám theo bác sĩ",
+    "lookupMedicalResult": "Tra cứu kết quả khám bệnh",
+    "payHospitalFee": "Thanh toán\nviện phí",
+    "medicineReminder": "Đặt lịch uống thuốc",
+    "quickSupport": "Hỗ trợ nhanh",
+    "viewMore": "Xem thêm",
+    "instructionBooking": "Hướng dẫn đặt khám",
+    "bookingViaHotline": "Đặt khám qua tổng đài 1900-1234"
+  },
   "bottomTab": {
     "home": "Trang chủ",
     "patientProfile": "Hồ sơ",

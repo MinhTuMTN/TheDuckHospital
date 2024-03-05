@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
+import {Image, StyleSheet, View} from 'react-native';
 import {TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
+import {useTranslation} from 'react-i18next';
 
 interface MoreMenuItemComponentProps {
   text: string;
@@ -9,8 +10,9 @@ interface MoreMenuItemComponentProps {
 }
 
 const MoreMenuItemComponent = (props: MoreMenuItemComponentProps) => {
+  const {t} = useTranslation();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <Image
         source={props.image}
         style={{
@@ -23,7 +25,7 @@ const MoreMenuItemComponent = (props: MoreMenuItemComponentProps) => {
         style={{
           maxWidth: '80%',
         }}>
-        {props.text}
+        {t(props.text)}
       </TextComponent>
     </View>
   );

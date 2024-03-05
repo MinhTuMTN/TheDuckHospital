@@ -1,12 +1,13 @@
+import {Fab} from '@gluestack-ui/themed';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, Pressable, TouchableOpacity, View} from 'react-native';
+import {Image, TouchableOpacity, View} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {Search, Typing} from '../../../assets/svgs';
+import {Headset, Search, Typing} from '../../../assets/svgs';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -44,13 +45,24 @@ const HomeScreen = () => {
   const handleChooseDoctor = () => {
     navigation.navigate('ChooseDoctorsScreen' as never);
   };
+  const handleNavigateTestScreen = () => {
+    navigation.navigate('TestScreen' as never);
+  };
 
   useEffect(() => {
-    navigation.setOptions({
-      screenOptions: {
-        tabBarStyle: showMoreMenu ? 'none' : 'flex',
-      },
-    });
+    if (showMoreMenu) {
+      navigation.setOptions({
+        tabBarStyle: {
+          display: 'none',
+        },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          display: 'flex',
+        },
+      });
+    }
   }, [showMoreMenu]);
 
   return (
@@ -67,13 +79,13 @@ const HomeScreen = () => {
             />
             <View className="pl-2">
               <TextComponent color={appColors.white} fontSize={20}>
-                Xin chào{' '}
+                {t('homeScreen.hello')}{' '}
                 <TextComponent bold color={appColors.white} fontSize={20}>
                   Hạ Băng,
                 </TextComponent>
               </TextComponent>
               <TextComponent color={appColors.white}>
-                Mừng bạn quay trở lại.
+                {t('homeScreen.welcome')}
               </TextComponent>
             </View>
           </View>
@@ -96,25 +108,36 @@ const HomeScreen = () => {
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Đặt khám theo bác sĩ
+              {t('homeScreen.makeAppointment')}
             </TextComponent>
           </TouchableOpacity>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={handleNavigateTestScreen}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/loupe.png')}
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Tra cứu kết quả khám bệnh
+              {t('homeScreen.lookupMedicalResult')}
             </TextComponent>
-          </View>
+          </TouchableOpacity>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/payment.png')}
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Thanh toán {'\n'} viện phí
+              {t('homeScreen.payHospitalFee')}
+            </TextComponent>
+          </View>
+          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
+            <Image
+              source={require('../../../assets/images/animal.png')}
+              className="w-12 h-12"
+            />
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.medicineReminder')}
             </TextComponent>
           </View>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
@@ -123,16 +146,7 @@ const HomeScreen = () => {
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Hỗ trợ nhanh
-            </TextComponent>
-          </View>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
-            <Image
-              source={require('../../../assets/images/instructions.png')}
-              className="w-12 h-12"
-            />
-            <TextComponent textAlign="center" fontSize={14}>
-              Hướng dẫn {'\n'} đặt khám
+              {t('homeScreen.quickSupport')}
             </TextComponent>
           </View>
           <TouchableOpacity
@@ -143,7 +157,7 @@ const HomeScreen = () => {
               className="w-12 h-12"
             />
             <TextComponent textAlign="center" fontSize={14}>
-              Xem thêm
+              {t('homeScreen.viewMore')}
             </TextComponent>
           </TouchableOpacity>
         </View>
@@ -191,6 +205,16 @@ const HomeScreen = () => {
         show={showMoreMenu}
         onClose={() => setShowMoreMenu(false)}
       />
+
+      <Fab
+        size="md"
+        placement="bottom right"
+        style={{
+          backgroundColor: appColors.primary,
+          display: showMoreMenu ? 'none' : 'flex',
+        }}>
+        <Headset width={35} height={35} />
+      </Fab>
     </View>
   );
 };

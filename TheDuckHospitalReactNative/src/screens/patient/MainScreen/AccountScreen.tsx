@@ -1,41 +1,32 @@
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {Avatar, AvatarImage} from '@gluestack-ui/themed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import {
+  Bell,
+  Headset,
+  KeyRound,
+  LogOut,
+  Share2,
+  Star,
+} from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Pressable, View} from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {English, Vietnamese} from '../../../assets/svgs';
+import {StyleSheet, View} from 'react-native';
+import {useAuth} from '../../../auth/AuthProvider';
 import {
+  AccountScreenRowComponent,
   ContainerComponent,
-  FlexComponent,
+  Header,
+  SectionComponent,
+  Space,
   TextComponent,
 } from '../../../components';
+import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
-import {globalStyles} from '../../../styles/globalStyles';
-import {Text} from '@gluestack-ui/themed';
-import ButtonComponent from '../../../components/ButtonComponent';
-import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useAuth} from '../../../auth/AuthProvider';
-
-const languages = [
-  {
-    id: 'vietnamese',
-    code: 'vi',
-    name: 'Tiếng Việt',
-    icon: <Vietnamese width={30} height={30} />,
-  },
-  {
-    id: 'english',
-    code: 'en',
-    name: 'English',
-    icon: <English width={30} height={30} />,
-  },
-];
 
 const AccountScreen = () => {
-  const bottomModalRef = React.useRef<BottomSheetModal>(null);
   const [isLogged, setIsLogged] = React.useState(false);
 
   const {i18n} = useTranslation();
@@ -58,84 +49,112 @@ const AccountScreen = () => {
     checkLogin();
   }, [auth.token]);
   return (
-    <ContainerComponent paddingTop={50}>
-      {isLogged ? (
-        <View>
-          <TextComponent fontSize={20} fontWeight={'bold'}>
-            Xin chào bạn
+    <ContainerComponent paddingTop={0}>
+      <Header
+        title={''}
+        showBackButton={true}
+        paddingTop={0}
+        noBackground
+        backButtonColor={appColors.textDarker}
+        backgroundColor={appColors.white}
+        paddingBottom={0}
+      />
+
+      <ContentComponent style={styles.container} paddingTop={0}>
+        <View style={styles.avatarContainer}>
+          <Avatar size="lg">
+            <AvatarImage
+              alt="avatar"
+              source={require('../../../assets/images/avatar-default.png')}
+            />
+          </Avatar>
+          <Space paddingBottom={8} />
+          <TextComponent fontSize={20} fontWeight="600">
+            Nguyễn Văn A
           </TextComponent>
-          <ButtonComponent
-            onPress={async () => {
-              await auth.logout();
-              setIsLogged(false);
-            }}>
-            Đăng xuất
-          </ButtonComponent>
         </View>
-      ) : (
-        <ButtonComponent onPress={handleBtnLoginClick}>
-          Đăng nhập
+
+        <SectionComponent
+          title="Cài đặt chung"
+          tilteStyle={styles.titleSection}>
+          <View style={styles.flexGap}>
+            <ChangeLanguage />
+            <AccountScreenRowComponent
+              title="Đổi mật khẩu"
+              icon={<KeyRound size={20} color={appColors.black} />}
+              onPress={() => console.log('Change password')}
+            />
+            <AccountScreenRowComponent
+              title="Cài đặt thông báo"
+              icon={<Bell size={20} color={appColors.black} />}
+              onPress={() => console.log('Notification settings')}
+            />
+          </View>
+        </SectionComponent>
+        <SectionComponent title="Liên hệ" tilteStyle={styles.titleSection}>
+          <View style={styles.flexGap}>
+            <AccountScreenRowComponent
+              title={'Tổng đài 1900 1234'}
+              icon={<Headset size={20} color={appColors.black} />}
+              onPress={() => console.log('Notification settings')}
+            />
+            <AccountScreenRowComponent
+              title={'Đánh giá ứng dụng'}
+              icon={<Star size={20} color={appColors.black} />}
+              onPress={() => console.log('Notification settings')}
+            />
+            <AccountScreenRowComponent
+              title={'Chia sẻ ứng dụng'}
+              icon={<Share2 size={20} color={appColors.black} />}
+              onPress={() => console.log('Notification settings')}
+            />
+          </View>
+        </SectionComponent>
+
+        <ButtonComponent
+          backgroundColor="white"
+          borderRadius={20}
+          textColor={'#F38181'}
+          containerStyles={styles.logoutButton}
+          startIcon={<LogOut size={20} color={'#F38181'} />}
+          onPress={async () => {
+            await AsyncStorage.removeItem('token');
+            auth.logout();
+          }}>
+          Đăng xuất
         </ButtonComponent>
-      )}
-      <Pressable
-        onPress={() => {
-          bottomModalRef.current?.close();
-        }}
-        style={{
-          flex: 1,
-        }}>
-        <ContentComponent>
-          <ChangeLanguage
-            onPress={() => {
-              bottomModalRef.current?.present();
-            }}
-          />
-        </ContentComponent>
-      </Pressable>
-      <GestureHandlerRootView style={{flex: 1}}>
-        <BottomSheetModalProvider>
-          <BottomSheetModal
-            ref={bottomModalRef}
-            index={0}
-            snapPoints={['40%']}
-            backgroundStyle={{
-              borderColor: 'rgba(0,0,0,.5)',
-              borderWidth: 1,
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-            }}>
-            <View style={{backgroundColor: 'white', paddingHorizontal: 15}}>
-              {languages.map(language => (
-                <Pressable
-                  key={language.id}
-                  onPress={() => {
-                    bottomModalRef.current?.close();
-                    i18n.changeLanguage(language.code);
-                  }}>
-                  <FlexComponent
-                    direction="row"
-                    alignItems={'center'}
-                    style={{paddingVertical: 7}}>
-                    {language.icon}
-                    <Text
-                      paddingLeft={3}
-                      fontSize={18}
-                      color={
-                        i18n.language === language.code
-                          ? appColors.primary
-                          : '#000000'
-                      }>
-                      {language.name}
-                    </Text>
-                  </FlexComponent>
-                </Pressable>
-              ))}
-            </View>
-          </BottomSheetModal>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
+      </ContentComponent>
     </ContainerComponent>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    width: '100%',
+    top: 96,
+  },
+  flexGap: {
+    rowGap: 8,
+  },
+  titleSection: {
+    fontSize: 15,
+    color: appColors.textDescription,
+    textTransform: 'none',
+  },
+  logoutButton: {
+    borderColor: '#F38181',
+    borderWidth: 1,
+    width: '50%',
+    marginHorizontal: '25%',
+    paddingVertical: 8,
+    marginTop: 24,
+  },
+  avatarContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+});
 
 export default AccountScreen;

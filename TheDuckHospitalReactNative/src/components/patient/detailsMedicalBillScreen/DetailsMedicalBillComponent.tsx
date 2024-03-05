@@ -1,8 +1,10 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {Space, TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 const DividerItem = () => {
   return (
@@ -15,6 +17,14 @@ const DividerItem = () => {
 };
 
 const DetailsMedicalBillComponent = () => {
+  const [status, setStatus] = React.useState(true);
+
+  const navigation = useNavigation<navigationProps>();
+
+  const handleClickViewDetails = () => {
+    navigation.navigate('MedicalExaminationHistoryScreen');
+  };
+
   return (
     <View style={styles.container}>
       <View style={{alignItems: 'center', rowGap: 8}}>
@@ -31,10 +41,22 @@ const DetailsMedicalBillComponent = () => {
             Tổng quát
           </TextComponent>
         </TextComponent>
-        <TextComponent fontSize={50} bold color={appColors.primary}>
+        <TextComponent
+          fontSize={50}
+          bold
+          color={status ? appColors.disabled : appColors.primary}>
           07
         </TextComponent>
-        <TextComponent italic>{`(Chưa khám)`}</TextComponent>
+        <TextComponent italic>
+          {status ? '(Đã khám)' : `(Chưa khám)`}
+        </TextComponent>
+        {status && (
+          <Pressable onPress={handleClickViewDetails}>
+            <TextComponent color={appColors.primary} italic>
+              Xem chi tiết tại đây
+            </TextComponent>
+          </Pressable>
+        )}
       </View>
       <Space paddingBottom={16} />
       <View style={{rowGap: 8}}>

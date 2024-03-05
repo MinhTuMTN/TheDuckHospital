@@ -1,4 +1,16 @@
 {
+  "homeScreen": {
+    "hello": "Hi",
+    "welcome": "Welcome back!",
+    "makeAppointment": "Make an appointment",
+    "lookupMedicalResult": "Lookup medical result",
+    "payHospitalFee": "Pay hospital fee",
+    "medicineReminder": "Medicine reminder",
+    "quickSupport": "Quick support",
+    "viewMore": "View more",
+    "instructionBooking": "Instruction for booking",
+    "bookingViaHotline": "Book an examination via hotline 1900-1234"
+  },
   "bottomTab": {
     "home": "Home",
     "patientProfile": "Profile",
