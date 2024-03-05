@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.response;
 
+import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.Booking;
 import lombok.Data;
@@ -21,7 +22,9 @@ public class MedicalRecordItemResponse {
     private ScheduleType scheduleType;
     private double price;
     private String patientName;
+    private Gender patientGender;
     private Date patientDateOfBirth;
+    private String patientProvince;
     private String patientCode;
 
     public MedicalRecordItemResponse(Booking booking) {
@@ -37,7 +40,9 @@ public class MedicalRecordItemResponse {
         this.scheduleType = booking.getDoctorSchedule().getScheduleType();
         this.price = booking.getDoctorSchedule().getMedicalService().getPrice();
         this.patientName = booking.getPatientProfile().getFullName();
+        this.patientGender = booking.getPatientProfile().getGender();
         this.patientDateOfBirth = booking.getPatientProfile().getDateOfBirth();
+        this.patientProvince = booking.getPatientProfile().getWard().getDistrict().getProvince().getProvinceName();
         this.patientCode = booking.getPatientProfile().getPatient() != null ? booking.getPatientProfile().getPatient().getPatientCode() : null;
     }
 }

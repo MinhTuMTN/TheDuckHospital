@@ -162,7 +162,9 @@ const SelectComponent = (props: SelectComponentProps) => {
 
   return (
     <Select
-      selectedValue={typeof value === 'string' ? value : value[keyTitle]}
+      selectedValue={
+        !value || typeof value === 'string' ? value : value[keyTitle]
+      }
       isDisabled={isDisabled}
       style={{
         marginTop,

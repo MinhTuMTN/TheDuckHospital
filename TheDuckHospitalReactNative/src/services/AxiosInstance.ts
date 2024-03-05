@@ -1,4 +1,5 @@
 import axios from 'axios';
+// import Realm from 'realm';
 
 interface ResultProps {
   success: boolean;
@@ -15,7 +16,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': '69420',
-    // Authorization: "Bearer " + localStorage.getItem("token"),
+    // Authorization: "Bearer " + Realm.Sync.User.current?.accessToken,
   },
 });
 
@@ -38,7 +39,7 @@ const handleRequest = async (
     statusCode: 200,
   };
 
-  console.log('url', url);
+  // console.log('url', url);
 
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;

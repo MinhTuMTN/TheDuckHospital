@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import Realm, {ObjectSchema} from 'realm';
+import {updateToken} from '../services/AxiosInstance';
 
 // Interface definition for the context
 interface AuthContextProps {
@@ -49,34 +50,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [token, setToken] = useState<string | null>(null);
   const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
 
-  useEffect(() => {
-    const initializeRealm = async () => {
-      const realmConnection = new Realm(realmConfig);
-      // const realmConnection = new Realm({ schema: [UserSchema] });
-      setRealmInstance(realmConnection);
-      return realmConnection;
-    };
-
-    initializeRealm();
-
-    return () => {
-      if (realmInstance && !realmInstance.isClosed) {
-        realmInstance.close();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const getToken = () => {
-      const user = realmInstance?.objects('User')[0];
-      if (user && user.rememberMe) {
-        setToken(user.token as string);
-      }
-    };
-
-    getToken();
-  }, [realmInstance]);
-
   const login = async (newToken: string, rememberMe: boolean) => {
     try {
       realmInstance?.write(() => {
@@ -108,6 +81,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       console.error('Lỗi xảy ra khi đăng xuất');
     }
   };
+
+  useEffect(() => {
+    const initializeRealm = async () => {
+      const realmConnection = new Realm(realmConfig);
+      // const realmConnection = new Realm({ schema: [UserSchema] });
+      setRealmInstance(realmConnection);
+      return realmConnection;
+    };
+
+    initializeRealm();
+
+    return () => {
+      if (realmInstance && !realmInstance.isClosed) {
+        realmInstance.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const getToken = () => {
+      const user = realmInstance?.objects('User')[0];
+      if (user && user.rememberMe) {
+        setToken(user.token as string);
+        updateToken(user.token as string);
+      }
+    };
+
+    getToken();
+  }, [realmInstance]);
 
   // The value provided to the context consumers
   const value = {

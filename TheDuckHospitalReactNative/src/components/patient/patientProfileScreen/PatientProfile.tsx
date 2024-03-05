@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
 import {FlexComponent} from '../..';
 import {Box, Card, Text} from '@gluestack-ui/themed';
+import {formatDate} from '../../../utils/dateUtils';
 
 interface RowProps {
   icon: React.ReactNode;
@@ -57,15 +58,8 @@ const Row = (props: RowProps) => {
   );
 };
 
-interface Profile {
-  name: string;
-  phone: string;
-  dob: string;
-  address: string;
-}
-
 interface PatientProfileProps {
-  profile: Profile;
+  profile: any;
   onPress?: () => void;
 }
 
@@ -98,7 +92,7 @@ const PatientProfile = (props: PatientProfileProps) => {
               }}
             />
           }
-          text={profile.name}
+          text={profile.fullName}
           uppercase
           textColor={appColors.textPrimary}
           fontWeight={'bold'}
@@ -128,7 +122,7 @@ const PatientProfile = (props: PatientProfileProps) => {
               }}
             />
           }
-          text={profile.phone}
+          text={profile.phoneNumber}
         />
         <Row
           icon={
@@ -141,7 +135,7 @@ const PatientProfile = (props: PatientProfileProps) => {
               }}
             />
           }
-          text={profile.dob}
+          text={formatDate(profile.dateOfBirth)}
         />
         <Row
           icon={
@@ -154,7 +148,7 @@ const PatientProfile = (props: PatientProfileProps) => {
               }}
             />
           }
-          text={profile.address}
+          text={`${profile.streetName}, ${profile.ward?.wardName}, ${profile.district?.districtName}, ${profile.province?.provinceName}`}
         />
       </Card>
     </View>
