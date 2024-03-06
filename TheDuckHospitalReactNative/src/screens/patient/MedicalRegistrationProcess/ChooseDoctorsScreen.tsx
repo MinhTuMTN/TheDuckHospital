@@ -2,6 +2,7 @@ import {View, Text, FlatList, ActivityIndicator} from 'react-native';
 import React, {memo, useCallback, useEffect} from 'react';
 import {
   InputComponent,
+  NotFoundComponent,
   SelectComponent,
   TextComponent,
 } from '../../../components';
@@ -14,7 +15,31 @@ import {
   getAllDepartment,
   getAllDoctor,
 } from '../../../services/bookingServices';
+import {searchDoctor} from '../../../services/dotorSevices';
+import {set} from '@gluestack-style/react';
 
+const data = [
+  {
+    id: 'BS',
+    degree: 'Bác sĩ',
+  },
+  {
+    id: 'ThS',
+    degree: 'Thạc sĩ',
+  },
+  {
+    id: 'TS',
+    degree: 'Tiến sĩ',
+  },
+  {
+    id: 'PGS',
+    degree: 'Phó giáo sư',
+  },
+  {
+    id: 'GS',
+    degree: 'Giáo sư',
+  },
+];
 const LoadmoreItem = memo(() => {
   return (
     <View
@@ -32,7 +57,10 @@ const ChooseDoctorsScreen = () => {
   const [doctors, setDoctors] = React.useState([]);
   const [initNumber, setInitNumber] = React.useState(0);
   const [departments, setDepartments] = React.useState([]);
-  const [selectedDepartment, setSelectedDepartment] = React.useState(null);
+  const [selectedDepartment, setSelectedDepartment] = React.useState<any>(null);
+  const [selectedDegree, setSelectedDegree] = React.useState<any>(null);
+  const [searchText, setSearchText] = React.useState('');
+  const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
 
   const renderItem = useCallback(({item}: {item: any}) => {
     return <DoctorInfoComponent item={item} />;
@@ -76,6 +104,30 @@ const ChooseDoctorsScreen = () => {
     handleGetAllDepartment();
   }, []);
 
+  useEffect(() => {
+    const handleSearchDoctor = async () => {
+      setIsLoadingAPI(true);
+      const response = await searchDoctor(
+        searchText,
+        selectedDepartment?.departmentId,
+        selectedDegree?.id,
+      );
+      setIsLoadingAPI(false);
+
+      if (response.success) {
+        setDoctors(response.data.data.items);
+      } else {
+        console.log('Error: ', response.error);
+      }
+    };
+
+    handleSearchDoctor();
+  }, [searchText, selectedDepartment, selectedDegree]);
+
+  const handleChangedText = (text: string) => {
+    setSearchText(text);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -102,17 +154,24 @@ const ChooseDoctorsScreen = () => {
               borderWidth: 0,
               borderRadius: 16,
             }}
+            value={searchText}
+            onChangeText={handleChangedText}
           />
+
           <View style={styles.filter}>
             <View style={styles.box}>
               <Filter width={18} height={18} />
               <Text style={{fontSize: 14, color: appColors.black}}>Bộ lọc</Text>
             </View>
             <SelectComponent
-              options={['Thạc sĩ', 'Tiến sĩ']}
-              value=""
+              options={data}
+              keyTitle="degree"
+              value={selectedDegree}
               size="md"
-              onChange={() => {}}
+              onChange={selectedDegree => {
+                setSelectedDegree(selectedDegree);
+                console.log('Selected degree: ', selectedDegree);
+              }}
               selectInputStyle={{
                 backgroundColor: appColors.primary,
                 paddingHorizontal: 8,
@@ -159,19 +218,38 @@ const ChooseDoctorsScreen = () => {
         </View>
       )}
 
-      <FlatList
-        data={doctors}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        style={{width: '100%'}}
-        initialNumToRender={initNumber}
-        onEndReached={e => {
-          console.log('Load more');
+      {isLoadingAPI ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size="large" color={appColors.primary} />
+        </View>
+      ) : doctors.length > 0 ? (
+        <FlatList
+          data={doctors}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          style={{width: '100%'}}
+          initialNumToRender={initNumber}
+          onEndReached={e => {
+            console.log('Load more');
 
-          // Add LoadmoreItem to the end of the list
-          // setDoctors
-        }}
-      />
+            // Add LoadmoreItem to the end of the list
+            // setDoctors
+          }}
+        />
+      ) : (
+        <NotFoundComponent
+          imageSrc={require('../../../assets/images/animal.png')}
+          desc="Không tìm thấy kết quả phù hợp"
+          descStyle={{
+            fontWeight: '400',
+          }}
+        />
+      )}
     </View>
   );
 };
