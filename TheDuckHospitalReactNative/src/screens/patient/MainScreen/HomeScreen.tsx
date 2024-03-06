@@ -1,6 +1,6 @@
 import {Fab} from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Image, TouchableOpacity, View} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
@@ -8,6 +8,7 @@ import {Headset, Search, Typing} from '../../../assets/svgs';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {useAuth} from '../../../auth/AuthProvider';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -16,6 +17,12 @@ const HomeScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation();
+  const auth = useAuth();
+  const fullName = useMemo(() => {
+    const name = auth.userInfo?.fullName?.split(' ');
+
+    return name ? `${name[name.length - 2]} ${name[name.length - 1]}` : '';
+  }, [auth.userInfo?.fullName]);
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -81,7 +88,7 @@ const HomeScreen = () => {
               <TextComponent color={appColors.white} fontSize={20}>
                 {t('homeScreen.hello')}{' '}
                 <TextComponent bold color={appColors.white} fontSize={20}>
-                  Hạ Băng,
+                  {fullName},
                 </TextComponent>
               </TextComponent>
               <TextComponent color={appColors.white}>

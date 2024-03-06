@@ -11,11 +11,14 @@ import {
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
+import {useAuth} from '../../../auth/AuthProvider';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const auth = useAuth();
 
   React.useEffect(() => {
     const handleGetAllPatientProfile = async () => {
@@ -26,8 +29,8 @@ const ProfileScreen = () => {
       } else console.log('Error: ', response.error);
     };
 
-    handleGetAllPatientProfile();
-  }, []);
+    if (auth.token) handleGetAllPatientProfile();
+  }, [auth.token]);
 
   return (
     <ContainerComponent paddingTop={0}>
