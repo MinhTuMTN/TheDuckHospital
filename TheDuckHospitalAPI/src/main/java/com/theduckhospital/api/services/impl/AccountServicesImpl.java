@@ -235,6 +235,7 @@ public class AccountServicesImpl implements IAccountServices {
         return CheckTokenResponse.builder()
                 .valid(true)
                 .role(role)
+                .fullName(account.getFullName())
                 .build();
     }
 

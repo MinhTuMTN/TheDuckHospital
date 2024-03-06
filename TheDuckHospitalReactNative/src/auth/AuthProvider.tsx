@@ -32,6 +32,8 @@ const UserSchema: Realm.ObjectSchema = {
   properties: {
     token: 'string',
     rememberMe: 'bool?',
+    fullName: 'string?',
+    role: 'string?',
   },
 };
 
@@ -82,6 +84,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   };
 
+  const updateInfo = async (fullName: string, role: string) => {
+    try {
+      realmInstance?.write(() => {
+        const user = realmInstance.objects('User')[0];
+        if (user) {
+          user.fullName = fullName;
+          user.role = role;
+        }
+      });
+    } catch (error) {
+      console.error('Lỗi xảy ra khi cập nhật thông tin người dùng: ', error);
+    }
+  };
+
   useEffect(() => {
     const initializeRealm = async () => {
       const realmConnection = new Realm(realmConfig);
@@ -116,6 +132,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     token,
     login,
     logout,
+    updateInfo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
