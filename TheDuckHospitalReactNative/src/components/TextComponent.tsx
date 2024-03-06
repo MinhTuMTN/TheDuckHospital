@@ -28,6 +28,7 @@ interface TextComponentProps {
   numberOfLines?: number | undefined;
   flex?: number;
   flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip' | undefined;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -44,10 +45,12 @@ const TextComponent = (props: TextComponentProps) => {
     numberOfLines,
     flex,
     flexWrap,
+    ellipsizeMode,
   } = props;
   return (
     <Text
       numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
       style={[
         {
           fontSize,

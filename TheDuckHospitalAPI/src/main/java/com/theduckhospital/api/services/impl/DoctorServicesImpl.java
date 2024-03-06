@@ -137,27 +137,38 @@ public class DoctorServicesImpl implements IDoctorServices {
         } 
 
         Page<Doctor> doctors;
+//        if (degree == null)
+//            doctors = doctorRepository
+//                    .findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+//                    fullName, department == null ? "" : department.getDepartmentName(),
+//                    pageable
+//            );
+//        else
+//            doctors = doctorRepository
+//                    .findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+//                    fullName, degree,
+//                    department == null ? "" : department.getDepartmentName(),
+//                    pageable
+//            );
         if (degree == null)
             doctors = doctorRepository
-                    .findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+                    .findDoctorsWithoutDegree(
                     fullName, department == null ? "" : department.getDepartmentName(),
+                    DateCommon.getToday(),
                     pageable
-            );
+                    );
         else
             doctors = doctorRepository
-                    .findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
+                    .findDoctorsByDegree(
                     fullName, degree,
                     department == null ? "" : department.getDepartmentName(),
+                    DateCommon.getToday(),
                     pageable
-            );
+                    );
 
         List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
         AtomicInteger remove = new AtomicInteger();
         doctors.forEach(doctor -> {
-            if (doctor.getStaffId() == UUID.fromString("488B1568-0A0C-43FB-8E1D-812C022E766B"))
-            {
-                System.out.println("Doctor: " + doctor.getFullName());
-            }
             List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
             doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
                     || doctorSchedule.getDate().before(DateCommon.getToday())

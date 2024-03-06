@@ -194,28 +194,30 @@ const SelectComponent = (props: SelectComponentProps) => {
         <View
           style={[
             {
-              borderRadius: 10,
+              borderRadius: borderRadius || 10,
               backgroundColor: appColors.white,
-              zIndex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
+              height: '100%',
+              width: '100%',
+              paddingHorizontal: 4,
             },
             selectInputStyle,
           ]}>
-          <SelectInput
-            placeholder={placeholder || 'Select Option'}
-            placeholderTextColor={placeholderColor}
-            fontSize={selectTextSize || 14}
-            style={{
-              color: selectTextColor,
-              textAlign: 'left',
-              marginLeft: -12,
-            }}
-            flexWrap="nowrap"
-            multiline={true}
-            numberOfLines={1}
-          />
+          <View style={{flex: 1}}>
+            <TextComponent
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              color={!value ? placeholderColor : selectTextColor}
+              fontSize={selectTextSize || 14}>
+              {!value
+                ? placeholder
+                : typeof value === 'string'
+                ? value
+                : value[keyTitle]}
+            </TextComponent>
+          </View>
           <SelectIcon>
             {selectInputIcon || (
               <ChevronDownIcon

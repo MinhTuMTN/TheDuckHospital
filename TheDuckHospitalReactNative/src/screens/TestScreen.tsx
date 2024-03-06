@@ -42,7 +42,7 @@ const TestScreen = () => {
       },
       {
         departmentId: 4,
-        departmentName: 'Tim mạch',
+        departmentName: 'Tim mạch - Răng hàm mặt',
       },
     ];
 
