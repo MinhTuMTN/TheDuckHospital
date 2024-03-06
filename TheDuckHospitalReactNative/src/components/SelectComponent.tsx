@@ -29,7 +29,7 @@ interface SelectComponentProps {
   options: string[] | any[];
   keyTitle?: string;
   value: string | any;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void;
   isLoading?: boolean;
   isDisabled?: boolean;
   enableSearch?: boolean;

@@ -32,7 +32,7 @@ const ChooseDoctorsScreen = () => {
   const [doctors, setDoctors] = React.useState([]);
   const [initNumber, setInitNumber] = React.useState(0);
   const [departments, setDepartments] = React.useState([]);
-  const [selectedDepartment, setSelectedDepartment] = React.useState({});
+  const [selectedDepartment, setSelectedDepartment] = React.useState(null);
 
   const renderItem = useCallback(({item}: {item: any}) => {
     return <DoctorInfoComponent item={item} />;
@@ -131,8 +131,6 @@ const ChooseDoctorsScreen = () => {
               value={selectedDepartment}
               size="md"
               onChange={selectedDepartment => {
-                console.log('selectedDepartment: ', selectedDepartment);
-
                 setSelectedDepartment(selectedDepartment);
               }}
               selectInputStyle={{
@@ -146,6 +144,8 @@ const ChooseDoctorsScreen = () => {
               selectTextColor={appColors.white}
               title="Chuyên khoa"
               placeholder="Chuyên khoa"
+              placeholderSearch="Tìm kiếm chuyên khoa"
+              enableSearch
               placeholderColor={appColors.white}
               selectTextSize={14}
             />

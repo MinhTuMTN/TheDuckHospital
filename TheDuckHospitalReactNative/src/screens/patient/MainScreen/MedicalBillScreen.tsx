@@ -107,6 +107,7 @@ const MedicalBillScreen = () => {
           value={selectedPatientName}
           selectTextColor={appColors.textDarker}
           title="Chọn hồ sơ bệnh nhân"
+          placeholder="Chọn hồ sơ bệnh nhân"
           onChange={value => {
             setSelectedPatientName(value);
           }}
