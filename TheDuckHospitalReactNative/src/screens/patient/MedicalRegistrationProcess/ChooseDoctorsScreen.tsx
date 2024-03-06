@@ -131,8 +131,6 @@ const ChooseDoctorsScreen = () => {
               value={selectedDepartment}
               size="md"
               onChange={selectedDepartment => {
-                console.log('selectedDepartment: ', selectedDepartment);
-
                 setSelectedDepartment(selectedDepartment);
               }}
               selectInputStyle={{
