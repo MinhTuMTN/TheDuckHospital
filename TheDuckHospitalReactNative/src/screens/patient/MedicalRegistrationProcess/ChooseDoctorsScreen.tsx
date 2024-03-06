@@ -1,54 +1,19 @@
 import {View, Text, FlatList, ActivityIndicator} from 'react-native';
 import React, {memo, useCallback, useEffect} from 'react';
-import {InputComponent, TextComponent} from '../../../components';
+import {
+  InputComponent,
+  SelectComponent,
+  TextComponent,
+} from '../../../components';
 import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
 import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Expand, ExpandInWhite, Filter} from '../../../assets/svgs';
-
-const data = [
-  {
-    id: '1',
-    name: 'Nguyễn Văn A',
-    department: 'Khoa nội',
-  },
-  {
-    id: '2',
-    name: 'Nguyễn Văn B',
-    department: 'Khoa ngoại',
-  },
-  {
-    id: '3',
-    name: 'Nguyễn Văn C',
-    department: 'Khoa nhi',
-  },
-  {
-    id: '4',
-    name: 'Nguyễn Văn D',
-    department: 'Khoa sản',
-  },
-  {
-    id: '5',
-    name: 'Nguyễn Văn E',
-    department: 'Khoa nội',
-  },
-  {
-    id: '6',
-    name: 'Nguyễn Văn F',
-    department: 'Khoa ngoại',
-  },
-  {
-    id: '7',
-    name: 'Nguyễn Văn G',
-    department: 'Khoa nhi',
-  },
-  {
-    id: '8',
-    name: 'Nguyễn Văn H',
-    department: 'Khoa sản',
-  },
-];
+import {
+  getAllDepartment,
+  getAllDoctor,
+} from '../../../services/bookingServices';
 
 const LoadmoreItem = memo(() => {
   return (
@@ -64,8 +29,11 @@ const LoadmoreItem = memo(() => {
 });
 
 const ChooseDoctorsScreen = () => {
-  const [doctors, setDoctors] = React.useState(data);
+  const [doctors, setDoctors] = React.useState([]);
   const [initNumber, setInitNumber] = React.useState(0);
+  const [departments, setDepartments] = React.useState([]);
+  const [selectedDepartment, setSelectedDepartment] = React.useState({});
+
   const renderItem = useCallback(({item}: {item: any}) => {
     return <DoctorInfoComponent item={item} />;
   }, []);
@@ -81,6 +49,33 @@ const ChooseDoctorsScreen = () => {
 
     return () => clearTimeout(timeOutId);
   }, []);
+
+  useEffect(() => {
+    const handleGetAllDoctor = async () => {
+      const respone = await getAllDoctor(2, 1);
+
+      if (respone.success) {
+        setDoctors(respone.data.data.items);
+      } else {
+        console.log('Error: ', respone.error);
+      }
+    };
+    handleGetAllDoctor();
+  }, []);
+
+  useEffect(() => {
+    const handleGetAllDepartment = async () => {
+      const response = await getAllDepartment();
+      if (response.success) {
+        setDepartments(response.data.data);
+      } else {
+        console.log('Error: ', response.error);
+      }
+    };
+
+    handleGetAllDepartment();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -113,32 +108,47 @@ const ChooseDoctorsScreen = () => {
               <Filter width={18} height={18} />
               <Text style={{fontSize: 14, color: appColors.black}}>Bộ lọc</Text>
             </View>
-            <View
-              style={[
-                styles.box,
-                {
-                  backgroundColor: appColors.primary,
-                  borderColor: appColors.primaryLight,
-                },
-              ]}>
-              <Text style={{fontSize: 14, color: appColors.white}}>
-                Họ hàm/Học vị
-              </Text>
-              <ExpandInWhite width={15} height={15} />
-            </View>
-            <View
-              style={[
-                styles.box,
-                {
-                  backgroundColor: appColors.primary,
-                  borderColor: appColors.primaryLight,
-                },
-              ]}>
-              <Text style={{fontSize: 14, color: appColors.white}}>
-                Chuyên khoa
-              </Text>
-              <ExpandInWhite width={15} height={15} />
-            </View>
+            <SelectComponent
+              options={['Thạc sĩ', 'Tiến sĩ']}
+              value=""
+              size="md"
+              onChange={() => {}}
+              selectInputStyle={{
+                backgroundColor: appColors.primary,
+                paddingHorizontal: 8,
+              }}
+              marginRight={8}
+              selectIconColor={appColors.white}
+              selectTextColor={appColors.white}
+              title="Họ hàm/Học vị"
+              placeholder="Học hàm/vị"
+              placeholderColor={appColors.white}
+              selectTextSize={14}
+            />
+            <SelectComponent
+              options={departments}
+              keyTitle="departmentName"
+              value={selectedDepartment}
+              size="md"
+              onChange={selectedDepartment => {
+                console.log('selectedDepartment: ', selectedDepartment);
+
+                setSelectedDepartment(selectedDepartment);
+              }}
+              selectInputStyle={{
+                backgroundColor: appColors.primary,
+                paddingHorizontal: 8,
+              }}
+              padding={0}
+              width={150}
+              flex={undefined}
+              selectIconColor={appColors.white}
+              selectTextColor={appColors.white}
+              title="Chuyên khoa"
+              placeholder="Chuyên khoa"
+              placeholderColor={appColors.white}
+              selectTextSize={14}
+            />
           </View>
         </View>
       </View>

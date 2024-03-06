@@ -1,17 +1,43 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
-import React, {memo} from 'react';
-import {Space, TextComponent} from '../..';
-import LineInfoComponent from '../../LineInfoComponent';
-import {CaseUpper, ChevronRight} from 'lucide-react-native';
+import React, {memo, useEffect} from 'react';
+import {Image, StyleSheet, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {TextComponent} from '../..';
 import {Calendar, CashInHand, Gender, Stethoscope} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import LineInfoComponent from '../../LineInfoComponent';
 
 interface DoctorInfoComponentProps {
   item: any;
 }
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
+  const {item} = props;
+  const [dayOfWeek, setDayOfWeek] = React.useState('');
+
+  useEffect(() => {
+    const doctorSchedules = item.doctorSchedules;
+
+    let dayOfWeeks: number[] = [];
+    doctorSchedules.forEach((schedule: any) => {
+      const dayOfWeek = schedule.dayOfWeek;
+
+      if (dayOfWeeks.indexOf(dayOfWeek) === -1) {
+        dayOfWeeks.push(dayOfWeek);
+      }
+    });
+    dayOfWeeks.sort();
+
+    let dayOfWeekString = '';
+    dayOfWeeks.forEach((day: number, index: number) => {
+      if (index === dayOfWeeks.length - 1) {
+        dayOfWeekString += `Thứ ${day}`;
+      } else {
+        dayOfWeekString += `Thứ ${day}, `;
+      }
+    });
+    setDayOfWeek(dayOfWeekString);
+  }, [item]);
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
@@ -34,7 +60,10 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             fontWeight="700"
             textAlign="justify"
             fontSize={15}>
-            pgs ts bs. {props.item.name}
+            <TextComponent fontWeight="700" fontSize={15}>
+              {item.degree}.
+            </TextComponent>{' '}
+            {item.doctorName}
           </TextComponent>
           <LineInfoComponent
             startIcon={
@@ -42,7 +71,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             }
             label="Chuyên khoa:"
             labelColor={'#8F8F8F'}
-            value={props.item.department}
+            value={item.department.departmentName}
             valueColor={'#4F4F4F'}
             flexLabel={2}
             flexValue={3}
@@ -58,7 +87,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             }
             label="Ngày khám:"
             labelColor={'#8F8F8F'}
-            value="Thứ 2, Thứ 3"
+            value={dayOfWeek}
             valueColor={'#4F4F4F'}
             flexLabel={2}
             flexValue={3}
@@ -69,7 +98,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             }
             label="Giới tính:"
             labelColor={'#8F8F8F'}
-            value="Nữ"
+            value={item.gender == 'MALE' ? 'Nam' : 'Nữ'}
             valueColor={'#4F4F4F'}
             flexLabel={2}
             flexValue={3}
@@ -80,7 +109,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             }
             label="Phí khám:"
             labelColor={'#8F8F8F'}
-            value="150.000đ"
+            value={formatCurrency(item.price) + ' đ'}
             valueColor={'#00A3E7'}
             valueStyles={{fontWeight: '500', fontSize: 13}}
             flexLabel={2}

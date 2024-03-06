@@ -12,6 +12,7 @@ import {ChevronDownIcon, ChevronRight, Search} from 'lucide-react-native';
 import React, {memo, useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  AnimatableNumericValue,
   ColorValue,
   DimensionValue,
   FlatList,
@@ -27,7 +28,7 @@ import {appInfo} from '../constants/appInfo';
 interface SelectComponentProps {
   options: string[] | any[];
   keyTitle?: string;
-  value: string;
+  value: string | any;
   onChange: (value: string) => void;
   isLoading?: boolean;
   isDisabled?: boolean;
@@ -53,6 +54,8 @@ interface SelectComponentProps {
   paddingRight?: DimensionValue | undefined;
   paddingBottom?: DimensionValue | undefined;
   paddingLeft?: DimensionValue | undefined;
+  selectIconColor?: ColorValue | undefined;
+  borderRadius?: AnimatableNumericValue | undefined;
 }
 
 interface CustomSelectItemComponentProps {
@@ -115,6 +118,8 @@ const SelectComponent = (props: SelectComponentProps) => {
     paddingBottom,
     paddingLeft,
     selectTextSize,
+    selectIconColor,
+    borderRadius,
   } = props;
 
   const handleOnChange = useCallback(
@@ -124,16 +129,15 @@ const SelectComponent = (props: SelectComponentProps) => {
     },
     [onChange],
   );
-  const renderItem = useCallback(
-    ({item}: {item: any}) => (
+  const renderItem = useCallback(({item}: {item: any}) => {
+    return (
       <CustomSelectItemComponent
         option={item}
         title={typeof item === 'string' ? item : item[keyTitle]}
         onPress={handleOnChange}
       />
-    ),
-    [],
-  );
+    );
+  }, []);
   const keyExtractor = useCallback(
     (item: any, index: any) =>
       typeof item === 'string'
@@ -179,27 +183,49 @@ const SelectComponent = (props: SelectComponentProps) => {
         paddingLeft,
       }}
       width={width}
-      flex={flex}>
+      flex={width ? undefined : flex}>
       <SelectTrigger
-        style={[
-          {
-            borderRadius: 10,
-            paddingHorizontal: 8,
-          },
-          selectInputStyle,
-        ]}
         variant="outline"
         size={size}
+        style={{
+          borderRadius: borderRadius || 10,
+        }}
         onPress={() => setIsOpen(true)}>
-        <SelectInput
-          placeholder={placeholder || 'Select Option'}
-          placeholderTextColor={placeholderColor}
-          fontSize={selectTextSize || 14}
-          style={{color: selectTextColor, textAlign: 'left', flex: 1}}
-        />
-        <SelectIcon>
-          {selectInputIcon || <Icon as={ChevronDownIcon} />}
-        </SelectIcon>
+        <View
+          style={[
+            {
+              borderRadius: 10,
+              backgroundColor: appColors.white,
+              zIndex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            },
+            selectInputStyle,
+          ]}>
+          <SelectInput
+            placeholder={placeholder || 'Select Option'}
+            placeholderTextColor={placeholderColor}
+            fontSize={selectTextSize || 14}
+            style={{
+              color: selectTextColor,
+              textAlign: 'left',
+              marginLeft: -12,
+            }}
+            flexWrap="nowrap"
+            multiline={true}
+            numberOfLines={1}
+          />
+          <SelectIcon>
+            {selectInputIcon || (
+              <ChevronDownIcon
+                width={20}
+                height={20}
+                color={selectIconColor || '#000000'}
+              />
+            )}
+          </SelectIcon>
+        </View>
       </SelectTrigger>
       <SelectPortal isOpen={isOpen}>
         <SelectBackdrop onPress={() => setIsOpen(false)} />
