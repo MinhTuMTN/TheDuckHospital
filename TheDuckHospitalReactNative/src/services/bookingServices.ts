@@ -1,4 +1,4 @@
-import {get, getNonAuth} from './AxiosInstance';
+import {get} from './AxiosInstance';
 
 export const getAllBooking = async () => {
   return get('/booking');
