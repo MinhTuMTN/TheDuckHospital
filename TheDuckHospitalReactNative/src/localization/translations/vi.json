@@ -1,4 +1,20 @@
 {
+  "homeScreen": {
+    "hello": "Xin chào",
+    "welcome": "Mừng bạn quay trở lại",
+    "makeAppointment": "Đặt khám\ntheo bác sĩ",
+    "makeAppointmentNoNewLine": "Đặt khám theo bác sĩ",
+    "lookupMedicalResult": "Tra cứu kết quả\nkhám bệnh",
+    "lookupMedicalResultNoNewLine": "Tra cứu kết quả khám bệnh",
+    "payHospitalFee": "Thanh toán\nviện phí",
+    "payHospitalFeeNoNewLine": "Thanh toán viện phí",
+    "medicineReminder": "Đặt lịch\nuống thuốc",
+    "medicineReminderNoNewLine": "Đặt lịch uống thuốc",
+    "quickSupport": "Hỗ trợ nhanh",
+    "viewMore": "Xem thêm",
+    "instructionBooking": "Hướng dẫn đặt khám",
+    "bookingViaHotline": "Đặt khám qua tổng đài 1900-1234"
+  },
   "bottomTab": {
     "home": "Trang chủ",
     "patientProfile": "Hồ sơ",
@@ -19,7 +35,15 @@
     "title": "Thông báo"
   },
   "account": {
-    "language": "Ngôn ngữ"
+    "generalSettings": "Cài đặt chung",
+    "language": "Ngôn ngữ",
+    "changePassword": "Đổi mật khẩu",
+    "notificationSettings": "Cài đặt thông báo",
+    "contactSupport": "Liên hệ",
+    "hotline": "Tổng đài 1900-1234",
+    "ratingApp": "Đánh giá ứng dụng",
+    "shareApp": "Chia sẻ ứng dụng",
+    "signOut": "Đăng xuất"
   },
   "notFoundScreen": {
     "title": "Trang không tồn tại",

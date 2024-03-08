@@ -25,6 +25,10 @@ interface TextComponentProps {
   color?: ColorValue | undefined;
   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
   style?: StyleProp<TextStyle>;
+  numberOfLines?: number | undefined;
+  flex?: number;
+  flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip' | undefined;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -38,9 +42,15 @@ const TextComponent = (props: TextComponentProps) => {
     color = appColors.black,
     textAlign,
     style,
+    numberOfLines,
+    flex,
+    flexWrap,
+    ellipsizeMode,
   } = props;
   return (
     <Text
+      numberOfLines={numberOfLines}
+      ellipsizeMode={ellipsizeMode}
       style={[
         {
           fontSize,
@@ -50,6 +60,8 @@ const TextComponent = (props: TextComponentProps) => {
           textDecorationLine: underline ? 'underline' : 'none',
           color,
           textAlign,
+          flex,
+          flexWrap,
         },
         style,
       ]}>

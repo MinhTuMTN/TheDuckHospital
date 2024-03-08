@@ -6,6 +6,7 @@ import {
   GestureResponderEvent,
   ActivityIndicator,
   StyleSheet,
+  ColorValue,
 } from 'react-native';
 import React from 'react';
 import {Text} from '@gluestack-ui/themed';
@@ -39,6 +40,8 @@ interface ButtonComponentProps {
   enabled?: boolean;
   onPress?: () => void | any;
   isLoading?: boolean;
+  startIcon?: React.ReactNode;
+  loadingColor?: ColorValue | undefined;
 }
 
 const ButtonComponent = (props: ButtonComponentProps) => {
@@ -58,6 +61,7 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     enabled = true,
     onPress,
     isLoading,
+    startIcon,
   } = props;
   return (
     <View
@@ -84,8 +88,14 @@ const ButtonComponent = (props: ButtonComponentProps) => {
           if (!isLoading && enabled && onPress) onPress();
         }}
         disabled={!enabled}>
-        <View style={isLoading && styles.loadingStyle}>
-          {isLoading && <ActivityIndicator size="small" color="#ffffff" />}
+        <View style={styles.loadingStyle}>
+          {isLoading && (
+            <ActivityIndicator
+              size="small"
+              color={props.loadingColor || '#ffffff'}
+            />
+          )}
+          {startIcon && !isLoading && startIcon}
           <Text
             style={textStyles}
             color={textColor}

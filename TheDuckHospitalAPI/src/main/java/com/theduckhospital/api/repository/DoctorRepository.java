@@ -6,8 +6,10 @@ import com.theduckhospital.api.entity.Doctor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,5 +26,36 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     long countByDeletedFalseAndDepartment(Department department);
     Page<Doctor> findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, String department_departmentName, Pageable pageable
+    );
+
+    @Query("SELECT d " +
+            "FROM Doctor d " +
+            "WHERE d.deleted = false " +
+            "AND d.department.departmentName LIKE %:departmentName% " +
+            "AND d.degree = :degree " +
+            "AND d.fullName LIKE %:fullName% " +
+            "AND (SELECT COUNT(ds) FROM DoctorSchedule ds WHERE ds.doctor = d AND ds.date > :today) > 0"
+    )
+    Page<Doctor> findDoctorsByDegree(
+            String fullName,
+            Degree degree,
+            String departmentName,
+            Date today,
+            Pageable pageable
+    );
+
+
+    @Query("SELECT d " +
+            "FROM Doctor d " +
+            "WHERE d.deleted = false " +
+            "AND d.department.departmentName LIKE %:departmentName% " +
+            "AND d.fullName LIKE %:fullName% " +
+            "AND (SELECT COUNT(ds) FROM DoctorSchedule ds WHERE ds.doctor = d AND ds.date > :today) > 0"
+    )
+    Page<Doctor> findDoctorsWithoutDegree(
+            String fullName,
+            String departmentName,
+            Date today,
+            Pageable pageable
     );
 }

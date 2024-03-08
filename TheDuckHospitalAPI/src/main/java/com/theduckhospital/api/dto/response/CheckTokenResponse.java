@@ -8,4 +8,5 @@ import lombok.Data;
 public class CheckTokenResponse {
     private boolean valid;
     private String role;
+    private String fullName;
 }

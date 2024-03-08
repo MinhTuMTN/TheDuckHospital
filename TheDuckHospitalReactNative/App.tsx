@@ -4,18 +4,16 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {StatusBar} from 'react-native';
+import {AuthProvider} from './src/auth/AuthProvider';
 import './src/localization/i18n';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
 import NotFoundScreen from './src/screens/NotFoundScreen';
 import SlashScreen from './src/screens/SlashScreen';
-import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
-import AuthNavigator from './src/navigator/AuthNavigator';
-import RegisterScreen from './src/screens/auth/RegisterScreen';
+import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
+import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
-import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
-import {AuthProvider} from './src/auth/AuthProvider';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
 import 'react-native-gesture-handler';
 import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
@@ -23,6 +21,11 @@ import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDe
 import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
 import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
 import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
+import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
+import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
+import TestScreen from './src/screens/TestScreen';
+import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDoctorsScreen';
+import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -88,6 +91,19 @@ const App = () => {
             <Stack.Screen
               name="TransactionDetailScreen"
               component={TransactionDetailScreen}
+            />
+            <Stack.Screen
+              name="DetailsMedicalBillScreen"
+              component={DetailsMedicalBillScreen}
+            />
+            <Stack.Screen name="TestScreen" component={TestScreen} />
+            <Stack.Screen
+              name="ChooseDoctorsScreen"
+              component={ChooseDoctorsScreen}
+            />
+            <Stack.Screen
+              name="MedicalExaminationHistoryScreen"
+              component={MedicalExaminationHistoryScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

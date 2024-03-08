@@ -1,18 +1,28 @@
-import React, {useRef, useState} from 'react';
+import {Fab} from '@gluestack-ui/themed';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, View} from 'react-native';
-import {Search, Typing} from '../../../assets/svgs';
-import {TextComponent} from '../../../components';
-import {appColors} from '../../../constants/appColors';
+import {Image, TouchableOpacity, View} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {Headset, Search, Typing} from '../../../assets/svgs';
+import {MoreMenuComponent, TextComponent} from '../../../components';
+import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {useAuth} from '../../../auth/AuthProvider';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const isCarousel = useRef(null);
 
   const {t} = useTranslation();
+  const navigation = useNavigation();
+  const auth = useAuth();
+  const fullName = useMemo(() => {
+    const name = auth.userInfo?.fullName?.split(' ');
 
+    return name ? `${name[name.length - 2]} ${name[name.length - 1]}` : '';
+  }, [auth.userInfo?.fullName]);
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -24,7 +34,6 @@ const HomeScreen = () => {
       image: require('../../../assets/images/slide_2.jpg'),
     },
   ];
-
   const _renderItem = ({item, index}: {item: any; index: number}) => {
     return (
       <View>
@@ -40,6 +49,29 @@ const HomeScreen = () => {
     );
   };
 
+  const handleChooseDoctor = () => {
+    navigation.navigate('ChooseDoctorsScreen' as never);
+  };
+  const handleNavigateTestScreen = () => {
+    navigation.navigate('TestScreen' as never);
+  };
+
+  useEffect(() => {
+    if (showMoreMenu) {
+      navigation.setOptions({
+        tabBarStyle: {
+          display: 'none',
+        },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          display: 'flex',
+        },
+      });
+    }
+  }, [showMoreMenu]);
+
   return (
     <View className={'flex-1 bg-white'}>
       <View
@@ -49,19 +81,18 @@ const HomeScreen = () => {
         <View className="pt-12 flex-row items-center justify-between">
           <View className="flex-row items-center flex-auto w-72">
             <Image
-              alt="avatar-meo"
               source={require('../../../assets/images/avatar-meo.jpg')}
               className="w-14 h-14 rounded-full"
             />
             <View className="pl-2">
               <TextComponent color={appColors.white} fontSize={20}>
-                Xin chào{' '}
+                {t('homeScreen.hello')}{' '}
                 <TextComponent bold color={appColors.white} fontSize={20}>
-                  Hạ Băng,
+                  {fullName},
                 </TextComponent>
               </TextComponent>
               <TextComponent color={appColors.white}>
-                Mừng bạn quay trở lại.
+                {t('homeScreen.welcome')}
               </TextComponent>
             </View>
           </View>
@@ -76,31 +107,44 @@ const HomeScreen = () => {
           style={{
             elevation: 10,
           }}>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={handleChooseDoctor}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/appointment.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
-              Đặt khám theo bác sĩ
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.makeAppointment')}
             </TextComponent>
-          </View>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleNavigateTestScreen}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/loupe.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
-              Tra cứu kết quả khám bệnh
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.lookupMedicalResult')}
             </TextComponent>
-          </View>
+          </TouchableOpacity>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
             <Image
               source={require('../../../assets/images/payment.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
-              Thanh toán {'\n'} viện phí
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.payHospitalFee')}
+            </TextComponent>
+          </View>
+          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
+            <Image
+              source={require('../../../assets/images/animal.png')}
+              className="w-12 h-12"
+            />
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.medicineReminder')}
             </TextComponent>
           </View>
           <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
@@ -108,31 +152,27 @@ const HomeScreen = () => {
               source={require('../../../assets/images/chat.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">Hỗ trợ nhanh</TextComponent>
-          </View>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
-            <Image
-              source={require('../../../assets/images/instructions.png')}
-              className="w-12 h-12"
-            />
-            <TextComponent textAlign="center">
-              Hướng dẫn {'\n'} đặt khám
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.quickSupport')}
             </TextComponent>
           </View>
-          <View className="w-1/3 h-1/2 items-center justify-center py-4 border-[#D5CFCF]">
+          <TouchableOpacity
+            onPress={() => setShowMoreMenu(!showMoreMenu)}
+            className="w-1/3 h-1/2 items-center justify-center py-4 border-[#D5CFCF]">
             <Image
-              source={require('../../../assets/images/customer-support.png')}
+              source={require('../../../assets/images/more.png')}
               className="w-12 h-12"
             />
-            <TextComponent textAlign="center">
-              Đặt khám ngay 1900-1230
+            <TextComponent textAlign="center" fontSize={14}>
+              {t('homeScreen.viewMore')}
             </TextComponent>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
       <View className="mt-40 px-5 overflow-hidden">
         <Carousel
+          autoplay
           ref={isCarousel}
           data={entries}
           renderItem={_renderItem}
@@ -141,7 +181,6 @@ const HomeScreen = () => {
           layout={'stack'}
           vertical={false}
           loop={true}
-          autoplay={true}
           onSnapToItem={index => setIndex(index)}
         />
         <Pagination
@@ -149,8 +188,8 @@ const HomeScreen = () => {
           activeDotIndex={index}
           carouselRef={isCarousel}
           dotStyle={{
-            width: 16,
-            height: 16,
+            width: 8,
+            height: 8,
             borderRadius: 8,
             marginHorizontal: 1,
             backgroundColor: appColors.primary,
@@ -168,6 +207,21 @@ const HomeScreen = () => {
           }}
         />
       </View>
+
+      <MoreMenuComponent
+        show={showMoreMenu}
+        onClose={() => setShowMoreMenu(false)}
+      />
+
+      <Fab
+        size="md"
+        placement="bottom right"
+        style={{
+          backgroundColor: appColors.primary,
+          display: showMoreMenu ? 'none' : 'flex',
+        }}>
+        <Headset width={35} height={35} />
+      </Fab>
     </View>
   );
 };

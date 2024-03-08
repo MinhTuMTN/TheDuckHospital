@@ -6,15 +6,16 @@ import {appColors} from '../constants/appColors';
 import {appInfo} from '../constants/appInfo';
 import {globalStyles} from '../styles/globalStyles';
 import {Space} from '../components';
+import {navigationProps} from '../types';
 
 const SlashScreen = () => {
-  const {reset} = useNavigation();
+  const {reset} = useNavigation<navigationProps>();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       reset({
         index: 0,
-        routes: [{name: 'PatientBottom' as never}],
+        routes: [{name: 'PatientBottom'}],
       });
     }, 1500);
 

@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {createContext, useState, useContext, useEffect} from 'react';
-import Realm, { ObjectSchema } from 'realm';
+import Realm, {ObjectSchema} from 'realm';
+import {updateToken} from '../services/AxiosInstance';
+import {checkToken} from '../services/authServices';
 
 // Interface definition for the context
 interface AuthContextProps {
   token: string | null;
+  userInfo: {
+    fullName: string | null;
+    role: string | null;
+  };
   login: (token: string, rememberMe: boolean) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -12,6 +18,10 @@ interface AuthContextProps {
 // Default values for the context
 const AuthContext = createContext<AuthContextProps>({
   token: null,
+  userInfo: {
+    fullName: null,
+    role: null,
+  },
   login: async () => {},
   logout: async () => {},
 });
@@ -31,6 +41,8 @@ const UserSchema: Realm.ObjectSchema = {
   properties: {
     token: 'string',
     rememberMe: 'bool?',
+    fullName: 'string?',
+    role: 'string?',
   },
 };
 
@@ -47,7 +59,67 @@ const realmConfig: Realm.Configuration = {
 // Provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [token, setToken] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<any>({
+    fullName: null,
+    role: null,
+  });
   const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
+
+  const handleCheckToken = async () => {
+    const response = await checkToken();
+
+    if (response.success && response.data?.data?.valid) {
+      realmInstance?.write(() => {
+        const user = realmInstance.objects('User')[0];
+        if (user) {
+          user.role = response.data.data.role;
+          user.fullName = response.data.data.fullName;
+
+          setUserInfo({
+            fullName: response.data.data.fullName,
+            role: response.data.data.role,
+          });
+        }
+      });
+    } else {
+      logout();
+    }
+  };
+
+  const login = async (newToken: string, rememberMe: boolean) => {
+    try {
+      realmInstance?.write(() => {
+        const user = realmInstance.objects('User')[0];
+        if (user) {
+          user.token = newToken;
+          user.rememberMe = rememberMe;
+        } else {
+          realmInstance.create('User', {token: newToken, rememberMe});
+        }
+      });
+
+      setToken(newToken);
+      updateToken(newToken);
+
+      handleCheckToken();
+    } catch (error) {
+      console.error('Lỗi xảy ra khi đăng nhập: ', error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      realmInstance?.write(() => {
+        const user = realmInstance.objects('User')[0];
+        if (user) {
+          realmInstance.delete(user);
+        }
+      });
+      setToken(null);
+    } catch (error) {
+      console.error('Lỗi xảy ra khi đăng xuất');
+    }
+  };
 
   useEffect(() => {
     const initializeRealm = async () => {
@@ -66,67 +138,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     };
   }, []);
 
-  // Login function
-  // const login = async (newToken: string) => {
-  //   setToken(newToken);
-  //   await AsyncStorage.setItem('token', newToken);
-  // };
-
-  const login = async (newToken: string, rememberMe: boolean) => {
-    try {
-      realmInstance?.write(() => {
-        const user = realmInstance.objects('User')[0];
-        if (user) {
-          user.token = newToken;
-          user.rememberMe = rememberMe;
-        } else {
-          realmInstance.create('User', { token: newToken, rememberMe });
-        }
-      });
-
-      setToken(newToken);
-    } catch (error) {
-      console.error('Lỗi xảy ra khi đăng nhập: ', error);
-    }
-  };
-
-  // Logout function
-  // const logout = async () => {
-  //   setToken(null);
-  //   await AsyncStorage.removeItem('token');
-  // };
-
-  const logout = async () => {
-    try {
-      realmInstance?.write(() => {
-        const user = realmInstance.objects('User')[0];
-        if (user) {
-          realmInstance.delete(user);
-        }
-      });
-      setToken(null);
-    } catch (error) {
-      console.error('Lỗi xảy ra khi đăng xuất');
-    }
-  };
-
-  // Effect for retrieving the token on mount
-  // useEffect(() => {
-  //   const getToken = async () => {
-  //     const storedToken = await AsyncStorage.getItem('token');
-  //     if (storedToken) {
-  //       setToken(storedToken);
-  //     }
-  //   };
-
-  //   getToken();
-  // }, []);
-
   useEffect(() => {
     const getToken = () => {
       const user = realmInstance?.objects('User')[0];
-      if (user && user.rememberMe) {
+      if (user) {
         setToken(user.token as string);
+        updateToken(user.token as string);
+        handleCheckToken();
       }
     };
 
@@ -136,6 +154,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   // The value provided to the context consumers
   const value = {
     token,
+    userInfo,
     login,
     logout,
   };

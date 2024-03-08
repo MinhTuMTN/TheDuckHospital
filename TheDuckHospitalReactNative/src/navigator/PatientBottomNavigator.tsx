@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTranslation} from 'react-i18next';
 import {TextComponent} from '../components';
 import {Text, TouchableOpacity, View} from 'react-native';
+import {appColors} from '../constants/appColors';
 
 const Tab = createBottomTabNavigator();
 
@@ -22,6 +23,15 @@ const PatientBottomNavigator = () => {
       screenOptions={{
         headerShown: false,
         lazy: false,
+        tabBarActiveTintColor: appColors.primary,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        tabBarStyle: {
+          paddingBottom: 2,
+        },
+        tabBarInactiveTintColor: appColors.textDescription,
       }}
       initialRouteName="HomeScreen">
       <Tab.Screen
