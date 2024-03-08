@@ -11,7 +11,11 @@ import {
 } from '@gluestack-ui/themed';
 import {FlexComponent} from '../..';
 
-const AvatarProfile = () => {
+interface AvatarProfileProps {
+  profile: any;
+}
+const AvatarProfile = (props: AvatarProfileProps) => {
+  const {profile} = props;
   const navigation = useNavigation();
   return (
     <View>
@@ -23,11 +27,11 @@ const AvatarProfile = () => {
       {/* Avatar and Name */}
       <View style={styles.avatarText}>
         <Avatar size={'lg'} style={styles.avatar}>
-          <AvatarFallbackText>Nguyen Minh Tu</AvatarFallbackText>
+          <AvatarFallbackText>{profile.fullName}</AvatarFallbackText>
           <AvatarBadge bg="green" />
         </Avatar>
         <Text bold fontSize={20} paddingTop={10} textTransform={'uppercase'}>
-          Nguyễn Minh Tú
+          {profile.fullName}
         </Text>
       </View>
 

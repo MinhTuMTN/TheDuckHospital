@@ -11,3 +11,7 @@ export const searchDoctor = async (
     degree,
   });
 };
+
+export const getAllHeadDoctor = async () => {
+  return getNonAuth(`/doctors/head-doctors`);
+};
