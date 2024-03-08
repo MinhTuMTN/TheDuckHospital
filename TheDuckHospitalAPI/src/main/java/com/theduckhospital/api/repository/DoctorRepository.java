@@ -44,6 +44,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Pageable pageable
     );
 
+    List<Doctor> findAllByHeadOfDepartmentIsTrue();
 
     @Query("SELECT d " +
             "FROM Doctor d " +

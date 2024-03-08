@@ -3,6 +3,7 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.dto.response.doctor.HeadDoctorResponse;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 
@@ -15,7 +16,7 @@ public interface IDoctorServices {
 
     List<Doctor> getDoctorNotInDepartment();
     Doctor getDoctorByToken(String token);
-    
+
     FilteredActiveDoctorsResponse getPaginationActiveDoctorsDepartment(
             String authorization,
             String search,
@@ -32,4 +33,5 @@ public interface IDoctorServices {
     );
 
     Doctor findHeadDoctor(Department department);
+    List<HeadDoctorResponse> getAllHeadDoctors();
 }
