@@ -5,15 +5,18 @@ import {
   ContentLoaderComponent,
   InputComponent,
   SectionComponent,
+  TextComponent,
 } from '../..';
 import {appInfo} from '../../../constants/appInfo';
+import {formatDate} from '../../../utils/dateUtils';
 
 interface DetailsInfomationProps {
   editabled?: boolean;
+  info: any;
 }
 
 const DetailsInfomation = (props: DetailsInfomationProps) => {
-  const {editabled = false} = props;
+  const {editabled = false, info} = props;
   const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(() => {
@@ -30,11 +33,28 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
           <ContentLoaderComponent />
         ) : (
           <>
-            <InputComponent label="Họ và tên" value="Nguyễn Minh Tú" disabled />
-            <InputComponent label="Ngày sinh" value="09/12/2000" disabled />
-            <InputComponent label="Giới tính" value="Nam" disabled />
-            <InputComponent label="CMND/CCCD" value="080012345678" disabled />
-            <InputComponent label="Dân tộc" value="Kinh" disabled />
+            <InputComponent label="Họ và tên" value={info.fullName} disabled />
+            <InputComponent
+              label="Ngày sinh"
+              value={formatDate(info.dateOfBirth)}
+              disabled
+            />
+            <InputComponent
+              label="Giới tính"
+              value={info.gender === 'MALE' ? 'Nam' : 'Nữ'}
+              disabled
+            />
+            <InputComponent
+              label="CCCD/CMND"
+              placeholder="Nhập số CCCD/CMND"
+              value={info.identityNumber}
+              disabled
+            />
+            <InputComponent
+              label="Dân tộc"
+              value={info.nation?.nationName}
+              disabled
+            />
           </>
         )}
       </SectionComponent>
@@ -45,12 +65,13 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
           <>
             <InputComponent
               label="Số điện thoại"
-              value="0987655321"
+              value={info.phoneNumber}
               editabled={false}
             />
             <InputComponent
               label="Email"
-              value="nguyenminhtu@gmail.com"
+              placeholder="Nhập email"
+              value={info.email}
               editabled={false}
             />
           </>
@@ -63,22 +84,22 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
           <>
             <InputComponent
               label="Tỉnh/Thành phố"
-              value="TP Hồ Chí Minh"
+              value={info.province?.provinceName}
               editabled={false}
             />
             <InputComponent
               label="Quận/Huyện"
-              value="Tp Thủ Đức"
+              value={info.district?.districtName}
               editabled={false}
             />
             <InputComponent
               label="Phường/Xã"
-              value="Phường Linh Trung"
+              value={info.ward?.wardName}
               editabled={false}
             />
             <InputComponent
               label="Địa chỉ cụ thể"
-              value="1 Võ Văn Ngân"
+              value={info.streetName}
               editabled={false}
             />
           </>
@@ -89,15 +110,25 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
           <ContentLoaderComponent />
         ) : (
           <>
-            <Barcode
-              value="123456789"
-              text="123456789"
-              textStyle={{color: 'black'}}
-              maxWidth={appInfo.size.width * 0.7}
-              width={appInfo.size.width * 0.7}
-              height={70}
-              format="CODE128"
-            />
+            {info.patientCode ? (
+              <Barcode
+                value={info.patientCode}
+                text={info.patientCode}
+                textStyle={{color: 'black'}}
+                maxWidth={appInfo.size.width * 0.7}
+                width={appInfo.size.width * 0.7}
+                height={70}
+                format="CODE128"
+              />
+            ) : (
+              <TextComponent
+                textAlign="center"
+                style={{
+                  paddingVertical: 8,
+                }}>
+                Chưa cập nhật mã bệnh nhân
+              </TextComponent>
+            )}
           </>
         )}
       </SectionComponent>

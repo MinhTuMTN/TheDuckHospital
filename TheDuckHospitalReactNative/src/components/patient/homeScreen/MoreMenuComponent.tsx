@@ -64,7 +64,7 @@ const MoreMenuComponent = (props: MoreMenuComponentProps) => {
       setShowMoreMenu(true);
       offsetValue.value = withSpring(0, {duration: 1000});
     } else {
-      offsetValue.value = withSpring(initOffset, {duration: 2000});
+      offsetValue.value = withSpring(initOffset, {duration: 1000});
 
       timeoutId = setTimeout(() => {
         setShowMoreMenu(false);

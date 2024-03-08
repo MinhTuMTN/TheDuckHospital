@@ -22,12 +22,12 @@ import {
   SelectComponent,
   TextComponent,
 } from '../../../components';
-import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
+import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
+import {getAllDepartment} from '../../../services/bookingServices';
 
 const degreeData = [
   {
@@ -309,7 +309,7 @@ const ChooseDoctorsScreen = () => {
             });
           }
         }}
-        onEndReachedThreshold={0.3}
+        onEndReachedThreshold={0.5}
         ListFooterComponent={listFooterComponent}
       />
     </View>

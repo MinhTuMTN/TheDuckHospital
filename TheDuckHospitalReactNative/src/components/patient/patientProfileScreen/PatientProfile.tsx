@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import {FlexComponent} from '../..';
 import {Box, Card, Text} from '@gluestack-ui/themed';
 import {formatDate} from '../../../utils/dateUtils';
+import {navigationProps} from '../../../types';
 
 interface RowProps {
   icon: React.ReactNode;
@@ -67,10 +68,12 @@ const PatientProfile = (props: PatientProfileProps) => {
   const {profile, onPress} = props;
 
   const {t} = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<navigationProps>();
 
   const handleViewDetailsClick = () => {
-    navigation.navigate('DetailsProfileScreen' as never);
+    navigation.navigate('DetailsProfileScreen', {
+      profile: profile,
+    });
   };
   return (
     <View style={{paddingBottom: 20, backgroundColor: '#00000000'}}>

@@ -15,3 +15,7 @@ export const searchDoctor = async (
     limit,
   });
 };
+
+export const getAllHeadDoctor = async () => {
+  return getNonAuth(`/doctors/head-doctors`);
+};

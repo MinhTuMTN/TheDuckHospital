@@ -4,6 +4,7 @@ export const appColors = {
   lightPrimary: '#9ad6ef',
   darkGreen: '#0891B2',
   gray: '#ebeced',
+  grayLight: '#8C8C8C',
   lightGray: '#f1f1f1',
   textPrimary: '#00adeb',
   textGray: '#34515d',
