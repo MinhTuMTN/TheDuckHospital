@@ -16,6 +16,13 @@ import LoginScreen from './src/screens/auth/LoginScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import {AuthProvider} from './src/auth/AuthProvider';
+import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
+import 'react-native-gesture-handler';
+import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
+import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
+import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
+import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
+import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,38 +35,62 @@ const App = () => {
         translucent={true}
       />
       <AuthProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="SlashScreen"
-          screenOptions={{
-            headerShown: false,
-          }}>
-          <Stack.Screen name="SlashScreen" component={SlashScreen} />
-          <Stack.Screen
-            name="PatientBottom"
-            component={PatientBottomNavigator}
-          />
-          <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
-          <Stack.Screen
-            name="DetailsProfileScreen"
-            component={DetailsProfileScreen}
-          />
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-          <Stack.Screen
-            name="ForgotPasswordScreen"
-            component={ForgotPasswordScreen}
-          />
-          <Stack.Screen
-            name="ChangePasswordScreen"
-            component={ChangePasswordScreen}
-          />
-          <Stack.Screen
-            name="VerifyPhoneScreen"
-            component={VerifyPhoneScreen}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="SlashScreen"
+            screenOptions={{
+              headerShown: false,
+            }}>
+            <Stack.Screen name="SlashScreen" component={SlashScreen} />
+            <Stack.Screen
+              name="PatientBottom"
+              component={PatientBottomNavigator}
+            />
+            <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
+            <Stack.Screen
+              name="DetailsProfileScreen"
+              component={DetailsProfileScreen}
+            />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+            <Stack.Screen
+              name="ForgotPasswordScreen"
+              component={ForgotPasswordScreen}
+            />
+            <Stack.Screen
+              name="ChangePasswordScreen"
+              component={ChangePasswordScreen}
+            />
+            <Stack.Screen
+              name="VerifyPhoneScreen"
+              component={VerifyPhoneScreen}
+            />
+            <Stack.Screen
+              name="AdminLeftSideDrawer"
+              component={AdminLeftSideDrawer}
+            />
+            <Stack.Screen
+              name="DepartmentDetailScreen"
+              component={DepartmentDetailScreen}
+            />
+            <Stack.Screen
+              name="StaffDetailScreen"
+              component={StaffDetailScreen}
+            />
+            <Stack.Screen
+              name="PatientDetailScreen"
+              component={PatientDetailScreen}
+            />
+            <Stack.Screen
+              name="PatientProfileDetailScreen"
+              component={PatientProfileDetailScreen}
+            />
+            <Stack.Screen
+              name="TransactionDetailScreen"
+              component={TransactionDetailScreen}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
       </AuthProvider>
     </GluestackUIProvider>
   );
