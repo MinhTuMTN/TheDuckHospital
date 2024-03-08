@@ -14,6 +14,13 @@ import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
+import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
+import 'react-native-gesture-handler';
+import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
+import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
+import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
+import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
+import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import TestScreen from './src/screens/TestScreen';
@@ -60,6 +67,30 @@ const App = () => {
             <Stack.Screen
               name="VerifyPhoneScreen"
               component={VerifyPhoneScreen}
+            />
+            <Stack.Screen
+              name="AdminLeftSideDrawer"
+              component={AdminLeftSideDrawer}
+            />
+            <Stack.Screen
+              name="DepartmentDetailScreen"
+              component={DepartmentDetailScreen}
+            />
+            <Stack.Screen
+              name="StaffDetailScreen"
+              component={StaffDetailScreen}
+            />
+            <Stack.Screen
+              name="PatientDetailScreen"
+              component={PatientDetailScreen}
+            />
+            <Stack.Screen
+              name="PatientProfileDetailScreen"
+              component={PatientProfileDetailScreen}
+            />
+            <Stack.Screen
+              name="TransactionDetailScreen"
+              component={TransactionDetailScreen}
             />
             <Stack.Screen
               name="DetailsMedicalBillScreen"
