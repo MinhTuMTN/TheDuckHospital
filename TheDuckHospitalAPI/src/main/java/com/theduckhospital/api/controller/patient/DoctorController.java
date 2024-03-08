@@ -18,6 +18,17 @@ public class DoctorController {
         this.doctorServices = doctorServices;
     }
 
+    @GetMapping("/head-doctors")
+    public ResponseEntity<?> getAllHeadDoctors() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all head doctors successfully")
+                        .data(doctorServices.getAllHeadDoctors())
+                        .build()
+        );
+    }
+
     @GetMapping
     public ResponseEntity<?> getMedicalExaminationDoctors(
             @RequestParam(name = "fullName", required = false, defaultValue = "") String fullName,
@@ -36,7 +47,8 @@ public class DoctorController {
                                         departmentId,
                                         degree,
                                         page,
-                                        limit))
+                                        limit)
+                        )
                         .build()
         );
     }

@@ -16,20 +16,20 @@ interface MoreMenuComponentProps {
 
 const items = [
   {
-    text: 'homeScreen.makeAppointment',
+    text: 'homeScreen.makeAppointmentNoNewLine',
     image: require('../../../assets/images/appointment.png'),
     screenNavigate: 'ChooseDoctorsScreen',
   },
   {
-    text: 'homeScreen.lookupMedicalResult',
+    text: 'homeScreen.lookupMedicalResultNoNewLine',
     image: require('../../../assets/images/loupe.png'),
   },
   {
-    text: 'homeScreen.payHospitalFee',
+    text: 'homeScreen.payHospitalFeeNoNewLine',
     image: require('../../../assets/images/payment.png'),
   },
   {
-    text: 'homeScreen.medicineReminder',
+    text: 'homeScreen.medicineReminderNoNewLine',
     image: require('../../../assets/images/animal.png'),
   },
   {

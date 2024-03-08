@@ -6,6 +6,7 @@ import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.ActiveDoctorResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.dto.response.doctor.HeadDoctorResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class DoctorServicesImpl implements IDoctorServices {
@@ -69,7 +71,7 @@ public class DoctorServicesImpl implements IDoctorServices {
     public List<Doctor> getDoctorNotInDepartment() {
         return doctorRepository.findByDepartmentIsNull();
     }
-    
+
     public Doctor getDoctorByToken(String token) {
         // Remove "Bearer " from token
         token = token.substring(7);
@@ -134,7 +136,7 @@ public class DoctorServicesImpl implements IDoctorServices {
         Department department = null;
         if (departmentId != null) {
             department = departmentServices.getDepartmentById(departmentId);
-        } 
+        }
 
         Page<Doctor> doctors;
 //        if (degree == null)
@@ -202,5 +204,12 @@ public class DoctorServicesImpl implements IDoctorServices {
                     .orElse(null);
         }
         return null;
+    }
+
+    @Override
+    public List<HeadDoctorResponse> getAllHeadDoctors() {
+        return doctorRepository.findAllByHeadOfDepartmentIsTrue().stream()
+                .map(doctor -> new HeadDoctorResponse(doctor, doctor.getDepartment()))
+                .collect(Collectors.toList());
     }
 }

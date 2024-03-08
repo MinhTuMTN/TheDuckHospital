@@ -28,6 +28,7 @@ public class Staff {
     protected Date dateOfBirth;
     protected Date createdAt;
     protected Date lastModifiedAt;
+    protected String avatar;
     protected boolean deleted;
     protected String msGraphId;
 

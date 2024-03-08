@@ -2,10 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import Realm, {ObjectSchema} from 'realm';
 import {updateToken} from '../services/AxiosInstance';
+import {checkToken} from '../services/authServices';
 
 // Interface definition for the context
 interface AuthContextProps {
   token: string | null;
+  userInfo: {
+    fullName: string | null;
+    role: string | null;
+  };
   login: (token: string, rememberMe: boolean) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -13,6 +18,10 @@ interface AuthContextProps {
 // Default values for the context
 const AuthContext = createContext<AuthContextProps>({
   token: null,
+  userInfo: {
+    fullName: null,
+    role: null,
+  },
   login: async () => {},
   logout: async () => {},
 });
@@ -50,7 +59,32 @@ const realmConfig: Realm.Configuration = {
 // Provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [token, setToken] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<any>({
+    fullName: null,
+    role: null,
+  });
   const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
+
+  const handleCheckToken = async () => {
+    const response = await checkToken();
+
+    if (response.success && response.data?.data?.valid) {
+      realmInstance?.write(() => {
+        const user = realmInstance.objects('User')[0];
+        if (user) {
+          user.role = response.data.data.role;
+          user.fullName = response.data.data.fullName;
+
+          setUserInfo({
+            fullName: response.data.data.fullName,
+            role: response.data.data.role,
+          });
+        }
+      });
+    } else {
+      logout();
+    }
+  };
 
   const login = async (newToken: string, rememberMe: boolean) => {
     try {
@@ -65,6 +99,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       });
 
       setToken(newToken);
+      updateToken(newToken);
+
+      handleCheckToken();
     } catch (error) {
       console.error('Lỗi xảy ra khi đăng nhập: ', error);
     }
@@ -81,20 +118,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       setToken(null);
     } catch (error) {
       console.error('Lỗi xảy ra khi đăng xuất');
-    }
-  };
-
-  const updateInfo = async (fullName: string, role: string) => {
-    try {
-      realmInstance?.write(() => {
-        const user = realmInstance.objects('User')[0];
-        if (user) {
-          user.fullName = fullName;
-          user.role = role;
-        }
-      });
-    } catch (error) {
-      console.error('Lỗi xảy ra khi cập nhật thông tin người dùng: ', error);
     }
   };
 
@@ -118,9 +141,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   useEffect(() => {
     const getToken = () => {
       const user = realmInstance?.objects('User')[0];
-      if (user && user.rememberMe) {
+      if (user) {
         setToken(user.token as string);
         updateToken(user.token as string);
+        handleCheckToken();
       }
     };
 
@@ -130,9 +154,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   // The value provided to the context consumers
   const value = {
     token,
+    userInfo,
     login,
     logout,
-    updateInfo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

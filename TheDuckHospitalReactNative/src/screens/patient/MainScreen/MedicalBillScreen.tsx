@@ -12,6 +12,7 @@ import {
 import FilterComponent from '../../../components/FilterComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllBooking} from '../../../services/bookingServices';
+import {useAuth} from '../../../auth/AuthProvider';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
@@ -22,6 +23,7 @@ const MedicalBillScreen = () => {
   const [bookingToDisplay, setBookingToDisplay] = useState([]);
 
   const {t} = useTranslation();
+  const auth = useAuth();
 
   const _renderItem = ({item}: any) => {
     return (
@@ -59,8 +61,8 @@ const MedicalBillScreen = () => {
       }
     };
 
-    handleGetAllBooking();
-  }, []);
+    if (auth.token) handleGetAllBooking();
+  }, [auth.token]);
 
   useEffect(() => {
     setIsLoadingAPI(true);

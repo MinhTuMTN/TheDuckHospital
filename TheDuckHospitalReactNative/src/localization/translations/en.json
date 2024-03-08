@@ -3,9 +3,13 @@
     "hello": "Hi",
     "welcome": "Welcome back!",
     "makeAppointment": "Make an appointment",
+    "makeAppointmentNoNewLine": "Make an appointment",
     "lookupMedicalResult": "Lookup medical result",
+    "lookupMedicalResultNoNewLine": "Lookup medical result",
     "payHospitalFee": "Pay hospital fee",
+    "payHospitalFeeNoNewLine": "Pay hospital fee",
     "medicineReminder": "Medicine reminder",
+    "medicineReminderNoNewLine": "Medicine reminder",
     "quickSupport": "Quick support",
     "viewMore": "View more",
     "instructionBooking": "Instruction for booking",
@@ -28,7 +32,15 @@
     }
   },
   "account": {
-    "language": "Language"
+    "generalSettings": "General Settings",
+    "language": "Language",
+    "changePassword": "Change Password",
+    "notificationSettings": "Notification Settings",
+    "contactSupport": "Contact Support",
+    "hotline": "Hotline 1900-1234",
+    "ratingApp": "Rating App",
+    "shareApp": "Share App",
+    "signOut": "Sign Out"
   },
   "notification": {
     "title": "Notification"

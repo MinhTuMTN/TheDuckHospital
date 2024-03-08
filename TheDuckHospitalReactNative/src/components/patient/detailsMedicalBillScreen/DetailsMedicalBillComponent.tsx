@@ -164,19 +164,17 @@ const DetailsMedicalBillComponent = (
             {booking?.patientCode || 'Đang cập nhật'}
           </TextComponent>
         </View>
-        {booking?.patientCode && (
-          <Barcode
-            value={booking?.patientCode}
-            text={booking?.patientCode}
-            format="CODE128"
-            height={60}
-            maxWidth={120}
-            textStyle={{
-              color: appColors.black,
-              fontWeight: '500',
-            }}
-          />
-        )}
+        <Barcode
+          value={booking?.bookingCode || '12345678'}
+          text={booking?.bookingCode || '12345678'}
+          format="CODE128"
+          height={60}
+          maxWidth={120}
+          textStyle={{
+            color: appColors.black,
+            fontWeight: '500',
+          }}
+        />
       </View>
 
       <Space paddingTop={60} />

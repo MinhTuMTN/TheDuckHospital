@@ -1,6 +1,6 @@
 import {Fab} from '@gluestack-ui/themed';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   FlatList,
@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {Headset, Search, Typing} from '../../../assets/svgs';
+import {useAuth} from '../../../auth/AuthProvider';
 import {MoreMenuComponent, TextComponent} from '../../../components';
+import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {styled} from 'nativewind';
-import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
 
 const HomeScreen = () => {
@@ -27,6 +27,12 @@ const HomeScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation();
+  const auth = useAuth();
+  const fullName = useMemo(() => {
+    const name = auth.userInfo?.fullName?.split(' ');
+
+    return name ? `${name[name.length - 2]} ${name[name.length - 1]}` : '';
+  }, [auth.userInfo?.fullName]);
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
