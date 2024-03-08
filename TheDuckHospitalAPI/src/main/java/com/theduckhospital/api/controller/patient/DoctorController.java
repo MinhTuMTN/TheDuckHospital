@@ -36,7 +36,8 @@ public class DoctorController {
                                         departmentId,
                                         degree,
                                         page,
-                                        limit))
+                                        limit)
+                        )
                         .build()
         );
     }

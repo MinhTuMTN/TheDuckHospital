@@ -1,5 +1,21 @@
-import {View, Text, FlatList, ActivityIndicator} from 'react-native';
-import React, {memo, useCallback, useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {
+  ActivityIndicator,
+  DimensionValue,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {useDebounce} from 'use-debounce';
+import {Filter} from '../../../assets/svgs';
 import {
   InputComponent,
   NotFoundComponent,
@@ -7,18 +23,13 @@ import {
   TextComponent,
 } from '../../../components';
 import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
-import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {Expand, ExpandInWhite, Filter} from '../../../assets/svgs';
-import {
-  getAllDepartment,
-  getAllDoctor,
-} from '../../../services/bookingServices';
+import {appInfo} from '../../../constants/appInfo';
+import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
-import {set} from '@gluestack-style/react';
+import {navigationProps} from '../../../types';
 
-const data = [
+const degreeData = [
   {
     id: 'BS',
     degree: 'Bác sĩ',
@@ -40,28 +51,46 @@ const data = [
     degree: 'Giáo sư',
   },
 ];
-const LoadmoreItem = memo(() => {
-  return (
-    <View
-      style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 10,
-      }}>
-      <ActivityIndicator size="small" color={appColors.primary} />
-    </View>
-  );
-});
 
 const ChooseDoctorsScreen = () => {
-  const [doctors, setDoctors] = React.useState([]);
-  const [initNumber, setInitNumber] = React.useState(0);
+  const [doctors, setDoctors] = React.useState<any>([]);
+  const [pagination, setPagination] = React.useState({
+    page: 1,
+    limit: 6,
+    totalPages: 0,
+  });
   const [departments, setDepartments] = React.useState([]);
   const [selectedDepartment, setSelectedDepartment] = React.useState<any>(null);
   const [selectedDegree, setSelectedDegree] = React.useState<any>(null);
   const [searchText, setSearchText] = React.useState('');
+  const [debouncedSearchText] = useDebounce(searchText, 500);
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
 
+  // Animation Filter
+  const offsetValue = useSharedValue(-100);
+  const displayValue = useSharedValue<'none' | 'flex' | undefined>('none');
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: offsetValue.value}],
+      display: displayValue.value,
+    };
+  });
+  const handleFilterClick = () => {
+    if (offsetValue.value === -100) {
+      offsetValue.value = withSpring(0, {
+        duration: 1000,
+      });
+      displayValue.value = 'flex';
+    } else {
+      offsetValue.value = withSpring(-100, {
+        duration: 500,
+      });
+      displayValue.value = 'none';
+    }
+  };
+  // End Animation Filter
+
+  const navigation = useNavigation<navigationProps>();
   const renderItem = useCallback(({item}: {item: any}) => {
     return <DoctorInfoComponent item={item} />;
   }, []);
@@ -69,27 +98,89 @@ const ChooseDoctorsScreen = () => {
     (item: any, index: number) => `doctor-${item.id}-${index}`,
     [],
   );
+  const listFooterComponent = useMemo(() => {
+    let _renderUI;
+    let _renderHeight: DimensionValue | undefined;
+    if (isLoadingAPI) {
+      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
+    } else if (doctors.length === 0) {
+      _renderUI = (
+        <NotFoundComponent
+          imageSrc={require('../../../assets/images/animal.png')}
+          desc="Không tìm thấy kết quả phù hợp"
+          descStyle={{
+            fontWeight: '400',
+          }}
+        />
+      );
+      _renderHeight = appInfo.size.height * 0.7;
+    } else if (pagination.page === pagination.totalPages) {
+      _renderUI = (
+        <TextComponent
+          fontSize={14}
+          fontWeight="400"
+          color={appColors.black}
+          textAlign="center">
+          Không còn dữ liệu để hiển thị
+        </TextComponent>
+      );
+    } else {
+      _renderUI = null;
+    }
+    return (
+      <View
+        style={{
+          height: _renderHeight,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: 20,
+        }}>
+        {_renderUI}
+      </View>
+    );
+  }, [isLoadingAPI, doctors, pagination.page, pagination.totalPages]);
 
-  useEffect(() => {
-    const timeOutId = setTimeout(() => {
-      setInitNumber(5);
-    }, 300);
+  const handleChangedText = (text: string) => {
+    setSearchText(text);
+    setPagination((prevState: any) => ({
+      ...prevState,
+      page: 1,
+    }));
+  };
+  const handleSearchDoctor = useCallback(async () => {
+    setIsLoadingAPI(true);
+    const response = await searchDoctor(
+      debouncedSearchText,
+      selectedDepartment?.departmentId,
+      selectedDegree?.id,
+      pagination.page,
+      pagination.limit,
+    );
+    setIsLoadingAPI(false);
 
-    return () => clearTimeout(timeOutId);
-  }, []);
-
-  useEffect(() => {
-    const handleGetAllDoctor = async () => {
-      const respone = await getAllDoctor(2, 1);
-
-      if (respone.success) {
-        setDoctors(respone.data.data.items);
+    if (response.success) {
+      if (pagination.page === 1) {
+        setDoctors(response.data.data.items);
       } else {
-        console.log('Error: ', respone.error);
+        setDoctors((prevState: any) => [
+          ...prevState,
+          ...response.data.data.items,
+        ]);
       }
-    };
-    handleGetAllDoctor();
-  }, []);
+      setPagination({
+        ...pagination,
+        totalPages: response.data.data.totalPages,
+      });
+    } else {
+      console.log('Error: ', response.error);
+    }
+  }, [
+    debouncedSearchText,
+    selectedDepartment,
+    selectedDegree,
+    pagination.page,
+    pagination.limit,
+  ]);
 
   useEffect(() => {
     const handleGetAllDepartment = async () => {
@@ -105,34 +196,19 @@ const ChooseDoctorsScreen = () => {
   }, []);
 
   useEffect(() => {
-    const handleSearchDoctor = async () => {
-      setIsLoadingAPI(true);
-      const response = await searchDoctor(
-        searchText,
-        selectedDepartment?.departmentId,
-        selectedDegree?.id,
-      );
-      setIsLoadingAPI(false);
-
-      if (response.success) {
-        setDoctors(response.data.data.items);
-      } else {
-        console.log('Error: ', response.error);
-      }
-    };
-
     handleSearchDoctor();
-  }, [searchText, selectedDepartment, selectedDegree]);
-
-  const handleChangedText = (text: string) => {
-    setSearchText(text);
-  };
+  }, [handleSearchDoctor]);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.mainHeader}>
-          <Icon name="chevron-back" size={30} color={appColors.black} />
+          <Icon
+            name="chevron-back"
+            size={30}
+            color={appColors.black}
+            onPress={() => navigation.goBack()}
+          />
           <TextComponent
             fontSize={18}
             fontWeight="700"
@@ -141,9 +217,9 @@ const ChooseDoctorsScreen = () => {
             uppercase>
             Chọn bác sĩ
           </TextComponent>
-          <Filter width={30} height={30} />
+          <Filter width={30} height={30} onPress={handleFilterClick} />
         </View>
-        <View style={styles.bodyHeard}>
+        <Animated.View style={[styles.bodyHeard, animatedStyles]}>
           <InputComponent
             variant="rounded"
             placeholder="Tìm kiếm bác sĩ"
@@ -164,13 +240,16 @@ const ChooseDoctorsScreen = () => {
               <Text style={{fontSize: 14, color: appColors.black}}>Bộ lọc</Text>
             </View>
             <SelectComponent
-              options={data}
+              options={degreeData}
               keyTitle="degree"
               value={selectedDegree}
               size="md"
               onChange={selectedDegree => {
                 setSelectedDegree(selectedDegree);
-                console.log('Selected degree: ', selectedDegree);
+                setPagination((prevState: any) => ({
+                  ...prevState,
+                  page: 1,
+                }));
               }}
               selectInputStyle={{
                 backgroundColor: appColors.primary,
@@ -191,6 +270,10 @@ const ChooseDoctorsScreen = () => {
               size="md"
               onChange={selectedDepartment => {
                 setSelectedDepartment(selectedDepartment);
+                setPagination((prevState: any) => ({
+                  ...prevState,
+                  page: 1,
+                }));
               }}
               selectInputStyle={{
                 backgroundColor: appColors.primary,
@@ -209,47 +292,26 @@ const ChooseDoctorsScreen = () => {
               selectTextSize={14}
             />
           </View>
-        </View>
+        </Animated.View>
       </View>
 
-      {initNumber === 0 && (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <ActivityIndicator size="large" color={appColors.primary} />
-        </View>
-      )}
-
-      {isLoadingAPI ? (
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <ActivityIndicator size="large" color={appColors.primary} />
-        </View>
-      ) : doctors.length > 0 ? (
-        <FlatList
-          data={doctors}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          style={{width: '100%'}}
-          initialNumToRender={initNumber}
-          onEndReached={e => {
-            console.log('Load more');
-
-            // Add LoadmoreItem to the end of the list
-            // setDoctors
-          }}
-        />
-      ) : (
-        <NotFoundComponent
-          imageSrc={require('../../../assets/images/animal.png')}
-          desc="Không tìm thấy kết quả phù hợp"
-          descStyle={{
-            fontWeight: '400',
-          }}
-        />
-      )}
+      <FlatList
+        data={doctors}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        style={{width: '100%'}}
+        initialNumToRender={5}
+        onEndReached={e => {
+          if (pagination.page < pagination.totalPages) {
+            setPagination({
+              ...pagination,
+              page: pagination.page + 1,
+            });
+          }
+        }}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={listFooterComponent}
+      />
     </View>
   );
 };
