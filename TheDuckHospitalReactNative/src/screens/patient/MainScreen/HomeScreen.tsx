@@ -64,9 +64,8 @@ const HomeScreen = () => {
       const respone = await getAllHeadDoctor();
 
       if (respone.success) {
-        setListDoctor(respone.data.data);
+        setListDoctor(respone.data?.data);
       }
-      console.log(respone.data.data);
     };
     handlegetAllHeadDoctor();
   }, []);
@@ -75,7 +74,11 @@ const HomeScreen = () => {
     navigation.navigate('ChooseDoctorsScreen' as never);
   };
   const handleNavigateTestScreen = () => {
-    navigation.navigate('TestScreen' as never);
+    navigation.navigate('ChooseDateScreen' as never);
+  };
+
+  const handleNavigateMedicalExaminationHistoryScreen = () => {
+    navigation.navigate('AllPatientProfilesScreen' as never);
   };
 
   useEffect(() => {
@@ -111,7 +114,7 @@ const HomeScreen = () => {
                 <TextComponent color={appColors.white} fontSize={20}>
                   {t('homeScreen.hello')}{' '}
                   <TextComponent bold color={appColors.white} fontSize={20}>
-                    Hạ Băng,
+                    {fullName},
                   </TextComponent>
                 </TextComponent>
                 <TextComponent color={appColors.white}>
@@ -142,7 +145,7 @@ const HomeScreen = () => {
               </TextComponent>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleNavigateTestScreen}
+              onPress={handleNavigateMedicalExaminationHistoryScreen}
               className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-b-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/loupe.png')}
@@ -152,7 +155,9 @@ const HomeScreen = () => {
                 {t('homeScreen.lookupMedicalResult')}
               </TextComponent>
             </TouchableOpacity>
-            <View className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
+            <TouchableOpacity
+              onPress={handleNavigateTestScreen}
+              className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/payment.png')}
                 className="w-12 h-12"
@@ -160,7 +165,7 @@ const HomeScreen = () => {
               <TextComponent textAlign="center" fontSize={14}>
                 {t('homeScreen.payHospitalFee')}
               </TextComponent>
-            </View>
+            </TouchableOpacity>
             <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/animal.png')}

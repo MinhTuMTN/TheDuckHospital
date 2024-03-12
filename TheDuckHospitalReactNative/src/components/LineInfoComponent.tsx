@@ -1,11 +1,11 @@
 import {
   View,
-  Text,
   TextStyle,
   StyleProp,
   ColorValue,
   StyleSheet,
   FlexAlignType,
+  ViewStyle,
 } from 'react-native';
 import React from 'react';
 import {TextComponent} from '.';
@@ -13,7 +13,7 @@ import {TextComponent} from '.';
 interface Props {
   startIcon?: any;
   label: string;
-  value: string;
+  value?: string;
   labelStyles?: StyleProp<TextStyle>;
   valueStyles?: StyleProp<TextStyle>;
   labelColor?: ColorValue;
@@ -22,6 +22,10 @@ interface Props {
   flexValue?: number;
   justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between';
   alignItems?: FlexAlignType | undefined;
+  labelUppercase?: boolean;
+  valueUppercase?: boolean;
+  containerStyles?: StyleProp<ViewStyle>;
+  containerFlex?: number;
 }
 
 const LineInfoComponent = (props: Props) => {
@@ -45,21 +49,39 @@ const LineInfoComponent = (props: Props) => {
     flexValue = 1,
     justifyContent = 'flex-start',
     alignItems = 'center',
+    labelUppercase = false,
+    valueUppercase = false,
+    containerFlex,
+    containerStyles,
   } = props;
   return (
     <View
-      style={{
-        ...styles.container,
-        justifyContent: justifyContent,
-        alignItems,
-      }}>
+      style={[
+        {
+          ...styles.container,
+          justifyContent: justifyContent,
+          alignItems,
+          flex: containerFlex,
+        },
+        containerStyles,
+      ]}>
       {startIcon && startIcon}
-      <TextComponent color={labelColor} style={labelStyles} flex={flexLabel}>
+      <TextComponent
+        color={labelColor}
+        style={labelStyles}
+        flex={flexLabel}
+        uppercase={labelUppercase}>
         {label}
       </TextComponent>
-      <TextComponent color={valueColor} style={valueStyles} flex={flexValue}>
-        {value}
-      </TextComponent>
+      {value && (
+        <TextComponent
+          color={valueColor}
+          style={valueStyles}
+          flex={flexValue}
+          uppercase={valueUppercase}>
+          {value}
+        </TextComponent>
+      )}
     </View>
   );
 };

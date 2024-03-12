@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   ColorValue,
+  TextStyle,
 } from 'react-native';
 import React from 'react';
 import {Text} from '@gluestack-ui/themed';
@@ -36,7 +37,7 @@ interface ButtonComponentProps {
   italic?: boolean;
   padding?: number;
   containerStyles?: StyleProp<ViewStyle>;
-  textStyles?: StyleProp<ViewStyle>;
+  textStyles?: StyleProp<TextStyle>;
   enabled?: boolean;
   onPress?: () => void | any;
   isLoading?: boolean;
