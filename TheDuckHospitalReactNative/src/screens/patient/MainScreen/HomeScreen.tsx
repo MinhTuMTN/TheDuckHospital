@@ -83,6 +83,10 @@ const HomeScreen = () => {
     navigation.navigate('AllPatientProfilesScreen' as never);
   };
 
+  const handlNavigateConfirmBookingInformationScreen = () => {
+    navigation.navigate('ConfirmBookingInformationScreen' as never);
+  };
+
   useEffect(() => {
     if (showMoreMenu) {
       navigation.setOptions({
@@ -179,7 +183,10 @@ const HomeScreen = () => {
                 {t('homeScreen.medicineReminder')}
               </TextComponent>
             </TouchableOpacity>
-            <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
+
+            <TouchableOpacity
+              onPress={handlNavigateConfirmBookingInformationScreen}
+              className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/chat.png')}
                 className="w-12 h-12"
@@ -187,7 +194,7 @@ const HomeScreen = () => {
               <TextComponent textAlign="center" fontSize={14}>
                 {t('homeScreen.quickSupport')}
               </TextComponent>
-            </View>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setShowMoreMenu(!showMoreMenu)}
               className="w-1/3 h-1/2 items-center justify-center py-4 border-[#D5CFCF]">

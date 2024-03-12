@@ -26,6 +26,7 @@ interface Props {
   valueUppercase?: boolean;
   containerStyles?: StyleProp<ViewStyle>;
   containerFlex?: number;
+  paddingStart?: number;
 }
 
 const LineInfoComponent = (props: Props) => {
@@ -53,6 +54,7 @@ const LineInfoComponent = (props: Props) => {
     valueUppercase = false,
     containerFlex,
     containerStyles,
+    paddingStart,
   } = props;
   return (
     <View
@@ -67,6 +69,7 @@ const LineInfoComponent = (props: Props) => {
       ]}>
       {startIcon && startIcon}
       <TextComponent
+        paddingStart={paddingStart}
         color={labelColor}
         style={labelStyles}
         flex={flexLabel}

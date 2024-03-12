@@ -18,6 +18,7 @@ interface Props {
   backButtonColor?: ColorValue | undefined;
   paddingTop?: number;
   paddingBottom?: number;
+  paddingStart?: number;
   uppercase?: boolean;
 }
 
@@ -33,6 +34,7 @@ const Header = (props: Props) => {
     paddingBottom,
     titleColor,
     backIcon,
+    paddingStart,
     uppercase = true,
     backgroundColor,
   } = props;
@@ -69,7 +71,11 @@ const Header = (props: Props) => {
         </View>
         {title && (
           <TextComponent
-            style={{flex: 4, textAlign: 'center'}}
+            style={{
+              flex: 4,
+              textAlign: 'center',
+            }}
+            paddingStart={paddingStart}
             uppercase={uppercase}
             bold
             fontSize={titleSize}

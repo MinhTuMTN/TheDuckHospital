@@ -29,6 +29,8 @@ import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExamin
 import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults/AllPatientProfilesScreen';
 import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
+import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -119,6 +121,14 @@ const App = () => {
             <Stack.Screen
               name="MedicineReminderScreen"
               component={MedicineReminderScreen}
+            />
+            <Stack.Screen
+              name="ConfirmBookingInformationScreen"
+              component={ConfirmBookingInformationScreen}
+            />
+            <Stack.Screen
+              name="BillingInformationScreen"
+              component={BillingInformationScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>
