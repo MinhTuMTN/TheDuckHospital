@@ -1,6 +1,6 @@
 import React from 'react';
 import {appColors} from '../constants/appColors';
-import {ColorValue, ImageBackground, Text, View} from 'react-native';
+import {ColorValue, ImageBackground, Pressable, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {FlexComponent, TextComponent} from '.';
@@ -14,6 +14,7 @@ interface Props {
   showBackButton?: boolean;
   icon?: React.ReactNode;
   noBackground?: boolean;
+  backIcon?: React.ReactNode;
   backButtonColor?: ColorValue | undefined;
   paddingTop?: number;
   paddingBottom?: number;
@@ -31,6 +32,7 @@ const Header = (props: Props) => {
     paddingTop,
     paddingBottom,
     titleColor,
+    backIcon,
     uppercase = true,
     backgroundColor,
   } = props;
@@ -52,13 +54,18 @@ const Header = (props: Props) => {
           paddingTop: 10,
         }}>
         <View style={{flex: 1}}>
-          {showBackButton && (
-            <ChevronLeft
-              size={30}
-              color={backButtonColor || 'white'}
-              onPress={() => navigation.goBack()}
-            />
-          )}
+          {showBackButton &&
+            (backIcon ? (
+              <Pressable onPress={() => navigation.goBack()}>
+                {backIcon}
+              </Pressable>
+            ) : (
+              <ChevronLeft
+                size={30}
+                color={backButtonColor || 'white'}
+                onPress={() => navigation.goBack()}
+              />
+            ))}
         </View>
         {title && (
           <TextComponent

@@ -1,6 +1,6 @@
 import {Info} from 'lucide-react-native';
-import React, {useCallback, useMemo, useRef} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {ActivityIndicator, Pressable, StyleSheet, View} from 'react-native';
 import {
   ContainerComponent,
   ContentComponent,
@@ -18,6 +18,7 @@ import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {appInfo} from '../../../constants/appInfo';
 
 const ChooseDateScreen = () => {
+  const [isRenderingUI, setIsRenderingUI] = React.useState(true);
   const [month, setMonth] = React.useState({
     month: dayjs().month() + 1,
     year: dayjs().year(),
@@ -102,6 +103,9 @@ const ChooseDateScreen = () => {
     [month],
   );
 
+  useEffect(() => {
+    setIsRenderingUI(false);
+  }, []);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -112,50 +116,61 @@ const ChooseDateScreen = () => {
           backButtonColor={appColors.textDarker}
         />
 
-        <ContentComponent>
-          <View style={styles.infoContainer}>
-            <Info size={25} color={appColors.primary} />
-            <TextComponent flex={1} textAlign="justify">
-              Vui lòng chọn ngày khám phù hợp với lịch trình của bạn. Chúng tôi
-              hỗ trợ đặt lịch khám trước từ{' '}
-              <TextComponent bold>1 đến 30 ngày</TextComponent>.
-            </TextComponent>
+        {isRenderingUI ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <ActivityIndicator size={'large'} color={appColors.primary} />
           </View>
+        ) : (
+          <ContentComponent>
+            <View style={styles.infoContainer}>
+              <Info size={25} color={appColors.primary} />
+              <TextComponent flex={1} textAlign="justify">
+                Vui lòng chọn ngày khám phù hợp với lịch trình của bạn. Chúng
+                tôi hỗ trợ đặt lịch khám trước từ{' '}
+                <TextComponent bold>1 đến 30 ngày</TextComponent>.
+              </TextComponent>
+            </View>
 
-          <Space paddingTop={32} />
+            <Space paddingTop={32} />
 
-          <View style={styles.noteContainer}>
-            <FlexComponent direction="row" alignItems="center" columnGap={4}>
-              <View style={[styles.square]} />
-              <TextComponent>Hôm nay</TextComponent>
-            </FlexComponent>
+            <View style={styles.noteContainer}>
+              <FlexComponent direction="row" alignItems="center" columnGap={4}>
+                <View style={[styles.square]} />
+                <TextComponent>Hôm nay</TextComponent>
+              </FlexComponent>
 
-            <FlexComponent direction="row" alignItems="center" columnGap={4}>
-              <View
-                style={[styles.square, {backgroundColor: appColors.gray}]}
-              />
-              <TextComponent>Kín lịch</TextComponent>
-            </FlexComponent>
+              <FlexComponent direction="row" alignItems="center" columnGap={4}>
+                <View
+                  style={[styles.square, {backgroundColor: appColors.gray}]}
+                />
+                <TextComponent>Kín lịch</TextComponent>
+              </FlexComponent>
 
-            <FlexComponent direction="row" alignItems="center" columnGap={4}>
-              <View
-                style={[
-                  styles.square,
-                  {backgroundColor: appColors.lightPrimary},
-                ]}
-              />
-              <TextComponent>Còn trống</TextComponent>
-            </FlexComponent>
-          </View>
+              <FlexComponent direction="row" alignItems="center" columnGap={4}>
+                <View
+                  style={[
+                    styles.square,
+                    {backgroundColor: appColors.lightPrimary},
+                  ]}
+                />
+                <TextComponent>Còn trống</TextComponent>
+              </FlexComponent>
+            </View>
 
-          <Space paddingTop={32} />
-          <Calendar
-            dayComponent={_dayComponent}
-            enableSwipeMonths={true}
-            onMonthChange={_onMonthChange}
-            customHeaderTitle={_customHeaderTitle}
-          />
-        </ContentComponent>
+            <Space paddingTop={32} />
+            <Calendar
+              dayComponent={_dayComponent}
+              enableSwipeMonths={true}
+              onMonthChange={_onMonthChange}
+              customHeaderTitle={_customHeaderTitle}
+            />
+          </ContentComponent>
+        )}
       </ContainerComponent>
       <BottomSheetModalProvider>
         <BottomSheetModal
@@ -328,6 +343,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginRight: 8,
     borderRadius: 10,
+    flexBasis: '47%',
+    alignItems: 'center',
   },
   timeSlotDisabled: {
     borderColor: appColors.textDescription,

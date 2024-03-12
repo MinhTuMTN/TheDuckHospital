@@ -76,7 +76,9 @@ const HomeScreen = () => {
   const handleNavigateTestScreen = () => {
     navigation.navigate('ChooseDateScreen' as never);
   };
-
+  const handleNavigateMidicineReminderScreen = () => {
+    navigation.navigate('MedicineReminderScreen' as never);
+  };
   const handleNavigateMedicalExaminationHistoryScreen = () => {
     navigation.navigate('AllPatientProfilesScreen' as never);
   };
@@ -166,7 +168,9 @@ const HomeScreen = () => {
                 {t('homeScreen.payHospitalFee')}
               </TextComponent>
             </TouchableOpacity>
-            <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
+            <TouchableOpacity
+              onPress={handleNavigateMidicineReminderScreen}
+              className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/animal.png')}
                 className="w-12 h-12"
@@ -174,7 +178,7 @@ const HomeScreen = () => {
               <TextComponent textAlign="center" fontSize={14}>
                 {t('homeScreen.medicineReminder')}
               </TextComponent>
-            </View>
+            </TouchableOpacity>
             <View className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/chat.png')}

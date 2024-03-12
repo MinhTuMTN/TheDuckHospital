@@ -1,6 +1,7 @@
 import {
   DimensionValue,
   FlexAlignType,
+  LayoutChangeEvent,
   StyleProp,
   View,
   ViewStyle,
@@ -24,6 +25,7 @@ interface FlexComponentProps {
   rowGap?: number | undefined;
   width?: DimensionValue | undefined;
   height?: DimensionValue | undefined;
+  onLayout?: (e: LayoutChangeEvent) => void;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -39,9 +41,11 @@ const FlexComponent = (props: FlexComponentProps) => {
     width,
     height,
     style,
+    onLayout,
   } = props;
   return (
     <View
+      onLayout={onLayout}
       style={[
         {
           flexDirection: direction,
