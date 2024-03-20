@@ -130,7 +130,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         Optional<Booking> bookingOptional = bookingRepository
                 .nurseFindBooking(
                         request.getPatientProfileId(),
-                        request.getDoctorScheduleId()
+                        request.getTimeSlotId()
                 );
         if (bookingOptional.isPresent())
             return new MedicalRecordItemResponse(bookingOptional.get());
@@ -144,7 +144,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         MedicalExaminationRecord result = createPatientMedicalExamRecord(
                 new PatientMedicalExamRequest(
                         booking.getBookingCode(),
-                        booking.getDoctorSchedule().getRoom().getRoomId()
+                        booking.getTimeSlot().getDoctorSchedule().getRoom().getRoomId()
                 )
         );
 
@@ -585,7 +585,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         medicalExaminationRecord.setPatient(patient);
         medicalExaminationRecord.setBooking(booking);
         medicalExaminationRecord.setPatientProfile(booking.getPatientProfile());
-        medicalExaminationRecord.setDoctorSchedule(booking.getDoctorSchedule());
+        medicalExaminationRecord.setDoctorSchedule(booking.getTimeSlot().getDoctorSchedule());
 
         medicalExaminationRepository.save(medicalExaminationRecord);
 

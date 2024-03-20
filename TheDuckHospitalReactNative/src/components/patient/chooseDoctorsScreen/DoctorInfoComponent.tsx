@@ -1,11 +1,19 @@
 import React, {memo, useEffect} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TextComponent} from '../..';
 import {Calendar, CashInHand, Gender, Stethoscope} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 interface DoctorInfoComponentProps {
   item: any;
@@ -14,6 +22,13 @@ interface DoctorInfoComponentProps {
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
   const {item} = props;
   const [dayOfWeek, setDayOfWeek] = React.useState('');
+  const navigation = useNavigation<navigationProps>();
+
+  const navigateToChooseDateScreen = () => {
+    navigation.navigate('ChooseDateScreen', {
+      data: item,
+    });
+  };
 
   useEffect(() => {
     const doctorSchedules = item.doctorSchedules;
@@ -40,7 +55,9 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
   }, [item]);
   return (
     <View style={styles.wrapper}>
-      <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={navigateToChooseDateScreen}>
         <Image
           // source={require('../../../assets/images/avatarDoctor.jpg')}
           source={{
@@ -120,7 +137,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
         <View style={styles.nextPage}>
           <Icon name="navigate-next" color={appColors.primary} size={20} />
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

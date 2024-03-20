@@ -1,4 +1,4 @@
-import {get} from './AxiosInstance';
+import {get, post} from './AxiosInstance';
 
 export const getAllBooking = async () => {
   return get('/booking');
@@ -14,4 +14,18 @@ export const getAllDoctor = async (departmentId: number, page: number) => {
 
 export const getAllDepartment = async () => {
   return get('/departments');
+};
+
+export const createBooking = async (
+  patientProfileId: string,
+  timeSlotIds: string[],
+  paymentMethod: 'MOMO' | 'VNPAY',
+  mobile: boolean = true,
+) => {
+  return post('/booking', {
+    patientProfileId,
+    timeSlotIds,
+    paymentMethod,
+    mobile,
+  });
 };

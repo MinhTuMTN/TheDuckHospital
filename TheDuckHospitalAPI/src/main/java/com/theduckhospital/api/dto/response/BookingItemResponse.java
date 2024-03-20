@@ -17,9 +17,9 @@ public class BookingItemResponse {
 
     public BookingItemResponse(Booking booking) {
         this.bookingId = booking.getBookingId();
-        this.departmentName = booking.getDoctorSchedule().getDoctor().getDepartment().getDepartmentName();
-        this.doctorName = booking.getDoctorSchedule().getDoctor().getFullName();
-        this.date = booking.getDoctorSchedule().getDate();
+        this.departmentName = booking.getTimeSlot().getDoctorSchedule().getDoctor().getDepartment().getDepartmentName();
+        this.doctorName = booking.getTimeSlot().getDoctorSchedule().getDoctor().getFullName();
+        this.date = booking.getTimeSlot().getDoctorSchedule().getDate();
         this.queueNumber = booking.getQueueNumber();
         this.status = booking.getMedicalExaminationRecord() != null;
     }

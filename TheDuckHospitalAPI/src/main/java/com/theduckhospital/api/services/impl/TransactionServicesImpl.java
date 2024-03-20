@@ -85,12 +85,12 @@ public class TransactionServicesImpl implements ITransactionServices {
             for (Booking booking : bookings) {
                 PatientProfileResponse patientProfileResponse = new PatientProfileResponse(booking.getPatientProfile());
                 long numberOfBooking = bookingRepository.
-                        countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                                booking.getDoctorSchedule(),
+                        countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+                                booking.getTimeSlot().getDoctorSchedule(),
                                 -1
                         );
                 DoctorScheduleRoomResponse doctorScheduleRoomResponse = new DoctorScheduleRoomResponse(
-                        booking.getDoctorSchedule(),
+                        booking.getTimeSlot().getDoctorSchedule(),
                         numberOfBooking
                 );
                 bookingResponses.add(new BookingResponse(booking, patientProfileResponse, doctorScheduleRoomResponse));

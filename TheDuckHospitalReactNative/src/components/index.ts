@@ -13,6 +13,7 @@ import AccountScreenRowComponent from './patient/accountScreen/AccountScreenRowC
 import DetailsMedicalBillComponent from './patient/detailsMedicalBillScreen/DetailsMedicalBillComponent';
 import MoreMenuComponent from './patient/homeScreen/MoreMenuComponent';
 import MedicalBillComponent from './patient/medicalBillScreen/MedicalBillComponent';
+import MedicineReminderChooseDate from './patient/medicineReminderScreen/MedicineReminderChooseDate';
 import NotificationItem from './patient/notificationScreen/NotificationItem';
 import AvatarProfile from './patient/patientProfileScreen/AvatarProfile';
 import DetailsInfomation from './patient/patientProfileScreen/DetailsInfomation';
@@ -38,4 +39,5 @@ export {
   MoreMenuComponent,
   AccountScreenRowComponent,
   SelectComponent,
+  MedicineReminderChooseDate,
 };

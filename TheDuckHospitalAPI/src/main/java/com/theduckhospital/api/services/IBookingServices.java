@@ -4,6 +4,7 @@ import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.Booking;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface IBookingServices {
-    String createBookingAndPayment(String token, BookingRequest request, String origin);
+    PaymentResponse createBookingAndPayment(String token, BookingRequest request, String origin);
     String checkBookingCallback(Map<String, String> vnpParams);
 
     List<AccountBookingResponse> getBookings(String token);

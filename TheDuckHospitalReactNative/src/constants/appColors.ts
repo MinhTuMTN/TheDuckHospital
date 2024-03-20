@@ -1,11 +1,14 @@
 export const appColors = {
   primary: '#00a3e8',
+  primaryLable: '#00A3E7',
   primaryLight: '#5AA1FF',
   lightPrimary: '#9ad6ef',
   darkGreen: '#0891B2',
   gray: '#ebeced',
   grayLight: '#8C8C8C',
   darkGray: '#6d6d6d',
+  grayLine: '#DADADA',
+  grayText: '#828282',
   lightGray: '#f1f1f1',
   textPrimary: '#00adeb',
   textGray: '#34515d',
@@ -22,4 +25,5 @@ export const appColors = {
   green: '#4cad61',
   disabled: '#959595',
   darkerBlue: '#2E6AE1',
+  darkBlue: '#2d75e3',
 };

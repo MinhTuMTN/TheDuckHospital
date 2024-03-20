@@ -29,6 +29,7 @@ interface TextComponentProps {
   flex?: number;
   flexWrap?: 'wrap' | 'nowrap' | 'wrap-reverse' | undefined;
   ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip' | undefined;
+  paddingStart?: number;
 }
 
 const TextComponent = (props: TextComponentProps) => {
@@ -46,6 +47,7 @@ const TextComponent = (props: TextComponentProps) => {
     flex,
     flexWrap,
     ellipsizeMode,
+    paddingStart,
   } = props;
   return (
     <Text
@@ -62,6 +64,7 @@ const TextComponent = (props: TextComponentProps) => {
           textAlign,
           flex,
           flexWrap,
+          paddingStart,
         },
         style,
       ]}>

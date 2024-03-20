@@ -29,6 +29,11 @@ import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExamin
 import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults/AllPatientProfilesScreen';
 import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
+import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
+import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
+import PaymentScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentScreen';
+import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -119,6 +124,23 @@ const App = () => {
             <Stack.Screen
               name="ChooseDateScreen"
               component={ChooseDateScreen}
+            />
+            <Stack.Screen
+              name="MedicineReminderScreen"
+              component={MedicineReminderScreen}
+            />
+            <Stack.Screen
+              name="ConfirmBookingInformationScreen"
+              component={ConfirmBookingInformationScreen}
+            />
+            <Stack.Screen
+              name="BillingInformationScreen"
+              component={BillingInformationScreen}
+            />
+            <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+            <Stack.Screen
+              name="ChooseProfileScreen"
+              component={ChooseProfileScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>
