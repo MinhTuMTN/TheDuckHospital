@@ -1,9 +1,8 @@
-import {config} from '@gluestack-ui/config';
 import {GluestackUIProvider} from '@gluestack-ui/themed';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
-import {StatusBar} from 'react-native';
+import React, {useEffect} from 'react';
+import {Linking, StatusBar} from 'react-native';
 import {AuthProvider} from './src/auth/AuthProvider';
 import './src/localization/i18n';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
@@ -31,12 +30,24 @@ import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/C
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
-import PaymentScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentScreen';
 import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
+import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
+import {config} from '@gluestack-ui/config';
+import linking from './src/linking';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  // useEffect(() => {
+  //   // THIS IS THE MAIN POINT OF THIS ANSWER
+  //   const navigateToInitialUrl = async () => {
+  //     const initialUrl = await Linking.getInitialURL();
+  //     if (initialUrl) {
+  //       await Linking.openURL(initialUrl);
+  //     }
+  //   };
+  //   navigateToInitialUrl();
+  // }, []);
   return (
     <GluestackUIProvider config={config}>
       <StatusBar
@@ -45,7 +56,7 @@ const App = () => {
         translucent={true}
       />
       <AuthProvider>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <Stack.Navigator
             initialRouteName="SlashScreen"
             screenOptions={{
@@ -132,7 +143,10 @@ const App = () => {
               name="BillingInformationScreen"
               component={BillingInformationScreen}
             />
-            <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+            <Stack.Screen
+              name="PaymentResultScreen"
+              component={PaymentResultScreen}
+            />
             <Stack.Screen
               name="ChooseProfileScreen"
               component={ChooseProfileScreen}

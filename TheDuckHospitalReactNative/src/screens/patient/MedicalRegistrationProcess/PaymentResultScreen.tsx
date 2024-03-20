@@ -4,7 +4,7 @@ import WebView from 'react-native-webview';
 import {ContainerComponent} from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 
-const PaymentScreen = () => {
+const PaymentResultScreen = () => {
   const onPressHandler = () => {
     Linking.openURL(
       'momo://app?action=payWithApp&isScanQR=false&serviceType=app&sid=TU9NT0JLVU4yMDE4MDUyOXwxNzEwMzg0MDc3MTY1OjAxMjM0NTY3Nzg&skipPayLater=false&v=3.0',
@@ -24,4 +24,4 @@ const PaymentScreen = () => {
   );
 };
 
-export default PaymentScreen;
+export default PaymentResultScreen;

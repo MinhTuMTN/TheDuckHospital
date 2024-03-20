@@ -5,6 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {
   FlatList,
   Image,
+  Linking,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -84,7 +85,7 @@ const HomeScreen = () => {
   };
 
   const handlNavigateConfirmBookingInformationScreen = () => {
-    navigation.navigate('ConfirmBookingInformationScreen' as never);
+    Linking.openURL('theduck://app/payment/1');
   };
 
   useEffect(() => {

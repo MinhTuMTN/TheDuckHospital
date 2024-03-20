@@ -8,10 +8,11 @@ import java.util.*;
 public class VNPayConfig {
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "https://tb7drp6q-8080.asse.devtunnels.ms/api/booking/callback";
+    public static String vnp_ReturnUrl = "https://tb7drp6q-8080.asse.devtunnels.ms/api/booking/callback/vnPay";
     public static String vnp_TmnCode = "7FC8KTQH";
     public static String secretKey = "UCMSQLIEPNJUJADCYBSOGFPIVSNINQVZ";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    public static int fee = 15000;
 
     public static String hashAllFields(Map<String, String> fields) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());

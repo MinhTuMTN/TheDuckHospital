@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
+import com.theduckhospital.api.constant.MomoConfig;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.request.BookingRequest;
@@ -16,6 +17,7 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.PatientProfileRepository;
+import com.theduckhospital.api.repository.TimeSlotRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.*;
 @Service
 public class BookingServicesImpl implements IBookingServices {
     private final BookingRepository bookingRepository;
+    private final TimeSlotRepository timeSlotRepository;
     private final TransactionRepository transactionRepository;
     private final IPatientProfileServices patientProfileServices;
     private final PatientProfileRepository patientProfileRepository;
@@ -41,6 +44,7 @@ public class BookingServicesImpl implements IBookingServices {
 
     public BookingServicesImpl(
             BookingRepository bookingRepository,
+            TimeSlotRepository timeSlotRepository,
             TransactionRepository transactionRepository,
             IPatientProfileServices patientProfileServices,
             PatientProfileRepository patientProfileRepository,
@@ -51,6 +55,7 @@ public class BookingServicesImpl implements IBookingServices {
             ITimeSlotServices timeSlotServices
     ) {
         this.bookingRepository = bookingRepository;
+        this.timeSlotRepository = timeSlotRepository;
         this.transactionRepository = transactionRepository;
         this.patientProfileServices = patientProfileServices;
         this.patientProfileRepository = patientProfileRepository;
@@ -132,12 +137,13 @@ public class BookingServicesImpl implements IBookingServices {
 
             return switch (request.getPaymentMethod()) {
                 case VNPAY -> paymentServices.vnPayCreatePaymentUrl(
-                        totalAmount,
+                        totalAmount + VNPayConfig.fee,
                         transaction.getTransactionId()
                 );
                 case MOMO -> paymentServices.momoCreatePaymentUrl(
-                        totalAmount,
-                        transaction.getTransactionId()
+                        totalAmount + MomoConfig.fee,
+                        transaction.getTransactionId(),
+                        request.isMobile()
                 );
                 default -> throw new BadRequestException("Invalid payment method");
             };
@@ -148,7 +154,7 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public String checkBookingCallback(Map<String, String> vnpParams) {
+    public String checkVNPayBookingCallback(Map<String, String> vnpParams) {
         Map<String, String> results = new HashMap<>();
         List<String> keys = vnpParams.keySet().stream().toList();
         for (String key : keys) {
@@ -182,9 +188,12 @@ public class BookingServicesImpl implements IBookingServices {
             return transaction.getOrigin() + "/payment-failed";
         }
 
-        String bankCode = vnpParams.get("vnp_BankCode");
-        String paymentMethod = "VNPAY";
-        Transaction transaction = updateTransactionAndBooking(transactionId, bankCode, paymentMethod, TransactionStatus.SUCCESS);
+        Transaction transaction = updateTransactionAndBooking(
+                transactionId,
+                vnpParams.get("vnp_BankCode"),
+                "VNPAY",
+                TransactionStatus.SUCCESS
+        );
 
         if (transaction == null)
             return null;
@@ -193,6 +202,51 @@ public class BookingServicesImpl implements IBookingServices {
             return "https://the-duck-hospital.web.app/payment-success?transactionId=" + transaction.getTransactionId();
 
         return transaction.getOrigin() + "/payment-success?transactionId=" + transaction.getTransactionId();
+    }
+
+    @Override
+    public boolean checkMomoBookingCallback(Map<String, String> params) throws Exception {
+        String accessKey = MomoConfig.accessKey;
+        String amount = params.get("amount");
+        String extraData = params.get("extraData");
+        String message = params.get("message");
+        String orderId = params.get("orderId");
+        String orderInfo = params.get("orderInfo");
+        String orderType = params.get("orderType");
+        String partnerCode = params.get("partnerCode");
+        String payType = params.get("payType");
+        String requestId = params.get("requestId");
+        String responseTime = params.get("responseTime");
+        String resultCode = params.get("resultCode");
+        String transId = params.get("transId");
+        String signatureFromMomo = params.get("signature");
+        UUID transactionId = UUID.fromString(orderId.split(":")[1]);
+
+        String signatureRaw = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
+                + "&message=" + message + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&orderType=" + orderType
+                + "&partnerCode=" + partnerCode + "&payType=" + payType + "&requestId=" + requestId
+                + "&responseTime=" + responseTime + "&resultCode=" + resultCode + "&transId=" + transId;
+        String signature = MomoConfig.hashSignature(signatureRaw, MomoConfig.secretKey);
+
+        if (!signature.equals(signatureFromMomo) || !resultCode.equals("0")) {
+            updateTransactionAndBooking(
+                    transactionId,
+                    null,
+                    null,
+                    TransactionStatus.FAILED
+            );
+
+            return false;
+        }
+
+        Transaction transaction = updateTransactionAndBooking(
+                transactionId,
+                transId,
+                "MOMO",
+                TransactionStatus.SUCCESS
+        );
+
+        return transaction != null;
     }
 
     @Override
@@ -313,9 +367,12 @@ public class BookingServicesImpl implements IBookingServices {
         booking.setPatientProfile(patientProfile);
         booking.setTimeSlot(timeSlot);
         booking.setTransaction(transaction);
-        booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot() + 1);
+        booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
         booking.setDeleted(false);
         bookingRepository.save(booking);
+
+        timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
+        timeSlotRepository.save(timeSlot);
 
         return booking;
     }
@@ -331,17 +388,21 @@ public class BookingServicesImpl implements IBookingServices {
             return transaction;
         }
         transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setBankCode(bankCode);
+        transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
         transaction.setPaymentMethod(paymentMethod);
+        transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
         transactionRepository.save(transaction);
 
         List<Booking> bookings = transaction.getBookings();
         for (Booking booking : bookings) {
             TimeSlot timeSlot = booking.getTimeSlot();
 
-            booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot() + 1);
+            booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
             booking.setDeleted(false);
             bookingRepository.save(booking);
+
+            timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
+            timeSlotRepository.save(timeSlot);
         }
 
         return transaction;

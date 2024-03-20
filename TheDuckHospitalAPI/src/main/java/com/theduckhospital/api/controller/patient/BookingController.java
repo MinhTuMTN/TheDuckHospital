@@ -43,14 +43,23 @@ public class BookingController {
         );
     }
 
-    @GetMapping("/callback")
+    @GetMapping("/callback/vnPay")
     public void callBackVNPay(
             @RequestParam(required=false) Map<String,String> params,
-            HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        String url = bookingServices.checkBookingCallback(params);
+        String url = bookingServices.checkVNPayBookingCallback(params);
         response.sendRedirect(url);
+    }
+
+    @PostMapping("/callback/momo")
+    public ResponseEntity<?> callBackMomo(
+            @RequestBody Map<String,String> params
+    ) throws Exception {
+        if (bookingServices.checkMomoBookingCallback(params))
+            return ResponseEntity.status(204).body(null);
+
+        return ResponseEntity.status(400).body(null);
     }
 
     @GetMapping

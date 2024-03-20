@@ -13,6 +13,7 @@ import FilterComponent from '../../../components/FilterComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllBooking} from '../../../services/bookingServices';
 import {useAuth} from '../../../auth/AuthProvider';
+import {useIsFocused} from '@react-navigation/native';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
@@ -21,6 +22,7 @@ const MedicalBillScreen = () => {
   const [selectedPatientName, setSelectedPatientName] = useState('');
   const [bookings, setBookings] = useState<any[]>([]);
   const [bookingToDisplay, setBookingToDisplay] = useState([]);
+  const isFocused = useIsFocused();
 
   const {t} = useTranslation();
   const auth = useAuth();
@@ -61,8 +63,8 @@ const MedicalBillScreen = () => {
       }
     };
 
-    if (auth.token) handleGetAllBooking();
-  }, [auth.token]);
+    if (auth.token && isFocused) handleGetAllBooking();
+  }, [auth.token, isFocused]);
 
   useEffect(() => {
     setIsLoadingAPI(true);

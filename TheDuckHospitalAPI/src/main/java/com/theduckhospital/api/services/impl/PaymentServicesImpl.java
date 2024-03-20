@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.theduckhospital.api.constant.MomoConfig;
 import com.theduckhospital.api.constant.PaymentMethod;
 import com.theduckhospital.api.constant.VNPayConfig;
 import com.theduckhospital.api.dto.response.PaymentResponse;
@@ -97,13 +98,8 @@ public class PaymentServicesImpl implements IPaymentServices {
     }
 
     @Override
-    public PaymentResponse momoCreatePaymentUrl(double amountInput, UUID transactionId) throws IOException {
+    public PaymentResponse momoCreatePaymentUrl(double amountInput, UUID transactionId, boolean mobile) throws IOException {
         OkHttpClient client = new OkHttpClient();
-
-        String payGateUrl = "https://test-payment.momo.vn";
-        String accessKey = "klm05TvNBzhg7h7j";
-        String partnerCode = "MOMOBKUN20180529";
-        String secretKey = "at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa";
 
         long date = new Date().getTime();
         String requestId = date + "id";
@@ -111,27 +107,29 @@ public class PaymentServicesImpl implements IPaymentServices {
         String amount = String.valueOf((int) amountInput);
 
         String requestType = "captureWallet";
-        String notifyUrl = "https://tb7drp6q-8080.asse.devtunnels.ms/api/callback";
-        String returnUrl = "https://the-duck-hospital.web.app/payment-success?transactionId=94def967-8330-4cac-9d46-e8f7f7b12439";
-        String orderInfo = "Thanh toán qua ví MoMo";
+        String notifyUrl = "https://tb7drp6q-8080.asse.devtunnels.ms/api/booking/callback/momo";
+        String returnUrl = "https://the-duck-hospital.web.app/payment-success?transactionId=" + transactionId;
+        if (mobile)
+            returnUrl = "theduck://app/payment/" + transactionId;
+        String orderInfo = "Thanh toán phieu kham benh The Duck Hospital";
         String extraData = "ew0KImVtYWlsIjogImh1b25neGRAZ21haWwuY29tIg0KfQ==";
 
-        String signatureRaw = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
+        String signatureRaw = "accessKey=" + MomoConfig.accessKey + "&amount=" + amount + "&extraData=" + extraData
                 + "&ipnUrl=" + notifyUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo
-                + "&partnerCode=" + partnerCode + "&redirectUrl=" + returnUrl + "&requestId=" + requestId
+                + "&partnerCode=" + MomoConfig.partnerCode + "&redirectUrl=" + returnUrl + "&requestId=" + requestId
                 + "&requestType=" + requestType;
 
         String signature = "";
         try {
-            signature = hashSignature(signatureRaw, secretKey);
+            signature = MomoConfig.hashSignature(signatureRaw, MomoConfig.secretKey);
         } catch (Exception e) {
             throw new StatusCodeException("Internal server error", 500);
         }
 
         JsonObject json = new JsonObject();
-        json.addProperty("partnerCode", partnerCode);
+        json.addProperty("partnerCode", MomoConfig.partnerCode);
         json.addProperty("partnerName", "Test");
-        json.addProperty("storeId", partnerCode);
+        json.addProperty("storeId", MomoConfig.partnerCode);
         json.addProperty("requestId", requestId);
         json.addProperty("amount", amount);
         json.addProperty("orderId", orderId);
@@ -166,13 +164,5 @@ public class PaymentServicesImpl implements IPaymentServices {
                     .deepLink(deeplink)
                     .build();
         }
-    }
-
-    private static String hashSignature(String data, String key) throws Exception {
-        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secret_key = new SecretKeySpec(key.getBytes(), "HmacSHA256");
-        sha256_HMAC.init(secret_key);
-
-        return Hex.encodeHexString(sha256_HMAC.doFinal(data.getBytes()));
     }
 }
