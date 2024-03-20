@@ -82,7 +82,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         }
       });
     } else {
-      logout();
+      setToken(null);
+      setUserInfo({
+        fullName: null,
+        role: null,
+      });
     }
   };
 

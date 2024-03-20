@@ -1,19 +1,29 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {ActivityIndicator, FlatList} from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign';
 import {useAuth} from '../../../auth/AuthProvider';
 import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
-const ProfileScreen = () => {
+const ChooseProfileScreen = ({route}: {route: any}) => {
   const {t} = useTranslation();
+  const {data} = route.params;
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const auth = useAuth();
+  const navigation = useNavigation<navigationProps>();
+
+  const handleNavigateToBillInfoScreen = (profile: any) => {
+    navigation.navigate('BillingInformationScreen', {
+      data: data,
+      profile: profile,
+    });
+  };
 
   React.useEffect(() => {
     const handleGetAllPatientProfile = async () => {
@@ -30,9 +40,11 @@ const ProfileScreen = () => {
   return (
     <ContainerComponent paddingTop={0}>
       <Header
-        title={t('patientProfile.title')}
-        titleSize={19}
-        icon={<Icon name="adduser" color={'white'} size={30} />}
+        title="Chọn hồ sơ bệnh nhân"
+        paddingStart={26}
+        noBackground
+        titleColor={appColors.textDarker}
+        backButtonColor={appColors.textDarker}
       />
       <ContentComponent>
         {isLoading ? (
@@ -44,7 +56,14 @@ const ProfileScreen = () => {
             showsVerticalScrollIndicator={false}
             data={patientProfiles}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => <PatientProfile profile={item} />}
+            renderItem={({item}) => (
+              <PatientProfile
+                profile={item}
+                onPress={() => {
+                  handleNavigateToBillInfoScreen(item);
+                }}
+              />
+            )}
           />
         )}
       </ContentComponent>
@@ -52,4 +71,4 @@ const ProfileScreen = () => {
   );
 };
 
-export default ProfileScreen;
+export default ChooseProfileScreen;

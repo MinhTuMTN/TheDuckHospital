@@ -30,7 +30,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
-    private DoctorSchedule doctorSchedule;
+    private TimeSlot timeSlot;
 
     @OneToOne
     @JoinColumn(name = "medicalExaminationRecordId", referencedColumnName = "medicalExaminationRecordId")

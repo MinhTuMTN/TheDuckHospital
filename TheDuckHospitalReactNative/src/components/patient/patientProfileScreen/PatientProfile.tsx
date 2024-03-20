@@ -107,9 +107,9 @@ const PatientProfile = (props: PatientProfileProps) => {
                 paddingHorizontal: 10,
                 borderRadius: 20,
               }}
-              onPress={handleViewDetailsClick}>
+              onPress={onPress ? onPress : handleViewDetailsClick}>
               <Text color={appColors.white} bold>
-                {t('patientProfile.item.details')}
+                {onPress ? 'Tiếp tục' : t('patientProfile.item.details')}
               </Text>
             </Pressable>
           }

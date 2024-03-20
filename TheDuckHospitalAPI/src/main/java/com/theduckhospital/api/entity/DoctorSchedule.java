@@ -41,10 +41,10 @@ public class DoctorSchedule {
     @ToStringExclude
     private MedicalService medicalService;
 
-    @OneToMany(mappedBy = "doctorSchedule", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "doctorSchedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonBackReference
     @ToStringExclude
-    private List<Booking> bookings;
+    private List<TimeSlot> timeSlots;
 
     private int slot;
     private int queueNumber = 0;
@@ -58,7 +58,6 @@ public class DoctorSchedule {
 
     @PrePersist
     public void prePersist() {
-        this.doctorScheduleId = UUID.randomUUID();
         this.createdDate = new Date();
         this.updatedDate = new Date();
     }

@@ -6,11 +6,17 @@ import {appColors} from '../../../constants/appColors';
 import LineComfirmBookingInfo from '../../../components/patient/confirmBookingScreen/LineComfirmBookingInfo';
 import {AlarmClock, Calendar7, Doctor, Hospital} from '../../../assets/svgs';
 import {useNavigation} from '@react-navigation/native';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
+import {navigationProps} from '../../../types';
 
-const ConfirmBookingInformationScreen = () => {
-  const navigation = useNavigation();
+const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
+  const {data} = route.params;
+
+  const navigation = useNavigation<navigationProps>();
   const handleNavigate = () => {
-    navigation.navigate('BillingInformationScreen' as never);
+    navigation.navigate('ChooseProfileScreen', {
+      data: data,
+    });
   };
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -25,22 +31,22 @@ const ConfirmBookingInformationScreen = () => {
         <View style={styles.container}>
           <LineComfirmBookingInfo
             label="Bác sĩ"
-            value="Nguyễn Khánh Ngọc"
+            value={data?.doctorName}
             image={<Doctor height={45} width={45} />}
           />
           <LineComfirmBookingInfo
             label="Chuyên khoa"
-            value="Tâm thần kinh"
+            value={data?.departmentName}
             image={<Hospital height={40} width={40} />}
           />
           <LineComfirmBookingInfo
             label="Ngày khám"
-            value="17/03/2024"
+            value={data?.selectedDay}
             image={<Calendar7 height={40} width={40} />}
           />
           <LineComfirmBookingInfo
             label="Giờ khám"
-            value="08:00 - 09:00"
+            value={getTimeSlotById(data?.timeSlot?.timeId)}
             image={<AlarmClock height={34} width={34} />}
           />
         </View>

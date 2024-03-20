@@ -6,6 +6,7 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IRoomServices;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class ScheduleHeadDoctorController {
     @PostMapping
     public ResponseEntity<?> createDoctorSchedule(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestBody CreateDoctorScheduleRequest request
+            @RequestBody @Valid CreateDoctorScheduleRequest request
     ) throws ParseException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()

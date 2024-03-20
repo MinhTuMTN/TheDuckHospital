@@ -17,12 +17,12 @@ import java.util.UUID;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
-    long countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+    long countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
             DoctorSchedule doctorSchedule,
             int queueNumber
     );
     Optional<Booking> findByBookingCodeAndDeletedIsFalse(String bookingCode);
-    Page<Booking> findBookingsByDoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
+    Page<Booking> findBookingsByTimeSlot_DoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
             DoctorSchedule doctorSchedule,
             int queueNumber,
             Pageable pageable
@@ -30,25 +30,22 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.patientProfile.patientProfileId = :patientProfileId " +
-            "AND b.doctorSchedule.doctorScheduleId = :doctorScheduleId " +
+            "AND b.timeSlot.timeSlotId = :timeSlotId " +
             "AND b.deleted = false"
     )
     Optional<Booking> nurseFindBooking(
             UUID patientProfileId,
-            UUID doctorScheduleId
+            String timeSlotId
     );
-    List<Booking> findByDoctorScheduleDateBetween(Date startDate, Date endDate);
-    long countByDoctorSchedule(DoctorSchedule doctorSchedule);
-
     @Query("SELECT ds.date, COUNT(b.bookingId) " +
             "FROM Booking b " +
-            "JOIN b.doctorSchedule ds " +
+            "JOIN b.timeSlot ds " +
             "WHERE ds.date BETWEEN :startDate AND :endDate " +
             "GROUP BY ds.date " +
             "ORDER BY ds.date ASC")
     List<Object[]> countBookingsByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    Optional<Booking> findByPatientProfileAndDoctorScheduleAndDeletedIsFalse(
+    Optional<Booking> findByPatientProfileAndTimeSlot_DoctorScheduleAndDeletedIsFalse(
             PatientProfile patientProfile,
             DoctorSchedule doctorSchedule
     );

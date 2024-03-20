@@ -16,24 +16,24 @@ import dayjs from 'dayjs';
 import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {appInfo} from '../../../constants/appInfo';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
-const ChooseDateScreen = () => {
+const ChooseDateScreen = ({route}: {route: any}) => {
+  const {data} = route.params;
+  const [availableDates, setAvailableDates] = React.useState<string[]>([]);
+  const [selectedDay, setSelectedDay] = React.useState<dayjs.Dayjs>(dayjs());
+  const [selectedDoctorSchedule, setSelectedDoctorSchedule] =
+    React.useState<any[]>();
+
   const [isRenderingUI, setIsRenderingUI] = React.useState(true);
   const [month, setMonth] = React.useState({
     month: dayjs().month() + 1,
     year: dayjs().year(),
   });
   const today = dayjs();
-  const availableDates = [
-    '07/03/2024',
-    '08/03/2024',
-    '14/03/2024',
-    '15/03/2024',
-    '21/03/2024',
-    '22/03/2024',
-    '28/03/2024',
-    '29/03/2024',
-  ];
+  const navigation = useNavigation<navigationProps>();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const _dayComponent = useCallback(
     (
@@ -49,7 +49,14 @@ const ChooseDateScreen = () => {
         <Pressable
           onPress={() => {
             if (available) {
-              console.log(e.date?.dateString);
+              setSelectedDay(dayjs(e.date?.dateString as string));
+              setSelectedDoctorSchedule(
+                data?.doctorSchedules.filter(
+                  (ds: any) =>
+                    dayjs(ds.date).format('DD/MM/YYYY') ===
+                    date.format('DD/MM/YYYY'),
+                ),
+              );
               bottomSheetModalRef.current?.present();
             } else {
               console.log('Không thể chọn ngày này');
@@ -86,7 +93,7 @@ const ChooseDateScreen = () => {
         </Pressable>
       );
     },
-    [],
+    [availableDates, today],
   );
   const _onMonthChange = useCallback((month: DateData) => {
     setMonth({
@@ -103,9 +110,33 @@ const ChooseDateScreen = () => {
     [month],
   );
 
+  const handleNavigateConfirmBooking = (timeSlot: any) => {
+    navigation.navigate('ConfirmBookingInformationScreen', {
+      data: {
+        doctorName: `${data?.degree} ${data?.doctorName}`,
+        departmentName: data?.department?.departmentName,
+        selectedDay: selectedDay.format('DD/MM/YYYY'),
+        timeSlot: timeSlot,
+        price: data?.price,
+      },
+    });
+  };
+
   useEffect(() => {
     setIsRenderingUI(false);
   }, []);
+
+  useEffect(() => {
+    const doctorSchedules = data?.doctorSchedules;
+
+    if (doctorSchedules) {
+      const dates = doctorSchedules.map((schedule: any) =>
+        dayjs(schedule.date).format('DD/MM/YYYY'),
+      );
+
+      setAvailableDates(dates);
+    }
+  }, [data]);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -168,6 +199,7 @@ const ChooseDateScreen = () => {
               enableSwipeMonths={true}
               onMonthChange={_onMonthChange}
               customHeaderTitle={_customHeaderTitle}
+              firstDay={1}
             />
           </ContentComponent>
         )}
@@ -215,7 +247,8 @@ const ChooseDateScreen = () => {
 
             <ScrollView>
               <TextComponent color={appColors.textDarker} bold>
-                Ngày 17 tháng 3 năm 2024
+                Ngày {selectedDay.get('D')} tháng {selectedDay.get('M') + 1} năm{' '}
+                {selectedDay.get('year')}
               </TextComponent>
 
               <Space paddingTop={16} />
@@ -237,76 +270,105 @@ const ChooseDateScreen = () => {
                 </FlexComponent>
               </View>
 
-              <Space paddingTop={16} />
-              <View>
-                <TextComponent
-                  bold
-                  fontSize={15}
-                  color={appColors.textDescription}>
-                  Buổi sáng
-                </TextComponent>
-                <Space paddingTop={8} />
-                <FlexComponent
-                  direction="row"
-                  style={{
-                    flexWrap: 'wrap',
-                    rowGap: 8,
-                  }}>
-                  <View style={styles.timeSlot}>
-                    <TextComponent bold color={appColors.primary}>
-                      8:00 - 9:00
+              {selectedDoctorSchedule?.some(
+                ds => ds.scheduleType === 'MORNING',
+              ) && (
+                <>
+                  <Space paddingTop={16} />
+                  <View>
+                    <TextComponent
+                      bold
+                      fontSize={15}
+                      color={appColors.textDescription}>
+                      Buổi sáng
                     </TextComponent>
+                    <Space paddingTop={8} />
+                    <FlexComponent
+                      direction="row"
+                      style={{
+                        flexWrap: 'wrap',
+                        rowGap: 8,
+                      }}>
+                      {selectedDoctorSchedule
+                        ?.find(ds => ds.scheduleType === 'MORNING')
+                        ?.timeSlots.map((timeSlot: any, index: number) => (
+                          <Pressable
+                            onPress={
+                              timeSlot.currentSlot < timeSlot.maxSlot
+                                ? () => handleNavigateConfirmBooking(timeSlot)
+                                : () => {}
+                            }
+                            key={timeSlot.timeSlotId}
+                            style={[
+                              styles.timeSlot,
+                              timeSlot.currentSlot >= timeSlot.maxSlot &&
+                                styles.timeSlotDisabled,
+                            ]}>
+                            <TextComponent
+                              bold
+                              color={
+                                timeSlot.currentSlot >= timeSlot.maxSlot
+                                  ? appColors.textDescription
+                                  : appColors.primary
+                              }>
+                              {getTimeSlotById(timeSlot?.timeId)}
+                            </TextComponent>
+                          </Pressable>
+                        ))}
+                    </FlexComponent>
                   </View>
-                  <View style={[styles.timeSlot, styles.timeSlotDisabled]}>
-                    <TextComponent bold color={appColors.textDescription}>
-                      9:00 - 10:00
-                    </TextComponent>
-                  </View>
-                  <View style={styles.timeSlot}>
-                    <TextComponent bold color={appColors.primary}>
-                      10:00 - 11:00
-                    </TextComponent>
-                  </View>
-                  <View style={styles.timeSlot}>
-                    <TextComponent bold color={appColors.primary}>
-                      11:00 - 12:00
-                    </TextComponent>
-                  </View>
-                </FlexComponent>
-              </View>
+                </>
+              )}
 
-              <Space paddingTop={16} />
-              <View>
-                <TextComponent
-                  bold
-                  fontSize={15}
-                  color={appColors.textDescription}>
-                  Buổi chiều
-                </TextComponent>
-                <Space paddingTop={8} />
-                <FlexComponent
-                  direction="row"
-                  style={{
-                    flexWrap: 'wrap',
-                    rowGap: 8,
-                  }}>
-                  <View style={styles.timeSlot}>
-                    <TextComponent bold color={appColors.primary}>
-                      13:00 - 14:00
+              {selectedDoctorSchedule?.some(
+                ds => ds.scheduleType === 'AFTERNOON',
+              ) && (
+                <>
+                  <Space paddingTop={16} />
+                  <View>
+                    <TextComponent
+                      bold
+                      fontSize={15}
+                      color={appColors.textDescription}>
+                      Buổi chiều
                     </TextComponent>
+                    <Space paddingTop={8} />
+                    <FlexComponent
+                      direction="row"
+                      style={{
+                        flexWrap: 'wrap',
+                        rowGap: 8,
+                      }}>
+                      {selectedDoctorSchedule
+                        ?.find(ds => ds.scheduleType === 'AFTERNOON')
+                        ?.timeSlots.map((timeSlot: any, index: number) => (
+                          <Pressable
+                            key={timeSlot.timeSlotId}
+                            onPress={
+                              timeSlot.currentSlot < timeSlot.maxSlot
+                                ? () => handleNavigateConfirmBooking(timeSlot)
+                                : () => {}
+                            }
+                            style={[
+                              styles.timeSlot,
+                              timeSlot.currentSlot >= timeSlot.maxSlot &&
+                                styles.timeSlotDisabled,
+                            ]}>
+                            <TextComponent
+                              bold
+                              color={
+                                timeSlot.currentSlot >= timeSlot.maxSlot
+                                  ? appColors.textDescription
+                                  : appColors.primary
+                              }>
+                              {getTimeSlotById(timeSlot?.timeId)}
+                            </TextComponent>
+                          </Pressable>
+                        ))}
+                    </FlexComponent>
                   </View>
-                  <View style={[styles.timeSlot, styles.timeSlotDisabled]}>
-                    <TextComponent bold color={appColors.textDescription}>
-                      15:00 - 16:00
-                    </TextComponent>
-                  </View>
-                  <View style={styles.timeSlot}>
-                    <TextComponent bold color={appColors.primary}>
-                      16:00 - 17:00
-                    </TextComponent>
-                  </View>
-                </FlexComponent>
-              </View>
+                </>
+              )}
             </ScrollView>
           </FlexComponent>
         </BottomSheetModal>

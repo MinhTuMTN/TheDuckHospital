@@ -16,7 +16,7 @@ public class CreateDoctorScheduleRequest {
     @NotNull(message = "Room ID is required")
     private Integer roomId;
     @NotNull(message = "Slot is required")
-    private Integer slot;
+    private Integer slotPerTimeSlot;
     @NotNull(message = "Morning Schedule is required")
     private List<Date> morningDates;
     @NotNull(message = "Afternoon Schedule is required")

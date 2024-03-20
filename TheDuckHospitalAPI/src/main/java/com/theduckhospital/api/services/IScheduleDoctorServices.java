@@ -13,6 +13,7 @@ import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 
+import javax.print.Doc;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ public interface IScheduleDoctorServices {
             CreateDoctorScheduleRequest doctorSchedule
     ) throws ParseException;
     DoctorSchedule getDoctorScheduleByIdForBooking(UUID doctorScheduleId) throws ParseException;
+    DoctorSchedule getDoctorScheduleByTimeSlotId(String timeSlotId);
     List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date);
 
     List<DoctorScheduleRoomResponse> getDoctorSchedulesByDoctorAndDateAdmin(UUID staffId, Date date);

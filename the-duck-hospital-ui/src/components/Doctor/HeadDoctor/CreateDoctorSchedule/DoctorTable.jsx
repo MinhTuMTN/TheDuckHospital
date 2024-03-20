@@ -194,7 +194,7 @@ function DoctorTable(props) {
       doctorId: doctorSchedule.doctorId,
       medicalServiceId: doctorSchedule.medicalServiceId,
       roomId: doctorSchedule.roomId,
-      slot: doctorSchedule.slot,
+      slotPerTimeSlot: doctorSchedule.slot,
       morningDates: highlightedMorningDays.map((date) => dayjs(date)),
       afternoonDates: highlightedAfternoonDays.map((date) => dayjs(date)),
     });
@@ -292,7 +292,7 @@ function DoctorTable(props) {
                       medicalServiceId: item.medicalServices[0].serviceId,
                       startTime: dayjs().add(1, "day"),
                       endTime: dayjs().add(1, "day"),
-                      slot: 30,
+                      slot: 5,
                     });
                     setOpenPopup(true);
                     setHighlightedMorningDays([]);
@@ -353,7 +353,7 @@ function DoctorTable(props) {
           }}
         >
           <Stack width={"30rem"} mt={3} spacing={4}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={2} flexWrap={true}>
               <CustomTextField
                 label="Bác sĩ"
                 value={doctorSchedule.doctorName}
@@ -365,21 +365,21 @@ function DoctorTable(props) {
               />
               <CustomTextField
                 type="number"
-                label="Số lượng chỗ"
+                label="Số lượt khám trong một giờ"
                 autoFocus
                 autoComplete="off"
                 style={{ width: "40%" }}
                 InputProps={{ inputProps: { min: 1 } }}
                 value={
-                  doctorSchedule.slot ? doctorSchedule.slot.toString() : "1"
+                  doctorSchedule.slot ? doctorSchedule.slot.toString() : "0"
                 }
                 onChange={(e) => {
                   setDoctorSchedule((prev) => ({
                     ...prev,
                     slot:
-                      e.target.value && parseInt(e.target.value) > 0
+                      e.target.value && parseInt(e.target.value) >= 0
                         ? parseInt(e.target.value)
-                        : 1,
+                        : 0,
                   }));
                 }}
                 required
@@ -387,10 +387,18 @@ function DoctorTable(props) {
                 helperText={
                   doctorSchedule.slot === 0 &&
                   addButtonClicked &&
-                  "Số lượng chỗ phải lớn hơn 0"
+                  "Số lượng khám trong một giờ phải lớn hơn 0"
                 }
               />
             </Stack>
+            <CustomTypography
+              style={{ width: "100%", marginTop: 8 }}
+              color={"#8e8e8e"}
+            >
+              Trong một buổi khám sẽ có tổng cộng {doctorSchedule.slot * 4}{" "}
+              người có thể đăng ký online
+            </CustomTypography>
+
             <Stack spacing={2} direction="row">
               <Box width="50%">
                 <CustomTypography

@@ -15,10 +15,8 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.BookingRepository;
 import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.MedicalExaminationRepository;
-import com.theduckhospital.api.services.IDoctorServices;
-import com.theduckhospital.api.services.IMedicalServiceServices;
-import com.theduckhospital.api.services.IRoomServices;
-import com.theduckhospital.api.services.IScheduleDoctorServices;
+import com.theduckhospital.api.repository.TimeSlotRepository;
+import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +41,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final DoctorScheduleRepository doctorScheduleRepository;
     private final MedicalExaminationRepository examinationRepository;
     private final BookingRepository bookingRepository;
+    private final ITimeSlotServices timeSlotServices;
+    private final TimeSlotRepository timeSlotRepository;
     @Value("${settings.date}")
     private String todayDate;
 
@@ -52,7 +52,9 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             IRoomServices roomServices,
             DoctorScheduleRepository doctorScheduleRepository,
             MedicalExaminationRepository examinationRepository,
-            BookingRepository bookingRepository
+            BookingRepository bookingRepository,
+            ITimeSlotServices timeSlotServices,
+            TimeSlotRepository timeSlotRepository
     ) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
@@ -60,6 +62,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.doctorScheduleRepository = doctorScheduleRepository;
         this.examinationRepository = examinationRepository;
         this.bookingRepository = bookingRepository;
+        this.timeSlotServices = timeSlotServices;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @Override
@@ -127,6 +131,23 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     @Override
+    public DoctorSchedule getDoctorScheduleByTimeSlotId(String timeSlotId) {
+        TimeSlot timeSlot = timeSlotServices.findTimeSlotByTimeSlotId(timeSlotId);
+
+        DoctorSchedule doctorSchedule = timeSlot.getDoctorSchedule();
+        if (timeSlot.isDeleted() || doctorSchedule.isDeleted()
+        ) {
+            throw new BadRequestException("Time slot not found");
+        }
+
+        if (doctorSchedule.getDate().before(DateCommon.getToday())) {
+            throw new BadRequestException("Doctor schedule is not available");
+        }
+
+        return doctorSchedule;
+    }
+
+    @Override
     public List<DoctorScheduleRoomResponse> getDoctorSchedulesByRoomAndDateAdmin(int roomId, Date date) {
         if(date == null) {
             date =  new Date();
@@ -166,7 +187,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     public QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException {
         DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
 
-        long maxQueueNumber = bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+        long maxQueueNumber = bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
                 doctorSchedule,
                 -1
         );
@@ -312,12 +333,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         Pageable pageable = PageRequest.of(0, limit);
         Page<Booking> bookings = bookingRepository
-                .findBookingsByDoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
+                .findBookingsByTimeSlot_DoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
                         doctorSchedule,
                         doctorSchedule.getQueueNumber(),
                         pageable
                 );
-        long maxQueueNumber = bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+        long maxQueueNumber = bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
                 doctorSchedule,
                 -1
         );
@@ -331,7 +352,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         );
     }
     public long calculateNumberOfBookings(DoctorSchedule schedule) {
-        return bookingRepository.countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(schedule, -1);
+        return bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(schedule, -1);
     }
 
     private List<DoctorSchedule> createDoctorScheduleRange(
@@ -350,41 +371,56 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Room is not in your department");
         }
 
-            Optional<DoctorSchedule> doctorScheduleOptional = doctorScheduleRepository
-                    .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
-                            room,
-                            date,
-                            scheduleType
-                    );
-            if (doctorScheduleOptional.isPresent()) {
-                throw new BadRequestException("Room is not available");
-            }
+        Optional<DoctorSchedule> doctorScheduleOptional = doctorScheduleRepository
+                .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+                        room,
+                        date,
+                        scheduleType
+                );
+        if (doctorScheduleOptional.isPresent()) {
+            throw new BadRequestException("Room is not available");
+        }
 
-            // Check doctor is available
-            Optional<DoctorSchedule> optional = doctorScheduleRepository
-                    .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
-                            doctor,
-                            date,
-                            scheduleType
-                    );
-            if (optional.isPresent()) {
-                throw new BadRequestException("Doctor is not available");
-            }
+        // Check doctor is available
+        Optional<DoctorSchedule> optional = doctorScheduleRepository
+                .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
+                        doctor,
+                        date,
+                        scheduleType
+                );
+        if (optional.isPresent()) {
+            throw new BadRequestException("Doctor is not available");
+        }
 
-            Calendar time = getCalendar(date);
+        Calendar time = getCalendar(date);
 
-            DoctorSchedule doctorSchedule = new DoctorSchedule();
-            doctorSchedule.setDoctor(doctor);
-            doctorSchedule.setRoom(room);
-            doctorSchedule.setMedicalService(medicalService);
-            doctorSchedule.setSlot(request.getSlot());
-            doctorSchedule.setDayOfWeek(time.get(Calendar.DAY_OF_WEEK));
-            doctorSchedule.setDate(date);
-            doctorSchedule.setScheduleType(scheduleType);
-            doctorSchedule.setDeleted(false);
+        DoctorSchedule doctorSchedule = new DoctorSchedule();
+        doctorSchedule.setDoctorScheduleId(UUID.randomUUID());
+        doctorSchedule.setDoctor(doctor);
+        doctorSchedule.setRoom(room);
+        doctorSchedule.setMedicalService(medicalService);
+        doctorSchedule.setSlot(request.getSlotPerTimeSlot() * 4);
+        doctorSchedule.setDayOfWeek(time.get(Calendar.DAY_OF_WEEK));
+        doctorSchedule.setDate(date);
+        doctorSchedule.setScheduleType(scheduleType);
+        doctorSchedule.setDeleted(false);
 
-            doctorSchedules.add(doctorSchedule);
+        int startTimeSlotId = scheduleType == MORNING ? 0 : 4;
+        List<TimeSlot> timeSlots = new ArrayList<>();
+        for (int i = startTimeSlotId; i < startTimeSlotId + 4; i++)
+        {
+            TimeSlot timeSlot = new TimeSlot(
+                    doctorSchedule,
+                    request.getSlotPerTimeSlot(),
+                    i * request.getSlotPerTimeSlot() + 1,
+                    i
+            );
 
+            timeSlots.add(timeSlot);
+        }
+        doctorSchedule.setTimeSlots(timeSlots);
+
+        doctorSchedules.add(doctorSchedule);
         return doctorSchedules;
     }
 
