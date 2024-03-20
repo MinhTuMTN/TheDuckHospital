@@ -31,6 +31,7 @@ import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/C
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
+import EnterProfileCode from './src/screens/patient/LookUpMedicalResults/EnterProfileCode';
 
 const Stack = createNativeStackNavigator();
 
@@ -129,6 +130,10 @@ const App = () => {
             <Stack.Screen
               name="BillingInformationScreen"
               component={BillingInformationScreen}
+            />
+            <Stack.Screen
+              name="EnterProfileCode"
+              component={EnterProfileCode}
             />
           </Stack.Navigator>
         </NavigationContainer>
