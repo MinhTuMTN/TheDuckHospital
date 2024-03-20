@@ -35,3 +35,15 @@ export type changePasswordDataProps = {
   newPassword: string;
   otp: string;
 };
+
+export type patientProfileDataProps = {
+  fullName: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  gender: number;
+  wardId: number;
+  streetName: string;
+  email: string;
+  identityNumber: string;
+  nationId: number;
+};

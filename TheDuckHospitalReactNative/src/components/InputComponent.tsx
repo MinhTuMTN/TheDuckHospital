@@ -163,11 +163,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           maxLength={maxLength}
           onSubmitEditing={onSubmitEditing}
         />
-        {endIcon && (
-          <InputSlot pr={'$3'}>
-            <InputIcon as={endIcon} />
-          </InputSlot>
-        )}
+        {endIcon && <InputSlot pr={'$3'}>{endIcon}</InputSlot>}
       </Input>
       {error && errorMessage && !isFirst && (
         <TextComponent

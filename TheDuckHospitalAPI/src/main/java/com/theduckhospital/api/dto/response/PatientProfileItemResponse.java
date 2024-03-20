@@ -13,6 +13,7 @@ public class PatientProfileItemResponse {
     private String fullName;
     private Date dateOfBirth;
     private String phoneNumber;
+    private String fullPhoneNumber;
     private String identityNumber;
     private Gender gender;
     private Nation nation;
@@ -29,6 +30,7 @@ public class PatientProfileItemResponse {
         this.fullName = patientProfile.getFullName();
         this.dateOfBirth = patientProfile.getDateOfBirth();
         this.phoneNumber = "*******" + patientProfile.getPhoneNumber().substring(7);
+        this.fullPhoneNumber = patientProfile.getPhoneNumber();
         this.identityNumber = patientProfile.getIdentityNumber();
         this.gender = patientProfile.getGender();
         this.nation = patientProfile.getNation();

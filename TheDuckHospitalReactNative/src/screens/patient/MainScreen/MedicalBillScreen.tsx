@@ -43,7 +43,7 @@ const MedicalBillScreen = () => {
         setBookings(bookingsTemp);
 
         let bookingToDisplayTemp = bookingsTemp[0]?.bookings;
-        bookingToDisplayTemp.sort((a: any, b: any) => {
+        bookingToDisplayTemp?.sort((a: any, b: any) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
 

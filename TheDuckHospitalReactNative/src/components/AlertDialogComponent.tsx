@@ -1,5 +1,10 @@
 import React from 'react';
-import {ColorValue, StyleProp, ViewStyle} from 'react-native';
+import {
+  ActivityIndicator,
+  ColorValue,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   AlertDialog,
@@ -26,6 +31,7 @@ interface AlertDialogComponentProps {
   acceptButtonStyles?: StyleProp<ViewStyle>;
   acceptButtonText?: string;
   acceptButtonTextColor?: ColorValue | undefined;
+  isLoading?: boolean;
   onClose?: () => void;
   onAccept?: () => void;
 }
@@ -41,6 +47,7 @@ const AlertDialogComponent = (props: AlertDialogComponentProps) => {
     acceptButtonStyles,
     acceptButtonText,
     acceptButtonTextColor,
+    isLoading = false,
     onClose,
     onAccept,
   } = props;
@@ -71,6 +78,11 @@ const AlertDialogComponent = (props: AlertDialogComponentProps) => {
         <AlertDialogFooter>
           <ButtonGroup space="lg">
             <ButtonComponent
+              startIcon={
+                isLoading && (
+                  <ActivityIndicator size="small" color={appColors.white} />
+                )
+              }
               onPress={onAccept}
               containerStyles={acceptButtonStyles}>
               <TextComponent bold color={acceptButtonTextColor}>

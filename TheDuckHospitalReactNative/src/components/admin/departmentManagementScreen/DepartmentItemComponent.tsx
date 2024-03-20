@@ -99,6 +99,7 @@ function DepartmentItemComponent() {
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}
         />
+
         <DepartmentAlertDialogComponent
           deleted={deleted}
           setDeleted={setDeleted}
