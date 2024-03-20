@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Linking,
+} from 'react-native';
 import React from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {
@@ -15,8 +22,43 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Done} from '../../../assets/svgs';
 import {TouchableOpacity} from '@gorhom/bottom-sheet';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
+import dayjs from 'dayjs';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import ButtonComponent from '../../../components/ButtonComponent';
+import {createBooking} from '../../../services/bookingServices';
 
-const BillingInformationScreen = () => {
+const BillingInformationScreen = ({route}: {route: any}) => {
+  const {data, profile} = route.params;
+
+  const [paymentLoading, setPaymentLoading] = React.useState(false);
+
+  const navigation = useNavigation<navigationProps>();
+  const handleNavigatPaymentScreen = () => {
+    navigation.navigate('PaymentScreen');
+  };
+  const handleBookingPayment = async () => {
+    setPaymentLoading(true);
+    const response = await createBooking(
+      profile?.patientProfileId,
+      [data?.timeSlot?.timeSlotId],
+      'MOMO',
+      true,
+    );
+    setPaymentLoading(false);
+
+    if (response.success) {
+      if (response.data?.data?.deepLink) {
+        Linking.openURL(response.data.data.deepLink);
+      } else if (response.data?.data?.paymentUrl) {
+        Linking.openURL(response.data.data.paymentUrl);
+      }
+    } else {
+      console.log('Payment failed');
+    }
+  };
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -59,7 +101,7 @@ const BillingInformationScreen = () => {
                     />
                   }
                   paddingStart={7}
-                  label="Nguyễn Ngọc Ánh Tuyết"
+                  label={profile?.fullName}
                   labelUppercase
                   labelStyles={{
                     fontSize: 15,
@@ -77,7 +119,7 @@ const BillingInformationScreen = () => {
                     />
                   }
                   paddingStart={10}
-                  label="20/07/1997"
+                  label={dayjs(profile?.dateOfBirth).format('DD/MM/YYYY')}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -94,7 +136,7 @@ const BillingInformationScreen = () => {
                     />
                   }
                   paddingStart={12}
-                  label="0372849294"
+                  label={profile?.phoneNumber}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -111,7 +153,7 @@ const BillingInformationScreen = () => {
                     />
                   }
                   paddingStart={6}
-                  label="484 Lê Văn Việt, phường Tăng Nhơn Phú A, Quận 9, TP.HCM"
+                  label={`${profile?.streetName}, ${profile?.ward?.wardName}, ${profile?.district?.districtName}, ${profile?.province?.provinceName}`}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -129,7 +171,7 @@ const BillingInformationScreen = () => {
                 <Space paddingTop={5} />
                 <LineInfoComponent
                   label="Bác sĩ"
-                  value="Đinh Huỳnh Tố Hương"
+                  value={data?.doctorName}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '400',
@@ -161,7 +203,7 @@ const BillingInformationScreen = () => {
                 <Space paddingTop={5} />
                 <LineInfoComponent
                   label="Chuyên khoa"
-                  value="Thần kinh"
+                  value={data?.departmentName}
                   valueUppercase
                   labelStyles={{
                     fontSize: 15,
@@ -178,7 +220,7 @@ const BillingInformationScreen = () => {
                 <Space paddingTop={5} />
                 <LineInfoComponent
                   label="Ngày khám"
-                  value="22/02/2024"
+                  value={data?.selectedDay}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '400',
@@ -194,7 +236,7 @@ const BillingInformationScreen = () => {
                 <Space paddingTop={5} />
                 <LineInfoComponent
                   label="Giờ khám"
-                  value="07:00-08:00"
+                  value={getTimeSlotById(data?.timeSlot?.timeId)}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '400',
@@ -210,7 +252,6 @@ const BillingInformationScreen = () => {
               </View>
             </ScrollView>
           </View>
-
           <View style={styles.bill}>
             <View style={styles.headerBill}>
               <TextComponent
@@ -228,7 +269,7 @@ const BillingInformationScreen = () => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
-                value="150.000đ"
+                value={formatCurrency(data?.price) + 'đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -246,7 +287,7 @@ const BillingInformationScreen = () => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label="Phí tiện ích + TGTT"
-                value="11.670đ"
+                value={formatCurrency('15000') + 'đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -264,7 +305,10 @@ const BillingInformationScreen = () => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label="Tổng tiền"
-                value="161.670đ"
+                value={
+                  formatCurrency((parseFloat(data?.price) + 15000).toString()) +
+                  'đ'
+                }
                 labelStyles={{
                   fontSize: 16,
                   fontWeight: '500',
@@ -284,22 +328,28 @@ const BillingInformationScreen = () => {
                   color={appColors.grayText}
                   fontSize={10}
                   paddingStart={8}
-                  textAlign="auto"
+                  flex={1}
+                  textAlign="justify"
                   flexWrap="wrap">
                   Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám,
                   thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ
                   sở ý tế.
                 </TextComponent>
               </View>
-              <TouchableOpacity style={styles.button}>
-                <TextComponent
-                  color={appColors.white}
-                  fontWeight="600"
-                  fontSize={15}
-                  uppercase>
-                  Thanh toán
-                </TextComponent>
-              </TouchableOpacity>
+              <ButtonComponent
+                onPress={handleBookingPayment}
+                borderRadius={40}
+                isLoading={paymentLoading}
+                textStyles={{
+                  textTransform: 'uppercase',
+                  fontWeight: '600',
+                }}
+                containerStyles={{
+                  marginTop: 20,
+                  padding: 15,
+                }}>
+                Thanh toán
+              </ButtonComponent>
             </View>
           </View>
         </View>
@@ -314,10 +364,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: appColors.white,
+    backgroundColor: '#fcfcfc',
   },
   overlay: {
-    flex: 6,
+    flex: 1,
   },
   note: {
     flexDirection: 'row',
@@ -340,12 +390,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   bill: {
-    flex: 5.5,
     width: '100%',
     flexDirection: 'column',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    elevation: 3,
+    elevation: 20,
+    backgroundColor: appColors.white,
   },
   headerBill: {
     paddingLeft: 20,

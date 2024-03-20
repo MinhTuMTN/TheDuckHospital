@@ -45,7 +45,9 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Booking> bookings = bookingRepository.findAll();
 
         Map<Department, Long> bookingsPerDepartment = bookings.stream()
-                .map(Booking::getDoctorSchedule)
+                .map(Booking::getTimeSlot)
+                .filter(Objects::nonNull)
+                .map(TimeSlot::getDoctorSchedule)
                 .filter(Objects::nonNull)
                 .map(DoctorSchedule::getDoctor)
                 .filter(Objects::nonNull)

@@ -2,9 +2,11 @@ package com.theduckhospital.api.dto.response;
 
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.DoctorSchedule;
+import com.theduckhospital.api.entity.TimeSlot;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,6 +20,7 @@ public class DoctorScheduleItemResponse {
     private boolean deleted;
     private Date createdDate;
     private Date updatedDate;
+    private List<TimeSlot> timeSlots;
     private boolean available;
 
     public DoctorScheduleItemResponse(DoctorSchedule doctorSchedule) {
@@ -30,9 +33,12 @@ public class DoctorScheduleItemResponse {
         this.deleted = doctorSchedule.isDeleted();
         this.createdDate = doctorSchedule.getCreatedDate();
         this.updatedDate = doctorSchedule.getUpdatedDate();
-        this.available = doctorSchedule.getBookings()
+        this.timeSlots = doctorSchedule.getTimeSlots();
+        this.available = doctorSchedule.getTimeSlots()
                 .stream()
-                .filter(booking -> !booking.isDeleted())
-                .count() < doctorSchedule.getSlot();
+                .anyMatch(timeSlot ->
+                        !timeSlot.isDeleted()
+                                && timeSlot.getCurrentSlot() < timeSlot.getMaxSlot()
+                );
     }
 }

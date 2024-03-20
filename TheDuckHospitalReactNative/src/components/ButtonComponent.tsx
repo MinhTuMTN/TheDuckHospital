@@ -65,7 +65,11 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     startIcon,
   } = props;
   return (
-    <View
+    <TouchableOpacity
+      onPress={() => {
+        if (!isLoading && enabled && onPress) onPress();
+      }}
+      disabled={!enabled}
       style={
         enabled
           ? [
@@ -84,32 +88,26 @@ const ButtonComponent = (props: ButtonComponentProps) => {
               },
             ]
       }>
-      <TouchableOpacity
-        onPress={() => {
-          if (!isLoading && enabled && onPress) onPress();
-        }}
-        disabled={!enabled}>
-        <View style={styles.loadingStyle}>
-          {isLoading && (
-            <ActivityIndicator
-              size="small"
-              color={props.loadingColor || '#ffffff'}
-            />
-          )}
-          {startIcon && !isLoading && startIcon}
-          <Text
-            style={textStyles}
-            color={textColor}
-            textAlign={textAlignment}
-            bold={bold}
-            italic={italic}
-            fontSize={fontSize}
-            fontWeight={fontWeight}>
-            {children}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.loadingStyle}>
+        {isLoading && (
+          <ActivityIndicator
+            size="small"
+            color={props.loadingColor || '#ffffff'}
+          />
+        )}
+        {startIcon && !isLoading && startIcon}
+        <Text
+          style={textStyles}
+          color={textColor}
+          textAlign={textAlignment}
+          bold={bold}
+          italic={italic}
+          fontSize={fontSize}
+          fontWeight={fontWeight}>
+          {children}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 

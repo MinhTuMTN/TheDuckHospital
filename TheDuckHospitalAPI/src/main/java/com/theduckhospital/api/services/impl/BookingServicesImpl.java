@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.BookingItemResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
@@ -34,8 +35,9 @@ public class BookingServicesImpl implements IBookingServices {
     private final PatientProfileRepository patientProfileRepository;
     private final IPatientServices patientServices;
     private final IScheduleDoctorServices doctorScheduleServices;
-    private final IVNPayServices vnPayServices;
+    private final IPaymentServices paymentServices;
     private final IAccountServices accountServices;
+    private final ITimeSlotServices timeSlotServices;
 
     public BookingServicesImpl(
             BookingRepository bookingRepository,
@@ -44,8 +46,9 @@ public class BookingServicesImpl implements IBookingServices {
             PatientProfileRepository patientProfileRepository,
             IPatientServices patientServices,
             IScheduleDoctorServices doctorScheduleServices,
-            IVNPayServices vnPayServices,
-            IAccountServices accountServices
+            IPaymentServices paymentServices,
+            IAccountServices accountServices,
+            ITimeSlotServices timeSlotServices
     ) {
         this.bookingRepository = bookingRepository;
         this.transactionRepository = transactionRepository;
@@ -53,15 +56,16 @@ public class BookingServicesImpl implements IBookingServices {
         this.patientProfileRepository = patientProfileRepository;
         this.patientServices = patientServices;
         this.doctorScheduleServices = doctorScheduleServices;
-        this.vnPayServices = vnPayServices;
+        this.paymentServices = paymentServices;
         this.accountServices = accountServices;
+        this.timeSlotServices = timeSlotServices;
     }
 
     @Override
     @Transactional
-    public String createBookingAndPayment(String token, BookingRequest request, String origin) {
+    public PaymentResponse createBookingAndPayment(String token, BookingRequest request, String origin) {
         try {
-            if (request.getDoctorScheduleIds().size() > 3)
+            if (request.getTimeSlotIds().size() > 3)
                 throw new BadRequestException("Maximum 3 doctor schedules per booking");
 
             PatientProfile patientProfile = patientProfileServices.getPatientProfileById(
@@ -70,17 +74,20 @@ public class BookingServicesImpl implements IBookingServices {
             );
 
             double totalAmount = 0;
-            List<DoctorSchedule> doctorSchedules = new ArrayList<>();
-            for (UUID doctorScheduleId : request.getDoctorScheduleIds()) {
+            List<TimeSlot> timeSlots = new ArrayList<>();
+            List<DoctorSchedule> tempDoctorSchedules = new ArrayList<>();
+            for (String timeSlotId : request.getTimeSlotIds()) {
+                TimeSlot timeSlot = timeSlotServices.findTimeSlotByTimeSlotId(timeSlotId);
+
                 DoctorSchedule doctorSchedule = doctorScheduleServices
-                        .getDoctorScheduleByIdForBooking(doctorScheduleId);
+                        .getDoctorScheduleByTimeSlotId(timeSlotId);
 
                 // Check duplicate doctor schedule
-                if (doctorSchedules.contains(doctorSchedule))
+                if (tempDoctorSchedules.contains(doctorSchedule))
                     throw new BadRequestException("Duplicate doctor schedule");
 
                 // Check duplicate department
-                for (DoctorSchedule schedule : doctorSchedules) {
+                for (DoctorSchedule schedule : tempDoctorSchedules) {
                     if (schedule.getDoctor().getDepartment().getDepartmentId() ==
                             doctorSchedule.getDoctor().getDepartment().getDepartmentId()) {
                         throw new BadRequestException("Duplicate department");
@@ -88,28 +95,24 @@ public class BookingServicesImpl implements IBookingServices {
                 }
 
                 // Check doctor schedule is full
-                long maxQueueNumber = bookingRepository
-                        .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                                doctorSchedule,
-                                -1
-                        );
-                if (maxQueueNumber >= doctorSchedule.getSlot())
-                    continue;
+                if (timeSlot.getCurrentSlot() >= timeSlot.getMaxSlot())
+                    throw new BadRequestException("Doctor schedule is full");
 
                 // Check already booked
                 Optional<Booking> bookingOptional = bookingRepository
-                        .findByPatientProfileAndDoctorScheduleAndDeletedIsFalse(
+                        .findByPatientProfileAndTimeSlot_DoctorScheduleAndDeletedIsFalse(
                                 patientProfile,
                                 doctorSchedule
                         );
                 if (bookingOptional.isPresent())
-                    continue;
+                    throw new BadRequestException("Doctor schedule already booked");
 
                 totalAmount += doctorSchedule.getMedicalService().getPrice();
-                doctorSchedules.add(doctorSchedule);
+                tempDoctorSchedules.add(doctorSchedule);
+                timeSlots.add(timeSlot);
             }
 
-            if (doctorSchedules.isEmpty())
+            if (timeSlots.isEmpty())
                 throw new BadRequestException("No doctor schedule available");
 
             Transaction transaction = new Transaction();
@@ -117,20 +120,27 @@ public class BookingServicesImpl implements IBookingServices {
             transaction.setOrigin(origin);
             transactionRepository.save(transaction);
 
-            for (DoctorSchedule doctorSchedule : doctorSchedules) {
+            for (TimeSlot timeSlot : timeSlots) {
                 Booking booking = new Booking();
                 booking.setPatientProfile(patientProfile);
-                booking.setDoctorSchedule(doctorSchedule);
+                booking.setTimeSlot(timeSlot);
                 booking.setTransaction(transaction);
                 booking.setQueueNumber(-1);
                 booking.setDeleted(true);
                 bookingRepository.save(booking);
             }
 
-            return vnPayServices.createPaymentUrl(
-                    transaction.getAmount(),
-                    transaction.getTransactionId()
-            );
+            return switch (request.getPaymentMethod()) {
+                case VNPAY -> paymentServices.vnPayCreatePaymentUrl(
+                        totalAmount,
+                        transaction.getTransactionId()
+                );
+                case MOMO -> paymentServices.momoCreatePaymentUrl(
+                        totalAmount,
+                        transaction.getTransactionId()
+                );
+                default -> throw new BadRequestException("Invalid payment method");
+            };
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
@@ -167,6 +177,8 @@ public class BookingServicesImpl implements IBookingServices {
             if (transaction == null)
                 return null;
 
+            if (transaction.getOrigin() == null)
+                return  "https://the-duck-hospital.web.app/payment-failed";
             return transaction.getOrigin() + "/payment-failed";
         }
 
@@ -176,6 +188,9 @@ public class BookingServicesImpl implements IBookingServices {
 
         if (transaction == null)
             return null;
+
+        if (transaction.getOrigin() == null)
+            return "https://the-duck-hospital.web.app/payment-success?transactionId=" + transaction.getTransactionId();
 
         return transaction.getOrigin() + "/payment-success?transactionId=" + transaction.getTransactionId();
     }
@@ -192,9 +207,9 @@ public class BookingServicesImpl implements IBookingServices {
                     .filter(booking -> !booking.isDeleted())
                     .toList().stream()
                     .sorted((b1, b2) -> {
-                        if (b1.getDoctorSchedule().getDate().after(b2.getDoctorSchedule().getDate()))
+                        if (b1.getTimeSlot().getDate().after(b2.getTimeSlot().getDate()))
                             return 1;
-                        else if (b1.getDoctorSchedule().getDate().before(b2.getDoctorSchedule().getDate()))
+                        else if (b1.getTimeSlot().getDate().before(b2.getTimeSlot().getDate()))
                             return -1;
                         else
                             return 0;
@@ -246,13 +261,13 @@ public class BookingServicesImpl implements IBookingServices {
 
 
         // Check date booking with current date
-        Date date = booking.getDoctorSchedule().getDate();
+        Date date = booking.getTimeSlot().getDate();
         Date currentDate = DateCommon.getToday();
         if (DateCommon.compareDate(date, currentDate) != 0 )
             throw new StatusCodeException("Invalid examination date", 409);
 
 
-        if (booking.getDoctorSchedule().getRoom().getRoomId() != roomId)
+        if (booking.getTimeSlot().getDoctorSchedule().getRoom().getRoomId() != roomId)
             throw new StatusCodeException("Room not valid", 410);
 
         return booking;
@@ -280,11 +295,11 @@ public class BookingServicesImpl implements IBookingServices {
         if (patientProfile.isDeleted() || patientProfile.getPatient() == null)
             throw new BadRequestException("Patient profile not valid");
 
-        DoctorSchedule doctorSchedule = doctorScheduleServices
-                .getDoctorScheduleByIdForBooking(request.getDoctorScheduleId());
+        TimeSlot timeSlot = timeSlotServices
+                .findTimeSlotByTimeSlotId(request.getTimeSlotId());
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(doctorSchedule.getMedicalService().getPrice());
+        transaction.setAmount(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
         transaction.setStatus(TransactionStatus.SUCCESS);
         transaction.setBankCode(null);
         transaction.setPaymentMethod("CASH");
@@ -293,16 +308,12 @@ public class BookingServicesImpl implements IBookingServices {
         transaction.setStatus(TransactionStatus.SUCCESS);
         transactionRepository.save(transaction);
 
-        long maxQueueNumber = bookingRepository
-                .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                        doctorSchedule,
-                        -1
-                );
+
         Booking booking = new Booking();
         booking.setPatientProfile(patientProfile);
-        booking.setDoctorSchedule(doctorSchedule);
+        booking.setTimeSlot(timeSlot);
         booking.setTransaction(transaction);
-        booking.setQueueNumber((int) maxQueueNumber + 1);
+        booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot() + 1);
         booking.setDeleted(false);
         bookingRepository.save(booking);
 
@@ -326,15 +337,9 @@ public class BookingServicesImpl implements IBookingServices {
 
         List<Booking> bookings = transaction.getBookings();
         for (Booking booking : bookings) {
-            DoctorSchedule doctorSchedule = booking.getDoctorSchedule();
+            TimeSlot timeSlot = booking.getTimeSlot();
 
-            long maxQueueNumber = bookingRepository
-                    .countByDoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                            doctorSchedule,
-                            -1
-                    );
-
-            booking.setQueueNumber((int) maxQueueNumber + 1);
+            booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot() + 1);
             booking.setDeleted(false);
             bookingRepository.save(booking);
         }
