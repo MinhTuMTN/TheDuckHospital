@@ -7,8 +7,14 @@ import InfoProfileItemComponent from '../../../components/patient/lookUpMedicalR
 import ButtonComponent from '../../../components/ButtonComponent';
 import {appInfo} from '../../../constants/appInfo';
 import {appColors} from '../../../constants/appColors';
+import {useNavigation} from '@react-navigation/native';
 
 const AllPatientProfilesScreen = () => {
+  const navigate = useNavigation();
+
+  const handleEnterProfileCode = () => {
+    navigate.navigate('EnterProfileCode' as never);
+  };
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -23,6 +29,7 @@ const AllPatientProfilesScreen = () => {
 
       <View style={styles.buttonAddProfile}>
         <ButtonComponent
+          onPress={handleEnterProfileCode}
           backgroundColor={appColors.darkerBlue}
           borderRadius={15}
           containerStyles={{paddingVertical: 12}}

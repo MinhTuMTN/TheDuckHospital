@@ -1,39 +1,40 @@
+import {config} from '@gluestack-ui/config';
 import {GluestackUIProvider} from '@gluestack-ui/themed';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
-import {Linking, StatusBar} from 'react-native';
+import React from 'react';
+import {StatusBar} from 'react-native';
+import 'react-native-gesture-handler';
 import {AuthProvider} from './src/auth/AuthProvider';
+import linking from './src/linking';
 import './src/localization/i18n';
+import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
 import NotFoundScreen from './src/screens/NotFoundScreen';
 import SlashScreen from './src/screens/SlashScreen';
+import TestScreen from './src/screens/TestScreen';
+import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
+import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
+import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
+import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
+import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
-import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
-import 'react-native-gesture-handler';
-import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
-import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
-import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
-import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
-import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
-import TestScreen from './src/screens/TestScreen';
-import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDoctorsScreen';
-import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults/AllPatientProfilesScreen';
-import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
-import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
-import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
+import EnterProfileCode from './src/screens/patient/LookUpMedicalResults/EnterProfileCode';
+import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
+import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
+import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDoctorsScreen';
 import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
+import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
-import {config} from '@gluestack-ui/config';
-import linking from './src/linking';
+import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -146,6 +147,10 @@ const App = () => {
             <Stack.Screen
               name="PaymentResultScreen"
               component={PaymentResultScreen}
+            />
+            <Stack.Screen
+              name="EnterProfileCode"
+              component={EnterProfileCode}
             />
             <Stack.Screen
               name="ChooseProfileScreen"
