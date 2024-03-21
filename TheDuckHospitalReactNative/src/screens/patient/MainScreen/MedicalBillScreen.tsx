@@ -19,7 +19,10 @@ const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
   const [fillter, setFillter] = useState('Tất cả');
   const [patientNames, setPatientNames] = useState([]);
-  const [selectedPatientName, setSelectedPatientName] = useState('');
+  const [selectedPatientName, setSelectedPatientName] = useState({
+    fullName: null,
+    patientProfileId: null,
+  });
   const [bookings, setBookings] = useState<any[]>([]);
   const [bookingToDisplay, setBookingToDisplay] = useState([]);
   const isFocused = useIsFocused();
@@ -29,7 +32,10 @@ const MedicalBillScreen = () => {
 
   const _renderItem = ({item}: any) => {
     return (
-      <MedicalBillComponent booking={item} patientName={selectedPatientName} />
+      <MedicalBillComponent
+        booking={item}
+        patientName={selectedPatientName.fullName || ''}
+      />
     );
   };
   const _keyExtractor = (item: any, index: number) => item.bookingId;
@@ -53,11 +59,19 @@ const MedicalBillScreen = () => {
         });
         setBookingToDisplay(bookingToDisplayTemp);
 
-        let patientNamesTemp = bookingsTemp.map(
-          (booking: any) => booking.fullName,
-        );
+        let patientNamesTemp = bookingsTemp.map((booking: any) => {
+          const item = {
+            fullName: booking.fullName,
+            patientProfileId: booking.patientProfileId,
+          };
+
+          return item;
+        });
         setPatientNames(patientNamesTemp);
-        setSelectedPatientName(bookingsTemp[0]?.fullName);
+        setSelectedPatientName({
+          fullName: patientNamesTemp[0]?.fullName,
+          patientProfileId: patientNamesTemp[0]?.patientProfileId,
+        });
       } else {
         console.log('Error: ', response.error);
       }
@@ -85,6 +99,21 @@ const MedicalBillScreen = () => {
     }
     setIsLoadingAPI(false);
   }, [fillter]);
+
+  useEffect(() => {
+    const temp = bookings.filter(
+      (booking: any) =>
+        booking.patientProfileId === selectedPatientName.patientProfileId,
+    );
+    let bookingToDisplayTemp = temp[0]?.bookings;
+    bookingToDisplayTemp?.sort((a: any, b: any) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+
+      return dateB.getTime() - dateA.getTime();
+    });
+    setBookingToDisplay(bookingToDisplayTemp);
+  }, [selectedPatientName]);
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -108,6 +137,7 @@ const MedicalBillScreen = () => {
         <SelectComponent
           flex={1}
           options={patientNames}
+          keyTitle="fullName"
           value={selectedPatientName}
           selectTextColor={appColors.textDarker}
           title="Chọn hồ sơ bệnh nhân"

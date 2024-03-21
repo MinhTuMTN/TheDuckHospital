@@ -277,6 +277,7 @@ public class BookingServicesImpl implements IBookingServices {
             AccountBookingResponse response = new AccountBookingResponse();
             response.setFullName(profile.getFullName());
             response.setBookings(bookings.stream().map(BookingItemResponse::new).toList());
+            response.setPatientProfileId(profile.getPatientProfileId());
             responses.add(response);
         }
 

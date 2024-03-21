@@ -412,7 +412,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             TimeSlot timeSlot = new TimeSlot(
                     doctorSchedule,
                     request.getSlotPerTimeSlot(),
-                    i * request.getSlotPerTimeSlot() + 1,
+                    (i % 4) * request.getSlotPerTimeSlot() + 1,
                     i
             );
 

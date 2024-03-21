@@ -7,6 +7,8 @@ import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
 import {formatDate} from '../../../utils/dateUtils';
 import {formatCurrency} from '../../../utils/currencyUtils';
+import dayjs from 'dayjs';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 
 const DividerItem = () => {
   return (
@@ -26,6 +28,8 @@ const DetailsMedicalBillComponent = (
   props: DetailsMedicalBillComponentProps,
 ) => {
   const {booking} = props;
+  console.log(booking.date);
+
   const navigation = useNavigation<navigationProps>();
 
   const handleClickViewDetails = () => {
@@ -77,7 +81,7 @@ const DetailsMedicalBillComponent = (
             Ngày khám:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            {formatDate(booking?.date, '-')} (
+            {dayjs(booking.date).format('DD-MM-YYYY')} (
             {booking?.scheduleType === 'MORNING' ? 'Buổi sáng' : 'Buổi chiều'})
           </TextComponent>
         </View>
@@ -89,7 +93,7 @@ const DetailsMedicalBillComponent = (
             Giờ khám:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            8:00
+            {getTimeSlotById(booking?.timeId)}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
@@ -122,7 +126,7 @@ const DetailsMedicalBillComponent = (
             Ngày sinh:
           </TextComponent>
           <TextComponent fontWeight="500" flex={3}>
-            {formatDate(booking?.patientDateOfBirth, '-')}
+            {dayjs(booking?.patientDateOfBirth).format('DD-MM-YYYY')}
           </TextComponent>
         </View>
         <View style={styles.rowItem}>
