@@ -21,7 +21,8 @@ import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
 
 const ChooseDateScreen = ({route}: {route: any}) => {
-  const {data} = route.params;
+  const {selectedDoctor, timeSlots} = route.params;
+
   const [availableDates, setAvailableDates] = React.useState<string[]>([]);
   const [selectedDay, setSelectedDay] = React.useState<dayjs.Dayjs>(dayjs());
   const [selectedDoctorSchedule, setSelectedDoctorSchedule] =
@@ -51,7 +52,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
             if (available) {
               setSelectedDay(dayjs(e.date?.dateString as string));
               setSelectedDoctorSchedule(
-                data?.doctorSchedules.filter(
+                selectedDoctor?.doctorSchedules.filter(
                   (ds: any) =>
                     dayjs(ds.date).format('DD/MM/YYYY') ===
                     date.format('DD/MM/YYYY'),
@@ -112,13 +113,16 @@ const ChooseDateScreen = ({route}: {route: any}) => {
 
   const handleNavigateConfirmBooking = (timeSlot: any) => {
     navigation.navigate('ConfirmBookingInformationScreen', {
-      data: {
-        doctorName: `${data?.degree} ${data?.doctorName}`,
-        departmentName: data?.department?.departmentName,
-        selectedDay: selectedDay.format('DD/MM/YYYY'),
-        timeSlot: timeSlot,
-        price: data?.price,
-      },
+      timeSlots: [
+        ...(timeSlots || []),
+        {
+          doctorName: `${selectedDoctor?.degree} ${selectedDoctor?.doctorName}`,
+          departmentName: selectedDoctor?.department?.departmentName,
+          selectedDay: selectedDay.format('DD/MM/YYYY'),
+          timeSlot: timeSlot,
+          price: selectedDoctor?.price,
+        },
+      ],
     });
   };
 
@@ -127,16 +131,26 @@ const ChooseDateScreen = ({route}: {route: any}) => {
   }, []);
 
   useEffect(() => {
-    const doctorSchedules = data?.doctorSchedules;
+    const doctorSchedules = selectedDoctor?.doctorSchedules;
+    if (doctorSchedules && timeSlots?.length > 0) {
+      const selectedDate = dayjs(timeSlots[0]?.timeSlot?.date).format(
+        'DD/MM/YYYY',
+      );
+      const available = doctorSchedules.some(
+        (schedule: any) =>
+          dayjs(schedule.date).format('DD/MM/YYYY') === selectedDate,
+      );
 
-    if (doctorSchedules) {
+      available ? setAvailableDates([selectedDate]) : setAvailableDates([]);
+      return;
+    } else {
       const dates = doctorSchedules.map((schedule: any) =>
         dayjs(schedule.date).format('DD/MM/YYYY'),
       );
 
       setAvailableDates(dates);
     }
-  }, [data]);
+  }, [selectedDoctor?.doctorSchedules]);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>

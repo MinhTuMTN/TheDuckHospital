@@ -31,19 +31,21 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import {createBooking} from '../../../services/bookingServices';
 
 const BillingInformationScreen = ({route}: {route: any}) => {
-  const {data, profile} = route.params;
+  const {timeSlots, profile} = route.params;
 
   const [paymentLoading, setPaymentLoading] = React.useState(false);
 
   const navigation = useNavigation<navigationProps>();
-  const handleNavigatPaymentScreen = () => {
-    navigation.navigate('PaymentScreen');
-  };
+  const totalAmount = React.useMemo(() => {
+    return timeSlots?.reduce((total: number, item: any) => {
+      return total + item.price;
+    }, 0);
+  }, [timeSlots]);
   const handleBookingPayment = async () => {
     setPaymentLoading(true);
     const response = await createBooking(
       profile?.patientProfileId,
-      [data?.timeSlot?.timeSlotId],
+      timeSlots.map((item: any) => item?.timeSlot?.timeSlotId),
       'MOMO',
       true,
     );
@@ -169,86 +171,94 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   Thông tin đặt khám
                 </TextComponent>
                 <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Bác sĩ"
-                  value={data?.doctorName}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Dịch vụ khám"
-                  value="Khám dịch vụ"
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Chuyên khoa"
-                  value={data?.departmentName}
-                  valueUppercase
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Ngày khám"
-                  value={data?.selectedDay}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Giờ khám"
-                  value={getTimeSlotById(data?.timeSlot?.timeId)}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
+                {timeSlots?.map((data: any, index: number) => (
+                  <View
+                    key={`time-slot-${index}`}
+                    style={{
+                      marginBottom: 16,
+                    }}>
+                    <LineInfoComponent
+                      label="Bác sĩ"
+                      value={data?.doctorName}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Dịch vụ khám"
+                      value="Khám dịch vụ"
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Chuyên khoa"
+                      value={data?.departmentName}
+                      valueUppercase
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Ngày khám"
+                      value={data?.selectedDay}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Giờ khám"
+                      value={getTimeSlotById(data?.timeSlot?.timeId)}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                  </View>
+                ))}
               </View>
             </ScrollView>
           </View>
@@ -269,7 +279,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
-                value={formatCurrency(data?.price) + 'đ'}
+                value={formatCurrency(totalAmount) + 'đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -306,7 +316,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <LineInfoComponent
                 label="Tổng tiền"
                 value={
-                  formatCurrency((parseFloat(data?.price) + 15000).toString()) +
+                  formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
                   'đ'
                 }
                 labelStyles={{

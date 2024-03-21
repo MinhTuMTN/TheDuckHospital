@@ -10,38 +10,48 @@ import {
   Trash,
 } from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
+import {formatDate} from '../../../utils/dateUtils';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
-const InfoBookingComponent = () => {
+interface InfoBookingComponentProps {
+  item: any;
+  onDelete?: () => void;
+}
+
+const InfoBookingComponent = (props: InfoBookingComponentProps) => {
+  const {item, onDelete} = props;
+
   return (
     <View style={styles.container}>
       <LineComfirmBookingInfo
         label="Chuyên khoa:"
-        value="Thần kinh vận động và parkinson"
+        value={item?.departmentName}
         isDepartment
         image={<Hospital />}
       />
       <LineComfirmBookingInfo
         label="Bác sĩ:"
-        value="Nguyễn Khánh Linh"
+        value={item?.doctorName}
         image={<Doctor />}
       />
       <LineComfirmBookingInfo
         label="Ngày khám:"
-        value="17/03/2024"
+        value={formatDate(item?.timeSlot?.date)}
         image={<Calendar7 />}
       />
       <LineComfirmBookingInfo
         label="Giờ khám:"
-        value="08:00 - 09:00"
+        value={getTimeSlotById(item?.timeSlot?.timeId)}
         image={<AlarmClock />}
       />
       <LineComfirmBookingInfo
         label="Phí khám:"
-        value="200.000đ"
+        value={formatCurrency(item?.price) + 'đ'}
         image={<Hospital />}
       />
       <View style={styles.button}>
-        <Trash width={20} height={20} />
+        <Trash width={20} height={20} onPress={onDelete && onDelete} />
       </View>
     </View>
   );

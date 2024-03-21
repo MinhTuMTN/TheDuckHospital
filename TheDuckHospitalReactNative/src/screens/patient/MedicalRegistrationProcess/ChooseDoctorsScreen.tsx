@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   ActivityIndicator,
@@ -28,6 +28,8 @@ import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
 import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
 import {getAllDepartment} from '../../../services/bookingServices';
+import dayjs from 'dayjs';
+import {t} from 'i18next';
 
 const degreeData = [
   {
@@ -52,7 +54,9 @@ const degreeData = [
   },
 ];
 
-const ChooseDoctorsScreen = () => {
+const ChooseDoctorsScreen = ({route}: {route: any}) => {
+  const timeSlots = route.params?.timeSlots;
+
   const [doctors, setDoctors] = React.useState<any>([]);
   const [pagination, setPagination] = React.useState({
     page: 1,
@@ -91,9 +95,13 @@ const ChooseDoctorsScreen = () => {
   // End Animation Filter
 
   const navigation = useNavigation<navigationProps>();
-  const renderItem = useCallback(({item}: {item: any}) => {
-    return <DoctorInfoComponent item={item} />;
-  }, []);
+  const isFocused = useIsFocused();
+  const renderItem = useCallback(
+    ({item}: {item: any}) => {
+      return <DoctorInfoComponent item={item} timeSlots={timeSlots} />;
+    },
+    [timeSlots],
+  );
   const keyExtractor = useCallback(
     (item: any, index: number) => `doctor-${item.id}-${index}`,
     [],
@@ -199,6 +207,33 @@ const ChooseDoctorsScreen = () => {
     handleSearchDoctor();
   }, [handleSearchDoctor]);
 
+  useEffect(() => {
+    if (!timeSlots || timeSlots.length === 0) return;
+    const selectedDepartments: any[] = timeSlots.map(
+      (item: any) => item.departmentName,
+    );
+    setDepartments((prevState: any) =>
+      prevState.filter(
+        (item: any) => selectedDepartments.indexOf(item.departmentName) === -1,
+      ),
+    );
+    const selectedDate = dayjs(timeSlots[0].timeSlot?.date).format(
+      'DD/MM/YYYY',
+    );
+
+    let prevDoctors: any[] = doctors;
+    prevDoctors = prevDoctors.filter((item: any) => {
+      return item.doctorSchedules.some(
+        (schedule: any) =>
+          dayjs(schedule.date).format('DD/MM/YYYY') === selectedDate,
+      );
+    });
+    prevDoctors = prevDoctors.filter(
+      (item: any) =>
+        selectedDepartments.indexOf(item.department.departmentName) === -1,
+    );
+    setDoctors(prevDoctors);
+  }, [timeSlots]);
   return (
     <View style={styles.container}>
       <View style={styles.header}>

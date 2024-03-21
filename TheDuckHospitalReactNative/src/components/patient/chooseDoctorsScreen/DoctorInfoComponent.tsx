@@ -17,6 +17,7 @@ import {navigationProps} from '../../../types';
 
 interface DoctorInfoComponentProps {
   item: any;
+  timeSlots: any;
 }
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
@@ -26,7 +27,8 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
 
   const navigateToChooseDateScreen = () => {
     navigation.navigate('ChooseDateScreen', {
-      data: item,
+      selectedDoctor: item,
+      timeSlots: props.timeSlots,
     });
   };
 

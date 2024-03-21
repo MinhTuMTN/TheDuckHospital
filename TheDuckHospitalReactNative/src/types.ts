@@ -7,6 +7,7 @@ export type navigationProps = {
   navigate: (screen: string, params?: any) => void;
   goBack: () => void;
   reset: (props: resetProps) => void;
+  push: (screen: string, params?: any) => void;
 };
 
 export type checkPhoneOrEmailDataProps = {

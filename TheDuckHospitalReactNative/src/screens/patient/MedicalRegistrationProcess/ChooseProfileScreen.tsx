@@ -11,7 +11,7 @@ import {navigationProps} from '../../../types';
 
 const ChooseProfileScreen = ({route}: {route: any}) => {
   const {t} = useTranslation();
-  const {data} = route.params;
+  const {timeSlots} = route.params;
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -20,7 +20,7 @@ const ChooseProfileScreen = ({route}: {route: any}) => {
 
   const handleNavigateToBillInfoScreen = (profile: any) => {
     navigation.navigate('BillingInformationScreen', {
-      data: data,
+      timeSlots: timeSlots,
       profile: profile,
     });
   };

@@ -1,5 +1,11 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
+import React, {useEffect, useMemo} from 'react';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {appColors} from '../../../constants/appColors';
@@ -12,20 +18,36 @@ import {
   StethoscopeBlue,
 } from '../../../assets/svgs';
 import {useNavigation} from '@react-navigation/native';
-import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 import {navigationProps} from '../../../types';
 import InfoBookingComponent from '../../../components/patient/confirmBookingScreen/InfoBookingComponent';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import ButtonComponent from '../../../components/ButtonComponent';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
 const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
-  const {data} = route.params;
+  const {timeSlots} = route.params;
+  const [timeSlotsState, setTimeSlotsState] = React.useState(timeSlots || []);
 
   const navigation = useNavigation<navigationProps>();
+  const totalAmount = useMemo(() => {
+    return timeSlotsState.reduce((total: number, item: any) => {
+      return total + item.price;
+    }, 0);
+  }, [timeSlotsState]);
   const handleNavigate = () => {
     navigation.navigate('ChooseProfileScreen', {
-      data: data,
+      timeSlots: timeSlotsState,
     });
   };
+  const handleNavigateAddDepartment = () => {
+    navigation.navigate('ChooseDoctorsScreen', {
+      timeSlots: timeSlotsState,
+    });
+  };
+
+  useEffect(() => {
+    if (timeSlotsState.length === 0) handleNavigateAddDepartment();
+  }, [timeSlotsState]);
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -45,7 +67,10 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
                   (3)
                 </TextComponent>
               </TextComponent>
-              <View
+              <Pressable
+                onPress={() => {
+                  setTimeSlotsState([]);
+                }}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -62,11 +87,21 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
                   color={appColors.error}
                   style={{paddingLeft: 5}}
                 />
-              </View>
+              </Pressable>
             </View>
             <View style={styles.bodyMain}>
-              <InfoBookingComponent />
-              <InfoBookingComponent />
+              {timeSlotsState.map((item: any, index: number) => (
+                <InfoBookingComponent
+                  key={index}
+                  item={item}
+                  onDelete={() => {
+                    const temp = timeSlotsState.filter(
+                      (timeSlot: any) => timeSlot !== item,
+                    );
+                    setTimeSlotsState(temp);
+                  }}
+                />
+              ))}
             </View>
           </View>
         </View>
@@ -85,28 +120,30 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
               fontSize={17}
               fontWeight="700"
               color={appColors.primary}>
-              450.000đ
+              {formatCurrency(totalAmount) + ' đ'}
             </TextComponent>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              {
-                borderColor: appColors.primary,
-                borderWidth: 1,
-                flexDirection: 'row',
-              },
-            ]}
-            onPress={handleNavigate}>
-            <StethoscopeBlue width={20} height={20} />
-            <TextComponent
-              paddingStart={5}
-              fontSize={17}
-              fontWeight="700"
-              color={appColors.primary}>
+          {timeSlotsState.length < 3 && (
+            <ButtonComponent
+              onPress={handleNavigateAddDepartment}
+              startIcon={<StethoscopeBlue width={20} height={20} />}
+              textStyles={{
+                fontSize: 17,
+                fontWeight: '700',
+                color: appColors.primary,
+              }}
+              containerStyles={[
+                styles.button,
+                {
+                  borderColor: appColors.primary,
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  backgroundColor: appColors.white,
+                },
+              ]}>
               Thêm chuyên khoa
-            </TextComponent>
-          </TouchableOpacity>
+            </ButtonComponent>
+          )}
           <TouchableOpacity
             style={[
               styles.button,

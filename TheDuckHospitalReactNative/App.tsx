@@ -39,16 +39,6 @@ import MedicineReminderScreen from './src/screens/patient/MedicineReminder/Medic
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  // useEffect(() => {
-  //   // THIS IS THE MAIN POINT OF THIS ANSWER
-  //   const navigateToInitialUrl = async () => {
-  //     const initialUrl = await Linking.getInitialURL();
-  //     if (initialUrl) {
-  //       await Linking.openURL(initialUrl);
-  //     }
-  //   };
-  //   navigateToInitialUrl();
-  // }, []);
   return (
     <GluestackUIProvider config={config}>
       <StatusBar
