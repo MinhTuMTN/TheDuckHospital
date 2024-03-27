@@ -1,4 +1,10 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import {appColors} from '../../../constants/appColors';
 import {FlexComponent, TextComponent} from '../..';
@@ -10,7 +16,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const InfoProfileItemComponent = () => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container}>
       <LineInfoComponent
         startIcon={
           <Ionicons
@@ -69,7 +75,7 @@ const InfoProfileItemComponent = () => {
       <View style={styles.buttonNext}>
         <ChevronRight size={28} color={appColors.textLight} />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -84,6 +90,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     flexDirection: 'column',
+    elevation: 7,
   },
   buttonNext: {
     position: 'absolute',
