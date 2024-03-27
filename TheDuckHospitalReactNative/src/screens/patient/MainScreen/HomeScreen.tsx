@@ -3,9 +3,11 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
+  Alert,
   FlatList,
   Image,
   Linking,
+  PermissionsAndroid,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -19,6 +21,9 @@ import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctor
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
+import messaging from '@react-native-firebase/messaging';
+import {AppNotification} from '../../../utils/appNotification';
+import notifee from '@notifee/react-native';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -60,17 +65,6 @@ const HomeScreen = () => {
     );
   };
 
-  useEffect(() => {
-    const handlegetAllHeadDoctor = async () => {
-      const respone = await getAllHeadDoctor();
-
-      if (respone.success) {
-        setListDoctor(respone.data?.data);
-      }
-    };
-    handlegetAllHeadDoctor();
-  }, []);
-
   const handleChooseDoctor = () => {
     navigation.navigate('ChooseDoctorsScreen' as never);
   };
@@ -89,6 +83,17 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
+    const handlegetAllHeadDoctor = async () => {
+      const respone = await getAllHeadDoctor();
+
+      if (respone.success) {
+        setListDoctor(respone.data?.data);
+      }
+    };
+    handlegetAllHeadDoctor();
+  }, []);
+
+  useEffect(() => {
     if (showMoreMenu) {
       navigation.setOptions({
         tabBarStyle: {
@@ -103,6 +108,27 @@ const HomeScreen = () => {
       });
     }
   }, [showMoreMenu]);
+
+  useEffect(() => {
+    AppNotification.requestPermission();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMess
+      AppNotification.displayNotification(remoteMessage);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    notifee.getInitialNotification().then(notification => {
+      if (notification) {
+        Linking.openURL('theduck://app/payment/1');
+      }
+    });
+  }, []);
 
   return (
     <>

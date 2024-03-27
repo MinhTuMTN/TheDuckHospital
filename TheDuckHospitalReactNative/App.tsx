@@ -2,8 +2,8 @@ import {config} from '@gluestack-ui/config';
 import {GluestackUIProvider} from '@gluestack-ui/themed';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
-import {StatusBar} from 'react-native';
+import React, {useEffect} from 'react';
+import {Linking, StatusBar} from 'react-native';
 import 'react-native-gesture-handler';
 import {AuthProvider} from './src/auth/AuthProvider';
 import linking from './src/linking';
@@ -35,10 +35,17 @@ import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProces
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import notifee, {EventType} from '@notifee/react-native';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  notifee.onForegroundEvent(async ({type, detail}) => {
+    if (type === EventType.PRESS) {
+      Linking.openURL('theduck://app/payment/1');
+    }
+  });
+
   return (
     <GluestackUIProvider config={config}>
       <StatusBar
