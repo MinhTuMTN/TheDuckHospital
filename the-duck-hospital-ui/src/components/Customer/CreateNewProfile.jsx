@@ -190,7 +190,7 @@ function CreateNewProfile(props) {
     const data = {
       fullName,
       phoneNumber,
-      dateOfBirth: dayjs(dateOfBirth).add(7, "hour").toISOString(),
+      dateOfBirth: dateOfBirth,
       gender,
       wardId: selectedWardId,
       streetName,

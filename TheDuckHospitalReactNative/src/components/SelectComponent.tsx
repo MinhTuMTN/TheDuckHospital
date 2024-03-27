@@ -56,6 +56,9 @@ interface SelectComponentProps {
   paddingLeft?: DimensionValue | undefined;
   selectIconColor?: ColorValue | undefined;
   borderRadius?: AnimatableNumericValue | undefined;
+  borderColor?: ColorValue | undefined;
+  error?: boolean;
+  errorMessage?: string;
 }
 
 interface CustomSelectItemComponentProps {
@@ -120,6 +123,9 @@ const SelectComponent = (props: SelectComponentProps) => {
     selectTextSize,
     selectIconColor,
     borderRadius,
+    borderColor,
+    error,
+    errorMessage,
   } = props;
 
   const handleOnChange = useCallback(
@@ -165,6 +171,7 @@ const SelectComponent = (props: SelectComponentProps) => {
   }, [searchText, options]);
 
   return (
+    <>
     <Select
       selectedValue={
         !value || typeof value === 'string' ? value : value[keyTitle]
@@ -189,6 +196,7 @@ const SelectComponent = (props: SelectComponentProps) => {
         size={size}
         style={{
           borderRadius: borderRadius || 10,
+          borderColor: borderColor,
         }}
         onPress={() => setIsOpen(true)}>
         <View
@@ -289,6 +297,18 @@ const SelectComponent = (props: SelectComponentProps) => {
         </SelectContent>
       </SelectPortal>
     </Select>
+    {error && errorMessage && (
+      <TextComponent
+        color={appColors.error}
+        fontSize={12}
+        style={{
+          paddingTop: 10,
+          paddingLeft: 5,
+        }}>
+        {errorMessage}
+      </TextComponent>
+    )}
+    </>
   );
 };
 

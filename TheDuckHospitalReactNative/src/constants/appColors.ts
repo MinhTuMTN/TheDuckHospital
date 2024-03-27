@@ -7,6 +7,7 @@ export const appColors = {
   darkGreen: '#0891B2',
   gray: '#ebeced',
   grayLight: '#8C8C8C',
+  darkGray: '#6d6d6d',
   grayLine: '#DADADA',
   grayText: '#828282',
   lightGray: '#f1f1f1',

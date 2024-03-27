@@ -12,6 +12,7 @@ import {TextComponent} from '.';
 
 interface Props {
   startIcon?: any;
+  endIcon?: any;
   label: string;
   value?: string;
   labelStyles?: StyleProp<TextStyle>;
@@ -32,6 +33,7 @@ interface Props {
 const LineInfoComponent = (props: Props) => {
   const {
     startIcon,
+    endIcon,
     label,
     value,
     labelStyles = {
@@ -76,15 +78,18 @@ const LineInfoComponent = (props: Props) => {
         uppercase={labelUppercase}>
         {label}
       </TextComponent>
-      {value && (
-        <TextComponent
-          color={valueColor}
-          style={valueStyles}
-          flex={flexValue}
-          uppercase={valueUppercase}>
-          {value}
-        </TextComponent>
-      )}
+      <View style={{flexDirection: 'row', flex: flexValue}}>
+        {value && (
+          <TextComponent
+            color={valueColor}
+            style={valueStyles}
+            flex={endIcon ? 0.85 : 1}
+            uppercase={valueUppercase}>
+            {value}
+          </TextComponent>
+        )}
+        {endIcon && endIcon}
+      </View>
     </View>
   );
 };

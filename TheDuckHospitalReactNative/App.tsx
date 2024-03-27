@@ -1,11 +1,12 @@
-import {config} from '@gluestack-ui/config';
-import {GluestackUIProvider} from '@gluestack-ui/themed';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
-import {Linking, StatusBar} from 'react-native';
+import { config } from '@gluestack-ui/config';
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+import notifee, { EventType } from '@notifee/react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
+import { Linking, StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
-import {AuthProvider} from './src/auth/AuthProvider';
+import { AuthProvider } from './src/auth/AuthProvider';
 import linking from './src/linking';
 import './src/localization/i18n';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
@@ -23,6 +24,7 @@ import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
+import AddProfileScreen from './src/screens/patient/AddProfileScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults/AllPatientProfilesScreen';
@@ -35,7 +37,6 @@ import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProces
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
-import notifee, {EventType} from '@notifee/react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -103,6 +104,10 @@ const App = () => {
             <Stack.Screen
               name="PatientProfileDetailScreen"
               component={PatientProfileDetailScreen}
+            />
+            <Stack.Screen
+              name="AddProfileScreen"
+              component={AddProfileScreen}
             />
             <Stack.Screen
               name="TransactionDetailScreen"

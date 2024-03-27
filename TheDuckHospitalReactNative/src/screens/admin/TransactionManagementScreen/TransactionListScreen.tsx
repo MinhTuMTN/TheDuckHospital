@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     height: 45,
     width: 60,
-    borderRadius: Dimensions.get('window').width * 0.5,
+    borderRadius: 30,
   },
   searchContainer: {
     flex: 0.2,
