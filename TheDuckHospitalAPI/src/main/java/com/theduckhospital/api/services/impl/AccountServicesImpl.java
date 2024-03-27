@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.ChangePasswordRequest;
+import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
@@ -429,7 +430,7 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public boolean forgetPassword(String phoneNumber) throws FirebaseMessagingException {
+    public boolean sendOTPForgetPassword(String phoneNumber) throws FirebaseMessagingException {
         Account account = findAccount(phoneNumber);
 
         if (account == null) {
@@ -452,7 +453,7 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public boolean changePassword(ChangePasswordRequest request) {
+    public boolean verifyForgetPassword(ForgetPasswordDataRequest request) {
         Account account = findAccount(request.getPhoneNumber());
 
         int otp = 0;
@@ -472,6 +473,33 @@ public class AccountServicesImpl implements IAccountServices {
 
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepository.save(account);
+
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(String token, ChangePasswordRequest request) {
+        Account account = findAccountByToken(token);
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadRequestException("Password not matched", 10001);
+        }
+
+        if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
+            throw new BadRequestException("Current password is not correct", 10002);
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
+            throw new BadRequestException("New password is the same as old password", 10003);
+        }
+
+        // New password contains least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character
+        if (!request.getNewPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")) {
+            throw new BadRequestException("Password is not valid", 10004);
+        }
+
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account) ;
 
         return true;
     }

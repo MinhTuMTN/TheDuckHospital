@@ -5,7 +5,6 @@ import com.theduckhospital.api.dto.request.*;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
@@ -48,6 +47,7 @@ public class AuthController {
             return ResponseEntity.status(401).body(GeneralResponse.builder()
                     .success(false)
                     .message("Login failed")
+                    .statusCode(401)
                     .build());
 
         return authenticate(loginRequest);
@@ -55,13 +55,14 @@ public class AuthController {
 
     @PostMapping("/login-otp")
     public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) {
-         if (!accountServices.loginWithOtp(
+        if (!accountServices.loginWithOtp(
                 loginRequest.getEmailOrPhoneNumber(),
                 loginRequest.getPasswordOrOTP()
         ))
             return ResponseEntity.status(401).body(GeneralResponse.builder()
                     .success(false)
                     .message("Login failed")
+                    .statusCode(401)
                     .build());
 
         return authenticate(loginRequest);
@@ -83,6 +84,7 @@ public class AuthController {
                 .success(true)
                 .message("Login success")
                 .data(token)
+                .statusCode(200)
                 .build()
         );
     }
@@ -94,10 +96,10 @@ public class AuthController {
             return ResponseEntity
                     .status(request.getEmailOrPhoneNumber().contains("@") ? 400 : 200)
                     .body(GeneralResponse.builder()
-                    .success(true)
-                    .message("Account not exist")
-                    .data(false)
-                    .build());
+                            .success(true)
+                            .message("Account not exist")
+                            .data(false)
+                            .build());
 
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
@@ -142,6 +144,7 @@ public class AuthController {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(response.isValid())
                 .message(response.isValid() ? "Token is valid" : "Token is invalid")
+                .statusCode(response.isValid() ? 200 : 401)
                 .data(response)
                 .build()
         );
@@ -156,26 +159,43 @@ public class AuthController {
                 .success(true)
                 .message("Get info success")
                 .data(data)
+                .statusCode(200)
                 .build()
         );
     }
 
     @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordRequest request) throws FirebaseMessagingException {
+    public ResponseEntity<?> sendOTPForgetPassword(@RequestBody ForgetPasswordRequest request) throws FirebaseMessagingException {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Send OTP success")
-                .data(accountServices.forgetPassword(request.getPhoneNumber()))
+                .data(accountServices.sendOTPForgetPassword(request.getPhoneNumber()))
+                .statusCode(200)
                 .build()
         );
     }
 
     @PostMapping("/forget-password/verify-change-password")
-    public ResponseEntity<?> verifyChangePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> verifyForgetPassword(@RequestBody ForgetPasswordDataRequest request) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Reset password success")
-                .data(accountServices.changePassword(request))
+                .data(accountServices.verifyForgetPassword(request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody ChangePasswordRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Change password success")
+                .data(accountServices.changePassword(token, request))
+                .statusCode(200)
                 .build()
         );
     }
