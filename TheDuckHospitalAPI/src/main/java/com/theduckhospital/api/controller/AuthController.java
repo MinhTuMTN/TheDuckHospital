@@ -8,6 +8,7 @@ import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
+import com.theduckhospital.api.services.IDeviceServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,17 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final IAccountServices accountServices;
+    private final IDeviceServices deviceServices;
 
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
+                            IDeviceServices deviceServices,
                           IAccountServices accountServices) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountServices = accountServices;
+        this.deviceServices = deviceServices;
     }
 
     @PostMapping("/login-password")
@@ -77,13 +81,17 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.generateToken(
+        Map<String, String> result = jwtTokenProvider.generateToken(
                 (CustomUserDetails) authentication.getPrincipal()
+        );
+        boolean isSaveDeviceJwtToken = deviceServices.saveDeviceJwtToken(
+                result.get("tokenId"),
+                ((CustomUserDetails) authentication.getPrincipal()).getAccount()
         );
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Login success")
-                .data(token)
+                .data(result.get("token"))
                 .statusCode(200)
                 .build()
         );
@@ -195,6 +203,33 @@ public class AuthController {
                 .success(true)
                 .message("Change password success")
                 .data(accountServices.changePassword(token, request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/update-device-info")
+    public ResponseEntity<?> updateDeviceInfo(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody UpdateDeviceInfoRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Update device info success")
+                .data(accountServices.updateDeviceInfo(token, request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Logout success")
+                .data(accountServices.logout(token))
                 .statusCode(200)
                 .build()
         );

@@ -4,8 +4,9 @@ import {
   registerDataProps,
   forgetPasswordDataProps,
   changePasswordDataProps,
+  updateDeviceInformationDataProps,
 } from '../types';
-import {get, postNonAuth} from './AxiosInstance';
+import {get, post, postNonAuth} from './AxiosInstance';
 
 export const checkPhoneOrEmail = async (data: checkPhoneOrEmailDataProps) => {
   return postNonAuth('/auth/check-account-exist', data);
@@ -36,9 +37,19 @@ export const checkInfo = async () => {
 };
 
 export const forgetPassword = async (data: forgetPasswordDataProps) => {
-  return postNonAuth("/auth/forget-password", data);
+  return postNonAuth('/auth/forget-password', data);
 };
 
 export const changePassword = async (data: changePasswordDataProps) => {
-  return postNonAuth("/auth/forget-password/verify-change-password", data);
+  return postNonAuth('/auth/forget-password/verify-change-password', data);
+};
+
+export const updateDeviceInformation = async (
+  data: updateDeviceInformationDataProps,
+) => {
+  return post('/auth/update-device-info', data);
+};
+
+export const logoutServer = async () => {
+  return get('/auth/logout');
 };

@@ -7,13 +7,15 @@ import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 const AllPatientProfilesScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const navigate = useNavigation();
+  const navigate = useNavigation<navigationProps>();
 
   const handleEnterProfileCode = () => {
-    navigate.navigate('EnterProfileCode' as never);
+    setModalVisible(false);
+    navigate.navigate('EnterProfileCode');
   };
   const handleOpenPopup = () => {
     setModalVisible(true);

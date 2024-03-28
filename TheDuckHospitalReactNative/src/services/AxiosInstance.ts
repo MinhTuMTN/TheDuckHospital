@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {useAuth} from '../auth/AuthProvider';
 // import Realm from 'realm';
 
 interface ResultProps {
@@ -24,6 +25,8 @@ export const updateToken = (token: string) => {
   axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + token;
 };
 
+export const logout = () => {};
+
 const handleRequest = async (
   requestMethod: any,
   url: string,
@@ -39,7 +42,7 @@ const handleRequest = async (
     statusCode: 200,
   };
 
-  // console.log('url', url);
+  logout();
 
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;

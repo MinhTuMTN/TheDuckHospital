@@ -5,6 +5,7 @@ import notifee, {
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
+import DeviceInfo from 'react-native-device-info';
 
 export class AppNotification {
   static async requestPermission() {
@@ -23,7 +24,11 @@ export class AppNotification {
     ) {
       const fcmToken = await messaging().getToken();
       console.log('fcmToken', fcmToken);
+
+      return fcmToken;
     }
+
+    return null;
   }
   static async displayNotification(
     remoteMessage: FirebaseMessagingTypes.RemoteMessage,

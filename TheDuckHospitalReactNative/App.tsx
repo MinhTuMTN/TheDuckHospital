@@ -1,12 +1,12 @@
-import { config } from '@gluestack-ui/config';
-import { GluestackUIProvider } from '@gluestack-ui/themed';
-import notifee, { EventType } from '@notifee/react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {config} from '@gluestack-ui/config';
+import {GluestackUIProvider} from '@gluestack-ui/themed';
+import notifee, {EventType} from '@notifee/react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import { Linking, StatusBar } from 'react-native';
+import {Linking, StatusBar} from 'react-native';
 import 'react-native-gesture-handler';
-import { AuthProvider } from './src/auth/AuthProvider';
+import {AuthProvider} from './src/auth/AuthProvider';
 import linking from './src/linking';
 import './src/localization/i18n';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
@@ -37,6 +37,7 @@ import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProces
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import AxiosInterceptorProvider from './src/auth/AxiosInterceptorProvider';
 
 const Stack = createNativeStackNavigator();
 
@@ -55,111 +56,113 @@ const App = () => {
         translucent={true}
       />
       <AuthProvider>
-        <NavigationContainer linking={linking}>
-          <Stack.Navigator
-            initialRouteName="SlashScreen"
-            screenOptions={{
-              headerShown: false,
-            }}>
-            <Stack.Screen name="SlashScreen" component={SlashScreen} />
-            <Stack.Screen
-              name="PatientBottom"
-              component={PatientBottomNavigator}
-            />
-            <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
-            <Stack.Screen
-              name="DetailsProfileScreen"
-              component={DetailsProfileScreen}
-            />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} />
-            <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-            <Stack.Screen
-              name="ForgotPasswordScreen"
-              component={ForgotPasswordScreen}
-            />
-            <Stack.Screen
-              name="ChangePasswordScreen"
-              component={ChangePasswordScreen}
-            />
-            <Stack.Screen
-              name="VerifyPhoneScreen"
-              component={VerifyPhoneScreen}
-            />
-            <Stack.Screen
-              name="AdminLeftSideDrawer"
-              component={AdminLeftSideDrawer}
-            />
-            <Stack.Screen
-              name="DepartmentDetailScreen"
-              component={DepartmentDetailScreen}
-            />
-            <Stack.Screen
-              name="StaffDetailScreen"
-              component={StaffDetailScreen}
-            />
-            <Stack.Screen
-              name="PatientDetailScreen"
-              component={PatientDetailScreen}
-            />
-            <Stack.Screen
-              name="PatientProfileDetailScreen"
-              component={PatientProfileDetailScreen}
-            />
-            <Stack.Screen
-              name="AddProfileScreen"
-              component={AddProfileScreen}
-            />
-            <Stack.Screen
-              name="TransactionDetailScreen"
-              component={TransactionDetailScreen}
-            />
-            <Stack.Screen
-              name="DetailsMedicalBillScreen"
-              component={DetailsMedicalBillScreen}
-            />
-            <Stack.Screen name="TestScreen" component={TestScreen} />
-            <Stack.Screen
-              name="ChooseDoctorsScreen"
-              component={ChooseDoctorsScreen}
-            />
-            <Stack.Screen
-              name="MedicalExaminationHistoryScreen"
-              component={MedicalExaminationHistoryScreen}
-            />
-            <Stack.Screen
-              name="AllPatientProfilesScreen"
-              component={AllPatientProfilesScreen}
-            />
-            <Stack.Screen
-              name="ChooseDateScreen"
-              component={ChooseDateScreen}
-            />
-            <Stack.Screen
-              name="MedicineReminderScreen"
-              component={MedicineReminderScreen}
-            />
-            <Stack.Screen
-              name="ConfirmBookingInformationScreen"
-              component={ConfirmBookingInformationScreen}
-            />
-            <Stack.Screen
-              name="BillingInformationScreen"
-              component={BillingInformationScreen}
-            />
-            <Stack.Screen
-              name="PaymentResultScreen"
-              component={PaymentResultScreen}
-            />
-            <Stack.Screen
-              name="EnterProfileCode"
-              component={EnterProfileCode}
-            />
-            <Stack.Screen
-              name="ChooseProfileScreen"
-              component={ChooseProfileScreen}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <AxiosInterceptorProvider>
+          <NavigationContainer linking={linking}>
+            <Stack.Navigator
+              initialRouteName="SlashScreen"
+              screenOptions={{
+                headerShown: false,
+              }}>
+              <Stack.Screen name="SlashScreen" component={SlashScreen} />
+              <Stack.Screen
+                name="PatientBottom"
+                component={PatientBottomNavigator}
+              />
+              <Stack.Screen name="NotFoundScreen" component={NotFoundScreen} />
+              <Stack.Screen
+                name="DetailsProfileScreen"
+                component={DetailsProfileScreen}
+              />
+              <Stack.Screen name="LoginScreen" component={LoginScreen} />
+              <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+              <Stack.Screen
+                name="ForgotPasswordScreen"
+                component={ForgotPasswordScreen}
+              />
+              <Stack.Screen
+                name="ChangePasswordScreen"
+                component={ChangePasswordScreen}
+              />
+              <Stack.Screen
+                name="VerifyPhoneScreen"
+                component={VerifyPhoneScreen}
+              />
+              <Stack.Screen
+                name="AdminLeftSideDrawer"
+                component={AdminLeftSideDrawer}
+              />
+              <Stack.Screen
+                name="DepartmentDetailScreen"
+                component={DepartmentDetailScreen}
+              />
+              <Stack.Screen
+                name="StaffDetailScreen"
+                component={StaffDetailScreen}
+              />
+              <Stack.Screen
+                name="PatientDetailScreen"
+                component={PatientDetailScreen}
+              />
+              <Stack.Screen
+                name="PatientProfileDetailScreen"
+                component={PatientProfileDetailScreen}
+              />
+              <Stack.Screen
+                name="AddProfileScreen"
+                component={AddProfileScreen}
+              />
+              <Stack.Screen
+                name="TransactionDetailScreen"
+                component={TransactionDetailScreen}
+              />
+              <Stack.Screen
+                name="DetailsMedicalBillScreen"
+                component={DetailsMedicalBillScreen}
+              />
+              <Stack.Screen name="TestScreen" component={TestScreen} />
+              <Stack.Screen
+                name="ChooseDoctorsScreen"
+                component={ChooseDoctorsScreen}
+              />
+              <Stack.Screen
+                name="MedicalExaminationHistoryScreen"
+                component={MedicalExaminationHistoryScreen}
+              />
+              <Stack.Screen
+                name="AllPatientProfilesScreen"
+                component={AllPatientProfilesScreen}
+              />
+              <Stack.Screen
+                name="ChooseDateScreen"
+                component={ChooseDateScreen}
+              />
+              <Stack.Screen
+                name="MedicineReminderScreen"
+                component={MedicineReminderScreen}
+              />
+              <Stack.Screen
+                name="ConfirmBookingInformationScreen"
+                component={ConfirmBookingInformationScreen}
+              />
+              <Stack.Screen
+                name="BillingInformationScreen"
+                component={BillingInformationScreen}
+              />
+              <Stack.Screen
+                name="PaymentResultScreen"
+                component={PaymentResultScreen}
+              />
+              <Stack.Screen
+                name="EnterProfileCode"
+                component={EnterProfileCode}
+              />
+              <Stack.Screen
+                name="ChooseProfileScreen"
+                component={ChooseProfileScreen}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </AxiosInterceptorProvider>
       </AuthProvider>
     </GluestackUIProvider>
   );

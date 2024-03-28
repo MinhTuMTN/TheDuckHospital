@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {appColors} from '../../../constants/appColors';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
-import {FlexComponent} from '../..';
+import {FlexComponent, TextComponent} from '../..';
 import {Box, Card, Text} from '@gluestack-ui/themed';
 import {formatDate} from '../../../utils/dateUtils';
 import {navigationProps} from '../../../types';
@@ -16,17 +16,17 @@ interface RowProps {
   textColor?: string;
   uppercase?: boolean;
   fontWeight?:
-    | (string & {})
-    | '$black'
-    | '$bold'
-    | '$light'
-    | '$normal'
-    | '$hairline'
-    | '$thin'
-    | '$medium'
-    | '$semibold'
-    | '$extrabold'
-    | '$extraBlack'
+    | 'bold'
+    | 'normal'
+    | '100'
+    | '200'
+    | '300'
+    | '400'
+    | '500'
+    | '600'
+    | '700'
+    | '800'
+    | '900'
     | undefined;
   button?: React.ReactNode;
 }
@@ -37,7 +37,7 @@ const Row = (props: RowProps) => {
     text,
     textColor = appColors.textGray,
     uppercase = false,
-    fontWeight = '$normal',
+    fontWeight = 'normal',
     button,
   } = props;
 
@@ -46,15 +46,19 @@ const Row = (props: RowProps) => {
       direction={'row'}
       alignItems={'center'}
       justifyContent={'space-between'}
-      style={{paddingBottom: 10}}>
-      <FlexComponent direction="row" alignItems={'center'}>
+      style={{paddingBottom: 10, overflow: 'hidden'}}>
+      <FlexComponent direction="row" alignItems={'center'} flex={2}>
         {icon}
-        <Text color={textColor} fontWeight={fontWeight}>
+        <TextComponent
+          color={textColor}
+          fontWeight={fontWeight}
+          flex={1}
+          textAlign="justify">
           {uppercase ? text.toUpperCase() : text}
-        </Text>
+        </TextComponent>
       </FlexComponent>
 
-      {button}
+      {button && <FlexComponent flex={1}>{button}</FlexComponent>}
     </FlexComponent>
   );
 };

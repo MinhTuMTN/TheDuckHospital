@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.ChangePasswordRequest;
 import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
+import com.theduckhospital.api.dto.request.UpdateDeviceInfoRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
@@ -14,10 +15,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
-import com.theduckhospital.api.services.IAccountServices;
-import com.theduckhospital.api.services.IFirebaseServices;
-import com.theduckhospital.api.services.IMSGraphServices;
-import com.theduckhospital.api.services.IOTPServices;
+import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +42,7 @@ public class AccountServicesImpl implements IAccountServices {
     private final TemporaryUserRepository temporaryUserRepository;
     private final IMSGraphServices graphServices;
     private final JwtTokenProvider tokenProvider;
+    private final IDeviceServices deviceServices;
 
     public AccountServicesImpl(AccountRepository accountRepository,
                                DoctorScheduleRepository doctorScheduleRepository,
@@ -55,7 +54,8 @@ public class AccountServicesImpl implements IAccountServices {
                                IFirebaseServices firebaseServices,
                                TemporaryUserRepository temporaryUserRepository,
                                IMSGraphServices graphServices,
-                               JwtTokenProvider tokenProvider
+                               JwtTokenProvider tokenProvider,
+                               IDeviceServices deviceServices
     ) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
@@ -68,6 +68,7 @@ public class AccountServicesImpl implements IAccountServices {
         this.patientProfileRepository = patientProfileRepository;
         this.staffRepository = staffRepository;
         this.doctorRepository = doctorRepository;
+        this.deviceServices = deviceServices;
     }
 
     @Override
@@ -499,9 +500,20 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         account.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        accountRepository.save(account) ;
+        accountRepository.save(account);
 
         return true;
     }
 
+    @Override
+    public boolean updateDeviceInfo(String token, UpdateDeviceInfoRequest request) {
+        Account account = findAccountByToken(token);
+        return deviceServices.updateDeviceInfo(request, account, tokenProvider.getTokenIdFromJwt(token.substring(7)));
+    }
+
+    @Override
+    public boolean logout(String token) {
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+        return deviceServices.deleteDeviceJwtToken(tokenId);
+    }
 }

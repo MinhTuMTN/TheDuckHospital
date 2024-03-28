@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {createContext, useState, useContext, useEffect} from 'react';
 import Realm, {ObjectSchema} from 'realm';
 import {updateToken} from '../services/AxiosInstance';
-import {checkToken} from '../services/authServices';
+import {checkToken, logoutServer} from '../services/authServices';
 
 // Interface definition for the context
 interface AuthContextProps {
@@ -113,6 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   const logout = async () => {
     try {
+      await logoutServer();
       realmInstance?.write(() => {
         const user = realmInstance.objects('User')[0];
         if (user) {

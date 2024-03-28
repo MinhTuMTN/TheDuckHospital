@@ -1,5 +1,6 @@
 package com.theduckhospital.api.security;
 
+import com.theduckhospital.api.services.IDeviceServices;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    @Autowired
+    private IDeviceServices deviceServices;
+
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -35,6 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
             if (jwt != null && jwtTokenProvider.validateToken(jwt)) {
                 String userId = jwtTokenProvider.getUserIdFromJwt(jwt);
+
+                // Check if the device is still valid
+                String tokenId = jwtTokenProvider.getTokenIdFromJwt(jwt);
+                if (!deviceServices.checkAuthorizationDevice(tokenId))
+                    throw new Exception("Unauthorized device");
 
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserById(userId);
                 if (userDetails != null) {

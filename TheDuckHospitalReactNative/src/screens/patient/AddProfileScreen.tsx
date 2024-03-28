@@ -26,6 +26,7 @@ import {
 } from '../../services/addressServices';
 import {getAllNations} from '../../services/nationServices';
 import {createPatientProfile} from '../../services/patientProfileServices';
+import LoadingComponent from '../../components/LoadingComponent';
 
 const genders = [
   {
@@ -40,6 +41,7 @@ const genders = [
 
 const AddProfileScreen = () => {
   const {t} = useTranslation();
+  const [datePickerLoading, setDatePickerLoading] = React.useState(false);
   const [patientProfile, setPatientProfile] = React.useState({
     fullName: '',
     phoneNumber: '',
@@ -75,7 +77,6 @@ const AddProfileScreen = () => {
   });
   const [error, setError] = React.useState(false);
   const [firstClick, setFirstClick] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const navigation = useNavigation();
 
@@ -160,11 +161,7 @@ const AddProfileScreen = () => {
     <ContainerComponent paddingTop={0}>
       <Header title={'Tạo hồ sơ khám bệnh'} titleSize={19} />
       <ContentComponent>
-        {isLoading ? (
-          <>
-            <ActivityIndicator size="large" color={appColors.primary} />
-          </>
-        ) : (
+        <LoadingComponent>
           <ScrollView>
             <ContainerComponent style={styles.container}>
               <FlexComponent
@@ -330,6 +327,7 @@ const AddProfileScreen = () => {
                         dateOfBirth: date,
                       });
                     }}
+                    onLayout={() => {}}
                     onCancel={() => {
                       setShowDatePicker(false);
                     }}
@@ -513,7 +511,7 @@ const AddProfileScreen = () => {
               </ContainerComponent>
             </ContainerComponent>
           </ScrollView>
-        )}
+        </LoadingComponent>
       </ContentComponent>
     </ContainerComponent>
   );

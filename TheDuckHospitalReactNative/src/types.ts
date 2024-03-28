@@ -48,3 +48,11 @@ export type patientProfileDataProps = {
   identityNumber: string;
   nationId: number;
 };
+
+export type updateDeviceInformationDataProps = {
+  deviceId: string;
+  deviceName: string;
+  systemName: string;
+  systemVersion: string;
+  fcmToken: string;
+};

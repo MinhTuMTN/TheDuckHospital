@@ -24,6 +24,8 @@ import {getAllHeadDoctor} from '../../../services/dotorSevices';
 import messaging from '@react-native-firebase/messaging';
 import {AppNotification} from '../../../utils/appNotification';
 import notifee from '@notifee/react-native';
+import DeviceInfo from 'react-native-device-info';
+import {updateDeviceInformation} from '../../../services/authServices';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -110,8 +112,30 @@ const HomeScreen = () => {
   }, [showMoreMenu]);
 
   useEffect(() => {
-    AppNotification.requestPermission();
-  }, []);
+    const updateDeviceInfo = async () => {
+      const fcmToken = await AppNotification.requestPermission();
+      if (!fcmToken || !auth.token) {
+        console.log("Can't get fcm token or token is null");
+        return;
+      }
+      const deviceId = DeviceInfo.getUniqueIdSync();
+      const deviceName = DeviceInfo.getBrand() + ' - ' + DeviceInfo.getModel();
+      const systemName = DeviceInfo.getSystemName();
+      const systemVersion = DeviceInfo.getSystemVersion();
+
+      const response = await updateDeviceInformation({
+        deviceId,
+        deviceName,
+        systemName,
+        systemVersion,
+        fcmToken,
+      });
+
+      console.log(response);
+    };
+
+    updateDeviceInfo();
+  }, [auth.token]);
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
