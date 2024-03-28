@@ -7,6 +7,7 @@ import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
+import {useIsFocused} from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
@@ -14,6 +15,7 @@ const ProfileScreen = () => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const auth = useAuth();
+  const isFocused = useIsFocused();
 
   React.useEffect(() => {
     const handleGetAllPatientProfile = async () => {
@@ -24,8 +26,8 @@ const ProfileScreen = () => {
       } else console.log('Error: ', response.error);
     };
 
-    if (auth.token) handleGetAllPatientProfile();
-  }, [auth.token]);
+    if (auth.token && isFocused) handleGetAllPatientProfile();
+  }, [auth.token, isFocused]);
 
   return (
     <ContainerComponent paddingTop={0}>

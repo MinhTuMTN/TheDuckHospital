@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   ContainerComponent,
   ContentComponent,
@@ -12,23 +12,25 @@ import {Mail} from 'lucide-react-native';
 import {appColors} from '../../constants/appColors';
 import {useTranslation} from 'react-i18next';
 import ButtonComponent from '../../components/ButtonComponent';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { forgetPassword } from '../../services/authServices';
-import { navigationProps } from '../../types';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {forgetPassword} from '../../services/authServices';
+import {navigationProps} from '../../types';
 
 const ForgotPasswordScreen = () => {
   const {t} = useTranslation();
   const [emailOrPhoneNumber, setEmailOrPhoneNumber] = useState('');
   const navigation = useNavigation<navigationProps>();
-  
+
   const handleResetPassword = async () => {
     try {
-      const response = await forgetPassword({ phoneNumber: emailOrPhoneNumber });
+      const response = await forgetPassword({phoneNumber: emailOrPhoneNumber});
 
       if (response.success) {
-        navigation.navigate('ChangePasswordScreen', { phoneNumber: emailOrPhoneNumber });
+        navigation.navigate('ForgetAndChangePasswordScreen', {
+          phoneNumber: emailOrPhoneNumber,
+        });
       } else {
-        console.error("Số điện thoại không hợp lệ");
+        console.error('Số điện thoại không hợp lệ');
       }
     } catch (error) {
       console.error('Lỗi xảy ra: ', error);
@@ -75,7 +77,7 @@ const ForgotPasswordScreen = () => {
             borderColor: appColors.white,
           }}
           variant="rounded"
-          onChangeText={(text) => setEmailOrPhoneNumber(text)}
+          onChangeText={text => setEmailOrPhoneNumber(text)}
         />
         <Space paddingTop={20} />
         <ButtonComponent
@@ -85,8 +87,7 @@ const ForgotPasswordScreen = () => {
             borderRadius: 20,
           }}
           bold
-          onPress={handleResetPassword}
-          >
+          onPress={handleResetPassword}>
           {t('forgotPasswordScreen.resetPassword')}
         </ButtonComponent>
       </ContentComponent>

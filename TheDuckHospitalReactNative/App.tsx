@@ -18,7 +18,7 @@ import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/Pat
 import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
 import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
 import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
-import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
+import ForgetAndChangePasswordScreen from './src/screens/auth/ForgetAndChangePasswordScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
@@ -35,6 +35,7 @@ import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProces
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -70,8 +71,8 @@ const App = () => {
               component={ForgotPasswordScreen}
             />
             <Stack.Screen
-              name="ChangePasswordScreen"
-              component={ChangePasswordScreen}
+              name="ForgetAndChangePasswordScreen"
+              component={ForgetAndChangePasswordScreen}
             />
             <Stack.Screen
               name="VerifyPhoneScreen"
@@ -145,6 +146,10 @@ const App = () => {
             <Stack.Screen
               name="ChooseProfileScreen"
               component={ChooseProfileScreen}
+            />
+            <Stack.Screen
+              name="ChangePasswordScreen"
+              component={ChangePasswordScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>

@@ -4,6 +4,7 @@ import {
   ColorValue,
   KeyboardTypeOptions,
   NativeSyntheticEvent,
+  Pressable,
   ReturnKeyTypeOptions,
   StyleProp,
   TextInput,
@@ -51,6 +52,7 @@ interface InputComponentProps {
   maxLength?: number;
   autoFocus?: boolean;
   onSubmitEditing?: () => void;
+  onEndIconPress?: () => void;
 }
 
 const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
@@ -97,6 +99,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     returnKeyType,
     maxLength,
     onSubmitEditing,
+    onEndIconPress,
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
@@ -164,8 +167,12 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           onSubmitEditing={onSubmitEditing}
         />
         {endIcon && (
-          <InputSlot pr={'$3'}>
-            <InputIcon as={endIcon} />
+          <InputSlot
+            pr={'$3'}
+            onPress={() => {
+              onEndIconPress && onEndIconPress();
+            }}>
+            {endIcon}
           </InputSlot>
         )}
       </Input>

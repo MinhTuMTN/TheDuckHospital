@@ -4,8 +4,9 @@ import {
   registerDataProps,
   forgetPasswordDataProps,
   changePasswordDataProps,
+  changePasswordWithOldPasswordDataProps,
 } from '../types';
-import {get, postNonAuth} from './AxiosInstance';
+import {get, post, postNonAuth} from './AxiosInstance';
 
 export const checkPhoneOrEmail = async (data: checkPhoneOrEmailDataProps) => {
   return postNonAuth('/auth/check-account-exist', data);
@@ -36,9 +37,15 @@ export const checkInfo = async () => {
 };
 
 export const forgetPassword = async (data: forgetPasswordDataProps) => {
-  return postNonAuth("/auth/forget-password", data);
+  return postNonAuth('/auth/forget-password', data);
 };
 
 export const changePassword = async (data: changePasswordDataProps) => {
-  return postNonAuth("/auth/forget-password/verify-change-password", data);
+  return postNonAuth('/auth/forget-password/verify-change-password', data);
+};
+
+export const changePasswordWithOldPassword = async (
+  data: changePasswordWithOldPasswordDataProps,
+) => {
+  return post('/auth/change-password', data);
 };
