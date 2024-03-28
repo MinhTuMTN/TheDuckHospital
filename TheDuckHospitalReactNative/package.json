@@ -31,7 +31,7 @@
     "axios": "^1.6.7",
     "dayjs": "^1.11.10",
     "i18next": "^23.8.2",
-    "lucide-react-native": "^0.323.0",
+    "lucide-react-native": "^0.363.0",
     "nativewind": "^2.0.11",
     "qs": "^6.11.2",
     "react": "18.2.0",

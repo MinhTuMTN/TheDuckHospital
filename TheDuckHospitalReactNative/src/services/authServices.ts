@@ -5,6 +5,7 @@ import {
   forgetPasswordDataProps,
   changePasswordDataProps,
   updateDeviceInformationDataProps,
+  changePasswordWithOldPasswordDataProps,
 } from '../types';
 import {get, post, postNonAuth} from './AxiosInstance';
 
@@ -52,4 +53,10 @@ export const updateDeviceInformation = async (
 
 export const logoutServer = async () => {
   return get('/auth/logout');
+};
+
+export const changePasswordWithOldPassword = async (
+  data: changePasswordWithOldPasswordDataProps,
+) => {
+  return post('/auth/change-password', data);
 };

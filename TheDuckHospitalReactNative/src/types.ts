@@ -56,3 +56,14 @@ export type updateDeviceInformationDataProps = {
   systemVersion: string;
   fcmToken: string;
 };
+
+export type changePasswordWithOldPasswordDataProps = {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
+export type addPatientProfileProps = {
+  patientProfileId: string;
+  phoneNumber: string;
+};

@@ -99,7 +99,9 @@ const AccountScreen = () => {
             <AccountScreenRowComponent
               title={t('account.changePassword')}
               icon={<KeyRound size={20} color={appColors.black} />}
-              onPress={() => console.log('Change password')}
+              onPress={() =>
+                navigation.navigate('ChangePasswordScreen' as never)
+              }
             />
             <AccountScreenRowComponent
               title={t('account.notificationSettings')}

@@ -17,6 +17,8 @@ import Calendar7 from './Calendar7.svg';
 import AlarmClock from './AlarmClock.svg';
 import Done from './Done.svg';
 import Trash from './Trash.svg';
+import Eye from './Eye.svg';
+import HideEye from './HideEye.svg';
 export {
   English,
   Vietnamese,
@@ -37,4 +39,6 @@ export {
   AlarmClock,
   Done,
   Trash,
+  Eye,
+  HideEye,
 };

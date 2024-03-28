@@ -1,28 +1,34 @@
-import React from 'react';
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from '@react-navigation/native';
+import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   ActivityIndicator,
   FlatList,
   Modal,
+  Pressable,
   StyleSheet,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign';
+import {
+  default as AntDesign,
+  default as Icon,
+} from 'react-native-vector-icons/AntDesign';
+import {useAuth} from '../../../auth/AuthProvider';
 import {
   ContainerComponent,
   Header,
   PatientProfile,
   TextComponent,
 } from '../../../components';
+import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
-import {useAuth} from '../../../auth/AuthProvider';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {View} from 'react-native';
-import {Pressable} from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import ButtonComponent from '../../../components/ButtonComponent';
 import {navigationProps} from '../../../types';
 
 const ProfileScreen = () => {
@@ -33,6 +39,7 @@ const ProfileScreen = () => {
 
   const auth = useAuth();
   const navigation = useNavigation<navigationProps>();
+  const isFocused = useIsFocused();
 
   const handleEndIconHeaderPress = () => {
     setModalVisible(true);
@@ -50,20 +57,18 @@ const ProfileScreen = () => {
     navigation.navigate('EnterProfileCode');
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const handleGetAllPatientProfile = async () => {
-        setIsLoading(true);
-        const response = await getAllPatientProfile();
-        setIsLoading(false);
-        if (response.success) {
-          setPatientProfiles(response.data.data);
-        } else console.log('Error: ', response.error);
-      };
+  useEffect(() => {
+    const handleGetAllPatientProfile = async () => {
+      setIsLoading(true);
+      const response = await getAllPatientProfile();
+      setIsLoading(false);
+      if (response.success) {
+        setPatientProfiles(response.data.data);
+      } else console.log('Error: ', response.error);
+    };
 
-      if (auth.token) handleGetAllPatientProfile();
-    }, [auth.token]),
-  );
+    if (auth.token && isFocused) handleGetAllPatientProfile();
+  }, [auth.token, isFocused]);
 
   return (
     <ContainerComponent paddingTop={0}>
