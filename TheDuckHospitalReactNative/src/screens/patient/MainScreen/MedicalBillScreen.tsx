@@ -12,7 +12,7 @@ import {
 import FilterComponent from '../../../components/FilterComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllBooking} from '../../../services/bookingServices';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {useIsFocused} from '@react-navigation/native';
 
 const MedicalBillScreen = () => {

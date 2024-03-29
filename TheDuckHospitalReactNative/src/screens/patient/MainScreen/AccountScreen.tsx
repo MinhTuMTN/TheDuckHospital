@@ -6,13 +6,14 @@ import {
   Headset,
   KeyRound,
   LogOut,
+  MonitorSmartphone,
   Share2,
   Star,
 } from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {
   AccountScreenRowComponent,
   ContainerComponent,
@@ -25,16 +26,17 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
+import {navigationProps} from '../../../types';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
 
   const {t} = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<navigationProps>();
   const auth = useAuth();
 
   const handleBtnLoginClick = () => {
-    navigation.navigate('LoginScreen' as never);
+    navigation.navigate('LoginScreen');
   };
 
   useEffect(() => {
@@ -99,9 +101,12 @@ const AccountScreen = () => {
             <AccountScreenRowComponent
               title={t('account.changePassword')}
               icon={<KeyRound size={20} color={appColors.black} />}
-              onPress={() =>
-                navigation.navigate('ChangePasswordScreen' as never)
-              }
+              onPress={() => navigation.navigate('ChangePasswordScreen')}
+            />
+            <AccountScreenRowComponent
+              title={t('account.deviceManagement')}
+              icon={<MonitorSmartphone size={20} color={appColors.black} />}
+              onPress={() => navigation.navigate('DeviceManagementScreen')}
             />
             <AccountScreenRowComponent
               title={t('account.notificationSettings')}

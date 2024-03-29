@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {ActivityIndicator, FlatList} from 'react-native';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';

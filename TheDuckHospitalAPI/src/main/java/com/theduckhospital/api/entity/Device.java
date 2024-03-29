@@ -21,7 +21,7 @@ public class Device {
     private String systemName;
     private String systemVersion;
     private String fcmToken;
-    private boolean isDeleted;
+    private boolean deleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

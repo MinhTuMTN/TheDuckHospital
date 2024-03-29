@@ -234,4 +234,31 @@ public class AuthController {
                 .build()
         );
     }
+
+    @GetMapping("/devices")
+    public ResponseEntity<?> getDevices(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get devices success")
+                .data(accountServices.getDevices(token))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/remote-logout")
+    public ResponseEntity<?> remoteLogout(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody RemoteLogoutRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Remote logout success")
+                .data(accountServices.remoteLogout(request.getLogoutTokenId(), token))
+                .statusCode(200)
+                .build()
+        );
+    }
 }

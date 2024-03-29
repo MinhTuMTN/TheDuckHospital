@@ -60,3 +60,7 @@ export const changePasswordWithOldPassword = async (
 ) => {
   return post('/auth/change-password', data);
 };
+
+export const getMyDevices = async () => {
+  return get('/auth/devices');
+};

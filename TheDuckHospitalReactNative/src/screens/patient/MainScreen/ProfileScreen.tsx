@@ -18,7 +18,7 @@ import {
   default as AntDesign,
   default as Icon,
 } from 'react-native-vector-icons/AntDesign';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {
   ContainerComponent,
   Header,

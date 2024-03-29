@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.request.UpdateDeviceInfoRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
+import com.theduckhospital.api.dto.response.DeviceResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
 import com.theduckhospital.api.entity.*;
@@ -457,7 +458,7 @@ public class AccountServicesImpl implements IAccountServices {
     public boolean verifyForgetPassword(ForgetPasswordDataRequest request) {
         Account account = findAccount(request.getPhoneNumber());
 
-        int otp = 0;
+        int otp;
         try {
             otp = Integer.parseInt(request.getOtp());
         } catch (Exception e) {
@@ -515,5 +516,20 @@ public class AccountServicesImpl implements IAccountServices {
     public boolean logout(String token) {
         String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
         return deviceServices.deleteDeviceJwtToken(tokenId);
+    }
+
+    @Override
+    public List<DeviceResponse> getDevices(String token) {
+        Account account = findAccountByToken(token);
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+        return deviceServices.getDevicesByAccount(account, tokenId);
+    }
+
+    @Override
+    public boolean remoteLogout(String logoutTokenId, String token) {
+        Account account = findAccountByToken(token);
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+
+        return deviceServices.remoteLogout(account, tokenId);
     }
 }

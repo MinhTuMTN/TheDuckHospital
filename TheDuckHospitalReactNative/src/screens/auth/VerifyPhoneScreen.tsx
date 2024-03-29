@@ -14,7 +14,7 @@ import {register} from '../../services/authServices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../types';
-import {useAuth} from '../../auth/AuthProvider';
+import {useAuth} from '../../hooks/AuthProvider';
 import {
   Toast,
   ToastDescription,

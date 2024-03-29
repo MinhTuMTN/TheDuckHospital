@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {useAuth} from '../auth/AuthProvider';
+import {useAuth} from '../hooks/AuthProvider';
 // import Realm from 'realm';
 
 interface ResultProps {

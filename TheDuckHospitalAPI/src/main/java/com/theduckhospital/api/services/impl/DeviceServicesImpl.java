@@ -1,15 +1,19 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.UpdateDeviceInfoRequest;
+import com.theduckhospital.api.dto.response.DeviceResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Device;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.DeviceRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IDeviceServices;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DeviceServicesImpl implements IDeviceServices {
@@ -75,6 +79,40 @@ public class DeviceServicesImpl implements IDeviceServices {
 
         Device device = optionalDevice.get();
         deviceRepository.delete(device);
+        return true;
+    }
+
+    @Override
+    public List<DeviceResponse> getDevicesByAccount(Account account, String jwtTokenId) {
+        List<Device> devices = deviceRepository.findDevicesByAccountAndDeletedIsFalse(account);
+
+        List<DeviceResponse> deviceResponses = devices
+                .stream()
+                .map(device -> new DeviceResponse(device, device.getJwtTokenId().equals(jwtTokenId)))
+                .toList();
+
+        return deviceResponses.stream()
+                .sorted((device1, device2) -> {
+                    if (device1.isThisDevice() && !device2.isThisDevice())
+                        return -1;
+                    if (!device1.isThisDevice() && device2.isThisDevice())
+                        return 1;
+                    return 0;
+                })
+                .toList();
+    }
+
+    @Override
+    public boolean remoteLogout(Account account, String jwtTokenId) {
+        Optional<Device> optionalDevice = deviceRepository.findByAccountAndJwtTokenId(account, jwtTokenId);
+
+        if (optionalDevice.isEmpty())
+            throw new BadRequestException("Logout token id not valid", 10005);
+
+        Device device = optionalDevice.get();
+        device.setDeleted(true);
+
+        deviceRepository.save(device);
         return true;
     }
 }

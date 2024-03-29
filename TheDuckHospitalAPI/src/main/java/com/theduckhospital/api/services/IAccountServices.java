@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
 import com.theduckhospital.api.dto.request.UpdateDeviceInfoRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
+import com.theduckhospital.api.dto.response.DeviceResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
 import com.theduckhospital.api.entity.Account;
@@ -41,4 +42,6 @@ public interface IAccountServices {
     boolean changePassword(String token, ChangePasswordRequest request);
     boolean updateDeviceInfo(String token, UpdateDeviceInfoRequest request);
     boolean logout(String token);
+    List<DeviceResponse> getDevices(String token);
+    boolean remoteLogout(String logoutTokenId, String token);
 }

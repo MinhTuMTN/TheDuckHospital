@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {createContext, useState, useContext, useEffect} from 'react';
-import Realm, {ObjectSchema} from 'realm';
+import React, {createContext, useContext, useEffect, useState} from 'react';
+import Realm from 'realm';
 import {updateToken} from '../services/AxiosInstance';
 import {checkToken, logoutServer} from '../services/authServices';
 

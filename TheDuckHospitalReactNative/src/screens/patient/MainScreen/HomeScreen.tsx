@@ -1,31 +1,30 @@
 import {Fab} from '@gluestack-ui/themed';
+import notifee from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  Alert,
   FlatList,
   Image,
   Linking,
-  PermissionsAndroid,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {Headset, Search, Typing} from '../../../assets/svgs';
-import {useAuth} from '../../../auth/AuthProvider';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {getAllHeadDoctor} from '../../../services/dotorSevices';
-import messaging from '@react-native-firebase/messaging';
-import {AppNotification} from '../../../utils/appNotification';
-import notifee from '@notifee/react-native';
-import DeviceInfo from 'react-native-device-info';
+import {useAuth} from '../../../hooks/AuthProvider';
+import {useToast} from '../../../hooks/ToastProvider';
 import {updateDeviceInformation} from '../../../services/authServices';
+import {getAllHeadDoctor} from '../../../services/dotorSevices';
+import {AppNotification} from '../../../utils/appNotification';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -35,6 +34,7 @@ const HomeScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation();
+  const toast = useToast();
   const auth = useAuth();
   const fullName = useMemo(() => {
     const name = auth.userInfo?.fullName?.split(' ');
@@ -81,7 +81,7 @@ const HomeScreen = () => {
   };
 
   const handlNavigateConfirmBookingInformationScreen = () => {
-    Linking.openURL('theduck://app/payment/1');
+    navigation.navigate('TestScreen' as never);
   };
 
   useEffect(() => {
