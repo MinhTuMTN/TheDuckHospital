@@ -2,6 +2,7 @@
   "homeScreen": {
     "hello": "Hi",
     "welcome": "Welcome back!",
+    "noLoginHello": "The Duck Hospital\nHello,",
     "makeAppointment": "Make an appointment",
     "makeAppointmentNoNewLine": "Make an appointment",
     "lookupMedicalResult": "Lookup medical result",

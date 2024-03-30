@@ -120,6 +120,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         }
       });
       setToken(null);
+      setUserInfo({
+        fullName: null,
+        role: null,
+      });
     } catch (error) {
       console.error('Lỗi xảy ra khi đăng xuất');
     }

@@ -44,4 +44,5 @@ public interface IAccountServices {
     boolean logout(String token);
     List<DeviceResponse> getDevices(String token);
     boolean remoteLogout(String logoutTokenId, String token);
+    boolean remoteLogoutAll(String token);
 }

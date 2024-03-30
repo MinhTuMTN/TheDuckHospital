@@ -6,9 +6,12 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {appColors} from '../../../constants/appColors';
 import dayjs from 'dayjs';
+import {remoteLogout} from '../../../services/authServices';
+import {useToast} from '../../../hooks/ToastProvider';
 
 interface DeviceItemComponentProps {
   device: any;
+  onRefresh?: () => void;
 }
 
 const DeviceItemComponent = (props: DeviceItemComponentProps) => {
@@ -64,6 +67,17 @@ const DeviceItemComponent = (props: DeviceItemComponentProps) => {
     );
   }, [device.systemName]);
 
+  const toast = useToast();
+  const handleRemoteLogout = async () => {
+    const response = await remoteLogout({
+      logoutTokenId: device.jwtTokenId,
+    });
+
+    if (response.success) {
+      toast.showToast(`Đăng xuất khỏi thiết bị ${deviceName} thành công`);
+      props.onRefresh && props.onRefresh();
+    }
+  };
   return (
     <FlexComponent
       direction="row"
@@ -84,7 +98,20 @@ const DeviceItemComponent = (props: DeviceItemComponentProps) => {
           borderBottomWidth: 1,
         }}>
         <FlexComponent flex={7}>
-          <TextComponent bold color={appColors.textDarker} fontSize={17}>
+          {device.thisDevice && (
+            <TextComponent
+              fontWeight="500"
+              color={appColors.textGray}
+              fontSize={14}>
+              Thiết bị này
+            </TextComponent>
+          )}
+          <TextComponent
+            bold
+            color={appColors.textDarker}
+            fontSize={17}
+            numberOfLines={1}
+            ellipsizeMode="clip">
             {deviceName}
           </TextComponent>
           <TextComponent fontWeight="500">
@@ -103,24 +130,14 @@ const DeviceItemComponent = (props: DeviceItemComponentProps) => {
             alignItems: 'flex-end',
           }}>
           {!device.thisDevice && (
-            <MaterialIcon name="logout" size={30} color="#ee8888" />
+            <MaterialIcon
+              name="logout"
+              size={30}
+              color="#ee8888"
+              onPress={handleRemoteLogout}
+            />
           )}
         </View>
-
-        {device.thisDevice && (
-          <View
-            style={{
-              backgroundColor: appColors.primary,
-              padding: 4,
-              paddingHorizontal: 8,
-              borderRadius: 20,
-              position: 'absolute',
-              right: 0,
-              top: 0,
-            }}>
-            <TextComponent color={appColors.white}>Thiết bị này</TextComponent>
-          </View>
-        )}
       </FlexComponent>
     </FlexComponent>
   );

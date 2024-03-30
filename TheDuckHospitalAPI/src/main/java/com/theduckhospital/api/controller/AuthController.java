@@ -261,4 +261,17 @@ public class AuthController {
                 .build()
         );
     }
+
+    @GetMapping("/remote-logout-all")
+    public ResponseEntity<?> remoteLogoutAll(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Remote logout all success")
+                .data(accountServices.remoteLogoutAll(token))
+                .statusCode(200)
+                .build()
+        );
+    }
 }

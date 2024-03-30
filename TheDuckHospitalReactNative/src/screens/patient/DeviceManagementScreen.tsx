@@ -5,26 +5,34 @@ import DeviceItemComponent from '../../components/patient/deviceManagementScreen
 import {ActivityIndicator, FlatList, View} from 'react-native';
 import {globalStyles} from '../../styles/globalStyles';
 import ButtonComponent from '../../components/ButtonComponent';
-import {getMyDevices} from '../../services/authServices';
+import {getMyDevices, remoteLogoutAll} from '../../services/authServices';
+import {useToast} from '../../hooks/ToastProvider';
 
 const DeviceManagementScreen = () => {
   const [devices, setDevices] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
   const _renderItem = useCallback(({item}: any) => {
-    return <DeviceItemComponent device={item} />;
+    return <DeviceItemComponent device={item} onRefresh={handleGetMyDevices} />;
   }, []);
   const _keyExtractor = useCallback((item: any) => item.jwtTokenId, []);
+  const toast = useToast();
+  const handleGetMyDevices = useCallback(async () => {
+    const response = await getMyDevices();
+    setLoading(false);
+    if (response.success) setDevices(response.data.data);
+  }, []);
+  const handleRemoteLogoutAll = async () => {
+    const response = await remoteLogoutAll();
+    if (response.success) {
+      toast.showToast('Đăng xuất khỏi tất cả thiết bị thành công');
+      handleGetMyDevices();
+    }
+  };
 
   useEffect(() => {
-    const handleGetMyDevices = async () => {
-      const response = await getMyDevices();
-      setLoading(false);
-      if (response.success) setDevices(response.data.data);
-    };
-
     handleGetMyDevices();
-  }, []);
+  }, [handleGetMyDevices]);
 
   return (
     <ContainerComponent paddingTop={0}>
@@ -50,17 +58,20 @@ const DeviceManagementScreen = () => {
               renderItem={_renderItem}
               keyExtractor={_keyExtractor}
             />
-            <View style={{paddingHorizontal: 32, marginTop: 16, flex: 1}}>
-              <ButtonComponent
-                backgroundColor={'#ff6666'}
-                textColor="white"
-                textStyles={{
-                  fontWeight: '600',
-                }}
-                borderRadius={20}>
-                Đăng xuất khỏi tất cả thiết bị
-              </ButtonComponent>
-            </View>
+            {devices.length > 1 && (
+              <View style={{paddingHorizontal: 32, marginTop: 16, flex: 1}}>
+                <ButtonComponent
+                  onPress={handleRemoteLogoutAll}
+                  backgroundColor={'#ff6666'}
+                  textColor="white"
+                  textStyles={{
+                    fontWeight: '600',
+                  }}
+                  borderRadius={20}>
+                  Đăng xuất khỏi tất cả thiết bị
+                </ButtonComponent>
+              </View>
+            )}
           </>
         )}
       </ContentComponent>

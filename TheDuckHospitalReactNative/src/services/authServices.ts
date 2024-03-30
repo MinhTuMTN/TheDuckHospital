@@ -6,6 +6,7 @@ import {
   changePasswordDataProps,
   updateDeviceInformationDataProps,
   changePasswordWithOldPasswordDataProps,
+  remoteLogoutDataProps,
 } from '../types';
 import {get, post, postNonAuth} from './AxiosInstance';
 
@@ -63,4 +64,12 @@ export const changePasswordWithOldPassword = async (
 
 export const getMyDevices = async () => {
   return get('/auth/devices');
+};
+
+export const remoteLogout = async (data: remoteLogoutDataProps) => {
+  return post('/auth/remote-logout', data);
+};
+
+export const remoteLogoutAll = async () => {
+  return get('/auth/remote-logout-all');
 };

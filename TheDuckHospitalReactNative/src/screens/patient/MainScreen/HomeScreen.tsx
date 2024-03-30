@@ -139,7 +139,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMess
       AppNotification.displayNotification(remoteMessage);
     });
 
@@ -168,15 +167,28 @@ const HomeScreen = () => {
                 className="w-14 h-14 rounded-full"
               />
               <View className="pl-2">
-                <TextComponent color={appColors.white} fontSize={20}>
-                  {t('homeScreen.hello')}{' '}
-                  <TextComponent bold color={appColors.white} fontSize={20}>
-                    {fullName},
-                  </TextComponent>
-                </TextComponent>
-                <TextComponent color={appColors.white}>
-                  {t('homeScreen.welcome')}
-                </TextComponent>
+                {fullName ? (
+                  <>
+                    <TextComponent color={appColors.white} fontSize={20}>
+                      {t('homeScreen.hello')}{' '}
+                      <TextComponent bold color={appColors.white} fontSize={20}>
+                        {fullName},
+                      </TextComponent>
+                    </TextComponent>
+                    <TextComponent color={appColors.white}>
+                      {t('homeScreen.welcome')}
+                    </TextComponent>
+                  </>
+                ) : (
+                  <>
+                    <TextComponent
+                      fontWeight="500"
+                      color={appColors.white}
+                      fontSize={16}>
+                      {t('homeScreen.noLoginHello')}
+                    </TextComponent>
+                  </>
+                )}
               </View>
             </View>
             <View className="flex-row flex-auto w-16 justify-between">

@@ -67,3 +67,7 @@ export type addPatientProfileProps = {
   patientProfileId: string;
   phoneNumber: string;
 };
+
+export type remoteLogoutDataProps = {
+  logoutTokenId: string;
+};

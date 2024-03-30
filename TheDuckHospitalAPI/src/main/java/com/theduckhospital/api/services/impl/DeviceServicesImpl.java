@@ -103,16 +103,26 @@ public class DeviceServicesImpl implements IDeviceServices {
     }
 
     @Override
-    public boolean remoteLogout(Account account, String jwtTokenId) {
-        Optional<Device> optionalDevice = deviceRepository.findByAccountAndJwtTokenId(account, jwtTokenId);
+    public boolean remoteLogout(Account account, String logoutTokenId) {
+        Optional<Device> optionalDevice = deviceRepository.findByAccountAndJwtTokenId(account, logoutTokenId);
 
         if (optionalDevice.isEmpty())
             throw new BadRequestException("Logout token id not valid", 10005);
 
         Device device = optionalDevice.get();
-        device.setDeleted(true);
+        deviceRepository.delete(device);
+        return true;
+    }
 
-        deviceRepository.save(device);
+    @Override
+    public boolean remoteLogoutAll(Account account, String jwtTokenId) {
+        List<Device> devices = deviceRepository.findOtherDevices(account, jwtTokenId);
+
+        devices.forEach(device -> {
+            if (!device.getJwtTokenId().equals(jwtTokenId))
+                deviceRepository.delete(device);
+        });
+
         return true;
     }
 }

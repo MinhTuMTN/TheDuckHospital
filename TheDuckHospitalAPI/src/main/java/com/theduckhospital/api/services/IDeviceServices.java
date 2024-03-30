@@ -13,5 +13,6 @@ public interface IDeviceServices {
     boolean checkAuthorizationDevice(String tokenId);
     boolean deleteDeviceJwtToken(String tokenId);
     List<DeviceResponse> getDevicesByAccount(Account account, String jwtTokenId);
-    boolean remoteLogout(Account account, String jwtTokenId);
+    boolean remoteLogout(Account account, String logoutTokenId);
+    boolean remoteLogoutAll(Account account, String jwtTokenId);
 }

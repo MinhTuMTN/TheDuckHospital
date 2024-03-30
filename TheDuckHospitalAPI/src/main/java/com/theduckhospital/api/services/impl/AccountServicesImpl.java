@@ -528,8 +528,15 @@ public class AccountServicesImpl implements IAccountServices {
     @Override
     public boolean remoteLogout(String logoutTokenId, String token) {
         Account account = findAccountByToken(token);
+
+        return deviceServices.remoteLogout(account, logoutTokenId);
+    }
+
+    @Override
+    public boolean remoteLogoutAll(String token) {
+        Account account = findAccountByToken(token);
         String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
 
-        return deviceServices.remoteLogout(account, tokenId);
+        return deviceServices.remoteLogoutAll(account, tokenId);
     }
 }
