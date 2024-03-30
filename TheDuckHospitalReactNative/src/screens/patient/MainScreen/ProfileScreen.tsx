@@ -30,6 +30,7 @@ import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
 import {navigationProps} from '../../../types';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
@@ -71,91 +72,93 @@ const ProfileScreen = () => {
   }, [auth.token, isFocused]);
 
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title={t('patientProfile.title')}
-        titleSize={19}
-        icon={
-          <TouchableOpacity onPress={handleEndIconHeaderPress}>
-            <Icon name="adduser" color={'white'} size={30} />
-          </TouchableOpacity>
-        }
-      />
-      <ContentComponent>
-        {isLoading ? (
-          <>
-            <ActivityIndicator size="large" color={appColors.primary} />
-          </>
-        ) : (
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={patientProfiles}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({item}) => <PatientProfile profile={item} />}
-          />
-        )}
-      </ContentComponent>
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={t('patientProfile.title')}
+          titleSize={19}
+          icon={
+            <TouchableOpacity onPress={handleEndIconHeaderPress}>
+              <Icon name="adduser" color={'white'} size={30} />
+            </TouchableOpacity>
+          }
+        />
+        <ContentComponent>
+          {isLoading ? (
+            <>
+              <ActivityIndicator size="large" color={appColors.primary} />
+            </>
+          ) : (
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={patientProfiles}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({item}) => <PatientProfile profile={item} />}
+            />
+          )}
+        </ContentComponent>
 
-      <Modal
-        statusBarTranslucent
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}>
-        <View style={styles.containerModal}>
-          <View style={styles.modalView}>
-            <Pressable
-              style={{
-                position: 'absolute',
-                right: 25,
-                top: 20,
-              }}
-              onPress={() => setModalVisible(false)}>
-              <AntDesign
-                name="closecircle"
-                size={24}
-                color={appColors.grayLight}
-              />
-            </Pressable>
-            <TextComponent textAlign="center" fontWeight="600" fontSize={16}>
-              Thêm hồ sơ khám bệnh mới
-            </TextComponent>
-            <ButtonComponent
-              onPress={handleAddProfileClick}
-              containerStyles={styles.buttonOption}
-              backgroundColor="white"
-              textStyles={{
-                color: appColors.textLight,
-                fontSize: 16,
-                fontWeight: '500',
-              }}>
-              Chưa từng khám, tạo hồ sơ mới
-            </ButtonComponent>
-            <ButtonComponent
-              containerStyles={styles.buttonOption}
-              backgroundColor="white"
-              textStyles={{
-                color: appColors.textLight,
-                fontSize: 16,
-                fontWeight: '500',
-              }}
-              onPress={handleEnterProfileCode}>
-              Đã từng khám, nhập mã hồ sơ
-            </ButtonComponent>
-            <ButtonComponent
-              containerStyles={styles.buttonOption}
-              backgroundColor="white"
-              textStyles={{
-                color: appColors.textLight,
-                fontSize: 16,
-                fontWeight: '500',
-              }}
-              onPress={handleEnterProfileCode}>
-              Tôi quên mã bệnh nhân của mình
-            </ButtonComponent>
+        <Modal
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <View style={styles.containerModal}>
+            <View style={styles.modalView}>
+              <Pressable
+                style={{
+                  position: 'absolute',
+                  right: 25,
+                  top: 20,
+                }}
+                onPress={() => setModalVisible(false)}>
+                <AntDesign
+                  name="closecircle"
+                  size={24}
+                  color={appColors.grayLight}
+                />
+              </Pressable>
+              <TextComponent textAlign="center" fontWeight="600" fontSize={16}>
+                Thêm hồ sơ khám bệnh mới
+              </TextComponent>
+              <ButtonComponent
+                onPress={handleAddProfileClick}
+                containerStyles={styles.buttonOption}
+                backgroundColor="white"
+                textStyles={{
+                  color: appColors.textLight,
+                  fontSize: 16,
+                  fontWeight: '500',
+                }}>
+                Chưa từng khám, tạo hồ sơ mới
+              </ButtonComponent>
+              <ButtonComponent
+                containerStyles={styles.buttonOption}
+                backgroundColor="white"
+                textStyles={{
+                  color: appColors.textLight,
+                  fontSize: 16,
+                  fontWeight: '500',
+                }}
+                onPress={handleEnterProfileCode}>
+                Đã từng khám, nhập mã hồ sơ
+              </ButtonComponent>
+              <ButtonComponent
+                containerStyles={styles.buttonOption}
+                backgroundColor="white"
+                textStyles={{
+                  color: appColors.textLight,
+                  fontSize: 16,
+                  fontWeight: '500',
+                }}
+                onPress={handleEnterProfileCode}>
+                Tôi quên mã bệnh nhân của mình
+              </ButtonComponent>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </ContainerComponent>
+        </Modal>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

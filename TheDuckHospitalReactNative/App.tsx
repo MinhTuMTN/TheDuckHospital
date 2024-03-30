@@ -41,6 +41,7 @@ import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegist
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 import {appColors} from './src/constants/appColors';
+import AddProfileScreen from './src/screens/patient/AddProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -173,6 +174,10 @@ const App = () => {
                 <Stack.Screen
                   name="DeviceManagementScreen"
                   component={DeviceManagementScreen}
+                />
+                <Stack.Screen
+                  name="AddProfileScreen"
+                  component={AddProfileScreen}
                 />
               </Stack.Navigator>
             </NavigationContainer>

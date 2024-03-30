@@ -14,6 +14,7 @@ import {appColors} from '../../../constants/appColors';
 import {getAllBooking} from '../../../services/bookingServices';
 import {useAuth} from '../../../hooks/AuthProvider';
 import {useIsFocused} from '@react-navigation/native';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
@@ -115,58 +116,60 @@ const MedicalBillScreen = () => {
     setBookingToDisplay(bookingToDisplayTemp);
   }, [selectedPatientName]);
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title={t('medicalBill.title')}
-        titleSize={19}
-        showBackButton={true}
-        paddingTop={35}
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-        backgroundColor={appColors.backgroundGray}
-      />
-
-      <FlexComponent
-        direction="row"
-        style={{
-          width: '100%',
-          paddingHorizontal: 16,
-          backgroundColor: appColors.backgroundGray,
-        }}>
-        <SelectComponent
-          flex={1}
-          options={patientNames}
-          keyTitle="fullName"
-          value={selectedPatientName}
-          selectTextColor={appColors.textDarker}
-          title="Chọn hồ sơ bệnh nhân"
-          placeholder="Chọn hồ sơ bệnh nhân"
-          onChange={value => {
-            setSelectedPatientName(value);
-          }}
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={t('medicalBill.title')}
+          titleSize={19}
+          showBackButton={true}
+          paddingTop={35}
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
+          backgroundColor={appColors.backgroundGray}
         />
-      </FlexComponent>
 
-      <FilterComponent
-        items={['Tất cả', 'Đã khám', 'Chưa khám']}
-        value={fillter}
-        onChange={value => setFillter(value)}
-      />
-      <ContentComponent style={{backgroundColor: appColors.backgroundGray}}>
-        {isLoadingAPI ? (
-          <FlexComponent flex={1} alignItems="center" justifyContent="center">
-            <ActivityIndicator size="large" color={appColors.primary} />
-          </FlexComponent>
-        ) : (
-          <FlatList
-            data={bookingToDisplay}
-            renderItem={_renderItem}
-            keyExtractor={_keyExtractor}
+        <FlexComponent
+          direction="row"
+          style={{
+            width: '100%',
+            paddingHorizontal: 16,
+            backgroundColor: appColors.backgroundGray,
+          }}>
+          <SelectComponent
+            flex={1}
+            options={patientNames}
+            keyTitle="fullName"
+            value={selectedPatientName}
+            selectTextColor={appColors.textDarker}
+            title="Chọn hồ sơ bệnh nhân"
+            placeholder="Chọn hồ sơ bệnh nhân"
+            onChange={value => {
+              setSelectedPatientName(value);
+            }}
           />
-        )}
-      </ContentComponent>
-    </ContainerComponent>
+        </FlexComponent>
+
+        <FilterComponent
+          items={['Tất cả', 'Đã khám', 'Chưa khám']}
+          value={fillter}
+          onChange={value => setFillter(value)}
+        />
+        <ContentComponent style={{backgroundColor: appColors.backgroundGray}}>
+          {isLoadingAPI ? (
+            <FlexComponent flex={1} alignItems="center" justifyContent="center">
+              <ActivityIndicator size="large" color={appColors.primary} />
+            </FlexComponent>
+          ) : (
+            <FlatList
+              data={bookingToDisplay}
+              renderItem={_renderItem}
+              keyExtractor={_keyExtractor}
+            />
+          )}
+        </ContentComponent>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 
