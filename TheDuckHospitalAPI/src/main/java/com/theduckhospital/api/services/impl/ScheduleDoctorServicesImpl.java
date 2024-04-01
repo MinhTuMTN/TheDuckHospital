@@ -8,14 +8,12 @@ import com.theduckhospital.api.dto.request.headdoctor.UpdateDoctorScheduleReques
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.doctor.*;
 import com.theduckhospital.api.dto.response.admin.DoctorScheduleRoomResponse;
+import com.theduckhospital.api.dto.response.nurse.QueueBookingItem;
 import com.theduckhospital.api.dto.response.nurse.QueueBookingResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.BookingRepository;
-import com.theduckhospital.api.repository.DoctorScheduleRepository;
-import com.theduckhospital.api.repository.MedicalExaminationRepository;
-import com.theduckhospital.api.repository.TimeSlotRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -43,6 +41,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final BookingRepository bookingRepository;
     private final ITimeSlotServices timeSlotServices;
     private final TimeSlotRepository timeSlotRepository;
+    private final AccountRepository accountRepository;
+    private final IFirebaseServices firebaseServices;
     @Value("${settings.date}")
     private String todayDate;
 
@@ -54,8 +54,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             MedicalExaminationRepository examinationRepository,
             BookingRepository bookingRepository,
             ITimeSlotServices timeSlotServices,
-            TimeSlotRepository timeSlotRepository
-    ) {
+            TimeSlotRepository timeSlotRepository,
+            AccountRepository accountRepository, IFirebaseServices firebaseServices) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
         this.roomServices = roomServices;
@@ -64,6 +64,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.bookingRepository = bookingRepository;
         this.timeSlotServices = timeSlotServices;
         this.timeSlotRepository = timeSlotRepository;
+        this.accountRepository = accountRepository;
+        this.firebaseServices = firebaseServices;
     }
 
     @Override
@@ -195,7 +197,20 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         doctorSchedule.setQueueNumber(newQueueNumber);
         doctorScheduleRepository.save(doctorSchedule);
 
-        return getQueueBookingResponse(doctorSchedule);
+        QueueBookingResponse response = getQueueBookingResponse(doctorSchedule);
+        List<QueueBookingItem> bookings = response.getQueueBookingItems();
+        for (QueueBookingItem booking : bookings) {
+            Account account = accountRepository.findAccountByUserIdAndDeletedIsFalse(booking.getUserId());
+            if (account != null) {
+                Map<String, String> data = Map.of(
+                        "title", "Thông báo",
+                        "body", "Đã đến lượt khám của bạn. Vui lòng đến phòng khám để khám bệnh."
+                );
+                firebaseServices.sendNotificationToAccount(account, data);
+            }
+        }
+
+        return response;
     }
 
     @Override
