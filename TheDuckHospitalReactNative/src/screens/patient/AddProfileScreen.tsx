@@ -1,6 +1,6 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {ActivityIndicator, Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import {
   ContainerComponent,

@@ -1,7 +1,7 @@
-import {get} from './AxiosInstance';
+import {get, getNonAuth} from './AxiosInstance';
 
 export const getAllProvinces = async () => {
-  return get(`/addresses/provinces`);
+  return getNonAuth(`/addresses/provinces`);
 };
 
 export const getAllDistricts = async (provinceId: number) => {

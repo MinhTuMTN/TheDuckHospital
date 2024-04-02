@@ -17,6 +17,10 @@ const AllPatientProfilesScreen = () => {
     setModalVisible(false);
     navigate.navigate('EnterProfileCode');
   };
+  const handleFindProfileCodeScreen = () => {
+    setModalVisible(false);
+    navigate.navigate('FindProfileCodeScreen');
+  };
   const handleOpenPopup = () => {
     setModalVisible(true);
   };
@@ -79,18 +83,21 @@ const AllPatientProfilesScreen = () => {
               <TextComponent
                 fontWeight="500"
                 fontSize={16}
-                color={appColors.textLight}>
+                color={appColors.primaryDark}>
                 Đã từng khám, nhập mã hồ sơ
               </TextComponent>
             </ButtonComponent>
-            <View style={styles.buttonOption}>
+            <ButtonComponent
+              containerStyles={styles.buttonOption}
+              backgroundColor="white"
+              onPress={handleFindProfileCodeScreen}>
               <TextComponent
                 fontWeight="500"
                 fontSize={16}
-                color={appColors.textLight}>
+                color={appColors.primaryDark}>
                 Tôi quên mã bệnh nhân của mình
               </TextComponent>
-            </View>
+            </ButtonComponent>
           </View>
         </View>
       </Modal>
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
   buttonOption: {
     width: '100%',
     alignItems: 'center',
-    borderColor: appColors.textLight,
+    borderColor: appColors.primaryDark,
     marginTop: 15,
     borderWidth: 1,
     borderRadius: 15,
