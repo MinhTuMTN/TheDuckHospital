@@ -129,7 +129,9 @@ const AccountScreen = () => {
             <AccountScreenRowComponent
               title={t('account.ratingApp')}
               icon={<Star size={20} color={appColors.black} />}
-              onPress={() => console.log('Notification settings')}
+              onPress={() =>
+                navigation.navigate('HospitalFeePaymentInformationScreen')
+              }
             />
             <AccountScreenRowComponent
               title={t('account.shareApp')}

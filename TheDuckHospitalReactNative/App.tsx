@@ -45,6 +45,8 @@ import AddProfileScreen from './src/screens/patient/AddProfileScreen';
 import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
 import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
+import {Hospital} from 'lucide-react-native';
+import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -193,6 +195,10 @@ const App = () => {
                 <Stack.Screen
                   name="EnterHospitalPaymentCodeScreen"
                   component={EnterHospitalPaymentCodeScreen}
+                />
+                <Stack.Screen
+                  name="HospitalFeePaymentInformationScreen"
+                  component={HospitalFeePaymentInformationScreen}
                 />
               </Stack.Navigator>
             </NavigationContainer>
