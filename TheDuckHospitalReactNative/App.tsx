@@ -48,7 +48,11 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   notifee.onForegroundEvent(async ({type, detail}) => {
     if (type === EventType.PRESS) {
-      Linking.openURL('theduck://app/payment/1');
+      Linking.openURL('theduck://app/notifications');
+    } else if (type === EventType.DISMISSED) {
+      console.log('Foreground user dismissed notification');
+    } else if (type === EventType.DELIVERED) {
+      console.log('Foreground notification delivered');
     }
   });
 

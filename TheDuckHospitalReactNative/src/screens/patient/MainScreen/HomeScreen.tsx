@@ -25,6 +25,10 @@ import {useToast} from '../../../hooks/ToastProvider';
 import {updateDeviceInformation} from '../../../services/authServices';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
 import {AppNotification} from '../../../utils/appNotification';
+import {
+  NotificationState,
+  updateNotificationState,
+} from '../../../services/notificationServices';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -140,6 +144,15 @@ const HomeScreen = () => {
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       AppNotification.displayNotification(remoteMessage);
+      const notificationId: string | undefined =
+        (remoteMessage.data?.notificationId as string) || undefined;
+      if (notificationId) {
+        const response = await updateNotificationState(
+          notificationId,
+          NotificationState.RECEIVED,
+        );
+        console.log(response);
+      }
     });
 
     return unsubscribe;
@@ -147,8 +160,10 @@ const HomeScreen = () => {
 
   useEffect(() => {
     notifee.getInitialNotification().then(notification => {
+      console.log('Initial notification', notification);
+
       if (notification) {
-        Linking.openURL('theduck://app/payment/1');
+        navigation.navigate('NotificationScreen' as never);
       }
     });
   }, []);

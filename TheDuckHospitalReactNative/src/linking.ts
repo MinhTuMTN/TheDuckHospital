@@ -1,6 +1,6 @@
 const config = {
   screens: {
-    Home: {
+    HomeScreen: {
       path: 'home',
     },
     PaymentResultScreen: {
@@ -8,6 +8,9 @@ const config = {
       parse: {
         id: (id: string) => `${id}`,
       },
+    },
+    NotificationScreen: {
+      path: 'notifications',
     },
   },
 };

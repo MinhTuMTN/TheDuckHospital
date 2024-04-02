@@ -10,9 +10,15 @@ import DeviceInfo from 'react-native-device-info';
 export class AppNotification {
   static async requestPermission() {
     await notifee.requestPermission();
-    const channelId = await notifee.createChannel({
+    await notifee.createChannel({
       id: 'general',
       name: 'General Channel',
+      importance: AndroidImportance.HIGH,
+      sound: 'notifications',
+    });
+    await notifee.createChannel({
+      id: 'booking',
+      name: 'Booking Channel',
       importance: AndroidImportance.HIGH,
       sound: 'notifications',
     });
@@ -42,11 +48,11 @@ export class AppNotification {
       id: remoteMessage.messageId,
       title: (remoteMessage.data?.title as string) || 'Default Title',
       data: {
-        link: 'theduck://app/payment/1',
+        notificationId: remoteMessage.data?.notificationId,
       },
       body: (remoteMessage.data?.body as string) || 'Default Body',
       android: {
-        channelId: 'general',
+        channelId: (remoteMessage.data?.channelId as string) || 'general',
         pressAction: {
           id: 'payment',
           launchActivity: 'default',

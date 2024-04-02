@@ -206,14 +206,17 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Account account = accountRepository.findAccountByUserIdAndDeletedIsFalse(booking.getUserId());
             String body = "Bệnh nhân " + booking.getFullName() + " đã đến lượt khám. Vui lòng đến phòng " + booking.getRoomName() + " để khám bệnh";
             if (account != null) {
+                UUID notificationId = UUID.randomUUID();
                 Map<String, String> data = Map.of(
                         "title", "Đến lượt khám bệnh của bạn",
                         "body", body,
                         "action", "almostTimeForMedicalExam",
-                        "value", ""
+                        "value", "",
+                        "notificationId", notificationId.toString(),
+                        "channelId", "booking"
                 );
                 Notification notification = new Notification();
-                notification.setNotificationId(UUID.randomUUID());
+                notification.setNotificationId(notificationId);
                 notification.setTitle("Đến lượt khám bệnh của bạn");
                 notification.setContent(body);
                 notification.setData(data.toString());

@@ -162,7 +162,7 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
       selectedDepartment?.departmentId,
       selectedDegree?.id,
       pagination.page,
-      pagination.limit,
+      6,
     );
     setIsLoadingAPI(false);
 
@@ -187,7 +187,6 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
     selectedDepartment,
     selectedDegree,
     pagination.page,
-    pagination.limit,
   ]);
 
   useEffect(() => {
@@ -337,14 +336,14 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
         style={{width: '100%'}}
         initialNumToRender={5}
         onEndReached={e => {
-          if (pagination.page < pagination.totalPages) {
-            setPagination({
-              ...pagination,
-              page: pagination.page + 1,
-            });
+          if (pagination.page < pagination.totalPages && !isLoadingAPI) {
+            setPagination((prevState: any) => ({
+              ...prevState,
+              page: prevState.page + 1,
+            }));
           }
         }}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.7}
         ListFooterComponent={listFooterComponent}
       />
     </View>
