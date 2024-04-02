@@ -1,5 +1,13 @@
-import React from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -19,6 +27,8 @@ import {formatCurrency} from '../../../utils/currencyUtils';
 
 const HospitalFeePaymentInformationScreen = () => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -204,19 +214,53 @@ const HospitalFeePaymentInformationScreen = () => {
             </ScrollView>
           </View>
           <View style={styles.bill}>
-            <View style={styles.headerBill}>
-              <TextComponent
-                color={appColors.primaryLable}
-                fontWeight="600"
-                fontSize={20}>
-                Chọn phương thức thanh toán
-              </TextComponent>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.headerBill}>
+              {paymentMethod === '' ? (
+                <>
+                  <TextComponent
+                    color={appColors.primaryLable}
+                    fontWeight="600"
+                    fontSize={20}>
+                    Chọn phương thức thanh toán
+                  </TextComponent>
+                </>
+              ) : paymentMethod === 'MOMO' ? (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/MoMo_Logo.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử Momo
+                  </TextComponent>
+                </View>
+              ) : (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/VNPay.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử VNPay
+                  </TextComponent>
+                </View>
+              )}
               <MaterialIcons
                 name="navigate-next"
                 size={30}
                 color={appColors.primary}
               />
-            </View>
+            </TouchableOpacity>
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
@@ -303,6 +347,81 @@ const HospitalFeePaymentInformationScreen = () => {
             </View>
           </View>
         </View>
+        <Modal
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <View style={styles.containerModal}>
+            <View style={styles.modalView}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  borderBottomColor: appColors.grayLine,
+                  borderBottomWidth: 1,
+                  paddingBottom: 10,
+                }}>
+                <TextComponent
+                  color={appColors.black}
+                  fontWeight="600"
+                  fontSize={18}>
+                  Chọn Phương Thức Thanh Toán
+                </TextComponent>
+                <Pressable onPress={() => setModalVisible(false)}>
+                  <AntDesign
+                    name="close"
+                    size={22}
+                    color={appColors.grayLight}
+                  />
+                </Pressable>
+              </View>
+              <Pressable
+                style={[
+                  styles.option,
+                  {
+                    borderBottomColor: appColors.grayLine,
+                    borderBottomWidth: 1,
+                  },
+                ]}
+                onPress={() => {
+                  setPaymentMethod('MOMO');
+                  setModalVisible(false);
+                }}>
+                <Image
+                  source={require('../../../assets/images/MoMo_Logo.png')}
+                  style={{width: 30, height: 30}}
+                />
+                <TextComponent
+                  fontWeight="400"
+                  fontSize={16}
+                  color={appColors.black}
+                  style={{marginLeft: 10, letterSpacing: 0.2}}>
+                  Ví điện tử Momo
+                </TextComponent>
+              </Pressable>
+              <Pressable
+                style={styles.option}
+                onPress={() => {
+                  setPaymentMethod('VNPay');
+                  setModalVisible(false);
+                }}>
+                <Image
+                  source={require('../../../assets/images/VNPay.png')}
+                  style={{width: 30, height: 30}}
+                />
+                <TextComponent
+                  fontWeight="400"
+                  fontSize={16}
+                  color={appColors.black}
+                  style={{marginLeft: 10, letterSpacing: 0.2}}>
+                  Ví điện tử VNPay
+                </TextComponent>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </ContainerComponent>
     </GestureHandlerRootView>
   );
@@ -381,5 +500,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 15,
+  },
+  containerModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: 'flex-end',
+  },
+  modalView: {
+    flexDirection: 'column',
+    marginBottom: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    paddingTop: 20,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  option: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 15,
+  },
+  isChoose: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingLeft: 10,
   },
 });
