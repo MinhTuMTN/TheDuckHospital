@@ -1,18 +1,16 @@
-import {
-  View,
-  TouchableOpacity,
-  StyleProp,
-  ViewStyle,
-  GestureResponderEvent,
-  ActivityIndicator,
-  StyleSheet,
-  ColorValue,
-  TextStyle,
-} from 'react-native';
-import React from 'react';
 import {Text} from '@gluestack-ui/themed';
+import React from 'react';
+import {
+  ActivityIndicator,
+  ColorValue,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {appColors} from '../constants/appColors';
-import {TextComponent} from '.';
 
 interface ButtonComponentProps {
   children: React.ReactNode | string;

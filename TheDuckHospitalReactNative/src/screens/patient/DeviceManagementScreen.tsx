@@ -1,12 +1,11 @@
 import React, {useCallback, useEffect} from 'react';
-import {ContainerComponent, ContentComponent, Header} from '../../components';
-import {appColors} from '../../constants/appColors';
-import DeviceItemComponent from '../../components/patient/deviceManagementScreen/DeviceItemComponent';
 import {ActivityIndicator, FlatList, View} from 'react-native';
-import {globalStyles} from '../../styles/globalStyles';
+import {ContainerComponent, ContentComponent, Header} from '../../components';
 import ButtonComponent from '../../components/ButtonComponent';
-import {getMyDevices, remoteLogoutAll} from '../../services/authServices';
+import DeviceItemComponent from '../../components/patient/deviceManagementScreen/DeviceItemComponent';
+import {appColors} from '../../constants/appColors';
 import {useToast} from '../../hooks/ToastProvider';
+import {getMyDevices, remoteLogoutAll} from '../../services/authServices';
 
 const DeviceManagementScreen = () => {
   const [devices, setDevices] = React.useState([]);

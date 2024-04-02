@@ -1,11 +1,10 @@
-import React from 'react';
-import {Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useAuth} from '../hooks/AuthProvider';
-import {TextComponent} from '.';
-import ButtonComponent from './ButtonComponent';
-import {appColors} from '../constants/appColors';
-import {globalStyles} from '../styles/globalStyles';
 import {useNavigation} from '@react-navigation/native';
+import React from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {TextComponent} from '.';
+import {appColors} from '../constants/appColors';
+import {useAuth} from '../hooks/AuthProvider';
+import {globalStyles} from '../styles/globalStyles';
 import {navigationProps} from '../types';
 
 interface LoginRequireComponentProps {

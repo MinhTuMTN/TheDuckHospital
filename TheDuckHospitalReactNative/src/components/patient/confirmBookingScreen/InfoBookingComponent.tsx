@@ -1,7 +1,5 @@
-import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import {TextComponent} from '../..';
-import LineComfirmBookingInfo from './LineComfirmBookingInfo';
+import {StyleSheet, View} from 'react-native';
 import {
   AlarmClock,
   Calendar7,
@@ -10,9 +8,10 @@ import {
   Trash,
 } from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
+import {formatCurrency} from '../../../utils/currencyUtils';
 import {formatDate} from '../../../utils/dateUtils';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
-import {formatCurrency} from '../../../utils/currencyUtils';
+import LineComfirmBookingInfo from './LineComfirmBookingInfo';
 
 interface InfoBookingComponentProps {
   item: any;

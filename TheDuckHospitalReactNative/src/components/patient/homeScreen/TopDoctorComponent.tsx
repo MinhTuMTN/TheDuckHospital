@@ -1,7 +1,6 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
+import {Image, StyleSheet, View} from 'react-native';
 import {TextComponent} from '../..';
-import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
 
 interface TopDoctorComponentProps {
