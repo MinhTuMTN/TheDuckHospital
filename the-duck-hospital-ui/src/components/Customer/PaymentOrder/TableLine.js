@@ -4,9 +4,9 @@ import MedicationIcon from "@mui/icons-material/Medication";
 import PaidIcon from "@mui/icons-material/Paid";
 import PersonIcon from "@mui/icons-material/Person";
 import dayjs from "dayjs";
+import { getTimeSlotById } from "../../../utils/timeSlotUtils";
 
 const createTableLine = (schedule) => {
-  console.log(schedule);
   const tableLine = [
     {
       icon: (
@@ -55,7 +55,9 @@ const createTableLine = (schedule) => {
         />
       ),
       label: "Buổi:",
-      value: schedule?.schedule?.scheduleType === "MORNING" ? "Sáng" : "Chiều",
+      value: `${
+        schedule?.schedule?.scheduleType === "MORNING" ? "Sáng" : "Chiều"
+      } ${getTimeSlotById(schedule?.timeSlot?.timeId)}`,
     },
     {
       icon: (

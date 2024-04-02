@@ -35,6 +35,7 @@ function ConfirmBookingInformation(props) {
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const { schedules, profile } = useLocation().state;
+  console.log("schedules", schedules);
 
   const breakcrumbs = [
     <CustomTextBreakcrumb key={1}>Trang chủ</CustomTextBreakcrumb>,

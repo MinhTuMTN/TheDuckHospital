@@ -121,13 +121,13 @@ function Payment(props) {
     setIsLoading(true);
     const response = await createBooking({
       patientProfileId: profile.patientProfileId,
-      doctorScheduleIds: schedules.map(
-        (schedule) => schedule.schedule.doctorScheduleId
-      ),
+      timeSlotIds: schedules.map((schedule) => schedule.timeSlot.timeSlotId),
+      paymentMethod: "VNPAY",
+      mobile: false,
     });
     setIsLoading(false);
     if (response.success && response.data.data) {
-      window.location.href = response.data.data;
+      window.location.href = response.data.data.paymentUrl;
     } else {
       enqueueSnackbar("Đặt lịch không thành công", { variant: "error" });
     }
@@ -224,7 +224,7 @@ function Payment(props) {
                 textAlign: "right",
               }}
             >
-              <FormatCurrency amount={10000} />
+              <FormatCurrency amount={15000} />
             </CustomTypographyValue>{" "}
           </Stack>
           <Stack
@@ -254,7 +254,7 @@ function Payment(props) {
                 fontSize: "20px",
               }}
             >
-              <FormatCurrency amount={total + 10000} />
+              <FormatCurrency amount={total + 15000} />
             </Typography>{" "}
           </Stack>
           <Stack
