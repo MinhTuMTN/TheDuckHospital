@@ -1,8 +1,10 @@
 package com.theduckhospital.api.services;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
+import com.theduckhospital.api.dto.request.SendOTPPatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
@@ -37,4 +39,5 @@ public interface IPatientProfileServices {
     PatientProfileItemResponse addPatientProfile(String authorization, AddPatientProfileRequest request);
 
     List<PatientProfileItemResponse> findPatientCode(FindPatientCodeRequest request);
+    boolean sendOTP(SendOTPPatientProfileRequest request);
 }

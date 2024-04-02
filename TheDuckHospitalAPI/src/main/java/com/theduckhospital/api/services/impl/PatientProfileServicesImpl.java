@@ -1,9 +1,11 @@
 package com.theduckhospital.api.services.impl;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
+import com.theduckhospital.api.dto.request.SendOTPPatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseUpdatePatientProfileRequest;
 import com.theduckhospital.api.dto.response.PatientProfileItemResponse;
@@ -17,34 +19,37 @@ import com.theduckhospital.api.repository.NationRepository;
 import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.ProvinceRepository;
 import com.theduckhospital.api.repository.WardRepository;
-import com.theduckhospital.api.services.IAccountServices;
-import com.theduckhospital.api.services.IPatientProfileServices;
-import com.theduckhospital.api.services.IPatientServices;
+import com.theduckhospital.api.services.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PatientProfileServicesImpl implements IPatientProfileServices {
+    @Value("${settings.fcm.token}")
+    private String fcmToken;
     private final IAccountServices accountServices;
     private final NationRepository nationRepository;
     private final WardRepository wardRepository;
     private final ProvinceRepository provinceRepository;
     private final PatientProfileRepository patientProfileRepository;
     private final IPatientServices patientServices;
+    private final IOTPServices otpServices;
+    private final IFirebaseServices firebaseServices;
 
     public PatientProfileServicesImpl(
             IAccountServices accountServices,
             NationRepository nationRepository,
-            WardRepository wardRepository, ProvinceRepository provinceRepository, PatientProfileRepository patientProfileRepository, IPatientServices patientServices) {
+            WardRepository wardRepository, ProvinceRepository provinceRepository, PatientProfileRepository patientProfileRepository, IPatientServices patientServices, IOTPServices otpServices, IFirebaseServices firebaseServices) {
         this.accountServices = accountServices;
         this.nationRepository = nationRepository;
         this.wardRepository = wardRepository;
         this.provinceRepository = provinceRepository;
         this.patientProfileRepository = patientProfileRepository;
         this.patientServices = patientServices;
+        this.otpServices = otpServices;
+        this.firebaseServices = firebaseServices;
     }
 
     @Override
@@ -272,10 +277,15 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
     public PatientProfileItemResponse addPatientProfile(String authorization, AddPatientProfileRequest request) {
         PatientProfile patientProfile = patientProfileRepository.findById(
                 request.getPatientProfileId()
-        ).orElseThrow(() -> new NotFoundException("Patient Profile not found"));
+        ).orElseThrow(() -> new BadRequestException("Patient Profile not found", 10006));
 
-        if (patientProfile.isDeleted() || !patientProfile.getPhoneNumber().equals(request.getPhoneNumber())) {
-            throw new BadRequestException("Patient Profile not valid");
+        if (patientProfile.isDeleted()
+        ) {
+            throw new BadRequestException("Patient Profile not found", 10006);
+        }
+
+        if (!otpServices.verifyOTP(patientProfile, request.getOtp())) {
+            throw new BadRequestException("OTP not valid", 10008);
         }
 
         Account account = accountServices.findAccountByToken(authorization);
@@ -303,6 +313,36 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
                 .filter(patientProfile -> !patientProfile.isDeleted())
                 .map(PatientProfileItemResponse::new)
                 .toList();
+    }
+
+    @Override
+    public boolean sendOTP(SendOTPPatientProfileRequest request) {
+        PatientProfile patientProfile = patientProfileRepository
+                .findById(request.getPatientProfileId())
+                .orElseThrow(() -> new BadRequestException("Patient profile not found", 10006));
+
+        if (patientProfile.isDeleted())
+            throw new BadRequestException("Patient profile not found", 10006);
+
+        if (!patientProfile.getPhoneNumber().equals(request.getPhoneNumber()))
+            throw new BadRequestException("Phone number not valid", 10007);
+
+        int otp = otpServices.generateOTP(patientProfile);
+        Map<String, String> data = new HashMap<>();
+        data.put("phoneNumber", patientProfile.getPhoneNumber());
+        data.put("message", "Mã xác nhận của bạn là: " + otp);
+        try {
+            firebaseServices.sendNotification(
+                    fcmToken,
+                    "OTP",
+                    "Mã xác nhận của bạn là: " + otp,
+                    data
+            );
+        } catch (FirebaseMessagingException ignored) {
+            // Ignore because this is not implement in test
+        }
+
+        return true;
     }
 
 

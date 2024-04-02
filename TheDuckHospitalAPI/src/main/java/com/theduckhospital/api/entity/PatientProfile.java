@@ -44,6 +44,11 @@ public class PatientProfile {
     private Date lastModifiedAt;
     private boolean deleted;
 
+    private String otp;
+    private Integer otpCount;
+    private Date otpExpiredAt;
+    private Date otpCreatedAt;
+
     @PrePersist
     private void onCreate() {
         this.patientProfileId = UUID.randomUUID();

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.MedicalExamState;
+import com.theduckhospital.api.constant.NotificationState;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
@@ -40,7 +41,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final MedicalExaminationRepository examinationRepository;
     private final BookingRepository bookingRepository;
     private final ITimeSlotServices timeSlotServices;
-    private final TimeSlotRepository timeSlotRepository;
+    private final NotificationRepository notificationRepository;
     private final AccountRepository accountRepository;
     private final IFirebaseServices firebaseServices;
     @Value("${settings.date}")
@@ -54,8 +55,10 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             MedicalExaminationRepository examinationRepository,
             BookingRepository bookingRepository,
             ITimeSlotServices timeSlotServices,
-            TimeSlotRepository timeSlotRepository,
-            AccountRepository accountRepository, IFirebaseServices firebaseServices) {
+            NotificationRepository notificationRepository,
+            AccountRepository accountRepository,
+            IFirebaseServices firebaseServices
+    ) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
         this.roomServices = roomServices;
@@ -63,7 +66,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.examinationRepository = examinationRepository;
         this.bookingRepository = bookingRepository;
         this.timeSlotServices = timeSlotServices;
-        this.timeSlotRepository = timeSlotRepository;
+        this.notificationRepository = notificationRepository;
         this.accountRepository = accountRepository;
         this.firebaseServices = firebaseServices;
     }
@@ -201,11 +204,27 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         List<QueueBookingItem> bookings = response.getQueueBookingItems();
         for (QueueBookingItem booking : bookings) {
             Account account = accountRepository.findAccountByUserIdAndDeletedIsFalse(booking.getUserId());
+            String body = "Bệnh nhân " + booking.getFullName() + " đã đến lượt khám. Vui lòng đến phòng " + booking.getRoomName() + " để khám bệnh";
             if (account != null) {
                 Map<String, String> data = Map.of(
-                        "title", "Thông báo",
-                        "body", "Đã đến lượt khám của bạn. Vui lòng đến phòng khám để khám bệnh."
+                        "title", "Đến lượt khám bệnh của bạn",
+                        "body", body,
+                        "action", "almostTimeForMedicalExam",
+                        "value", ""
                 );
+                Notification notification = new Notification();
+                notification.setNotificationId(UUID.randomUUID());
+                notification.setTitle("Đến lượt khám bệnh của bạn");
+                notification.setContent(body);
+                notification.setData(data.toString());
+                notification.setAccount(account);
+                notification.setCreatedAt(new Date());
+                notification.setLastModifiedAt(new Date());
+                notification.setDeleted(false);
+                notification.setState(NotificationState.NOT_RECEIVED);
+                notificationRepository.save(notification);
+
+
                 firebaseServices.sendNotificationToAccount(account, data);
             }
         }

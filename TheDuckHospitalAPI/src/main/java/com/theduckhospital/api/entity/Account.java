@@ -64,6 +64,11 @@ public class Account {
     @ToStringExclude
     private List<Device> devices;
 
+    @OneToMany(mappedBy = "account")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Notification> notifications;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staffId", referencedColumnName = "staffId")
     @JsonBackReference
