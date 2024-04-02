@@ -13,7 +13,7 @@ var qs = require('qs');
 const axiosInstance = axios.create({
   baseURL: 'https://tb7drp6q-8080.asse.devtunnels.ms/api',
   // baseURL: 'https://z58krthx-8080.asse.devtunnels.ms/api',
-  timeout: 10000,
+  timeout: 3000,
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': '69420',
@@ -47,7 +47,7 @@ const handleRequest = async (
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;
   } else {
-    axiosInstance.defaults.timeout = 30000;
+    axiosInstance.defaults.timeout = 3000;
   }
 
   try {

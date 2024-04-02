@@ -1,10 +1,8 @@
 import {
-  Icon,
   Select,
   SelectBackdrop,
   SelectContent,
   SelectIcon,
-  SelectInput,
   SelectPortal,
   SelectTrigger,
 } from '@gluestack-ui/themed';

@@ -1,27 +1,26 @@
+import {ChevronRight} from 'lucide-react-native';
+import React from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
   Modal,
   Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import React from 'react';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {appColors} from '../../../constants/appColors';
 import LineInfoComponent from '../../LineInfoComponent';
-import {ChevronRight, Info} from 'lucide-react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import ButtonComponent from '../../ButtonComponent';
+import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {confirmPatientProfileViaOTP} from '../../../services/patientProfileServices';
 import {addPatientProfileProps, navigationProps} from '../../../types';
-import {addPatientProfile} from '../../../services/patientProfileServices';
-import {useNavigation} from '@react-navigation/native';
+import ButtonComponent from '../../ButtonComponent';
 
 interface InfoProfileSearchComponentProps {
   info: any;
@@ -40,10 +39,12 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
     setIsShow(true);
   };
   const handleConfirmPhoneNumber = async () => {
-    const respone = await addPatientProfile(confirm);
+    const respone = await confirmPatientProfileViaOTP(confirm);
 
     if (respone.success) {
-      navigation.navigate('ProfileScreen');
+      navigation.navigate('AuthenticatePatientAccountViaOTPScreen', {
+        patientProfileId: confirm.patientProfileId,
+      });
     } else {
       console.log(respone.error);
     }
@@ -73,7 +74,7 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
             <Ionicons
               name="location-sharp"
               size={20}
-              style={{marginRight: 5, marginLeft: -4}}
+              style={{marginRight: 8, marginLeft: -4}}
               color={appColors.grayLight}
             />
           }
@@ -82,7 +83,7 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
             fontSize: 16,
             fontWeight: '500',
             color: appColors.grayLight,
-            letterSpacing: 1,
+            letterSpacing: 0,
           }}
           containerFlex={1}
         />
@@ -93,7 +94,7 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
             <FontAwesome
               name="mobile-phone"
               size={20}
-              style={{marginRight: 10, marginLeft: 1}}
+              style={{marginRight: 13, marginLeft: 2}}
               color={appColors.grayLight}
             />
           }

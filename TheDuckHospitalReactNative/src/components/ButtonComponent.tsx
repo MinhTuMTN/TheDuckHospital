@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import {Text} from '@gluestack-ui/themed';
 import {appColors} from '../constants/appColors';
+import {TextComponent} from '.';
 
 interface ButtonComponentProps {
   children: React.ReactNode | string;
@@ -37,12 +38,14 @@ interface ButtonComponentProps {
   italic?: boolean;
   padding?: number;
   containerStyles?: StyleProp<ViewStyle>;
+  disabledStyles?: StyleProp<ViewStyle>;
   textStyles?: StyleProp<TextStyle>;
   enabled?: boolean;
   onPress?: () => void | any;
   isLoading?: boolean;
   startIcon?: React.ReactNode;
   loadingColor?: ColorValue | undefined;
+  letterSpacing?: number;
 }
 
 const ButtonComponent = (props: ButtonComponentProps) => {
@@ -58,11 +61,13 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     italic = false,
     padding = 10,
     containerStyles,
+    disabledStyles,
     textStyles,
     enabled = true,
     onPress,
     isLoading,
     startIcon,
+    letterSpacing,
   } = props;
   return (
     <TouchableOpacity
@@ -86,6 +91,7 @@ const ButtonComponent = (props: ButtonComponentProps) => {
                 ...styles.disableStyle,
                 padding,
               },
+              disabledStyles,
             ]
       }>
       <View style={styles.loadingStyle}>
@@ -103,7 +109,8 @@ const ButtonComponent = (props: ButtonComponentProps) => {
           bold={bold}
           italic={italic}
           fontSize={fontSize}
-          fontWeight={fontWeight}>
+          fontWeight={fontWeight}
+          letterSpacing={letterSpacing}>
           {children}
         </Text>
       </View>

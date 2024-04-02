@@ -122,7 +122,9 @@ const AccountScreen = () => {
             <AccountScreenRowComponent
               title={t('account.hotline')}
               icon={<Headset size={20} color={appColors.black} />}
-              onPress={() => console.log('Notification settings')}
+              onPress={() =>
+                navigation.navigate('EnterHospitalPaymentCodeScreen')
+              }
             />
             <AccountScreenRowComponent
               title={t('account.ratingApp')}

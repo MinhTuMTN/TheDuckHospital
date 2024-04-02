@@ -42,6 +42,9 @@ import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProces
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 import {appColors} from './src/constants/appColors';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
+import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
+import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
+import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -182,6 +185,18 @@ const App = () => {
                 <Stack.Screen
                   name="AddProfileScreen"
                   component={AddProfileScreen}
+                />
+                <Stack.Screen
+                  name="FindProfileCodeScreen"
+                  component={FindProfileCodeScreen}
+                />
+                <Stack.Screen
+                  name="AuthenticatePatientAccountViaOTPScreen"
+                  component={AuthenticatePatientAccountViaOTPScreen}
+                />
+                <Stack.Screen
+                  name="EnterHospitalPaymentCodeScreen"
+                  component={EnterHospitalPaymentCodeScreen}
                 />
               </Stack.Navigator>
             </NavigationContainer>
