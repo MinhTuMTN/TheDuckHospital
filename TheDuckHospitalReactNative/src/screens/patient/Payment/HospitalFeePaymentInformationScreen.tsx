@@ -332,15 +332,16 @@ const HospitalFeePaymentInformationScreen = () => {
                 onPress={() => {
                   console.log('Thanh toán');
                 }}
-                borderRadius={40}
+                backgroundColor={appColors.primaryDark}
+                borderRadius={30}
                 isLoading={paymentLoading}
                 textStyles={{
                   textTransform: 'uppercase',
                   fontWeight: '600',
                 }}
                 containerStyles={{
-                  marginTop: 20,
-                  padding: 15,
+                  marginTop: 15,
+                  paddingVertical: 10,
                 }}>
                 Thanh toán
               </ButtonComponent>
