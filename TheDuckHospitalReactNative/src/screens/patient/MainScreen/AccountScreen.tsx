@@ -123,7 +123,7 @@ const AccountScreen = () => {
               title={t('account.hotline')}
               icon={<Headset size={20} color={appColors.black} />}
               onPress={() =>
-                navigation.navigate('AuthenticatePatientAccountViaOTPScreen')
+                navigation.navigate('EnterHospitalPaymentCodeScreen')
               }
             />
             <AccountScreenRowComponent

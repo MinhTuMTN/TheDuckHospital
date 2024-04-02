@@ -26,7 +26,6 @@ const AuthenticatePatientAccountViaOTPScreen = ({route}: {route: any}) => {
 
     const response = await addPatientProfileViaOTP(data);
     if (response.success) {
-      console.log(response.data);
       navigation.navigate('ProfileScreen');
     } else {
       console.log(response.error);
