@@ -136,7 +136,7 @@ const AccountScreen = () => {
             <AccountScreenRowComponent
               title={t('account.shareApp')}
               icon={<Share2 size={20} color={appColors.black} />}
-              onPress={() => console.log('Notification settings')}
+              onPress={() => navigation.navigate('SuccessScreen')}
             />
           </View>
         </SectionComponent>
