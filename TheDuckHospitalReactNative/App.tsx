@@ -50,6 +50,7 @@ import {Provider} from 'react-redux';
 import store from './src/store/store';
 import {RealmProvider} from '@realm/react';
 import {User} from './src/realm/User';
+import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -212,6 +213,7 @@ const App = () => {
                     name="HospitalFeePaymentInformationScreen"
                     component={HospitalFeePaymentInformationScreen}
                   />
+                  <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
                 </Stack.Navigator>
               </NavigationContainer>
             </AxiosInterceptorProvider>

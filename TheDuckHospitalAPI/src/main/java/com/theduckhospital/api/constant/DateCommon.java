@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,15 +25,15 @@ public class DateCommon {
     }
 
     public static Date getToday() {
-//        try {
-//            String todayString = environment.getProperty("settings.date");
-//            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//            return formatter.parse(todayString);
-//        } catch (Exception e) {
-//            return new Date();
-//        }
+        try {
+            String todayString = environment.getProperty("settings.date");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            return formatter.parse(todayString);
+        } catch (Exception e) {
+            return new Date();
+        }
 
-        return new Date();
+//        return new Date();
     }
 
     public static Calendar getCalendar(Date date) {

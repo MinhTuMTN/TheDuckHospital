@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import {TextComponent} from '.';
+import {appColors} from '../constants/appColors';
 
 interface Props {
   startIcon?: any;
@@ -28,6 +29,7 @@ interface Props {
   containerStyles?: StyleProp<ViewStyle>;
   containerFlex?: number;
   paddingStart?: number;
+  valueTextAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify' | undefined;
 }
 
 const LineInfoComponent = (props: Props) => {
@@ -57,6 +59,7 @@ const LineInfoComponent = (props: Props) => {
     containerFlex,
     containerStyles,
     paddingStart,
+    valueTextAlign,
   } = props;
   return (
     <View
@@ -79,10 +82,21 @@ const LineInfoComponent = (props: Props) => {
         {label}
       </TextComponent>
       {value && (
-        <View style={{flexDirection: 'row', flex: flexValue}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            flex: flexValue,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
           <TextComponent
             color={valueColor}
-            style={valueStyles}
+            style={[
+              valueStyles,
+              {
+                textAlign: valueTextAlign,
+              },
+            ]}
             flex={endIcon ? 0.85 : 1}
             uppercase={valueUppercase}>
             {value}

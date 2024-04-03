@@ -27,8 +27,8 @@ import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
 import {RootState, navigationProps} from '../../../types';
-import { useSelector } from 'react-redux';
-import { useAuth } from '../../../hooks/AuthHooks';
+import {useSelector} from 'react-redux';
+import {useAuth} from '../../../hooks/AuthHooks';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -142,7 +142,7 @@ const AccountScreen = () => {
               <AccountScreenRowComponent
                 title={t('account.shareApp')}
                 icon={<Share2 size={20} color={appColors.black} />}
-                onPress={() => console.log('Notification settings')}
+                onPress={() => navigation.navigate('SuccessScreen')}
               />
             </View>
           </SectionComponent>

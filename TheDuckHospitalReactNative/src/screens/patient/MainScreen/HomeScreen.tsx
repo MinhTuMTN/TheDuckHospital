@@ -30,6 +30,7 @@ import {
 } from '../../../services/notificationServices';
 import {useSelector} from 'react-redux';
 import { RootState } from '../../../types';
+import {navigationProps} from '../../../types';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -38,7 +39,7 @@ const HomeScreen = () => {
   const isCarousel = useRef(null);
 
   const {t} = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<navigationProps>();
   const toast = useToast();
   const token = useSelector((state: RootState) => state.auth.token);
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -74,20 +75,20 @@ const HomeScreen = () => {
   };
 
   const handleChooseDoctor = () => {
-    navigation.navigate('ChooseDoctorsScreen' as never);
+    navigation.navigate('ChooseDoctorsScreen');
   };
-  const handleNavigateTestScreen = () => {
-    navigation.navigate('ChooseDateScreen' as never);
+  const handleNavigateEnterCodePaymentScreen = () => {
+    navigation.navigate('EnterHospitalPaymentCodeScreen');
   };
   const handleNavigateMidicineReminderScreen = () => {
-    navigation.navigate('MedicineReminderScreen' as never);
+    navigation.navigate('MedicineReminderScreen');
   };
   const handleNavigateMedicalExaminationHistoryScreen = () => {
-    navigation.navigate('AllPatientProfilesScreen' as never);
+    navigation.navigate('AllPatientProfilesScreen');
   };
 
   const handlNavigateConfirmBookingInformationScreen = () => {
-    navigation.navigate('TestScreen' as never);
+    navigation.navigate('TestScreen');
   };
 
   useEffect(() => {
@@ -165,7 +166,7 @@ const HomeScreen = () => {
       console.log('Initial notification', notification);
 
       if (notification) {
-        navigation.navigate('NotificationScreen' as never);
+        navigation.navigate('NotificationScreen');
       }
     });
   }, []);
@@ -242,7 +243,7 @@ const HomeScreen = () => {
               </TextComponent>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleNavigateTestScreen}
+              onPress={handleNavigateEnterCodePaymentScreen}
               className="w-1/3 h-1/2 items-center justify-center py-4 border-b-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/payment.png')}

@@ -19,6 +19,8 @@ import Done from './Done.svg';
 import Trash from './Trash.svg';
 import Eye from './Eye.svg';
 import HideEye from './HideEye.svg';
+import QRScan from './QRScan.svg';
+
 export {
   English,
   Vietnamese,
@@ -41,4 +43,5 @@ export {
   Trash,
   Eye,
   HideEye,
+  QRScan,
 };

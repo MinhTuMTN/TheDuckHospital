@@ -3,7 +3,7 @@ const config = {
     HomeScreen: {
       path: 'home',
     },
-    PaymentResultScreen: {
+    SuccessScreen: {
       path: 'payment/:id',
       parse: {
         id: (id: string) => `${id}`,

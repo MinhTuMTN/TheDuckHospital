@@ -1,38 +1,50 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.MedicalTestState;
-import com.theduckhospital.api.constant.ServiceType;
+import com.theduckhospital.api.constant.*;
+import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
+import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.doctor.MedicalTestRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.SearchMedicalTestResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.MedicalTestRepository;
+import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final MedicalTestRepository medicalTestRepository;
+    private final TransactionRepository transactionRepository;
     private final ICloudinaryServices cloudinaryServices;
+    private final IPaymentServices paymentServices;
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
             MedicalTestRepository medicalTestRepository,
-            ICloudinaryServices cloudinaryServices
-    ) {
+            TransactionRepository transactionRepository, ICloudinaryServices cloudinaryServices,
+            IPaymentServices paymentServices) {
         this.medicalServiceServices = medicalServiceServices;
         this.medicalTestRepository = medicalTestRepository;
+        this.transactionRepository = transactionRepository;
         this.cloudinaryServices = cloudinaryServices;
+        this.paymentServices = paymentServices;
     }
 
     @Override
@@ -171,5 +183,96 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         medicalTest.setResultFileUrl(url);
 
         return updateStateMedicalTest(medicalTest, MedicalTestState.DONE);
+    }
+
+    @Override
+    public PatientMedicalTestDetailsResponse patientGetMedicalTestDetails(String medicalTestCode) {
+        Optional<MedicalTest> optional = medicalTestRepository
+                .findByMedicalTestCodeAndDeletedIsFalse(
+                        medicalTestCode
+                );
+
+        if(optional.isEmpty()) {
+            throw new BadRequestException("Not found medical test", 10010);
+        }
+
+        MedicalTest medicalTest = optional.get();
+        return new PatientMedicalTestDetailsResponse(
+                medicalTest.getMedicalExaminationRecord().getPatientProfile(),
+                medicalTest
+        );
+    }
+
+    @Override
+    @Transactional
+    public PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin) {
+        try {
+            Optional<MedicalTest> optional = medicalTestRepository
+                    .findByMedicalTestCodeAndDeletedIsFalse(
+                            request.getMedicalTestCode()
+                    );
+
+            if(optional.isEmpty()) {
+                throw new BadRequestException("Not found medical test", 10010);
+            }
+            MedicalTest medicalTest = optional.get();
+            if (medicalTest.getTransaction() != null &&
+                    medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
+            ) {
+                throw new BadRequestException("This medical test has been paid", 10011);
+            }
+
+            int totalAmount = (int) (medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
+            Transaction transaction = getTransaction(origin, medicalTest);
+            transactionRepository.save(transaction);
+
+            UUID oldTransactionId = medicalTest.getTransaction() != null ?
+                    medicalTest.getTransaction().getTransactionId() : null;
+            medicalTest.setTransaction(transaction);
+            medicalTestRepository.save(medicalTest);
+
+            if (oldTransactionId != null) {
+                transactionRepository.deleteById(oldTransactionId);
+            }
+
+            return switch (request.getPaymentMethod()) {
+                case VNPAY -> {
+                    try {
+                        yield paymentServices.vnPayCreatePaymentUrl(
+                                totalAmount,
+                                transaction.getTransactionId()
+                        );
+                    } catch (UnsupportedEncodingException e) {
+                        throw new BadRequestException("Error when create payment url");
+                    }
+                }
+                case MOMO -> {
+                    try {
+                        yield paymentServices.momoCreatePaymentUrl(
+                                totalAmount,
+                                transaction.getTransactionId(),
+                                true
+                        );
+                    } catch (IOException e) {
+                        throw new BadRequestException("Error when create payment url");
+                    }
+                }
+                default -> throw new BadRequestException("Invalid payment method");
+            };
+        } catch (BadRequestException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), e.getErrorCode() == 0 ? 400 : e.getErrorCode());
+        } catch (Exception e) {
+            throw new BadRequestException("Error when pay medical test", 400);
+        }
+    }
+
+    @NotNull
+    private static Transaction getTransaction(String origin, MedicalTest medicalTest) {
+        Transaction transaction = new Transaction();
+        transaction.setAmount(medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
+        transaction.setOrigin(origin);
+        transaction.setPaymentType(PaymentType.MEDICAL_TEST);
+        return transaction;
     }
 }

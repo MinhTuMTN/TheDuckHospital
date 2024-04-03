@@ -1,20 +1,62 @@
-import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Keyboard, Zap} from 'lucide-react-native';
+import React, {useEffect} from 'react';
+import {Image, Modal, Pressable, StyleSheet, View} from 'react-native';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {QRScan} from '../../../assets/svgs';
 import {
   ContainerComponent,
+  FlexComponent,
   Header,
   InputComponent,
+  Space,
   TextComponent,
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import {appColors} from '../../../constants/appColors';
+import {appInfo} from '../../../constants/appInfo';
+import {globalStyles} from '../../../styles/globalStyles';
+import {getMedicalTestDetails} from '../../../services/payment';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
+
 const EnterHospitalPaymentCodeScreen = () => {
-  const [profileCode, setProfileCode] = React.useState('');
-  const handleSearch = () => {
-    console.log('search');
+  const [medicalCode, setMedicalCode] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const navigation = useNavigation<navigationProps>();
+  const top = useSharedValue(0);
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: top.value}],
+    };
+  });
+  const handleSearch = async () => {
+    setLoading(true);
+    const response = await getMedicalTestDetails(medicalCode);
+    setLoading(false);
+    console.log('Response: ', response);
+
+    if (response.success) {
+      navigation.navigate('HospitalFeePaymentInformationScreen', {
+        aboutPayment: response.data?.data,
+        medicalCodeId: medicalCode,
+      });
+    } else {
+      console.log('Error: ', response.error);
+    }
   };
+
+  useEffect(() => {
+    top.value = withRepeat(withTiming(200, {duration: 1000}), -1, true);
+  }, []);
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -50,8 +92,8 @@ const EnterHospitalPaymentCodeScreen = () => {
             borderColor: appColors.primaryDark,
             borderRadius: 20,
           }}
-          value={profileCode}
-          onChangeText={text => setProfileCode(text)}
+          value={medicalCode}
+          onChangeText={text => setMedicalCode(text)}
           startIcon={
             <Fontisto
               name="search"
@@ -74,6 +116,9 @@ const EnterHospitalPaymentCodeScreen = () => {
               }}
             />
           }
+          onEndIconPress={() => {
+            setModalVisible(true);
+          }}
         />
         <View style={styles.howToGetCode}>
           <TextComponent
@@ -92,6 +137,7 @@ const EnterHospitalPaymentCodeScreen = () => {
             style={{width: 360, height: 180, marginTop: 20}}
           />
           <ButtonComponent
+            isLoading={loading}
             onPress={handleSearch}
             backgroundColor={appColors.primaryDark}
             borderRadius={25}
@@ -109,6 +155,84 @@ const EnterHospitalPaymentCodeScreen = () => {
           </ButtonComponent>
         </View>
       </View>
+      <Modal
+        statusBarTranslucent
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}>
+        <View
+          style={[
+            globalStyles.containerModal,
+            {paddingHorizontal: 0, paddingVertical: 0},
+          ]}>
+          <View style={styles.modalView}>
+            <Pressable
+              style={styles.closeModalButton}
+              onPress={() => {
+                setModalVisible(false);
+              }}
+            />
+            <View style={styles.content}>
+              <QRCodeScanner
+                containerStyle={styles.content}
+                cameraStyle={{
+                  width: '100%',
+                  borderRadius: 20,
+                }}
+                onRead={e => {
+                  setMedicalCode(e.data);
+                  setModalVisible(false);
+                }}
+                topContent={
+                  <View style={styles.topContent}>
+                    <TextComponent bold fontSize={20}>
+                      Quét mã QR
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                    <TextComponent
+                      fontSize={15}
+                      textAlign="center"
+                      fontWeight="500"
+                      color={appColors.textDescription}>
+                      Đưa camera vào mã QR để quét. Vui lòng giữ camera ổn định
+                      để có kết quả tốt nhất
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                  </View>
+                }
+                bottomContent={
+                  <View style={styles.bottomContent}>
+                    <TextComponent
+                      color={appColors.textDescription}
+                      fontWeight="600">
+                      Đang quét mã...
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                    <FlexComponent
+                      direction="row"
+                      justifyContent="center"
+                      columnGap={12}>
+                      <Pressable
+                        onPress={() => {
+                          setModalVisible(false);
+                        }}>
+                        <Keyboard size={28} color={appColors.textDescription} />
+                      </Pressable>
+                      <Pressable>
+                        <Zap size={28} color={appColors.textDescription} />
+                      </Pressable>
+                    </FlexComponent>
+                  </View>
+                }
+              />
+              <View style={styles.scanFrame}>
+                <QRScan width={200} height={200} />
+                <Animated.View style={[styles.indicator, animatedStyles]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ContainerComponent>
   );
 };
@@ -140,5 +264,55 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  modalView: {
+    backgroundColor: appColors.white,
+    height: '90%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 16,
+    paddingHorizontal: 8,
+  },
+  closeModalButton: {
+    width: 60,
+    height: 4,
+    backgroundColor: appColors.grayLight,
+    alignSelf: 'center',
+    borderRadius: 10,
+  },
+  content: {
+    flex: 1,
+  },
+  topContent: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: appInfo.size.width - 16,
+    marginLeft: -16,
+    marginTop: -32,
+  },
+  bottomContent: {
+    marginTop: 32,
+  },
+  scanFrame: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    top: '50%',
+    left: '50%',
+    marginLeft: -100,
+    marginTop: -100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicator: {
+    width: 200,
+    height: 3,
+    backgroundColor: appColors.primary,
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -100,
+    marginTop: -1,
+    top: 0,
   },
 });

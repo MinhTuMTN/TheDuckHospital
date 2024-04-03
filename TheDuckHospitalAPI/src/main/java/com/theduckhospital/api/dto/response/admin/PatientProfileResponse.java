@@ -41,4 +41,22 @@ public class PatientProfileResponse {
                 patientProfile.getWard().getDistrict().getDistrictName(),
                 patientProfile.getWard().getDistrict().getProvince().getProvinceName());
     }
+
+    public PatientProfileResponse(PatientProfile patientProfile, boolean notShowDetails) {
+        this.patientProfileId = patientProfile.getPatientProfileId();
+        this.fullName = patientProfile.getFullName();
+        this.phoneNumber = patientProfile.getPhoneNumber();
+        this.dateOfBirth = patientProfile.getDateOfBirth();
+        this.address = String.format("%s, %s",
+                patientProfile.getWard().getDistrict().getDistrictName(),
+                patientProfile.getWard().getDistrict().getProvince().getProvinceName());
+
+        if (!notShowDetails) {
+            this.email = patientProfile.getEmail();
+            this.identityNumber = patientProfile.getIdentityNumber();
+            this.nation = patientProfile.getNation().getNationName();
+            this.deleted = patientProfile.isDeleted();
+            this.medicalExaminationRecords = patientProfile.getMedicalExaminationRecords();
+        }
+    }
 }

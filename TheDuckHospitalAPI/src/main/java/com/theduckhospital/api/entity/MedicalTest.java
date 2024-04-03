@@ -20,6 +20,7 @@ import java.util.UUID;
 public class MedicalTest {
     @Id
     private UUID medicalTestId;
+    private String medicalTestCode;
 
     private int queueNumber;
     @Nationalized
@@ -48,8 +49,15 @@ public class MedicalTest {
     private Date date;
     private boolean deleted;
 
+    @OneToOne
+    @JoinColumn(name = "transactionId", referencedColumnName = "transactionId")
+    @JsonBackReference
+    @ToStringExclude
+    private Transaction transaction;
+
     @PrePersist
     public void prePersist() {
         this.medicalTestId = UUID.randomUUID();
+        this.medicalTestCode = this.medicalTestId.toString().substring(0, 13);
     }
 }

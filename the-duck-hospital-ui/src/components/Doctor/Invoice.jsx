@@ -15,6 +15,7 @@ import {
 import React from "react";
 import FormatCurrency from "../General/FormatCurrency";
 import dayjs from "dayjs";
+import QRCode from "react-qr-code";
 
 function ContactItem(props) {
   const { title, content, titleMinWidth = 0 } = props;
@@ -81,7 +82,13 @@ function Invoice(props, ref) {
       </Grid>
 
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
-      <Grid item xs={12}>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          position: "relative",
+        }}
+      >
         <Typography
           variant="h5"
           sx={{
@@ -116,6 +123,29 @@ function Invoice(props, ref) {
           content={patientInfo?.patient?.address}
           titleMinWidth={"110px"}
         />
+
+        <Stack
+          direction={"column"}
+          sx={{
+            position: "absolute",
+            right: "16px",
+            top: "0",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography fontSize={12} fontWeight={500}>
+            Quét mã QR
+          </Typography>
+          <Typography fontSize={12} fontWeight={500}>
+            để thanh toán
+          </Typography>
+          <QRCode
+            value={medicalTest?.medicalTestId.substring(0, 13).toUpperCase()}
+            size={64}
+          />
+        </Stack>
       </Grid>
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
       <Grid item xs={12}>

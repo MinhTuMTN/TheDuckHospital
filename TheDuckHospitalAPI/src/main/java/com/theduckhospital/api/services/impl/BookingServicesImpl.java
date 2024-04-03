@@ -1,9 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.DateCommon;
-import com.theduckhospital.api.constant.MomoConfig;
-import com.theduckhospital.api.constant.TransactionStatus;
-import com.theduckhospital.api.constant.VNPayConfig;
+import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
@@ -121,8 +118,9 @@ public class BookingServicesImpl implements IBookingServices {
                 throw new BadRequestException("No doctor schedule available");
 
             Transaction transaction = new Transaction();
-            transaction.setAmount(totalAmount + 10000);
+            transaction.setAmount(totalAmount + MomoConfig.fee);
             transaction.setOrigin(origin);
+            transaction.setPaymentType(PaymentType.BOOKING);
             transactionRepository.save(transaction);
 
             for (TimeSlot timeSlot : timeSlots) {
@@ -318,8 +316,8 @@ public class BookingServicesImpl implements IBookingServices {
         // Check date booking with current date
         Date date = booking.getTimeSlot().getDate();
         Date currentDate = DateCommon.getToday();
-        if (DateCommon.compareDate(date, currentDate) != 0 )
-            throw new StatusCodeException("Invalid examination date", 409);
+//        if (DateCommon.compareDate(date, currentDate) != 0 )
+//            throw new StatusCodeException("Invalid examination date", 409);
 
 
         if (booking.getTimeSlot().getDoctorSchedule().getRoom().getRoomId() != roomId)
@@ -394,16 +392,19 @@ public class BookingServicesImpl implements IBookingServices {
         transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
         transactionRepository.save(transaction);
 
-        List<Booking> bookings = transaction.getBookings();
-        for (Booking booking : bookings) {
-            TimeSlot timeSlot = booking.getTimeSlot();
+        // Update Booking
+        if (transaction.getPaymentType() == PaymentType.BOOKING) {
+            List<Booking> bookings = transaction.getBookings();
+            for (Booking booking : bookings) {
+                TimeSlot timeSlot = booking.getTimeSlot();
 
-            booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
-            booking.setDeleted(false);
-            bookingRepository.save(booking);
+                booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
+                booking.setDeleted(false);
+                bookingRepository.save(booking);
 
-            timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
-            timeSlotRepository.save(timeSlot);
+                timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
+                timeSlotRepository.save(timeSlot);
+            }
         }
 
         return transaction;
