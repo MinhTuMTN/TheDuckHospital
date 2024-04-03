@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {
   Image,
+  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -25,12 +26,36 @@ import LineInfoComponent from '../../../components/LineInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import {globalStyles} from '../../../styles/globalStyles';
+import dayjs from 'dayjs';
+import {payment} from '../../../services/payment';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
-const HospitalFeePaymentInformationScreen = () => {
+const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
 
+  const {aboutPayment, medicalCodeId} = route.params;
+
+  const navigation = useNavigation<navigationProps>();
+  const handlePayment = async () => {
+    const data = {
+      medicalTestCode: medicalCodeId,
+      paymentMethod: paymentMethod,
+    };
+
+    const response = await payment(data);
+    console.log('Response: ', response.data);
+
+    if (response.success) {
+      console.log('Success: ', response.data.data.deepLink);
+
+      Linking.openURL(response.data.data.deepLink);
+    } else {
+      console.log('Error: ', response.error);
+    }
+  };
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -73,7 +98,7 @@ const HospitalFeePaymentInformationScreen = () => {
                     />
                   }
                   paddingStart={7}
-                  label={'Nguyễn Thị Ánh Nguyệt'}
+                  label={aboutPayment.patientProfile?.fullName}
                   labelUppercase
                   labelStyles={{
                     fontSize: 15,
@@ -91,7 +116,9 @@ const HospitalFeePaymentInformationScreen = () => {
                     />
                   }
                   paddingStart={10}
-                  label={'20/10/1999'}
+                  label={dayjs(aboutPayment.patientProfile?.dateOfBirth).format(
+                    'DD/MM/YYYY',
+                  )}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -108,7 +135,7 @@ const HospitalFeePaymentInformationScreen = () => {
                     />
                   }
                   paddingStart={12}
-                  label={'0987654321'}
+                  label={aboutPayment.patientProfile?.phoneNumber}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -125,7 +152,7 @@ const HospitalFeePaymentInformationScreen = () => {
                     />
                   }
                   paddingStart={6}
-                  label={'Thành phố Bảo Lộc - Tỉnh Lâm Đồng'}
+                  label={aboutPayment.patientProfile?.address}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -148,7 +175,8 @@ const HospitalFeePaymentInformationScreen = () => {
                   }}>
                   <LineInfoComponent
                     label="Bác sĩ chỉ định"
-                    value={'Nguyễn Thị Như Nguyệt'}
+                    value={aboutPayment.medicalTest?.doctorName}
+                    valueTextAlign="right"
                     labelStyles={{
                       fontSize: 15,
                       fontWeight: '400',
@@ -164,7 +192,8 @@ const HospitalFeePaymentInformationScreen = () => {
                   <Space paddingTop={5} />
                   <LineInfoComponent
                     label="Chuyên khoa"
-                    value={'Cơ - Xương - Khớp'}
+                    value={aboutPayment.medicalTest?.departmentName}
+                    valueTextAlign="right"
                     valueUppercase
                     labelStyles={{
                       fontSize: 15,
@@ -181,7 +210,8 @@ const HospitalFeePaymentInformationScreen = () => {
                   <Space paddingTop={5} />
                   <LineInfoComponent
                     label="Dịch vụ khám"
-                    value={'Chụp X-Quang'}
+                    value={aboutPayment.medicalTest?.serviceName}
+                    valueTextAlign="right"
                     labelStyles={{
                       fontSize: 15,
                       fontWeight: '400',
@@ -198,6 +228,7 @@ const HospitalFeePaymentInformationScreen = () => {
                   <LineInfoComponent
                     label="Loại dịch vụ"
                     value="Khám dịch vụ"
+                    valueTextAlign="right"
                     labelStyles={{
                       fontSize: 15,
                       fontWeight: '400',
@@ -265,16 +296,15 @@ const HospitalFeePaymentInformationScreen = () => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
-                value={'150.000 đ'}
+                value={formatCurrency(aboutPayment.medicalTest?.price) + ' đ'}
+                valueTextAlign="right"
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
-                  textAlign: 'left',
                 }}
                 valueStyles={{
                   fontSize: 15,
                   fontWeight: '500',
-                  textAlign: 'right',
                 }}
                 labelColor={appColors.grayText}
                 valueColor={appColors.grayText}
@@ -284,6 +314,7 @@ const HospitalFeePaymentInformationScreen = () => {
               <LineInfoComponent
                 label="Phí TGTT"
                 value={formatCurrency('1500') + ' đ'}
+                valueTextAlign="right"
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -301,7 +332,10 @@ const HospitalFeePaymentInformationScreen = () => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label="Tổng tiền"
-                value={'165.000đ'}
+                value={
+                  formatCurrency(aboutPayment.medicalTest?.price + 1500) + ' đ'
+                }
+                valueTextAlign="right"
                 labelStyles={{
                   fontSize: 16,
                   fontWeight: '500',
@@ -330,9 +364,7 @@ const HospitalFeePaymentInformationScreen = () => {
                 </TextComponent>
               </View>
               <ButtonComponent
-                onPress={() => {
-                  console.log('Thanh toán');
-                }}
+                onPress={handlePayment}
                 backgroundColor={appColors.primaryDark}
                 borderRadius={30}
                 isLoading={paymentLoading}

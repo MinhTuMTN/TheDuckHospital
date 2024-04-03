@@ -1,7 +1,16 @@
+import {Keyboard, Zap} from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {Image, Modal, Pressable, StyleSheet, View} from 'react-native';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {QRScan} from '../../../assets/svgs';
 import {
   ContainerComponent,
   FlexComponent,
@@ -12,31 +21,39 @@ import {
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import {appColors} from '../../../constants/appColors';
-import {globalStyles} from '../../../styles/globalStyles';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import QRCodeScanner from 'react-native-qrcode-scanner';
 import {appInfo} from '../../../constants/appInfo';
-import {Keyboard, Zap} from 'lucide-react-native';
-import {QRScan} from '../../../assets/svgs';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import {globalStyles} from '../../../styles/globalStyles';
+import {getMedicalTestDetails} from '../../../services/payment';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 const EnterHospitalPaymentCodeScreen = () => {
-  const [profileCode, setProfileCode] = React.useState('');
-  const [modalVisible, setModalVisible] = React.useState(true);
+  const [medicalCode, setMedicalCode] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const navigation = useNavigation<navigationProps>();
   const top = useSharedValue(0);
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{translateY: top.value}],
     };
   });
-  const handleSearch = () => {
-    console.log('search');
+  const handleSearch = async () => {
+    setLoading(true);
+    const response = await getMedicalTestDetails(medicalCode);
+    setLoading(false);
+    console.log('Response: ', response);
+
+    if (response.success) {
+      navigation.navigate('HospitalFeePaymentInformationScreen', {
+        aboutPayment: response.data?.data,
+        medicalCodeId: medicalCode,
+      });
+    } else {
+      console.log('Error: ', response.error);
+    }
   };
+
   useEffect(() => {
     top.value = withRepeat(withTiming(200, {duration: 1000}), -1, true);
   }, []);
@@ -75,8 +92,8 @@ const EnterHospitalPaymentCodeScreen = () => {
             borderColor: appColors.primaryDark,
             borderRadius: 20,
           }}
-          value={profileCode}
-          onChangeText={text => setProfileCode(text)}
+          value={medicalCode}
+          onChangeText={text => setMedicalCode(text)}
           startIcon={
             <Fontisto
               name="search"
@@ -120,6 +137,7 @@ const EnterHospitalPaymentCodeScreen = () => {
             style={{width: 360, height: 180, marginTop: 20}}
           />
           <ButtonComponent
+            isLoading={loading}
             onPress={handleSearch}
             backgroundColor={appColors.primaryDark}
             borderRadius={25}
@@ -162,7 +180,7 @@ const EnterHospitalPaymentCodeScreen = () => {
                   borderRadius: 20,
                 }}
                 onRead={e => {
-                  setProfileCode(e.data);
+                  setMedicalCode(e.data);
                   setModalVisible(false);
                 }}
                 topContent={
