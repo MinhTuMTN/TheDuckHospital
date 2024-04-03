@@ -38,7 +38,6 @@ const LoginScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
-  const {reset} = useNavigation<navigationProps>();
   const auth = useAuth();
 
   const handleSignUpClick = () => {
@@ -56,15 +55,7 @@ const LoginScreen = () => {
       const token = response.data.data;
 
       await auth.login(token, rememberMe.length > 0);
-
-      if (auth.userInfo.role === 'Admin') {
-        reset({
-          index: 0,
-          routes: [{name: 'AdminLeftSideDrawer'}],
-        });
-      } else {
-        navigation.navigate('HomeScreen');
-      }
+      navigation.navigate('HomeScreen');
     } else {
       setIsLoadingAPI(false);
       console.log('Error', response);

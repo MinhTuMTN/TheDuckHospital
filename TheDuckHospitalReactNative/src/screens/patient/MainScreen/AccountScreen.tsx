@@ -12,7 +12,7 @@ import {
 } from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {useAuth} from '../../../hooks/AuthProvider';
 import {
   AccountScreenRowComponent,
@@ -116,31 +116,33 @@ const AccountScreen = () => {
             />
           </View>
         </SectionComponent>
-        <SectionComponent
-          title={t('account.contactSupport')}
-          tilteStyle={styles.titleSection}>
-          <View style={styles.flexGap}>
-            <AccountScreenRowComponent
-              title={t('account.hotline')}
-              icon={<Headset size={20} color={appColors.black} />}
-              onPress={() =>
-                navigation.navigate('EnterHospitalPaymentCodeScreen')
-              }
-            />
-            <AccountScreenRowComponent
-              title={t('account.ratingApp')}
-              icon={<Star size={20} color={appColors.black} />}
-              onPress={() =>
-                navigation.navigate('HospitalFeePaymentInformationScreen')
-              }
-            />
-            <AccountScreenRowComponent
-              title={t('account.shareApp')}
-              icon={<Share2 size={20} color={appColors.black} />}
-              onPress={() => console.log('Notification settings')}
-            />
-          </View>
-        </SectionComponent>
+        {auth.userInfo.role !== 'Admin' && (
+          <SectionComponent
+            title={t('account.contactSupport')}
+            tilteStyle={styles.titleSection}>
+            <View style={styles.flexGap}>
+              <AccountScreenRowComponent
+                title={t('account.hotline')}
+                icon={<Headset size={20} color={appColors.black} />}
+                onPress={() =>
+                  navigation.navigate('EnterHospitalPaymentCodeScreen')
+                }
+              />
+              <AccountScreenRowComponent
+                title={t('account.ratingApp')}
+                icon={<Star size={20} color={appColors.black} />}
+                onPress={() =>
+                  navigation.navigate('HospitalFeePaymentInformationScreen')
+                }
+              />
+              <AccountScreenRowComponent
+                title={t('account.shareApp')}
+                icon={<Share2 size={20} color={appColors.black} />}
+                onPress={() => console.log('Notification settings')}
+              />
+            </View>
+          </SectionComponent>
+        )}
 
         {auth.userInfo.role === 'Admin' && (
           <SectionComponent title={'Quản lý'} tilteStyle={styles.titleSection}>

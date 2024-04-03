@@ -86,8 +86,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const response = await checkToken();
 
     if (response.success && response.data?.data?.valid) {
-      console.log(response);
-
       realmInstance?.write(() => {
         const user = realmInstance.objects('User')[0];
         if (user) {
@@ -173,7 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     try {
       await logoutServer();
       realmInstance?.write(() => {
-        const user = realmInstance.objects('User')[0];
+        const user = realmInstance.objects('User')[0];        
         if (user) {
           realmInstance.delete(user);
         }

@@ -20,11 +20,13 @@ import {ActivitySquare, BarChart3, LogOut, Users} from 'lucide-react-native';
 import StaffListScreen from '../screens/admin/StaffManagementScreen/StaffListScreen';
 import StatisticsScreen from '../screens/admin/StatisticsScreen/StatisticsScreen';
 import ButtonComponent from '../components/ButtonComponent';
-import {useAuth} from '../auth/AuthProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../hooks/AuthProvider';
+import { useNavigation } from '@react-navigation/native';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const auth = useAuth();
+  const navigation = useNavigation();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.logoContainer}>
@@ -43,8 +45,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         containerStyles={styles.logoutButton}
         startIcon={<LogOut size={20} color={'#F38181'} />}
         onPress={async () => {
-          await AsyncStorage.removeItem('token');
           auth.logout();
+          navigation.navigate('LoginScreen' as never);
         }}>
         Đăng xuất
       </ButtonComponent>
