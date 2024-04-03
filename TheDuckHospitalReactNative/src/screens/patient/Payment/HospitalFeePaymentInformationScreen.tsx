@@ -24,6 +24,7 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
+import {globalStyles} from '../../../styles/globalStyles';
 
 const HospitalFeePaymentInformationScreen = () => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
@@ -353,7 +354,7 @@ const HospitalFeePaymentInformationScreen = () => {
           animationType="slide"
           transparent={true}
           visible={modalVisible}>
-          <View style={styles.containerModal}>
+          <View style={globalStyles.containerModal}>
             <View style={styles.modalView}>
               <View
                 style={{
@@ -501,13 +502,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 15,
-  },
-  containerModal: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    justifyContent: 'flex-end',
   },
   modalView: {
     flexDirection: 'column',

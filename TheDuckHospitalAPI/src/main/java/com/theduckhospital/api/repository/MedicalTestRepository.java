@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -32,4 +33,6 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             MedicalService medicalService,
             MedicalTestState state
     );
+
+    Optional<MedicalTest> findByMedicalTestCodeAndDeletedIsFalse(String medicalTestCode);
 }

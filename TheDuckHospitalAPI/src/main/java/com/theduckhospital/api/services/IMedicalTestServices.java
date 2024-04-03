@@ -1,8 +1,11 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.constant.MedicalTestState;
+import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
+import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.doctor.MedicalTestRecordResponse;
 import com.theduckhospital.api.entity.MedicalTest;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,4 +32,11 @@ public interface IMedicalTestServices {
     MedicalTestRecordResponse getMedicalTestRecordById(UUID medicalTestId);
 
     MedicalTest completeMedicalTest(UUID medicalTestId, MultipartFile file);
+    PatientMedicalTestDetailsResponse patientGetMedicalTestDetails(
+            String medicalTestCode
+    );
+    PaymentResponse patientPayMedicalTest(
+            PayMedicalTestRequest request,
+            String origin
+    );
 }

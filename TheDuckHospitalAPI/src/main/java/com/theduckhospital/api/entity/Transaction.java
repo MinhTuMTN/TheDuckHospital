@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,13 @@ public class Transaction {
     @JsonBackReference
     @ToStringExclude
     private List<Booking> bookings;
+
+    @OneToOne(mappedBy = "transaction", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private MedicalTest medicalTest;
+
+    private PaymentType paymentType;
 
     @PrePersist
     public void prePersist() {

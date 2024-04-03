@@ -24,4 +24,11 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 20,
   },
+  containerModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: 'flex-end',
+  },
 });
