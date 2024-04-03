@@ -1,12 +1,9 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
+import {Image, StyleSheet, View} from 'react-native';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
-import {appColors} from '../../../constants/appColors';
-import InfoBookingComponent from '../../../components/patient/confirmBookingScreen/InfoBookingComponent';
-import LineComfirmBookingInfo from '../../../components/patient/confirmBookingScreen/LineComfirmBookingInfo';
-import LineInfoComponent from '../../../components/LineInfoComponent';
-import {Button} from '@gluestack-ui/themed';
 import ButtonComponent from '../../../components/ButtonComponent';
+import LineInfoComponent from '../../../components/LineInfoComponent';
+import {appColors} from '../../../constants/appColors';
 
 const SuccessScreen = () => {
   return (
