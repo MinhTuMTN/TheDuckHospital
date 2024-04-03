@@ -3,8 +3,11 @@ package com.theduckhospital.api.services.impl;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.ChangePasswordRequest;
+import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
+import com.theduckhospital.api.dto.request.UpdateDeviceInfoRequest;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
+import com.theduckhospital.api.dto.response.DeviceResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
 import com.theduckhospital.api.entity.*;
@@ -13,10 +16,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
-import com.theduckhospital.api.services.IAccountServices;
-import com.theduckhospital.api.services.IFirebaseServices;
-import com.theduckhospital.api.services.IMSGraphServices;
-import com.theduckhospital.api.services.IOTPServices;
+import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +43,7 @@ public class AccountServicesImpl implements IAccountServices {
     private final TemporaryUserRepository temporaryUserRepository;
     private final IMSGraphServices graphServices;
     private final JwtTokenProvider tokenProvider;
+    private final IDeviceServices deviceServices;
 
     public AccountServicesImpl(AccountRepository accountRepository,
                                DoctorScheduleRepository doctorScheduleRepository,
@@ -54,7 +55,8 @@ public class AccountServicesImpl implements IAccountServices {
                                IFirebaseServices firebaseServices,
                                TemporaryUserRepository temporaryUserRepository,
                                IMSGraphServices graphServices,
-                               JwtTokenProvider tokenProvider
+                               JwtTokenProvider tokenProvider,
+                               IDeviceServices deviceServices
     ) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
@@ -67,6 +69,7 @@ public class AccountServicesImpl implements IAccountServices {
         this.patientProfileRepository = patientProfileRepository;
         this.staffRepository = staffRepository;
         this.doctorRepository = doctorRepository;
+        this.deviceServices = deviceServices;
     }
 
     @Override
@@ -429,7 +432,7 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public boolean forgetPassword(String phoneNumber) throws FirebaseMessagingException {
+    public boolean sendOTPForgetPassword(String phoneNumber) throws FirebaseMessagingException {
         Account account = findAccount(phoneNumber);
 
         if (account == null) {
@@ -452,10 +455,10 @@ public class AccountServicesImpl implements IAccountServices {
     }
 
     @Override
-    public boolean changePassword(ChangePasswordRequest request) {
+    public boolean verifyForgetPassword(ForgetPasswordDataRequest request) {
         Account account = findAccount(request.getPhoneNumber());
 
-        int otp = 0;
+        int otp;
         try {
             otp = Integer.parseInt(request.getOtp());
         } catch (Exception e) {
@@ -476,4 +479,64 @@ public class AccountServicesImpl implements IAccountServices {
         return true;
     }
 
+    @Override
+    public boolean changePassword(String token, ChangePasswordRequest request) {
+        Account account = findAccountByToken(token);
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadRequestException("Password not matched", 10001);
+        }
+
+        if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
+            throw new BadRequestException("Current password is not correct", 10002);
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), account.getPassword())) {
+            throw new BadRequestException("New password is the same as old password", 10003);
+        }
+
+        // New password contains least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character
+        if (!request.getNewPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")) {
+            throw new BadRequestException("Password is not valid", 10004);
+        }
+
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account);
+
+        return true;
+    }
+
+    @Override
+    public boolean updateDeviceInfo(String token, UpdateDeviceInfoRequest request) {
+        Account account = findAccountByToken(token);
+        return deviceServices.updateDeviceInfo(request, account, tokenProvider.getTokenIdFromJwt(token.substring(7)));
+    }
+
+    @Override
+    public boolean logout(String token) {
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+        return deviceServices.deleteDeviceJwtToken(tokenId);
+    }
+
+    @Override
+    public List<DeviceResponse> getDevices(String token) {
+        Account account = findAccountByToken(token);
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+        return deviceServices.getDevicesByAccount(account, tokenId);
+    }
+
+    @Override
+    public boolean remoteLogout(String logoutTokenId, String token) {
+        Account account = findAccountByToken(token);
+
+        return deviceServices.remoteLogout(account, logoutTokenId);
+    }
+
+    @Override
+    public boolean remoteLogoutAll(String token) {
+        Account account = findAccountByToken(token);
+        String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
+
+        return deviceServices.remoteLogoutAll(account, tokenId);
+    }
 }

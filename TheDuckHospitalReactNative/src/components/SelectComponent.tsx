@@ -1,10 +1,8 @@
 import {
-  Icon,
   Select,
   SelectBackdrop,
   SelectContent,
   SelectIcon,
-  SelectInput,
   SelectPortal,
   SelectTrigger,
 } from '@gluestack-ui/themed';
@@ -24,6 +22,7 @@ import {
 import {FlexComponent, InputComponent, TextComponent} from '.';
 import {appColors} from '../constants/appColors';
 import {appInfo} from '../constants/appInfo';
+import LoadingComponent from './LoadingComponent';
 
 interface SelectComponentProps {
   options: string[] | any[];
@@ -172,142 +171,146 @@ const SelectComponent = (props: SelectComponentProps) => {
 
   return (
     <>
-    <Select
-      selectedValue={
-        !value || typeof value === 'string' ? value : value[keyTitle]
-      }
-      isDisabled={isDisabled}
-      style={{
-        marginTop,
-        marginRight,
-        marginBottom,
-        marginLeft,
-        margin,
-        padding,
-        paddingTop,
-        paddingRight,
-        paddingBottom,
-        paddingLeft,
-      }}
-      width={width}
-      flex={width ? undefined : flex}>
-      <SelectTrigger
-        variant="outline"
-        size={size}
+      <Select
+        selectedValue={
+          !value || typeof value === 'string' ? value : value[keyTitle]
+        }
+        isDisabled={isDisabled}
         style={{
-          borderRadius: borderRadius || 10,
-          borderColor: borderColor,
+          marginTop,
+          marginRight,
+          marginBottom,
+          marginLeft,
+          margin,
+          padding,
+          paddingTop,
+          paddingRight,
+          paddingBottom,
+          paddingLeft,
         }}
-        onPress={() => setIsOpen(true)}>
-        <View
-          style={[
-            {
-              borderRadius: borderRadius || 10,
-              backgroundColor: appColors.white,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: '100%',
-              width: '100%',
-              paddingHorizontal: 4,
-            },
-            selectInputStyle,
-          ]}>
-          <View style={{flex: 1}}>
-            <TextComponent
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              color={!value ? placeholderColor : selectTextColor}
-              fontSize={selectTextSize || 14}>
-              {!value
-                ? placeholder
-                : typeof value === 'string'
-                ? value
-                : value[keyTitle]}
-            </TextComponent>
-          </View>
-          <SelectIcon>
-            {selectInputIcon || (
-              <ChevronDownIcon
-                width={20}
-                height={20}
-                color={selectIconColor || '#000000'}
-              />
-            )}
-          </SelectIcon>
-        </View>
-      </SelectTrigger>
-      <SelectPortal isOpen={isOpen}>
-        <SelectBackdrop onPress={() => setIsOpen(false)} />
-        <SelectContent
+        width={width}
+        flex={width ? undefined : flex}>
+        <SelectTrigger
+          variant="outline"
+          size={size}
           style={{
-            paddingVertical: 16,
-            flexDirection: 'row',
-          }}>
-          <FlexComponent style={{flex: 1}} alignItems="center">
-            <TextComponent
-              textAlign="center"
-              bold
-              uppercase
-              fontSize={18}
-              color={appColors.textGray}>
-              {title}
-            </TextComponent>
+            borderRadius: borderRadius || 10,
+            borderColor: borderColor,
+          }}
+          onPress={() => setIsOpen(true)}>
+          <View
+            style={[
+              {
+                borderRadius: borderRadius || 10,
+                backgroundColor: appColors.white,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                height: '100%',
+                width: '100%',
+                paddingHorizontal: 4,
+              },
+              selectInputStyle,
+            ]}>
+            <View style={{flex: 1}}>
+              <TextComponent
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                color={!value ? placeholderColor : selectTextColor}
+                fontSize={selectTextSize || 14}>
+                {!value
+                  ? placeholder
+                  : typeof value === 'string'
+                  ? value
+                  : value[keyTitle]}
+              </TextComponent>
+            </View>
+            <SelectIcon>
+              {selectInputIcon || (
+                <ChevronDownIcon
+                  width={20}
+                  height={20}
+                  color={selectIconColor || '#000000'}
+                />
+              )}
+            </SelectIcon>
+          </View>
+        </SelectTrigger>
+        <SelectPortal isOpen={isOpen}>
+          <SelectBackdrop onPress={() => setIsOpen(false)} />
+          <SelectContent
+            style={{
+              paddingVertical: 16,
+              flexDirection: 'row',
+            }}>
+            <FlexComponent style={{flex: 1}} alignItems="center">
+              <TextComponent
+                textAlign="center"
+                bold
+                uppercase
+                fontSize={18}
+                color={appColors.textGray}>
+                {title}
+              </TextComponent>
 
-            {enableSearch && (
-              <InputComponent
-                value={searchText}
-                onChangeText={text => setSearchText(text)}
-                startIcon={<Search color={appColors.primary} />}
-                placeholder={placeholderSearch}
-                variant="rounded"
-                _inputContainerStyle={{
-                  marginTop: 16,
-                  borderWidth: 0,
+              {enableSearch && (
+                <InputComponent
+                  value={searchText}
+                  onChangeText={text => setSearchText(text)}
+                  startIcon={<Search color={appColors.primary} />}
+                  placeholder={placeholderSearch}
+                  variant="rounded"
+                  _inputContainerStyle={{
+                    marginTop: 16,
+                    borderWidth: 0,
+                    width: '100%',
+                    backgroundColor: 'rgba(211,211,211,0.31)',
+                  }}
+                />
+              )}
+
+              <LoadingComponent
+                styles={{
                   width: '100%',
-                  backgroundColor: 'rgba(211,211,211,0.31)',
-                }}
-              />
-            )}
-
-            {isLoading ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginVertical: 40,
                 }}>
-                <ActivityIndicator size="large" color={appColors.primary} />
-              </View>
-            ) : (
-              <FlatList
-                showsVerticalScrollIndicator={true}
-                indicatorStyle="black"
-                data={optionsToShow}
-                keyExtractor={keyExtractor}
-                renderItem={renderItem}
-                style={{
-                  width: '100%',
-                  maxHeight: appInfo.size.height * 0.4,
-                  marginTop: enableSearch ? 0 : 24,
-                }}
-              />
-            )}
-          </FlexComponent>
-        </SelectContent>
-      </SelectPortal>
-    </Select>
-    {error && errorMessage && (
-      <TextComponent
-        color={appColors.error}
-        fontSize={12}
-        style={{
-          paddingTop: 10,
-          paddingLeft: 5,
-        }}>
-        {errorMessage}
-      </TextComponent>
-    )}
+                {isLoading ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginVertical: 40,
+                    }}>
+                    <ActivityIndicator size="large" color={appColors.primary} />
+                  </View>
+                ) : (
+                  <FlatList
+                    showsVerticalScrollIndicator={true}
+                    indicatorStyle="black"
+                    data={optionsToShow}
+                    keyExtractor={keyExtractor}
+                    renderItem={renderItem}
+                    style={{
+                      maxHeight: appInfo.size.height * 0.4,
+                      marginTop: enableSearch ? 0 : 24,
+                    }}
+                  />
+                )}
+              </LoadingComponent>
+            </FlexComponent>
+          </SelectContent>
+        </SelectPortal>
+      </Select>
+      {error && errorMessage && (
+        <TextComponent
+          color={appColors.error}
+          fontSize={12}
+          style={{
+            paddingTop: 10,
+            paddingLeft: 5,
+          }}>
+          {errorMessage}
+        </TextComponent>
+      )}
     </>
   );
 };

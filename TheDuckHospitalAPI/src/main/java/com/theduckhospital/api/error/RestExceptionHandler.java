@@ -53,6 +53,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.badRequest().body(GeneralResponse.builder()
                 .success(false)
+                .statusCode(e.getErrorCode())
                 .message(e.getMessage())
                 .build());
     }

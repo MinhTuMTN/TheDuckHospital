@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {useAuth} from '../hooks/AuthProvider';
 // import Realm from 'realm';
 
 interface ResultProps {
@@ -12,7 +13,7 @@ var qs = require('qs');
 const axiosInstance = axios.create({
   baseURL: 'https://tb7drp6q-8080.asse.devtunnels.ms/api',
   // baseURL: 'https://z58krthx-8080.asse.devtunnels.ms/api',
-  timeout: 10000,
+  timeout: 3000,
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': '69420',
@@ -23,6 +24,8 @@ const axiosInstance = axios.create({
 export const updateToken = (token: string) => {
   axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + token;
 };
+
+export const logout = () => {};
 
 const handleRequest = async (
   requestMethod: any,
@@ -39,12 +42,12 @@ const handleRequest = async (
     statusCode: 200,
   };
 
-  // console.log('url', url);
+  logout();
 
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;
   } else {
-    axiosInstance.defaults.timeout = 30000;
+    axiosInstance.defaults.timeout = 3000;
   }
 
   try {

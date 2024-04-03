@@ -1,23 +1,34 @@
 import {Fab} from '@gluestack-ui/themed';
+import notifee from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   FlatList,
   Image,
+  Linking,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {Headset, Search, Typing} from '../../../assets/svgs';
-import {useAuth} from '../../../auth/AuthProvider';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {useAuth} from '../../../hooks/AuthProvider';
+import {useToast} from '../../../hooks/ToastProvider';
+import {updateDeviceInformation} from '../../../services/authServices';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
+import {AppNotification} from '../../../utils/appNotification';
+import {
+  NotificationState,
+  updateNotificationState,
+} from '../../../services/notificationServices';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -27,6 +38,7 @@ const HomeScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation();
+  const toast = useToast();
   const auth = useAuth();
   const fullName = useMemo(() => {
     const name = auth.userInfo?.fullName?.split(' ');
@@ -59,17 +71,6 @@ const HomeScreen = () => {
     );
   };
 
-  useEffect(() => {
-    const handlegetAllHeadDoctor = async () => {
-      const respone = await getAllHeadDoctor();
-
-      if (respone.success) {
-        setListDoctor(respone.data?.data);
-      }
-    };
-    handlegetAllHeadDoctor();
-  }, []);
-
   const handleChooseDoctor = () => {
     navigation.navigate('ChooseDoctorsScreen' as never);
   };
@@ -84,8 +85,19 @@ const HomeScreen = () => {
   };
 
   const handlNavigateConfirmBookingInformationScreen = () => {
-    navigation.navigate('ConfirmBookingInformationScreen' as never);
+    navigation.navigate('TestScreen' as never);
   };
+
+  useEffect(() => {
+    const handlegetAllHeadDoctor = async () => {
+      const respone = await getAllHeadDoctor();
+
+      if (respone.success) {
+        setListDoctor(respone.data?.data);
+      }
+    };
+    handlegetAllHeadDoctor();
+  }, []);
 
   useEffect(() => {
     if (showMoreMenu) {
@@ -103,6 +115,59 @@ const HomeScreen = () => {
     }
   }, [showMoreMenu]);
 
+  useEffect(() => {
+    const updateDeviceInfo = async () => {
+      const fcmToken = await AppNotification.requestPermission();
+      if (!fcmToken || !auth.token) {
+        console.log("Can't get fcm token or token is null");
+        return;
+      }
+      const deviceId = DeviceInfo.getUniqueIdSync();
+      const deviceName = DeviceInfo.getBrand() + ' - ' + DeviceInfo.getModel();
+      const systemName = DeviceInfo.getSystemName();
+      const systemVersion = DeviceInfo.getSystemVersion();
+
+      const response = await updateDeviceInformation({
+        deviceId,
+        deviceName,
+        systemName,
+        systemVersion,
+        fcmToken,
+      });
+
+      console.log(response);
+    };
+
+    updateDeviceInfo();
+  }, [auth.token]);
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      AppNotification.displayNotification(remoteMessage);
+      const notificationId: string | undefined =
+        (remoteMessage.data?.notificationId as string) || undefined;
+      if (notificationId) {
+        const response = await updateNotificationState(
+          notificationId,
+          NotificationState.RECEIVED,
+        );
+        console.log(response);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    notifee.getInitialNotification().then(notification => {
+      console.log('Initial notification', notification);
+
+      if (notification) {
+        navigation.navigate('NotificationScreen' as never);
+      }
+    });
+  }, []);
+
   return (
     <>
       <ScrollView className={'flex-1 bg-white'}>
@@ -117,15 +182,28 @@ const HomeScreen = () => {
                 className="w-14 h-14 rounded-full"
               />
               <View className="pl-2">
-                <TextComponent color={appColors.white} fontSize={20}>
-                  {t('homeScreen.hello')}{' '}
-                  <TextComponent bold color={appColors.white} fontSize={20}>
-                    {fullName},
-                  </TextComponent>
-                </TextComponent>
-                <TextComponent color={appColors.white}>
-                  {t('homeScreen.welcome')}
-                </TextComponent>
+                {fullName ? (
+                  <>
+                    <TextComponent color={appColors.white} fontSize={20}>
+                      {t('homeScreen.hello')}{' '}
+                      <TextComponent bold color={appColors.white} fontSize={20}>
+                        {fullName},
+                      </TextComponent>
+                    </TextComponent>
+                    <TextComponent color={appColors.white}>
+                      {t('homeScreen.welcome')}
+                    </TextComponent>
+                  </>
+                ) : (
+                  <>
+                    <TextComponent
+                      fontWeight="500"
+                      color={appColors.white}
+                      fontSize={16}>
+                      {t('homeScreen.noLoginHello')}
+                    </TextComponent>
+                  </>
+                )}
               </View>
             </View>
             <View className="flex-row flex-auto w-16 justify-between">

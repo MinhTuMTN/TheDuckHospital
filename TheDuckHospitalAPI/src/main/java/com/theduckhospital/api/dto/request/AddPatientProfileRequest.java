@@ -7,5 +7,5 @@ import java.util.UUID;
 @Data
 public class AddPatientProfileRequest {
     private UUID patientProfileId;
-    private String phoneNumber;
+    private String otp;
 }

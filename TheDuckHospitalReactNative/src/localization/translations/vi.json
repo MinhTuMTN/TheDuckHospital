@@ -2,6 +2,7 @@
   "homeScreen": {
     "hello": "Xin chào",
     "welcome": "Mừng bạn quay trở lại",
+    "noLoginHello": "The Duck Hospital\nXin chào,",
     "makeAppointment": "Đặt khám\ntheo bác sĩ",
     "makeAppointmentNoNewLine": "Đặt khám theo bác sĩ",
     "lookupMedicalResult": "Tra cứu kết quả\nkhám bệnh",
@@ -38,6 +39,7 @@
     "generalSettings": "Cài đặt chung",
     "language": "Ngôn ngữ",
     "changePassword": "Đổi mật khẩu",
+    "deviceManagement": "Quản lý thiết bị",
     "notificationSettings": "Cài đặt thông báo",
     "contactSupport": "Liên hệ",
     "hotline": "Tổng đài 1900-1234",

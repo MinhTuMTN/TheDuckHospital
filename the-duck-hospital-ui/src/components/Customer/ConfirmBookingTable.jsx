@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import React from "react";
 import FormatCurrency from "../General/FormatCurrency";
 import { useNavigate } from "react-router-dom";
+import { getTimeSlotById } from "../../utils/timeSlotUtils";
 
 const Header = styled(Box)(({ theme }) => ({
   background: `linear-gradient(45deg, #5ab2f7, #12cff3)`,
@@ -170,9 +171,7 @@ function ConfirmBookingTable(props) {
                     }}
                   >
                     <Typography>
-                      {schedule.schedule.scheduleType === "MORNING"
-                        ? "Buổi sáng"
-                        : "Buổi chiều"}
+                      {getTimeSlotById(schedule.timeSlot.timeId)}
                       <br />{" "}
                       {dayjs(schedule.schedule.date).format("DD/MM/YYYY")}
                     </Typography>
@@ -247,9 +246,7 @@ function ConfirmBookingTable(props) {
                 </CustomGrid>
                 <CustomGrid item md={10} xs={7} sm={9}>
                   <CustomTypographyValue>
-                    {schedule.schedule.scheduleType === "MORNING"
-                      ? "Buổi sáng "
-                      : "Buổi chiều "}
+                    {getTimeSlotById(schedule.timeSlot.timeId)}{" "}
                     {dayjs(schedule.schedule.date).format("DD/MM/YYYY")}
                   </CustomTypographyValue>
                 </CustomGrid>

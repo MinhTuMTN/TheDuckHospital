@@ -1,27 +1,44 @@
-import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import {TextComponent} from '../..';
-import {Image} from 'react-native-svg';
-import {Doctor} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
 
 interface LineComfirmBookingInfoProps {
   label: string;
   value: string;
+  isDepartment?: boolean;
   image?: any;
 }
 const LineComfirmBookingInfo = (props: LineComfirmBookingInfoProps) => {
-  const {label, value, image} = props;
+  const {label, value, image, isDepartment} = props;
   return (
     <View style={styles.container}>
       <View style={styles.image}>{image}</View>
       <View style={styles.info}>
-        <TextComponent color={appColors.grayLight} fontWeight="400">
-          {label}
-        </TextComponent>
-        <TextComponent color={appColors.black} fontWeight="700" fontSize={18}>
-          {value}
-        </TextComponent>
+        <View
+          style={{
+            width: 115,
+          }}>
+          <TextComponent fontSize={14} color={appColors.black} fontWeight="500">
+            {label}
+          </TextComponent>
+        </View>
+        {isDepartment ? (
+          <TextComponent
+            flex={1}
+            numberOfLines={1}
+            color={appColors.primaryDark}
+            fontSize={14}
+            fontWeight="700"
+            uppercase
+            ellipsizeMode="middle">
+            {value}
+          </TextComponent>
+        ) : (
+          <TextComponent fontSize={14} color={appColors.black} fontWeight="500">
+            {value}
+          </TextComponent>
+        )}
       </View>
     </View>
   );
@@ -32,23 +49,18 @@ export default LineComfirmBookingInfo;
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingBottom: 12,
-    paddingHorizontal: 20,
     alignItems: 'center',
-    marginTop: 22,
-    borderBottomColor: appColors.gray,
-    borderBottomWidth: 2,
+    paddingBottom: 8,
   },
   image: {
-    height: 60,
-    width: 60,
-    borderRadius: 15,
+    height: 22,
+    width: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,163,231,0.27)',
+    marginRight: 8,
   },
   info: {
-    marginLeft: 20,
-    flexDirection: 'column',
+    flex: 1,
+    flexDirection: 'row',
   },
 });

@@ -5,10 +5,10 @@ import com.theduckhospital.api.dto.request.*;
 import com.theduckhospital.api.dto.response.CheckTokenResponse;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.security.CustomUserDetails;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IAccountServices;
+import com.theduckhospital.api.services.IDeviceServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +29,17 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final IAccountServices accountServices;
+    private final IDeviceServices deviceServices;
 
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
+                            IDeviceServices deviceServices,
                           IAccountServices accountServices) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountServices = accountServices;
+        this.deviceServices = deviceServices;
     }
 
     @PostMapping("/login-password")
@@ -48,6 +51,7 @@ public class AuthController {
             return ResponseEntity.status(401).body(GeneralResponse.builder()
                     .success(false)
                     .message("Login failed")
+                    .statusCode(401)
                     .build());
 
         return authenticate(loginRequest);
@@ -55,13 +59,14 @@ public class AuthController {
 
     @PostMapping("/login-otp")
     public ResponseEntity<?> loginWithOtp(@RequestBody LoginRequest loginRequest) {
-         if (!accountServices.loginWithOtp(
+        if (!accountServices.loginWithOtp(
                 loginRequest.getEmailOrPhoneNumber(),
                 loginRequest.getPasswordOrOTP()
         ))
             return ResponseEntity.status(401).body(GeneralResponse.builder()
                     .success(false)
                     .message("Login failed")
+                    .statusCode(401)
                     .build());
 
         return authenticate(loginRequest);
@@ -76,13 +81,18 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenProvider.generateToken(
+        Map<String, String> result = jwtTokenProvider.generateToken(
                 (CustomUserDetails) authentication.getPrincipal()
+        );
+        boolean isSaveDeviceJwtToken = deviceServices.saveDeviceJwtToken(
+                result.get("tokenId"),
+                ((CustomUserDetails) authentication.getPrincipal()).getAccount()
         );
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Login success")
-                .data(token)
+                .data(result.get("token"))
+                .statusCode(200)
                 .build()
         );
     }
@@ -94,10 +104,10 @@ public class AuthController {
             return ResponseEntity
                     .status(request.getEmailOrPhoneNumber().contains("@") ? 400 : 200)
                     .body(GeneralResponse.builder()
-                    .success(true)
-                    .message("Account not exist")
-                    .data(false)
-                    .build());
+                            .success(true)
+                            .message("Account not exist")
+                            .data(false)
+                            .build());
 
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
@@ -142,6 +152,7 @@ public class AuthController {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(response.isValid())
                 .message(response.isValid() ? "Token is valid" : "Token is invalid")
+                .statusCode(response.isValid() ? 200 : 401)
                 .data(response)
                 .build()
         );
@@ -156,26 +167,110 @@ public class AuthController {
                 .success(true)
                 .message("Get info success")
                 .data(data)
+                .statusCode(200)
                 .build()
         );
     }
 
     @PostMapping("/forget-password")
-    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordRequest request) throws FirebaseMessagingException {
+    public ResponseEntity<?> sendOTPForgetPassword(@RequestBody ForgetPasswordRequest request) throws FirebaseMessagingException {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Send OTP success")
-                .data(accountServices.forgetPassword(request.getPhoneNumber()))
+                .data(accountServices.sendOTPForgetPassword(request.getPhoneNumber()))
+                .statusCode(200)
                 .build()
         );
     }
 
     @PostMapping("/forget-password/verify-change-password")
-    public ResponseEntity<?> verifyChangePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> verifyForgetPassword(@RequestBody ForgetPasswordDataRequest request) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Reset password success")
-                .data(accountServices.changePassword(request))
+                .data(accountServices.verifyForgetPassword(request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody ChangePasswordRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Change password success")
+                .data(accountServices.changePassword(token, request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/update-device-info")
+    public ResponseEntity<?> updateDeviceInfo(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody UpdateDeviceInfoRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Update device info success")
+                .data(accountServices.updateDeviceInfo(token, request))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Logout success")
+                .data(accountServices.logout(token))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping("/devices")
+    public ResponseEntity<?> getDevices(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get devices success")
+                .data(accountServices.getDevices(token))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/remote-logout")
+    public ResponseEntity<?> remoteLogout(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody RemoteLogoutRequest request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Remote logout success")
+                .data(accountServices.remoteLogout(request.getLogoutTokenId(), token))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping("/remote-logout-all")
+    public ResponseEntity<?> remoteLogoutAll(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Remote logout all success")
+                .data(accountServices.remoteLogoutAll(token))
+                .statusCode(200)
                 .build()
         );
     }

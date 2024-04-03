@@ -29,6 +29,7 @@ public class Transaction {
     private String bankCode;
     private String paymentMethod;
     private String origin;
+    private String momoTransactionId;
 
     @OneToMany(mappedBy = "transaction")
     @JsonBackReference

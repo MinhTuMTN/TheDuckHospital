@@ -1,5 +1,5 @@
-import {View, Text, StyleProp, TextStyle, ColorValue} from 'react-native';
 import React from 'react';
+import {ColorValue, StyleProp, Text, TextStyle} from 'react-native';
 import {appColors} from '../constants/appColors';
 
 interface TextComponentProps {

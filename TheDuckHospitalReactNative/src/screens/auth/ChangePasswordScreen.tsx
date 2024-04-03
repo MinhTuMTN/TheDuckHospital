@@ -1,176 +1,246 @@
-import {
-  LockKeyhole,
-  Phone,
-  ShieldCheck,
-} from 'lucide-react-native';
-import React, {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {ActivityIndicator, Image, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
+import React, {useCallback} from 'react';
 import {
   ContainerComponent,
-  ContentComponent,
+  Header,
   InputComponent,
-  Space,
   TextComponent,
 } from '../../components';
-import ButtonComponent from '../../components/ButtonComponent';
 import {appColors} from '../../constants/appColors';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import { changePassword } from '../../services/authServices';
+import {ChevronLeft, RectangleEllipsis} from 'lucide-react-native';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import {Eye, HideEye} from '../../assets/svgs';
+import ButtonComponent from '../../components/ButtonComponent';
+import {changePasswordWithOldPassword} from '../../services/authServices';
+import {changePasswordWithOldPasswordDataProps} from '../../types';
+import {useNavigation} from '@react-navigation/native';
+import LoginRequireComponent from '../../components/LoginRequireComponent';
 
 const ChangePasswordScreen = () => {
-  const route = useRoute();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const { phoneNumber } = route.params as { phoneNumber: string };
-  const [otp, setOTP] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-
-  const {t} = useTranslation();
   const navigation = useNavigation();
+  const [showOldPassword, setShowOldPassword] = React.useState(false);
+  const [showNewPassword, setShowNewPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  const handleChangePasswordClick = async () => {
-    try {
-      const response = await changePassword({
-        otp: otp,
-        phoneNumber: phoneNumber,
-        newPassword: newPassword,
-        confirmNewPassword: confirmNewPassword
-      });
+  const [password, setPassword] =
+    React.useState<changePasswordWithOldPasswordDataProps>({
+      oldPassword: '',
+      newPassword: '',
+      confirmNewPassword: '',
+    });
 
-      if (response.success) {
-        console.info("Đổi mật khẩu thành công");
-        navigation.navigate('LoginScreen' as never);
-      } else {
-        console.error("Thông tin không hợp lệ" + phoneNumber);
-      }
-    } catch (error) {
-      console.error('Đã có lỗi xảy ra: ', error);
-    }
-  };
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setIsLoading(false);
-    }, 50);
-    return () => clearTimeout(id);
+  const validatePassword = useCallback((password: string) => {
+    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*d)(?=.*W).{8,}$/;
+    return regex.test(password);
   }, []);
 
+  const handleChangePassword = async () => {
+    const respone = await changePasswordWithOldPassword(password);
+    if (respone.success) {
+      navigation.goBack();
+    } else {
+      console.log(respone);
+    }
+  };
   return (
-    <ContainerComponent
-      style={[
-        {backgroundColor: '#fafafa'},
-        isLoading && {justifyContent: 'center', alignItems: 'center'},
-      ]}>
-      {isLoading ? (
-        <ActivityIndicator size="large" color={appColors.primary} />
-      ) : (
-        <ContentComponent style={styles.container}>
-          <Image
-            source={require('../../assets/images/logo-text-small.png')}
-            alt="Logo"
-            style={{
-              width: 175,
-              height: 175,
-            }}
-          />
-          <Space paddingTop={20} />
-          <TextComponent bold fontSize={23}>
-            Đổi mật khẩu
-          </TextComponent>
-          <Space paddingTop={5} />
-          <TextComponent color={appColors.textDescription}>
-            Nhập mã OTP để đổi mật khẩu
-          </TextComponent>
-          <Space paddingTop={20} />
-          <InputComponent
-            size="md"
-            placeholder="Mã OTP"
-            startIcon={
-              <Phone color={appColors.textDescription} strokeWidth={2} />
-            }
-            containerStyle={{
-              width: '90%',
-            }}
-            inputContainerStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            inputContainerFocusStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            variant="rounded"
-            onChangeText={(text) => setOTP(text)}
-          />
-          <Space paddingTop={15} />
-          <InputComponent
-            size="md"
-            placeholder={t('registerScreen.password')}
-            startIcon={
-              <LockKeyhole color={appColors.textDescription} strokeWidth={2} />
-            }
-            containerStyle={{
-              width: '90%',
-            }}
-            inputContainerStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            inputContainerFocusStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            variant="rounded"
-            type="password"
-            onChangeText={(text) => setNewPassword(text)}
-          />
-          <Space paddingTop={15} />
-          <InputComponent
-            size="md"
-            placeholder={t('registerScreen.confirmPassword')}
-            startIcon={
-              <ShieldCheck color={appColors.textDescription} strokeWidth={2} />
-            }
-            containerStyle={{
-              width: '90%',
-            }}
-            inputContainerStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            inputContainerFocusStyle={{
-              backgroundColor: appColors.white,
-              borderColor: appColors.white,
-            }}
-            variant="rounded"
-            type="password"
-            onChangeText={(text) => setConfirmNewPassword(text)}
-          />
-          <Space paddingTop={30} />
-          <ButtonComponent
-            onPress={handleChangePasswordClick}
-            containerStyles={{
-              width: '90%',
-              backgroundColor: '#00a3e8',
-              borderRadius: 20,
-            }}
-            bold>
-            Đổi mật khẩu
-          </ButtonComponent>
-        </ContentComponent>
-      )}
-    </ContainerComponent>
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={`Mật khẩu`}
+          titleColor={appColors.black}
+          showBackButton
+          backIcon={<ChevronLeft size={30} color={appColors.black} />}
+          titleSize={20}
+          paddingTop={30}
+          noBackground
+          backgroundColor={'#F7F7F7'}
+        />
+        <ScrollView style={{flexDirection: 'column', flex: 1}}>
+          <View style={styles.image}>
+            <Image
+              source={require('../../assets/images/changeNewPassword.png')}
+              style={{width: 280, height: 280}}
+            />
+          </View>
+          <View style={styles.container}>
+            <TextComponent bold fontSize={22} textAlign="center">
+              Đổi Mật Khẩu Mới
+            </TextComponent>
+            <TextComponent
+              color={appColors.textDescription}
+              fontSize={14}
+              textAlign="center"
+              style={{
+                paddingTop: 4,
+                letterSpacing: 0.4,
+              }}>
+              Vui lòng nhập chính xác các thông tin bên dưới để đặt mật khẩu mới{' '}
+            </TextComponent>
+
+            <InputComponent
+              label="Mật khẩu cũ"
+              labelStyle={{
+                color: appColors.textDescription,
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              value={password.oldPassword}
+              onChangeText={text =>
+                setPassword({...password, oldPassword: text})
+              }
+              error={password.oldPassword === ''}
+              errorMessage="Mật khẩu cũ không được để trống"
+              variant="underlined"
+              startIcon={
+                <SimpleLineIcons
+                  size={25}
+                  style={{
+                    marginLeft: -12,
+                  }}
+                  name="lock"
+                  color={appColors.primaryDark}
+                />
+              }
+              endIcon={
+                showOldPassword ? (
+                  <HideEye width={30} height={30} />
+                ) : (
+                  <Eye width={30} height={30} />
+                )
+              }
+              type={showOldPassword ? 'text' : 'password'}
+              placeholder="Mật khẩu cũ"
+              onEndIconPress={() => {
+                setShowOldPassword(!showOldPassword);
+              }}
+            />
+            <InputComponent
+              label="Mật khẩu mới"
+              labelStyle={{
+                color: appColors.textDescription,
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              value={password.newPassword}
+              onChangeText={text =>
+                setPassword({...password, newPassword: text})
+              }
+              error={
+                password.newPassword === '' ||
+                !validatePassword(password.newPassword)
+              }
+              errorMessage={
+                password.newPassword === ''
+                  ? 'Mật khẩu mới không được để trống'
+                  : 'Mật khẩu mới phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
+              }
+              variant="underlined"
+              startIcon={
+                <SimpleLineIcons
+                  size={25}
+                  style={{
+                    marginLeft: -12,
+                  }}
+                  name="lock"
+                  color={appColors.primaryDark}
+                />
+              }
+              endIcon={
+                showNewPassword ? (
+                  <HideEye width={30} height={30} />
+                ) : (
+                  <Eye width={30} height={30} />
+                )
+              }
+              type={showNewPassword ? 'text' : 'password'}
+              placeholder="Mật khẩu mới"
+              onEndIconPress={() => {
+                setShowNewPassword(!showNewPassword);
+              }}
+            />
+            <InputComponent
+              label="Xác nhận lại mật khẩu"
+              labelStyle={{
+                color: appColors.textDescription,
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              value={password.confirmNewPassword}
+              onChangeText={text =>
+                setPassword({...password, confirmNewPassword: text})
+              }
+              error={
+                password.confirmNewPassword === '' ||
+                password.newPassword !== password.confirmNewPassword
+              }
+              errorMessage={
+                password.confirmNewPassword === ''
+                  ? 'Mật khẩu mới không được để trống'
+                  : 'Mật khẩu mới không trùng khớp với mật khẩu mới'
+              }
+              variant="underlined"
+              startIcon={
+                <RectangleEllipsis
+                  size={25}
+                  style={{
+                    marginLeft: -12,
+                  }}
+                  color={appColors.primaryDark}
+                />
+              }
+              endIcon={
+                showConfirmPassword ? (
+                  <HideEye width={30} height={30} />
+                ) : (
+                  <Eye width={30} height={30} />
+                )
+              }
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Xác nhận lại mật khẩu"
+              onEndIconPress={() => {
+                setShowConfirmPassword(!showConfirmPassword);
+              }}
+            />
+
+            <View
+              style={{
+                paddingHorizontal: 12,
+                marginTop: 16,
+              }}>
+              <ButtonComponent
+                onPress={handleChangePassword}
+                borderRadius={20}
+                textStyles={{
+                  textTransform: 'uppercase',
+                  fontWeight: 'bold',
+                }}
+                backgroundColor={appColors.primaryDark}>
+                Đổi mật khẩu
+              </ButtonComponent>
+            </View>
+          </View>
+        </ScrollView>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
+
+export default ChangePasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
+    elevation: 20,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    backgroundColor: appColors.white,
+    paddingHorizontal: 25,
+    paddingTop: 10,
+  },
+  image: {
+    backgroundColor: '#F7F7F7',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fafafa',
   },
 });
-
-export default ChangePasswordScreen;

@@ -1,4 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+import dayjs from 'dayjs';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   ActivityIndicator,
@@ -22,12 +23,12 @@ import {
   SelectComponent,
   TextComponent,
 } from '../../../components';
+import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
-import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
-import {getAllDepartment} from '../../../services/bookingServices';
 
 const degreeData = [
   {
@@ -52,7 +53,9 @@ const degreeData = [
   },
 ];
 
-const ChooseDoctorsScreen = () => {
+const ChooseDoctorsScreen = ({route}: {route: any}) => {
+  const timeSlots = route.params?.timeSlots;
+
   const [doctors, setDoctors] = React.useState<any>([]);
   const [pagination, setPagination] = React.useState({
     page: 1,
@@ -91,9 +94,13 @@ const ChooseDoctorsScreen = () => {
   // End Animation Filter
 
   const navigation = useNavigation<navigationProps>();
-  const renderItem = useCallback(({item}: {item: any}) => {
-    return <DoctorInfoComponent item={item} />;
-  }, []);
+  const isFocused = useIsFocused();
+  const renderItem = useCallback(
+    ({item}: {item: any}) => {
+      return <DoctorInfoComponent item={item} timeSlots={timeSlots} />;
+    },
+    [timeSlots],
+  );
   const keyExtractor = useCallback(
     (item: any, index: number) => `doctor-${item.id}-${index}`,
     [],
@@ -154,7 +161,7 @@ const ChooseDoctorsScreen = () => {
       selectedDepartment?.departmentId,
       selectedDegree?.id,
       pagination.page,
-      pagination.limit,
+      6,
     );
     setIsLoadingAPI(false);
 
@@ -179,7 +186,6 @@ const ChooseDoctorsScreen = () => {
     selectedDepartment,
     selectedDegree,
     pagination.page,
-    pagination.limit,
   ]);
 
   useEffect(() => {
@@ -199,6 +205,33 @@ const ChooseDoctorsScreen = () => {
     handleSearchDoctor();
   }, [handleSearchDoctor]);
 
+  useEffect(() => {
+    if (!timeSlots || timeSlots.length === 0) return;
+    const selectedDepartments: any[] = timeSlots.map(
+      (item: any) => item.departmentName,
+    );
+    setDepartments((prevState: any) =>
+      prevState.filter(
+        (item: any) => selectedDepartments.indexOf(item.departmentName) === -1,
+      ),
+    );
+    const selectedDate = dayjs(timeSlots[0].timeSlot?.date).format(
+      'DD/MM/YYYY',
+    );
+
+    let prevDoctors: any[] = doctors;
+    prevDoctors = prevDoctors.filter((item: any) => {
+      return item.doctorSchedules.some(
+        (schedule: any) =>
+          dayjs(schedule.date).format('DD/MM/YYYY') === selectedDate,
+      );
+    });
+    prevDoctors = prevDoctors.filter(
+      (item: any) =>
+        selectedDepartments.indexOf(item.department.departmentName) === -1,
+    );
+    setDoctors(prevDoctors);
+  }, [timeSlots]);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -302,14 +335,14 @@ const ChooseDoctorsScreen = () => {
         style={{width: '100%'}}
         initialNumToRender={5}
         onEndReached={e => {
-          if (pagination.page < pagination.totalPages) {
-            setPagination({
-              ...pagination,
-              page: pagination.page + 1,
-            });
+          if (pagination.page < pagination.totalPages && !isLoadingAPI) {
+            setPagination((prevState: any) => ({
+              ...prevState,
+              page: prevState.page + 1,
+            }));
           }
         }}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.7}
         ListFooterComponent={listFooterComponent}
       />
     </View>

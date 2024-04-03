@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -18,18 +21,26 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(CustomUserDetails userDetails) {
+    public Map<String, String> generateToken(CustomUserDetails userDetails) {
         Date now = new Date();
         long JWT_EXPIRATION = 604800000L;
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
-        return Jwts.builder()
+        Map<String, String> result = new HashMap<>();
+        String tokenId = UUID.randomUUID().toString();
+        String token =  Jwts.builder()
                 .subject(String.valueOf((userDetails.getAccount().getUserId())))
                 .claim("userId", userDetails.getAccount().getUserId())
+                .claim("tokenId", tokenId)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSingingKey())
                 .compact();
+
+        result.put("token", token);
+        result.put("tokenId", tokenId);
+
+        return result;
     }
 
     public String getUserIdFromJwt(String token) {
@@ -39,6 +50,15 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.getSubject();
+    }
+
+    public String getTokenIdFromJwt(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSingingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("tokenId", String.class);
     }
 
 

@@ -1,8 +1,10 @@
 package com.theduckhospital.api.controller.patient;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.dto.request.AddPatientProfileRequest;
 import com.theduckhospital.api.dto.request.CreatePatientProfileRequest;
 import com.theduckhospital.api.dto.request.FindPatientCodeRequest;
+import com.theduckhospital.api.dto.request.SendOTPPatientProfileRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import jakarta.validation.Valid;
@@ -116,6 +118,21 @@ public class PatientProfileController {
                         .success(true)
                         .message("Search Patient Profile Successful")
                         .data(patientProfileServices.findPatientCode(
+                                request
+                        ))
+                        .build()
+        );
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOTP(
+            @RequestBody @Valid SendOTPPatientProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Send OTP Successful")
+                        .data(patientProfileServices.sendOTP(
                                 request
                         ))
                         .build()

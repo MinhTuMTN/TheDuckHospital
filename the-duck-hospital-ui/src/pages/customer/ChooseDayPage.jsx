@@ -17,12 +17,13 @@ import {
 } from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { useState } from "react";
-import InfoLine from "../../components/Customer/InfoLine";
 import dayjs from "dayjs";
-import { useLocation, useNavigate } from "react-router-dom";
-import CustomLink from "../../components/General/CustomLink";
 import { enqueueSnackbar } from "notistack";
+import React, { useCallback, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import InfoLine from "../../components/Customer/InfoLine";
+import CustomLink from "../../components/General/CustomLink";
+import { getTimeSlotById } from "../../utils/timeSlotUtils";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -68,31 +69,23 @@ const Body = styled(Box)(({ theme }) => ({
 }));
 
 const CustomButtonChoosen = styled(Button)(({ theme, isactive }) => ({
-  borderRadius: "4px",
-  border: "1.5px solid ",
-  borderImage: `linear-gradient(45deg, #5a96f7, #12b3f3)`, // Đặt đường viền gradient khi hover
-  borderImageSlice: 1,
+  borderRadius: "20px",
   textTransform: "none",
   background:
     isactive === "true"
       ? "linear-gradient(to right, #42a5f5, #6fccea)"
       : "#fff",
   color: isactive === "true" ? "#fff" : "#000",
+  display: "flex",
+  flexBasis: "48%",
+  margin: "4px 0",
+  border: "1px solid #3978b4",
 
   "&:hover": {
     backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
     color: "#fff !important",
   },
 }));
-
-let doctorSchedules = [];
-const disableDate = (date) => {
-  const dateStr = dayjs(date).format("DD/MM/YYYY");
-  const isDisable = doctorSchedules.some((schedule) => {
-    return dayjs(schedule.date).format("DD/MM/YYYY") === dateStr;
-  });
-  return !isDisable;
-};
 
 function ChooseDayPage(props) {
   const isLgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -101,30 +94,52 @@ function ChooseDayPage(props) {
   const [isConfirmationOpen, setConfirmationOpen] = useState(false);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const navigate = useNavigate();
 
   const { doctor, profile, schedules = [] } = useLocation().state;
-  doctorSchedules = doctor.doctorSchedules;
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
     setConfirmationOpen(true);
 
     const dateStr = dayjs(newDate).format("DD/MM/YYYY");
+    const doctorSchedules = doctor.doctorSchedules;
     const selectedSchedules = doctorSchedules.filter((schedule) => {
       return dayjs(schedule.date).format("DD/MM/YYYY") === dateStr;
     });
     setSelectedSchedules(selectedSchedules);
   };
+  const disableDate = useCallback(
+    (date) => {
+      const dateStr = dayjs(date).format("DD/MM/YYYY");
+      if (schedules && schedules.length > 0) {
+        const enableDate = dayjs(schedules[0].schedule.date).format(
+          "DD/MM/YYYY"
+        );
+
+        return dateStr !== enableDate;
+      }
+      const doctorSchedules = doctor.doctorSchedules;
+      const isDisable = doctorSchedules.some((schedule) => {
+        return dayjs(schedule.date).format("DD/MM/YYYY") === dateStr;
+      });
+      return !isDisable;
+    },
+    [doctor.doctorSchedules, schedules]
+  );
 
   const handleConfirmationClose = () => {
     setConfirmationOpen(false);
     setSelectedSchedule(null);
+    setSelectedTimeSlot(null);
     handleButtonClick(null);
   };
 
   const handleConfirmationProceed = () => {
     if (!selectedSchedule) {
-      enqueueSnackbar("Vui lòng chọn buổi khám", { variant: "error" });
+      enqueueSnackbar("Vui lòng chọn buổi khám và giờ khám", {
+        variant: "error",
+      });
       return;
     }
     setConfirmationOpen(false);
@@ -132,6 +147,7 @@ function ChooseDayPage(props) {
     schedules.push({
       doctor,
       schedule: selectedSchedule,
+      timeSlot: selectedTimeSlot,
     });
     navigate("/confirm-booking-information", {
       state: {
@@ -287,7 +303,7 @@ function ChooseDayPage(props) {
                 paddingY: "8px",
               }}
             >
-              Chọn buổi khám bênh
+              Chọn giờ khám bênh
             </DialogTitle>
             <DialogContent
               sx={{
@@ -333,24 +349,41 @@ function ChooseDayPage(props) {
                 }}
               >
                 {selectedSchedules.map((schedule) => (
-                  <CustomButtonChoosen
-                    key={schedule.doctorScheduleId}
-                    variant="contained"
-                    isactive={
-                      activeButton === schedule.doctorScheduleId
-                        ? "true"
-                        : "false"
-                    }
-                    onClick={() => {
-                      handleButtonClick(schedule.doctorScheduleId);
-                      setSelectedSchedule(schedule);
-                    }}
-                    disabled={!schedule.available}
-                  >
-                    {schedule.scheduleType === "MORNING"
-                      ? "Buổi sáng"
-                      : "Buổi chiều"}
-                  </CustomButtonChoosen>
+                  <Stack key={schedule.doctorScheduleId}>
+                    <Typography fontSize={14} fontWeight={500}>
+                      {schedule.scheduleType === "MORNING"
+                        ? "Buổi sáng"
+                        : "Buổi chiều"}
+                    </Typography>
+                    <Stack
+                      direction={"row"}
+                      flexWrap={"wrap"}
+                      justifyContent={"space-between"}
+                    >
+                      {schedule.timeSlots?.map((timeSlot) => (
+                        <CustomButtonChoosen
+                          key={timeSlot.timeSlotId}
+                          variant="contained"
+                          isactive={
+                            activeButton === timeSlot.timeSlotId
+                              ? "true"
+                              : "false"
+                          }
+                          onClick={() => {
+                            handleButtonClick(timeSlot.timeSlotId);
+                            setSelectedSchedule(schedule);
+                            setSelectedTimeSlot(timeSlot);
+                          }}
+                          disabled={
+                            !schedule.available ||
+                            timeSlot.currentSlot >= timeSlot.maxSlot
+                          }
+                        >
+                          {getTimeSlotById(timeSlot.timeId)}
+                        </CustomButtonChoosen>
+                      ))}
+                    </Stack>
+                  </Stack>
                 ))}
               </Stack>
             </DialogContent>

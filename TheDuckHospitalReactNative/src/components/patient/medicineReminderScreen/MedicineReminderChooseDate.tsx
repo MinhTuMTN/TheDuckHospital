@@ -1,20 +1,19 @@
-import {View, Text, StyleSheet, Pressable, Easing} from 'react-native';
-import React, {useEffect, useMemo, useState} from 'react';
-import {FlexComponent, TextComponent} from '../..';
-import {appColors} from '../../../constants/appColors';
+import dayjs from 'dayjs';
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import dayjs from 'dayjs';
+import {FlexComponent, TextComponent} from '../..';
+import {appColors} from '../../../constants/appColors';
 
 interface MedicineReminderChooseDateProps {
   selectedDate: dayjs.Dayjs;

@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {ActivityIndicator, FlatList} from 'react-native';
-import {useAuth} from '../../../auth/AuthProvider';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
@@ -11,7 +11,7 @@ import {navigationProps} from '../../../types';
 
 const ChooseProfileScreen = ({route}: {route: any}) => {
   const {t} = useTranslation();
-  const {data} = route.params;
+  const {timeSlots} = route.params;
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -20,7 +20,7 @@ const ChooseProfileScreen = ({route}: {route: any}) => {
 
   const handleNavigateToBillInfoScreen = (profile: any) => {
     navigation.navigate('BillingInformationScreen', {
-      data: data,
+      timeSlots: timeSlots,
       profile: profile,
     });
   };

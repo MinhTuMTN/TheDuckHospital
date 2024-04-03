@@ -9,6 +9,7 @@ import {appInfo} from '../../../constants/appInfo';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {English, Vietnamese} from '../../../assets/svgs';
+import LoadingComponent from '../../LoadingComponent';
 
 interface ChangeLanguageProps {}
 
@@ -73,33 +74,35 @@ const ChangeLanguage = (props: ChangeLanguageProps) => {
               borderTopLeftRadius: 30,
               borderTopRightRadius: 30,
             }}>
-            <View style={{backgroundColor: 'white', paddingHorizontal: 15}}>
-              {languages.map(language => (
-                <Pressable
-                  key={language.id}
-                  onPress={() => {
-                    bottomModalRef.current?.close();
-                    i18n.changeLanguage(language.code);
-                  }}>
-                  <FlexComponent
-                    direction="row"
-                    alignItems={'center'}
-                    style={{paddingVertical: 7}}>
-                    {language.icon}
-                    <Text
-                      paddingLeft={3}
-                      fontSize={18}
-                      color={
-                        i18n.language === language.code
-                          ? appColors.primary
-                          : '#000000'
-                      }>
-                      {language.name}
-                    </Text>
-                  </FlexComponent>
-                </Pressable>
-              ))}
-            </View>
+            <LoadingComponent>
+              <View style={{backgroundColor: 'white', paddingHorizontal: 15}}>
+                {languages.map(language => (
+                  <Pressable
+                    key={language.id}
+                    onPress={() => {
+                      bottomModalRef.current?.close();
+                      i18n.changeLanguage(language.code);
+                    }}>
+                    <FlexComponent
+                      direction="row"
+                      alignItems={'center'}
+                      style={{paddingVertical: 7}}>
+                      {language.icon}
+                      <Text
+                        paddingLeft={3}
+                        fontSize={18}
+                        color={
+                          i18n.language === language.code
+                            ? appColors.primary
+                            : '#000000'
+                        }>
+                        {language.name}
+                      </Text>
+                    </FlexComponent>
+                  </Pressable>
+                ))}
+              </View>
+            </LoadingComponent>
           </BottomSheetModal>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>

@@ -7,6 +7,7 @@ export type navigationProps = {
   navigate: (screen: string, params?: any) => void;
   goBack: () => void;
   reset: (props: resetProps) => void;
+  push: (screen: string, params?: any) => void;
 };
 
 export type checkPhoneOrEmailDataProps = {
@@ -48,8 +49,25 @@ export type patientProfileDataProps = {
   nationId: number;
 };
 
-export type paginationParamsProps = {
-  search: string;
-  page: number;
-  limit: number;
+export type updateDeviceInformationDataProps = {
+  deviceId: string;
+  deviceName: string;
+  systemName: string;
+  systemVersion: string;
+  fcmToken: string;
+};
+
+export type changePasswordWithOldPasswordDataProps = {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
+export type addPatientProfileProps = {
+  patientProfileId: string;
+  phoneNumber: string;
+};
+
+export type remoteLogoutDataProps = {
+  logoutTokenId: string;
 };

@@ -24,7 +24,7 @@ import {useNavigation} from '@react-navigation/native';
 import {loginDataProps, navigationProps} from '../../types';
 import FormControlComponent from '../../components/FormControlComponent';
 import {loginWithPassword} from '../../services/authServices';
-import {useAuth} from '../../auth/AuthProvider';
+import {useAuth} from '../../hooks/AuthProvider';
 
 const LoginScreen = () => {
   const [rememberMe, setRememberMe] = React.useState(['rememberMe']);

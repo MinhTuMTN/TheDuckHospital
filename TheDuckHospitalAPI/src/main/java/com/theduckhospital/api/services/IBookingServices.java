@@ -15,7 +15,8 @@ import java.util.UUID;
 
 public interface IBookingServices {
     PaymentResponse createBookingAndPayment(String token, BookingRequest request, String origin);
-    String checkBookingCallback(Map<String, String> vnpParams);
+    String checkVNPayBookingCallback(Map<String, String> vnpParams);
+    boolean checkMomoBookingCallback(Map<String, String> params) throws Exception;
 
     List<AccountBookingResponse> getBookings(String token);
 

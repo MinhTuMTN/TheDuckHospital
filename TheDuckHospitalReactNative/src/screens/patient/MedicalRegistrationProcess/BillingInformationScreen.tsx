@@ -1,49 +1,53 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  Linking,
-} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import dayjs from 'dayjs';
 import React from 'react';
+import {
+  Image,
+  Linking,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Done} from '../../../assets/svgs';
 import {
   ContainerComponent,
   Header,
   Space,
   TextComponent,
 } from '../../../components';
-import {appColors} from '../../../constants/appColors';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import LineInfoComponent from '../../../components/LineInfoComponent';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Done} from '../../../assets/svgs';
-import {TouchableOpacity} from '@gorhom/bottom-sheet';
-import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
-import dayjs from 'dayjs';
-import {getTimeSlotById} from '../../../utils/timeSlotUtils';
-import {formatCurrency} from '../../../utils/currencyUtils';
 import ButtonComponent from '../../../components/ButtonComponent';
+import LineInfoComponent from '../../../components/LineInfoComponent';
+import {appColors} from '../../../constants/appColors';
 import {createBooking} from '../../../services/bookingServices';
+import {navigationProps} from '../../../types';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 
 const BillingInformationScreen = ({route}: {route: any}) => {
-  const {data, profile} = route.params;
+  const {timeSlots, profile} = route.params;
 
   const [paymentLoading, setPaymentLoading] = React.useState(false);
-
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState('');
   const navigation = useNavigation<navigationProps>();
-  const handleNavigatPaymentScreen = () => {
-    navigation.navigate('PaymentScreen');
-  };
+  const totalAmount = React.useMemo(() => {
+    return timeSlots?.reduce((total: number, item: any) => {
+      return total + item.price;
+    }, 0);
+  }, [timeSlots]);
   const handleBookingPayment = async () => {
     setPaymentLoading(true);
     const response = await createBooking(
       profile?.patientProfileId,
-      [data?.timeSlot?.timeSlotId],
+      timeSlots.map((item: any) => item?.timeSlot?.timeSlotId),
       'MOMO',
       true,
     );
@@ -169,107 +173,149 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   Thông tin đặt khám
                 </TextComponent>
                 <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Bác sĩ"
-                  value={data?.doctorName}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Dịch vụ khám"
-                  value="Khám dịch vụ"
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Chuyên khoa"
-                  value={data?.departmentName}
-                  valueUppercase
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Ngày khám"
-                  value={data?.selectedDay}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
-                <Space paddingTop={5} />
-                <LineInfoComponent
-                  label="Giờ khám"
-                  value={getTimeSlotById(data?.timeSlot?.timeId)}
-                  labelStyles={{
-                    fontSize: 15,
-                    fontWeight: '400',
-                    textAlign: 'left',
-                  }}
-                  valueStyles={{
-                    fontSize: 15,
-                    fontWeight: '500',
-                    textAlign: 'right',
-                  }}
-                  labelColor={appColors.grayText}
-                />
+                {timeSlots?.map((data: any, index: number) => (
+                  <View
+                    key={`time-slot-${index}`}
+                    style={{
+                      marginBottom: 16,
+                    }}>
+                    <LineInfoComponent
+                      label="Bác sĩ"
+                      value={data?.doctorName}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Dịch vụ khám"
+                      value="Khám dịch vụ"
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Chuyên khoa"
+                      value={data?.departmentName}
+                      valueUppercase
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Ngày khám"
+                      value={data?.selectedDay}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                    <Space paddingTop={5} />
+                    <LineInfoComponent
+                      label="Giờ khám"
+                      value={getTimeSlotById(data?.timeSlot?.timeId)}
+                      labelStyles={{
+                        fontSize: 15,
+                        fontWeight: '400',
+                        textAlign: 'left',
+                      }}
+                      valueStyles={{
+                        fontSize: 15,
+                        fontWeight: '500',
+                        textAlign: 'right',
+                      }}
+                      labelColor={appColors.grayText}
+                    />
+                  </View>
+                ))}
               </View>
             </ScrollView>
           </View>
           <View style={styles.bill}>
-            <View style={styles.headerBill}>
-              <TextComponent
-                color={appColors.primaryLable}
-                fontWeight="600"
-                fontSize={20}>
-                Chọn phương thức thanh toán
-              </TextComponent>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.headerBill}>
+              {paymentMethod === '' ? (
+                <>
+                  <TextComponent
+                    color={appColors.primaryLable}
+                    fontWeight="600"
+                    fontSize={20}>
+                    Chọn phương thức thanh toán
+                  </TextComponent>
+                </>
+              ) : paymentMethod === 'MOMO' ? (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/MoMo_Logo.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử Momo
+                  </TextComponent>
+                </View>
+              ) : (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/VNPay.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử VNPay
+                  </TextComponent>
+                </View>
+              )}
               <MaterialIcons
                 name="navigate-next"
                 size={30}
                 color={appColors.primary}
               />
-            </View>
+            </TouchableOpacity>
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
-                value={formatCurrency(data?.price) + 'đ'}
+                value={formatCurrency(totalAmount) + 'đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -306,7 +352,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <LineInfoComponent
                 label="Tổng tiền"
                 value={
-                  formatCurrency((parseFloat(data?.price) + 15000).toString()) +
+                  formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
                   'đ'
                 }
                 labelStyles={{
@@ -353,6 +399,81 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             </View>
           </View>
         </View>
+        <Modal
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <View style={styles.containerModal}>
+            <View style={styles.modalView}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  borderBottomColor: appColors.grayLine,
+                  borderBottomWidth: 1,
+                  paddingBottom: 10,
+                }}>
+                <TextComponent
+                  color={appColors.black}
+                  fontWeight="600"
+                  fontSize={18}>
+                  Chọn Phương Thức Thanh Toán
+                </TextComponent>
+                <Pressable onPress={() => setModalVisible(false)}>
+                  <AntDesign
+                    name="close"
+                    size={22}
+                    color={appColors.grayLight}
+                  />
+                </Pressable>
+              </View>
+              <Pressable
+                style={[
+                  styles.option,
+                  {
+                    borderBottomColor: appColors.grayLine,
+                    borderBottomWidth: 1,
+                  },
+                ]}
+                onPress={() => {
+                  setPaymentMethod('MOMO');
+                  setModalVisible(false);
+                }}>
+                <Image
+                  source={require('../../../assets/images/MoMo_Logo.png')}
+                  style={{width: 30, height: 30}}
+                />
+                <TextComponent
+                  fontWeight="400"
+                  fontSize={16}
+                  color={appColors.black}
+                  style={{marginLeft: 10, letterSpacing: 0.2}}>
+                  Ví điện tử Momo
+                </TextComponent>
+              </Pressable>
+              <Pressable
+                style={styles.option}
+                onPress={() => {
+                  setPaymentMethod('VNPay');
+                  setModalVisible(false);
+                }}>
+                <Image
+                  source={require('../../../assets/images/VNPay.png')}
+                  style={{width: 30, height: 30}}
+                />
+                <TextComponent
+                  fontWeight="400"
+                  fontSize={16}
+                  color={appColors.black}
+                  style={{marginLeft: 10, letterSpacing: 0.2}}>
+                  Ví điện tử VNPay
+                </TextComponent>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
       </ContainerComponent>
     </GestureHandlerRootView>
   );
@@ -431,5 +552,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
+  },
+  containerModal: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: 'flex-end',
+  },
+  modalView: {
+    flexDirection: 'column',
+    marginBottom: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    paddingTop: 20,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  option: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 15,
+  },
+  isChoose: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingLeft: 10,
   },
 });

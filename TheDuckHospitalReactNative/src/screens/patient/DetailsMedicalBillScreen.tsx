@@ -1,5 +1,6 @@
-import {View, Text, ScrollView, ActivityIndicator} from 'react-native';
+import {Spinner} from '@gluestack-ui/themed';
 import React, {useEffect, useState} from 'react';
+import {ScrollView} from 'react-native';
 import {
   ContainerComponent,
   ContentComponent,
@@ -8,7 +9,6 @@ import {
   Header,
 } from '../../components';
 import {appColors} from '../../constants/appColors';
-import {Progress, Spinner} from '@gluestack-ui/themed';
 import {getDetailsMedicalBill} from '../../services/bookingServices';
 
 const DetailsMedicalBillScreen = ({route}: {route: any}) => {

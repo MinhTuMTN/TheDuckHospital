@@ -1,15 +1,9 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
-import React from 'react';
-import {Space, TextComponent} from '../..';
-import {Check, CircleDashed} from 'lucide-react-native';
-import {appColors} from '../../../constants/appColors';
 import {useNavigation} from '@react-navigation/native';
+import {Check, CircleDashed} from 'lucide-react-native';
+import React from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
+import {Space, TextComponent} from '../..';
+import {appColors} from '../../../constants/appColors';
 import {navigationProps} from '../../../types';
 import {getDateObject, getDayOfWeek} from '../../../utils/dateUtils';
 

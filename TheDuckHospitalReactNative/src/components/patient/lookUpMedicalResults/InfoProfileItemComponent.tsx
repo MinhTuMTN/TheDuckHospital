@@ -1,16 +1,16 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {ChevronRight} from 'lucide-react-native';
 import React from 'react';
-import {appColors} from '../../../constants/appColors';
-import {FlexComponent, TextComponent} from '../..';
-import LineInfoComponent from '../../LineInfoComponent';
-import {ChevronRight, Info} from 'lucide-react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {FlexComponent} from '../..';
+import {appColors} from '../../../constants/appColors';
+import LineInfoComponent from '../../LineInfoComponent';
 
 const InfoProfileItemComponent = () => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container}>
       <LineInfoComponent
         startIcon={
           <Ionicons
@@ -69,7 +69,7 @@ const InfoProfileItemComponent = () => {
       <View style={styles.buttonNext}>
         <ChevronRight size={28} color={appColors.textLight} />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     flexDirection: 'column',
+    elevation: 7,
   },
   buttonNext: {
     position: 'absolute',

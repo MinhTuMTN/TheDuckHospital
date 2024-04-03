@@ -174,7 +174,10 @@ function ChooseDoctorPage(props) {
         doctors = doctors.filter(
           (doctor) =>
             doctor.department?.departmentName !==
-            schedule.doctor.department?.departmentName
+              schedule.doctor.department?.departmentName &&
+            doctor.doctorSchedules.some(
+              (doctorSchedule) => doctorSchedule.date === schedule.schedule.date
+            )
         );
       });
       setDoctors(doctors);

@@ -78,8 +78,8 @@ const LineInfoComponent = (props: Props) => {
         uppercase={labelUppercase}>
         {label}
       </TextComponent>
-      <View style={{flexDirection: 'row', flex: flexValue}}>
-        {value && (
+      {value && (
+        <View style={{flexDirection: 'row', flex: flexValue}}>
           <TextComponent
             color={valueColor}
             style={valueStyles}
@@ -87,9 +87,9 @@ const LineInfoComponent = (props: Props) => {
             uppercase={valueUppercase}>
             {value}
           </TextComponent>
-        )}
-        {endIcon && endIcon}
-      </View>
+          {endIcon && endIcon}
+        </View>
+      )}
     </View>
   );
 };

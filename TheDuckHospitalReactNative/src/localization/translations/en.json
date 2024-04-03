@@ -2,6 +2,7 @@
   "homeScreen": {
     "hello": "Hi",
     "welcome": "Welcome back!",
+    "noLoginHello": "The Duck Hospital\nHello,",
     "makeAppointment": "Make an appointment",
     "makeAppointmentNoNewLine": "Make an appointment",
     "lookupMedicalResult": "Lookup medical result",
@@ -35,6 +36,7 @@
     "generalSettings": "General Settings",
     "language": "Language",
     "changePassword": "Change Password",
+    "deviceManagement": "Device Management",
     "notificationSettings": "Notification Settings",
     "contactSupport": "Contact Support",
     "hotline": "Hotline 1900-1234",

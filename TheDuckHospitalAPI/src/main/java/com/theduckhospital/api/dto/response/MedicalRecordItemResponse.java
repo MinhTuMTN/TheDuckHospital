@@ -26,6 +26,7 @@ public class MedicalRecordItemResponse {
     private Date patientDateOfBirth;
     private String patientProvince;
     private String patientCode;
+    private int timeId;
 
     public MedicalRecordItemResponse(Booking booking) {
         this.bookingId = booking.getBookingId();
@@ -44,5 +45,6 @@ public class MedicalRecordItemResponse {
         this.patientDateOfBirth = booking.getPatientProfile().getDateOfBirth();
         this.patientProvince = booking.getPatientProfile().getWard().getDistrict().getProvince().getProvinceName();
         this.patientCode = booking.getPatientProfile().getPatient() != null ? booking.getPatientProfile().getPatient().getPatientCode() : null;
+        this.timeId = booking.getTimeSlot().getTimeId();
     }
 }

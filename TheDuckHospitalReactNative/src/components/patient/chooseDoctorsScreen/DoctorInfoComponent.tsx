@@ -1,22 +1,17 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {memo, useEffect} from 'react';
-import {
-  Image,
-  StyleSheet,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TextComponent} from '../..';
 import {Calendar, CashInHand, Gender, Stethoscope} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
+import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
-import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
 
 interface DoctorInfoComponentProps {
   item: any;
+  timeSlots: any;
 }
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
@@ -26,7 +21,8 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
 
   const navigateToChooseDateScreen = () => {
     navigation.navigate('ChooseDateScreen', {
-      data: item,
+      selectedDoctor: item,
+      timeSlots: props.timeSlots,
     });
   };
 
