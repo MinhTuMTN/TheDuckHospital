@@ -1,8 +1,4 @@
-import {
-  useFocusEffect,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
@@ -18,7 +14,6 @@ import {
   default as AntDesign,
   default as Icon,
 } from 'react-native-vector-icons/AntDesign';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {
   ContainerComponent,
   Header,
@@ -27,10 +22,11 @@ import {
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 import {appColors} from '../../../constants/appColors';
+import {useAuth} from '../../../hooks/AuthProvider';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
 import {navigationProps} from '../../../types';
-import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();

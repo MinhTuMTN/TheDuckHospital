@@ -1,9 +1,6 @@
-import {useNavigation} from '@react-navigation/native';
-import dayjs from 'dayjs';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Image,
-  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -26,43 +23,13 @@ import {
 import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
 import {appColors} from '../../../constants/appColors';
-import {createBooking} from '../../../services/bookingServices';
-import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
-import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 
-const BillingInformationScreen = ({route}: {route: any}) => {
-  const {timeSlots, profile} = route.params;
-
+const HospitalFeePaymentInformationScreen = () => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [paymentMethod, setPaymentMethod] = React.useState('');
-  const navigation = useNavigation<navigationProps>();
-  const totalAmount = React.useMemo(() => {
-    return timeSlots?.reduce((total: number, item: any) => {
-      return total + item.price;
-    }, 0);
-  }, [timeSlots]);
-  const handleBookingPayment = async () => {
-    setPaymentLoading(true);
-    const response = await createBooking(
-      profile?.patientProfileId,
-      timeSlots.map((item: any) => item?.timeSlot?.timeSlotId),
-      'MOMO',
-      true,
-    );
-    setPaymentLoading(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('');
 
-    if (response.success) {
-      if (response.data?.data?.deepLink) {
-        Linking.openURL(response.data.data.deepLink);
-      } else if (response.data?.data?.paymentUrl) {
-        Linking.openURL(response.data.data.paymentUrl);
-      }
-    } else {
-      console.log('Payment failed');
-    }
-  };
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
@@ -105,7 +72,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                   }
                   paddingStart={7}
-                  label={profile?.fullName}
+                  label={'Nguyễn Thị Ánh Nguyệt'}
                   labelUppercase
                   labelStyles={{
                     fontSize: 15,
@@ -123,7 +90,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                   }
                   paddingStart={10}
-                  label={dayjs(profile?.dateOfBirth).format('DD/MM/YYYY')}
+                  label={'20/10/1999'}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -140,7 +107,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                   }
                   paddingStart={12}
-                  label={profile?.phoneNumber}
+                  label={'0987654321'}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -157,7 +124,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                   }
                   paddingStart={6}
-                  label={`${profile?.streetName}, ${profile?.ward?.wardName}, ${profile?.district?.districtName}, ${profile?.province?.provinceName}`}
+                  label={'Thành phố Bảo Lộc - Tỉnh Lâm Đồng'}
                   labelStyles={{
                     fontSize: 15,
                     fontWeight: '500',
@@ -173,94 +140,76 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   Thông tin đặt khám
                 </TextComponent>
                 <Space paddingTop={5} />
-                {timeSlots?.map((data: any, index: number) => (
-                  <View
-                    key={`time-slot-${index}`}
-                    style={{
-                      marginBottom: 16,
-                    }}>
-                    <LineInfoComponent
-                      label="Bác sĩ"
-                      value={data?.doctorName}
-                      labelStyles={{
-                        fontSize: 15,
-                        fontWeight: '400',
-                        textAlign: 'left',
-                      }}
-                      valueStyles={{
-                        fontSize: 15,
-                        fontWeight: '500',
-                        textAlign: 'right',
-                      }}
-                      labelColor={appColors.grayText}
-                    />
-                    <Space paddingTop={5} />
-                    <LineInfoComponent
-                      label="Dịch vụ khám"
-                      value="Khám dịch vụ"
-                      labelStyles={{
-                        fontSize: 15,
-                        fontWeight: '400',
-                        textAlign: 'left',
-                      }}
-                      valueStyles={{
-                        fontSize: 15,
-                        fontWeight: '500',
-                        textAlign: 'right',
-                      }}
-                      labelColor={appColors.grayText}
-                    />
-                    <Space paddingTop={5} />
-                    <LineInfoComponent
-                      label="Chuyên khoa"
-                      value={data?.departmentName}
-                      valueUppercase
-                      labelStyles={{
-                        fontSize: 15,
-                        fontWeight: '400',
-                        textAlign: 'left',
-                      }}
-                      valueStyles={{
-                        fontSize: 15,
-                        fontWeight: '500',
-                        textAlign: 'right',
-                      }}
-                      labelColor={appColors.grayText}
-                    />
-                    <Space paddingTop={5} />
-                    <LineInfoComponent
-                      label="Ngày khám"
-                      value={data?.selectedDay}
-                      labelStyles={{
-                        fontSize: 15,
-                        fontWeight: '400',
-                        textAlign: 'left',
-                      }}
-                      valueStyles={{
-                        fontSize: 15,
-                        fontWeight: '500',
-                        textAlign: 'right',
-                      }}
-                      labelColor={appColors.grayText}
-                    />
-                    <Space paddingTop={5} />
-                    <LineInfoComponent
-                      label="Giờ khám"
-                      value={getTimeSlotById(data?.timeSlot?.timeId)}
-                      labelStyles={{
-                        fontSize: 15,
-                        fontWeight: '400',
-                        textAlign: 'left',
-                      }}
-                      valueStyles={{
-                        fontSize: 15,
-                        fontWeight: '500',
-                        textAlign: 'right',
-                      }}
-                      labelColor={appColors.grayText}
-                    />
-                  </View>
-                ))}
+
+                <View
+                  style={{
+                    marginBottom: 16,
+                  }}>
+                  <LineInfoComponent
+                    label="Bác sĩ chỉ định"
+                    value={'Nguyễn Thị Như Nguyệt'}
+                    labelStyles={{
+                      fontSize: 15,
+                      fontWeight: '400',
+                      textAlign: 'left',
+                    }}
+                    valueStyles={{
+                      fontSize: 15,
+                      fontWeight: '500',
+                      textAlign: 'right',
+                    }}
+                    labelColor={appColors.grayText}
+                  />
+                  <Space paddingTop={5} />
+                  <LineInfoComponent
+                    label="Chuyên khoa"
+                    value={'Cơ - Xương - Khớp'}
+                    valueUppercase
+                    labelStyles={{
+                      fontSize: 15,
+                      fontWeight: '400',
+                      textAlign: 'left',
+                    }}
+                    valueStyles={{
+                      fontSize: 15,
+                      fontWeight: '500',
+                      textAlign: 'right',
+                    }}
+                    labelColor={appColors.grayText}
+                  />
+                  <Space paddingTop={5} />
+                  <LineInfoComponent
+                    label="Dịch vụ khám"
+                    value={'Chụp X-Quang'}
+                    labelStyles={{
+                      fontSize: 15,
+                      fontWeight: '400',
+                      textAlign: 'left',
+                    }}
+                    valueStyles={{
+                      fontSize: 15,
+                      fontWeight: '500',
+                      textAlign: 'right',
+                    }}
+                    labelColor={appColors.grayText}
+                  />
+                  <Space paddingTop={5} />
+                  <LineInfoComponent
+                    label="Loại dịch vụ"
+                    value="Khám dịch vụ"
+                    labelStyles={{
+                      fontSize: 15,
+                      fontWeight: '400',
+                      textAlign: 'left',
+                    }}
+                    valueStyles={{
+                      fontSize: 15,
+                      fontWeight: '500',
+                      textAlign: 'right',
+                    }}
+                    labelColor={appColors.grayText}
+                  />
+                </View>
               </View>
             </ScrollView>
           </View>
@@ -315,7 +264,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label="Tiền khám"
-                value={formatCurrency(totalAmount) + 'đ'}
+                value={'150.000 đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -332,8 +281,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <View style={styles.line}></View>
               <Space paddingTop={5} />
               <LineInfoComponent
-                label="Phí tiện ích + TGTT"
-                value={formatCurrency('15000') + 'đ'}
+                label="Phí TGTT"
+                value={formatCurrency('1500') + ' đ'}
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -351,10 +300,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label="Tổng tiền"
-                value={
-                  formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
-                  'đ'
-                }
+                value={'165.000đ'}
                 labelStyles={{
                   fontSize: 16,
                   fontWeight: '500',
@@ -383,16 +329,19 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                 </TextComponent>
               </View>
               <ButtonComponent
-                onPress={handleBookingPayment}
-                borderRadius={40}
+                onPress={() => {
+                  console.log('Thanh toán');
+                }}
+                backgroundColor={appColors.primaryDark}
+                borderRadius={30}
                 isLoading={paymentLoading}
                 textStyles={{
                   textTransform: 'uppercase',
                   fontWeight: '600',
                 }}
                 containerStyles={{
-                  marginTop: 20,
-                  padding: 15,
+                  marginTop: 15,
+                  paddingVertical: 10,
                 }}>
                 Thanh toán
               </ButtonComponent>
@@ -479,7 +428,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
   );
 };
 
-export default BillingInformationScreen;
+export default HospitalFeePaymentInformationScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -532,7 +481,7 @@ const styles = StyleSheet.create({
   mainBill: {
     flexDirection: 'column',
     paddingHorizontal: 35,
-    paddingVertical: 15,
+    paddingVertical: 20,
   },
   line: {
     paddingVertical: 5,
@@ -551,7 +500,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   containerModal: {
     flex: 1,

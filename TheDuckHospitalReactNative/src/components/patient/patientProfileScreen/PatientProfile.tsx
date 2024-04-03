@@ -1,14 +1,14 @@
+import {Card, Text} from '@gluestack-ui/themed';
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {Pressable, View} from 'react-native';
 import * as Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {appColors} from '../../../constants/appColors';
-import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
 import {FlexComponent, TextComponent} from '../..';
-import {Box, Card, Text} from '@gluestack-ui/themed';
-import {formatDate} from '../../../utils/dateUtils';
+import {appColors} from '../../../constants/appColors';
 import {navigationProps} from '../../../types';
+import {formatDate} from '../../../utils/dateUtils';
 
 interface RowProps {
   icon: React.ReactNode;

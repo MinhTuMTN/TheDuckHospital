@@ -1,13 +1,12 @@
+import Barcode from '@kichiyaki/react-native-barcode-generator';
+import {useNavigation} from '@react-navigation/native';
+import dayjs from 'dayjs';
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {Space, TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
-import Barcode from '@kichiyaki/react-native-barcode-generator';
-import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
-import {formatDate} from '../../../utils/dateUtils';
 import {formatCurrency} from '../../../utils/currencyUtils';
-import dayjs from 'dayjs';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 
 const DividerItem = () => {

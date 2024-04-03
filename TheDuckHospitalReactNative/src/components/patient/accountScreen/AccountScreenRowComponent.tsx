@@ -1,7 +1,7 @@
-import {View, Text, Pressable, TouchableOpacity} from 'react-native';
-import React from 'react';
-import {FlexComponent, TextComponent} from '../..';
 import {ChevronRight} from 'lucide-react-native';
+import React from 'react';
+import {TouchableOpacity, View} from 'react-native';
+import {FlexComponent, TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
 
 interface AccountScreenRowComponentProps {

@@ -1,4 +1,5 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
+import dayjs from 'dayjs';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   ActivityIndicator,
@@ -22,14 +23,12 @@ import {
   SelectComponent,
   TextComponent,
 } from '../../../components';
+import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
-import DoctorInfoComponent from '../../../components/patient/chooseDoctorsScreen/DoctorInfoComponent';
-import {getAllDepartment} from '../../../services/bookingServices';
-import dayjs from 'dayjs';
-import {t} from 'i18next';
 
 const degreeData = [
   {

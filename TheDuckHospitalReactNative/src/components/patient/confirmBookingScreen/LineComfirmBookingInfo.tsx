@@ -1,8 +1,6 @@
-import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import {TextComponent} from '../..';
-import {Image} from 'react-native-svg';
-import {Doctor} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
 
 interface LineComfirmBookingInfoProps {

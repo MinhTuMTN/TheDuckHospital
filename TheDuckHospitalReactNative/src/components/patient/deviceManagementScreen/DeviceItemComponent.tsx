@@ -1,13 +1,13 @@
-import {View, Text} from 'react-native';
-import React, {memo, useMemo} from 'react';
-import {FlexComponent, TextComponent} from '../..';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {appColors} from '../../../constants/appColors';
 import dayjs from 'dayjs';
-import {remoteLogout} from '../../../services/authServices';
+import React, {memo, useMemo} from 'react';
+import {View} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {FlexComponent, TextComponent} from '../..';
+import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
+import {remoteLogout} from '../../../services/authServices';
 
 interface DeviceItemComponentProps {
   device: any;

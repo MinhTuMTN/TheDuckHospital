@@ -1,18 +1,12 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
-} from 'react-native';
+import {ChevronRight} from 'lucide-react-native';
 import React from 'react';
-import {appColors} from '../../../constants/appColors';
-import {FlexComponent, TextComponent} from '../..';
-import LineInfoComponent from '../../LineInfoComponent';
-import {ChevronRight, Info} from 'lucide-react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {FlexComponent} from '../..';
+import {appColors} from '../../../constants/appColors';
+import LineInfoComponent from '../../LineInfoComponent';
 
 const InfoProfileItemComponent = () => {
   return (

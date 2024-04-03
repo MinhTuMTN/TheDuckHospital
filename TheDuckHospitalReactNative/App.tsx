@@ -4,7 +4,7 @@ import notifee, {EventType} from '@notifee/react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {Linking, StatusBar, View} from 'react-native';
+import {Linking, StatusBar} from 'react-native';
 import 'react-native-gesture-handler';
 import {AuthProvider} from './src/hooks/AuthProvider';
 import AxiosInterceptorProvider from './src/hooks/AxiosInterceptorProvider';
@@ -27,11 +27,14 @@ import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
+import AddProfileScreen from './src/screens/patient/AddProfileScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import DeviceManagementScreen from './src/screens/patient/DeviceManagementScreen';
 import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults/AllPatientProfilesScreen';
+import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
 import EnterProfileCode from './src/screens/patient/LookUpMedicalResults/EnterProfileCode';
+import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
 import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
 import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
@@ -40,11 +43,8 @@ import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProces
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
-import {appColors} from './src/constants/appColors';
-import AddProfileScreen from './src/screens/patient/AddProfileScreen';
-import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
-import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
+import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -197,6 +197,10 @@ const App = () => {
                 <Stack.Screen
                   name="EnterHospitalPaymentCodeScreen"
                   component={EnterHospitalPaymentCodeScreen}
+                />
+                <Stack.Screen
+                  name="HospitalFeePaymentInformationScreen"
+                  component={HospitalFeePaymentInformationScreen}
                 />
               </Stack.Navigator>
             </NavigationContainer>

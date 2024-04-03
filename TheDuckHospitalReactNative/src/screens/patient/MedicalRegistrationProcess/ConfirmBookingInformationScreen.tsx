@@ -1,27 +1,14 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
-import React, {useEffect, useMemo} from 'react';
-import {ContainerComponent, Header, TextComponent} from '../../../components';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {appColors} from '../../../constants/appColors';
-import LineComfirmBookingInfo from '../../../components/patient/confirmBookingScreen/LineComfirmBookingInfo';
-import {
-  AlarmClock,
-  Calendar7,
-  Doctor,
-  Hospital,
-  StethoscopeBlue,
-} from '../../../assets/svgs';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
-import InfoBookingComponent from '../../../components/patient/confirmBookingScreen/InfoBookingComponent';
+import React, {useEffect, useMemo} from 'react';
+import {Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {StethoscopeBlue} from '../../../assets/svgs';
+import {ContainerComponent, Header, TextComponent} from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
+import InfoBookingComponent from '../../../components/patient/confirmBookingScreen/InfoBookingComponent';
+import {appColors} from '../../../constants/appColors';
+import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 
 const ConfirmBookingInformationScreen = ({route}: {route: any}) => {

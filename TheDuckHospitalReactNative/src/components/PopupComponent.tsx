@@ -1,6 +1,5 @@
-import {View, Text, StyleSheet, Modal, Alert} from 'react-native';
 import React from 'react';
-import {appInfo} from '../constants/appInfo';
+import {Alert, Modal, StyleSheet, View} from 'react-native';
 import {TextComponent} from '.';
 
 interface PopupComponentProps {

@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
 import React, {useEffect} from 'react';
+import {ActivityIndicator, StyleProp, View, ViewStyle} from 'react-native';
 import {appColors} from '../constants/appColors';
 
 interface LoadingComponentProps {
