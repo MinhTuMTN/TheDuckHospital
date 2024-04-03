@@ -27,7 +27,7 @@ public class DoctorAdminController {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Department deleted successfully")
+                        .message("Head Doctor deleted successfully")
                         .data(doctorServices.deleteHeadDoctor(staffId))
                         .build()
         );

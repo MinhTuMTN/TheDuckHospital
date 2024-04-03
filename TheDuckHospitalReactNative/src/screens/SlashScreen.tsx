@@ -15,7 +15,8 @@ const SlashScreen = () => {
     const timeoutId = setTimeout(() => {
       reset({
         index: 0,
-        routes: [{name: 'PatientBottom'}],
+        // routes: [{name: 'PatientBottom'}],
+        routes: [{name: 'AdminLeftSideDrawer'}],
       });
     }, 1500);
 

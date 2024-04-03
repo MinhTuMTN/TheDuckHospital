@@ -47,3 +47,9 @@ export type patientProfileDataProps = {
   identityNumber: string;
   nationId: number;
 };
+
+export type paginationParamsProps = {
+  search: string;
+  page: number;
+  limit: number;
+};

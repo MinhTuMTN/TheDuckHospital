@@ -29,7 +29,9 @@ const DetailsMedicalBillComponent = (
   const navigation = useNavigation<navigationProps>();
 
   const handleClickViewDetails = () => {
-    navigation.navigate('MedicalExaminationHistoryScreen');
+    navigation.navigate('MedicalExaminationHistoryScreen', {
+      medicalRecordId: booking.medicalRecordId,
+    });
   };
 
   return (

@@ -22,6 +22,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
     private final DoctorRepository doctorRepository;
 
     private final IDoctorServices doctorServices;
+
     public StatisticsServicesImpl(IDoctorServices doctorServices,
                                   DepartmentRepository departmentRepository,
                                   BookingRepository bookingRepository,
@@ -65,19 +66,23 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         entry.getValue())).sorted((response1, response2) ->
                         Long.compare(response2.getTotalPatients(), response1.getTotalPatients())).toList();
 
-        List<DepartmentStatisticsResponse> topDepartment = departmentStatistics.stream().limit(5)
+        List<DepartmentStatisticsResponse> topDepartment = departmentStatistics.stream().limit(10)
                 .collect(Collectors.toList());
 
         // Total patients
         long totalPatients = patientRepository.count();
 
+        // Total departments
+        long totalDepartments = departmentRepository.count();
+
         // Statistics payment method
         List<PieChartItemResponse> pieChartData = new ArrayList<>();
         pieChartData.add(getPaymentMethodCount(1, "VNPay"));
         pieChartData.add(getPaymentMethodCount(2, "CASH"));
+        pieChartData.add(getPaymentMethodCount(3, "MOMO"));
 
 
-        return new TotalStatisticsResponse(topDepartment, totalPatients, pieChartData);
+        return new TotalStatisticsResponse(topDepartment, totalPatients, totalDepartments, pieChartData);
     }
 
     @Override
@@ -131,6 +136,12 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     public PieChartItemResponse getPaymentMethodCount(int id, String paymentMethod) {
         long count = transactionRepository.countByPaymentMethod(paymentMethod);
-        return new PieChartItemResponse(id, count, !Objects.equals(paymentMethod, "CASH") ? "Online" : "Tại quầy");
+        String label;
+        if (Objects.equals(paymentMethod, "MOMO")) {
+            label = "Momo";
+        } else if (Objects.equals(paymentMethod, "CASH")) {
+            label = "Tiền mặt";
+        } else label = "VNPay";
+        return new PieChartItemResponse(id, count, label);
     }
 }

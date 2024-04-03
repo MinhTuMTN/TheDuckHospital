@@ -10,7 +10,12 @@ import {ArchiveRestore} from 'lucide-react-native';
 import {useNavigation} from '@react-navigation/native';
 import DepartmentDialogComponent from './DepartmentDialogComponent';
 
-function DepartmentItemComponent() {
+interface DepartmentItemComponentProps {
+  department: any;
+}
+
+function DepartmentItemComponent(props: DepartmentItemComponentProps) {
+  const {department} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -34,9 +39,11 @@ function DepartmentItemComponent() {
       <ContainerComponent style={styles.departmentItemContainer}>
         <FlexComponent style={[styles.departmentInfoContainer, {flex: 0.5}]}>
           <TextComponent bold fontSize={21}>
-            Tai mũi họng
+            {department.departmentName}
           </TextComponent>
-          <TextComponent fontSize={16}>Lý Đại Bàng</TextComponent>
+          <TextComponent fontSize={16}>
+            {department.headDoctorName}
+          </TextComponent>
         </FlexComponent>
 
         <FlexComponent
@@ -48,13 +55,13 @@ function DepartmentItemComponent() {
             <EntypoIcon
               name="dot-single"
               size={20}
-              color={deleted ? appColors.darkRed : appColors.green}
+              color={department.deleted ? appColors.darkRed : appColors.green}
             />
             <TextComponent
               bold
               fontSize={12}
-              color={deleted ? appColors.darkRed : appColors.green}>
-              {deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+              color={department.deleted ? appColors.darkRed : appColors.green}>
+              {department.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
             </TextComponent>
           </FlexComponent>
         </FlexComponent>
@@ -76,7 +83,7 @@ function DepartmentItemComponent() {
           </Pressable>
           <Pressable onPress={toggleAlert}>
             {({pressed}) =>
-              deleted ? (
+              department.deleted ? (
                 <ArchiveRestore
                   size={24}
                   color={appColors.green}

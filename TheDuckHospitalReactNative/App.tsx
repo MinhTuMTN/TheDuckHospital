@@ -17,6 +17,7 @@ import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
 import 'react-native-gesture-handler';
 import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
+import StatisticsScreen from './src/screens/admin/StatisticsScreen/StatisticsScreen';
 import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
 import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
 import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
@@ -79,6 +80,10 @@ const App = () => {
             <Stack.Screen
               name="AdminLeftSideDrawer"
               component={AdminLeftSideDrawer}
+            />
+            <Stack.Screen
+              name="StatisticsScreen"
+              component={StatisticsScreen}
             />
             <Stack.Screen
               name="DepartmentDetailScreen"

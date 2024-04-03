@@ -25,6 +25,7 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
+import { navigationProps } from '../../../types';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -32,6 +33,7 @@ const AccountScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const auth = useAuth();
+  const {reset} = useNavigation<navigationProps>();
 
   const handleBtnLoginClick = () => {
     navigation.navigate('LoginScreen' as never);
@@ -129,6 +131,24 @@ const AccountScreen = () => {
             />
           </View>
         </SectionComponent>
+
+        {auth.userInfo.role === 'Admin' && (
+          <SectionComponent title={'Quản lý'} tilteStyle={styles.titleSection}>
+            <View style={styles.flexGap}>
+              <AccountScreenRowComponent
+                title={'Giao diện quản lý'}
+                icon={<Headset size={20} color={appColors.black} />}
+                onPress={() =>
+                  reset({
+                    index: 0,
+                    // routes: [{name: 'PatientBottom'}],
+                    routes: [{name: 'AdminLeftSideDrawer'}],
+                  })
+                }
+              />
+            </View>
+          </SectionComponent>
+        )}
 
         {isLogged && (
           <ButtonComponent

@@ -16,10 +16,15 @@ import RoomListScreen from '../screens/admin/RoomManagementScreen/RoomListScreen
 import TransactionListScreen from '../screens/admin/TransactionManagementScreen/TransactionListScreen';
 import PatientListScreen from '../screens/admin/PatientManagementScreen/PatientListScreen';
 import ServiceListScreen from '../screens/admin/ServiceManagementScreen/ServiceListScreen';
-import { ActivitySquare, Users } from 'lucide-react-native';
+import {ActivitySquare, BarChart3, LogOut, Users} from 'lucide-react-native';
 import StaffListScreen from '../screens/admin/StaffManagementScreen/StaffListScreen';
+import StatisticsScreen from '../screens/admin/StatisticsScreen/StatisticsScreen';
+import ButtonComponent from '../components/ButtonComponent';
+import {useAuth} from '../auth/AuthProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const auth = useAuth();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.logoContainer}>
@@ -30,6 +35,19 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         />
       </View>
       <DrawerItemList {...props} />
+
+      <ButtonComponent
+        backgroundColor="white"
+        borderRadius={20}
+        textColor={'#F38181'}
+        containerStyles={styles.logoutButton}
+        startIcon={<LogOut size={20} color={'#F38181'} />}
+        onPress={async () => {
+          await AsyncStorage.removeItem('token');
+          auth.logout();
+        }}>
+        Đăng xuất
+      </ButtonComponent>
     </DrawerContentScrollView>
   );
 }
@@ -39,7 +57,7 @@ const Drawer = createDrawerNavigator();
 function AdminLeftSideDrawer() {
   return (
     <Drawer.Navigator
-      initialRouteName="Quản lý thuốc"
+      initialRouteName="Thống kê"
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerLabelStyle: {...styles.drawerLabel},
@@ -47,6 +65,15 @@ function AdminLeftSideDrawer() {
         headerTintColor: appColors.white,
         headerTitleStyle: {...styles.headerTitle},
       }}>
+      <Drawer.Screen
+        name="Thống kê"
+        component={StatisticsScreen}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <BarChart3 size={24} color={color} style={styles.drawerItemIcon} />
+          ),
+        }}
+      />
       <Drawer.Screen
         name="Quản lý thuốc"
         component={MedicineListScreen}
@@ -108,11 +135,7 @@ function AdminLeftSideDrawer() {
         component={StaffListScreen}
         options={{
           drawerIcon: ({color, size}) => (
-            <Users
-              size={24}
-              color={color}
-              style={styles.drawerItemIcon}
-            />
+            <Users size={24} color={color} style={styles.drawerItemIcon} />
           ),
         }}
       />
@@ -176,6 +199,14 @@ const styles = StyleSheet.create({
   drawerHeaderIcon: {
     fontSize: 26,
     marginLeft: 20,
+  },
+  logoutButton: {
+    borderColor: '#F38181',
+    borderWidth: 1,
+    width: '50%',
+    marginHorizontal: '25%',
+    paddingVertical: 8,
+    marginTop: 24,
   },
 });
 

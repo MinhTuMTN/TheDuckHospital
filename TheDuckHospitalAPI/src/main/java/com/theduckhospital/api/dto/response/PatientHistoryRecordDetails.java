@@ -13,6 +13,7 @@ public class PatientHistoryRecordDetails {
     private Date date;
     private String doctorName;
     private String departmentName;
+    private String symptom;
     private String diagnosis;
     private List<PrescriptionItem> prescriptionItems;
     private Date reExaminationDate;
@@ -30,6 +31,7 @@ public class PatientHistoryRecordDetails {
                 .getDoctor()
                 .getDepartment()
                 .getDepartmentName();
+        this.symptom = medicalExaminationRecord.getSymptom();
         this.diagnosis = medicalExaminationRecord.getDiagnosis();
         this.prescriptionItems = medicalExaminationRecord
                 .getPrescription() == null ? null : medicalExaminationRecord
