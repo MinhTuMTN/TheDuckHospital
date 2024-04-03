@@ -45,6 +45,7 @@ import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProces
 import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
+import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -202,6 +203,7 @@ const App = () => {
                   name="HospitalFeePaymentInformationScreen"
                   component={HospitalFeePaymentInformationScreen}
                 />
+                <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
               </Stack.Navigator>
             </NavigationContainer>
           </AxiosInterceptorProvider>
