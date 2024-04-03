@@ -226,7 +226,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             Transaction transaction = getTransaction(origin, medicalTest);
             transactionRepository.save(transaction);
 
-            UUID oldTransactionId = medicalTest.getTransaction().getTransactionId();
+            UUID oldTransactionId = medicalTest.getTransaction() != null ?
+                    medicalTest.getTransaction().getTransactionId() : null;
             medicalTest.setTransaction(transaction);
             medicalTestRepository.save(medicalTest);
 
