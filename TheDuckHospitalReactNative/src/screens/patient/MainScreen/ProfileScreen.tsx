@@ -24,9 +24,9 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import LoginRequireComponent from '../../../components/LoginRequireComponent';
 import {appColors} from '../../../constants/appColors';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
+import {useSelector} from 'react-redux';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
@@ -34,16 +34,16 @@ const ProfileScreen = () => {
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const auth = useAuth();
   const navigation = useNavigation<navigationProps>();
   const isFocused = useIsFocused();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const handleEndIconHeaderPress = () => {
     setModalVisible(true);
   };
   const handleAddProfileClick = () => {
     setModalVisible(false);
-    if (auth.token) {
+    if (token) {
       navigation.navigate('AddProfileScreen');
     } else {
       navigation.navigate('LoginScreen');
@@ -64,8 +64,8 @@ const ProfileScreen = () => {
       } else console.log('Error: ', response.error);
     };
 
-    if (auth.token && isFocused) handleGetAllPatientProfile();
-  }, [auth.token, isFocused]);
+    if (token && isFocused) handleGetAllPatientProfile();
+  }, [token, isFocused]);
 
   return (
     <LoginRequireComponent>

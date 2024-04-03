@@ -20,7 +20,6 @@ import {MoreMenuComponent, TextComponent} from '../../../components';
 import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {useToast} from '../../../hooks/ToastProvider';
 import {updateDeviceInformation} from '../../../services/authServices';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
@@ -29,6 +28,8 @@ import {
   NotificationState,
   updateNotificationState,
 } from '../../../services/notificationServices';
+import {useSelector} from 'react-redux';
+import { RootState } from '../../../types';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -39,12 +40,13 @@ const HomeScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation();
   const toast = useToast();
-  const auth = useAuth();
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
   const fullName = useMemo(() => {
-    const name = auth.userInfo?.fullName?.split(' ');
+    const name = userInfo.fullName?.split(' ');
 
     return name ? `${name[name.length - 2]} ${name[name.length - 1]}` : '';
-  }, [auth.userInfo?.fullName]);
+  }, [userInfo.fullName]);
   const entries: unknown[] = [
     {
       image: require('../../../assets/images/slide_0.jpg'),
@@ -118,7 +120,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const updateDeviceInfo = async () => {
       const fcmToken = await AppNotification.requestPermission();
-      if (!fcmToken || !auth.token) {
+      if (!fcmToken || !token) {
         console.log("Can't get fcm token or token is null");
         return;
       }
@@ -139,7 +141,7 @@ const HomeScreen = () => {
     };
 
     updateDeviceInfo();
-  }, [auth.token]);
+  }, [token]);
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -182,7 +184,7 @@ const HomeScreen = () => {
                 className="w-14 h-14 rounded-full"
               />
               <View className="pl-2">
-                {fullName ? (
+                {token ? (
                   <>
                     <TextComponent color={appColors.white} fontSize={20}>
                       {t('homeScreen.hello')}{' '}

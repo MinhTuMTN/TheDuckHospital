@@ -32,10 +32,7 @@ const DetailsProfileScreen = ({route}: {route: any}) => {
     wardName: '',
   });
 
-  const navigation = useNavigation();
-  /* 2. Get the param */
   const {profile} = route.params;
-  // console.log('profile', profile);
 
   React.useEffect(() => {
     setEditProfile(profile);

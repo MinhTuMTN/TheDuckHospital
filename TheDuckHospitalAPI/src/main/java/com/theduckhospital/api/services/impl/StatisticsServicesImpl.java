@@ -46,6 +46,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Booking> bookings = bookingRepository.findAll();
 
         Map<Department, Long> bookingsPerDepartment = bookings.stream()
+                .filter(booking -> !booking.isDeleted())
                 .map(Booking::getTimeSlot)
                 .filter(Objects::nonNull)
                 .map(TimeSlot::getDoctorSchedule)
@@ -118,7 +119,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public BookingStatisticsResponse getBookingStatistics(Date startDate, Date endDate) {
-        List<Object[]> bookings = bookingRepository.countBookingsByDateRange(startDate, endDate);
+        List<Object[]> bookings = bookingRepository.countBookingsByCreatedAtBetweenAndDeletedIsFalse(startDate, endDate);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 

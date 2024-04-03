@@ -6,7 +6,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {Linking, StatusBar} from 'react-native';
 import 'react-native-gesture-handler';
-import {AuthProvider} from './src/hooks/AuthProvider';
 import AxiosInterceptorProvider from './src/hooks/AxiosInterceptorProvider';
 import ToastProvider from './src/hooks/ToastProvider';
 import linking from './src/linking';
@@ -48,9 +47,9 @@ import MedicineReminderScreen from './src/screens/patient/MedicineReminder/Medic
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 import {Provider} from 'react-redux';
-import {createStore} from 'redux';
-import rootReducer from './src/store/reducers/rootReducer';
-import HomeScreen from './src/screens/patient/MainScreen/HomeScreen';
+import store from './src/store/store';
+import {RealmProvider} from '@realm/react';
+import {User} from './src/realm/User';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,7 +64,6 @@ const App = () => {
     }
   });
 
-  const reduxStore = createStore(rootReducer);
   return (
     <GluestackUIProvider config={config}>
       <StatusBar
@@ -74,8 +72,8 @@ const App = () => {
         translucent={true}
       />
       <ToastProvider>
-        <AuthProvider>
-          <Provider store={reduxStore}>
+        <RealmProvider schema={[User]}>
+          <Provider store={store}>
             <AxiosInterceptorProvider>
               <NavigationContainer linking={linking}>
                 <Stack.Navigator
@@ -218,7 +216,7 @@ const App = () => {
               </NavigationContainer>
             </AxiosInterceptorProvider>
           </Provider>
-        </AuthProvider>
+        </RealmProvider>
       </ToastProvider>
     </GluestackUIProvider>
   );

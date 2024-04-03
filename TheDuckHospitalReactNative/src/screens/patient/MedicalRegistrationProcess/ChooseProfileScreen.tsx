@@ -1,13 +1,13 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {ActivityIndicator, FlatList} from 'react-native';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {ContainerComponent, Header, PatientProfile} from '../../../components';
 import ContentComponent from '../../../components/ContentComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
+import {useSelector} from 'react-redux';
 
 const ChooseProfileScreen = ({route}: {route: any}) => {
   const {t} = useTranslation();
@@ -15,8 +15,8 @@ const ChooseProfileScreen = ({route}: {route: any}) => {
   const [patientProfiles, setPatientProfiles] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const auth = useAuth();
   const navigation = useNavigation<navigationProps>();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const handleNavigateToBillInfoScreen = (profile: any) => {
     navigation.navigate('BillingInformationScreen', {
@@ -34,8 +34,8 @@ const ChooseProfileScreen = ({route}: {route: any}) => {
       } else console.log('Error: ', response.error);
     };
 
-    if (auth.token) handleGetAllPatientProfile();
-  }, [auth.token]);
+    if (token) handleGetAllPatientProfile();
+  }, [token]);
 
   return (
     <ContainerComponent paddingTop={0}>

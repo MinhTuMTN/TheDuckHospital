@@ -12,9 +12,10 @@ import {
 import FilterComponent from '../../../components/FilterComponent';
 import {appColors} from '../../../constants/appColors';
 import {getAllBooking} from '../../../services/bookingServices';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {useIsFocused} from '@react-navigation/native';
 import LoginRequireComponent from '../../../components/LoginRequireComponent';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../types';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
@@ -29,7 +30,7 @@ const MedicalBillScreen = () => {
   const isFocused = useIsFocused();
 
   const {t} = useTranslation();
-  const auth = useAuth();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   const _renderItem = ({item}: any) => {
     return (
@@ -46,7 +47,7 @@ const MedicalBillScreen = () => {
       setIsLoadingAPI(true);
       const response = await getAllBooking();
       setIsLoadingAPI(false);
-
+      
       if (response.success) {
         let bookingsTemp = response.data.data;
         setBookings(bookingsTemp);
@@ -78,8 +79,8 @@ const MedicalBillScreen = () => {
       }
     };
 
-    if (auth.token && isFocused) handleGetAllBooking();
-  }, [auth.token, isFocused]);
+    if (token && isFocused) handleGetAllBooking();
+  }, [token, isFocused]);
 
   useEffect(() => {
     setIsLoadingAPI(true);

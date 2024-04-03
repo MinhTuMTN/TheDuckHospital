@@ -24,7 +24,7 @@ import {useNavigation} from '@react-navigation/native';
 import {loginDataProps, navigationProps} from '../../types';
 import FormControlComponent from '../../components/FormControlComponent';
 import {loginWithPassword} from '../../services/authServices';
-import {useAuth} from '../../hooks/AuthProvider';
+import { useAuth } from '../../hooks/AuthHooks';
 
 const LoginScreen = () => {
   const [rememberMe, setRememberMe] = React.useState(['rememberMe']);
@@ -38,6 +38,7 @@ const LoginScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
+  const {reset} = useNavigation<navigationProps>();
   const auth = useAuth();
 
   const handleSignUpClick = () => {
@@ -46,6 +47,7 @@ const LoginScreen = () => {
   const handlForgotPasswordClick = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
+
   const handleLogin = async () => {
     setIsLoadingAPI(true);
     const response = await loginWithPassword(info);
@@ -54,8 +56,13 @@ const LoginScreen = () => {
     if (response.success) {
       const token = response.data.data;
 
-      await auth.login(token, rememberMe.length > 0);
-      navigation.navigate('HomeScreen');
+      await auth.login(token, true);
+      // navigation.navigate('HomeScreen');
+      reset({
+            index: 0,
+            routes: [{name: 'PatientBottom'}],
+            // routes: [{name: 'AdminLeftSideDrawer'}],
+          });
     } else {
       setIsLoadingAPI(false);
       console.log('Error', response);

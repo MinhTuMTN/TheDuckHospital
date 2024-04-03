@@ -54,15 +54,12 @@ function DepartmentListScreen() {
       )
         return;
       setIsLoadingAPI(true);
-      console.log(paginationParams);
       const response = await getPaginationDepartments(
         '',
         paginationParams.limit,
         paginationParams.page,
       );
       setIsLoadingAPI(false);
-
-      console.log(response);
 
       if (response.success) {
         if (paginationParams.page === 0) {

@@ -11,10 +11,8 @@ import {
 } from '../../components';
 import {appColors} from '../../constants/appColors';
 import {register} from '../../services/authServices';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../types';
-import {useAuth} from '../../hooks/AuthProvider';
 import {
   Toast,
   ToastDescription,
@@ -22,6 +20,7 @@ import {
   VStack,
   useToast,
 } from '@gluestack-ui/themed';
+import { useAuth } from '../../hooks/AuthHooks';
 
 const VerifyPhoneScreen = ({route}: {route: any}) => {
   const [remainingTime, setRemainingTime] = useState<number>(120);

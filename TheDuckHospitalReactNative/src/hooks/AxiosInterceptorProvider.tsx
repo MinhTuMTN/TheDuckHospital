@@ -1,16 +1,19 @@
 import {View, Text} from 'react-native';
 import React, {useEffect} from 'react';
-import {useAuth} from './AuthProvider';
+// import {useAuth} from './AuthProvider';
 import axios from 'axios';
 import axiosInstance from '../services/AxiosInstance';
 import {ignoreAxiosIntercepter} from '../services/ignoreAxiosIntercepter';
+import { useAuth } from './AuthHooks';
 
 interface AxiosInterceptorProviderProps {
   children: React.ReactNode;
 }
 
 const AxiosInterceptorProvider = (props: AxiosInterceptorProviderProps) => {
+  // const auth = useAuth();
   const auth = useAuth();
+
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.response.use(
       response => response,

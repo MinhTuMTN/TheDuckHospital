@@ -37,13 +37,21 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             UUID patientProfileId,
             String timeSlotId
     );
-    @Query("SELECT ds.date, COUNT(b.bookingId) " +
+
+//    @Query("SELECT ds.date, COUNT(b.bookingId) " +
+//            "FROM Booking b " +
+//            "JOIN b.timeSlot ds " +
+//            "WHERE ds.date BETWEEN :startDate AND :endDate " +
+//            "GROUP BY ds.date " +
+//            "ORDER BY ds.date ASC")
+//    List<Object[]> countBookingsByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT CAST(b.createdAt AS DATE), COUNT(b) " +
             "FROM Booking b " +
-            "JOIN b.timeSlot ds " +
-            "WHERE ds.date BETWEEN :startDate AND :endDate " +
-            "GROUP BY ds.date " +
-            "ORDER BY ds.date ASC")
-    List<Object[]> countBookingsByDateRange(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+            "WHERE b.createdAt BETWEEN :startDate AND :endDate AND b.deleted = false " +
+            "GROUP BY CAST(b.createdAt AS DATE) " +
+            "ORDER BY CAST(b.createdAt AS DATE) ASC")
+    List<Object[]> countBookingsByCreatedAtBetweenAndDeletedIsFalse(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     Optional<Booking> findByPatientProfileAndTimeSlot_DoctorScheduleAndDeletedIsFalse(
             PatientProfile patientProfile,

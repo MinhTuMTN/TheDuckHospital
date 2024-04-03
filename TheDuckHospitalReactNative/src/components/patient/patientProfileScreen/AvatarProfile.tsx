@@ -77,10 +77,6 @@ const AvatarProfile = (props: AvatarProfileProps) => {
       editProfile.patientProfileId,
       data,
     );
-    console.log(editProfile.patientProfileId);
-
-    console.log(response);
-    console.log(data);
 
     if (response.success) {
       navigation.navigate('ProfileScreen' as never);

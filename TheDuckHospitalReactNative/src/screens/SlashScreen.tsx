@@ -7,9 +7,32 @@ import {appInfo} from '../constants/appInfo';
 import {globalStyles} from '../styles/globalStyles';
 import {Space} from '../components';
 import {navigationProps} from '../types';
+import {checkToken} from '../services/authServices';
+import {connect, useDispatch} from 'react-redux';
+import {useRealm} from '@realm/react';
+import {setToken, setUserInfo} from '../store/authSlice';
+import {updateToken} from '../services/AxiosInstance';
+import {User} from '../realm/User';
+import { useAuth } from '../hooks/AuthHooks';
 
 const SlashScreen = () => {
+  const realm = useRealm();
+  const auth = useAuth();
+  const dispatch = useDispatch();
   const {reset} = useNavigation<navigationProps>();
+
+  useEffect(() => {
+    const getToken = () => {
+      const user = realm?.objects('User')[0];
+      if (user) {
+        dispatch(setToken(user.token as string));
+        updateToken(user.token as string);
+        auth.handleCheckToken();
+      }
+    };
+
+    getToken();
+  }, [realm]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -42,4 +65,9 @@ const SlashScreen = () => {
   );
 };
 
-export default SlashScreen;
+const mapDispatchToProps = {
+  setUserInfo,
+  setToken,
+};
+
+export default connect()(SlashScreen);

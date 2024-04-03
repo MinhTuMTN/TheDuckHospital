@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {
   Bell,
+  FolderKanban,
   Headset,
   KeyRound,
   LogOut,
@@ -12,8 +13,7 @@ import {
 } from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {useAuth} from '../../../hooks/AuthProvider';
+import {StyleSheet, View} from 'react-native';
 import {
   AccountScreenRowComponent,
   ContainerComponent,
@@ -26,7 +26,9 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
+import { useSelector } from 'react-redux';
+import { useAuth } from '../../../hooks/AuthHooks';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -34,6 +36,8 @@ const AccountScreen = () => {
   const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
   const auth = useAuth();
+  const tokenRedux = useSelector((state: RootState) => state.auth.token);
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
   const {reset} = useNavigation<navigationProps>();
 
   const handleBtnLoginClick = () => {
@@ -42,7 +46,7 @@ const AccountScreen = () => {
 
   useEffect(() => {
     const checkLogin = () => {
-      const token = auth.token;
+      const token = tokenRedux;
       if (token) {
         setIsLogged(true);
       } else {
@@ -50,7 +54,7 @@ const AccountScreen = () => {
       }
     };
     checkLogin();
-  }, [auth.token]);
+  }, [tokenRedux]);
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -67,7 +71,7 @@ const AccountScreen = () => {
         <View style={styles.avatarContainer}>
           <Avatar size="lg">
             {isLogged ? (
-              <AvatarFallbackText>{auth.userInfo.fullName}</AvatarFallbackText>
+              <AvatarFallbackText>{userInfo.fullName}</AvatarFallbackText>
             ) : (
               <AvatarImage
                 alt="avatar"
@@ -78,7 +82,7 @@ const AccountScreen = () => {
           <Space paddingBottom={8} />
           {isLogged ? (
             <TextComponent fontSize={20} fontWeight="600">
-              {auth.userInfo.fullName}
+              {userInfo.fullName}
             </TextComponent>
           ) : (
             <ButtonComponent
@@ -116,7 +120,7 @@ const AccountScreen = () => {
             />
           </View>
         </SectionComponent>
-        {auth.userInfo.role !== 'Admin' && (
+        {userInfo.role !== 'Admin' && (
           <SectionComponent
             title={t('account.contactSupport')}
             tilteStyle={styles.titleSection}>
@@ -144,15 +148,15 @@ const AccountScreen = () => {
           </SectionComponent>
         )}
 
-        {auth.userInfo.role === 'Admin' && (
+        {userInfo.role === 'Admin' && (
           <SectionComponent title={'Quản lý'} tilteStyle={styles.titleSection}>
             <View style={styles.flexGap}>
               <AccountScreenRowComponent
                 title={'Giao diện quản lý'}
-                icon={<Headset size={20} color={appColors.black} />}
+                icon={<FolderKanban size={20} color={appColors.black} />}
                 onPress={() =>
                   reset({
-                    index: 0,
+                    index: 1,
                     // routes: [{name: 'PatientBottom'}],
                     routes: [{name: 'AdminLeftSideDrawer'}],
                   })

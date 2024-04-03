@@ -1,6 +1,4 @@
 import axios from 'axios';
-import {useAuth} from '../hooks/AuthProvider';
-// import Realm from 'realm';
 
 interface ResultProps {
   success: boolean;

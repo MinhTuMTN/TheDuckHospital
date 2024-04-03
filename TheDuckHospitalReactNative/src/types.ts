@@ -1,3 +1,5 @@
+import { AuthState } from "./store/authSlice";
+
 type resetProps = {
   index: number;
   routes: [{name: string}];
@@ -71,3 +73,7 @@ export type addPatientProfileProps = {
 export type remoteLogoutDataProps = {
   logoutTokenId: string;
 };
+
+export interface RootState {
+  auth: AuthState;
+}

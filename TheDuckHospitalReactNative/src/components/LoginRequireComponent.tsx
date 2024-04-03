@@ -3,16 +3,16 @@ import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {TextComponent} from '.';
 import {appColors} from '../constants/appColors';
-import {useAuth} from '../hooks/AuthProvider';
 import {globalStyles} from '../styles/globalStyles';
-import {navigationProps} from '../types';
+import {RootState, navigationProps} from '../types';
+import { useSelector } from 'react-redux';
 
 interface LoginRequireComponentProps {
   children: React.ReactNode;
 }
 
 const LoginRequireComponent = (props: LoginRequireComponentProps) => {
-  const auth = useAuth();
+  const token = useSelector((state: RootState) => state.auth.token)
   const navigation = useNavigation<navigationProps>();
   const handleNavigateToLogin = () => {
     navigation.navigate('LoginScreen');
@@ -20,7 +20,7 @@ const LoginRequireComponent = (props: LoginRequireComponentProps) => {
   return (
     <View style={globalStyles.container}>
       {props.children}
-      {!auth.token && (
+      {!token && (
         <View style={styles.dialogWrapper}>
           <View style={styles.dialog}>
             <TextComponent

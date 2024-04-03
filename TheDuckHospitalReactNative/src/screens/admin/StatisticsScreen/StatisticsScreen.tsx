@@ -106,7 +106,6 @@ function StatisticsScreen() {
         dayjs(startDate1).format('YYYY/MM/DD'),
         dayjs(endDate1).format('YYYY/MM/DD'),
       );
-      console.log(response);
 
       if (response.success) {
         setRevenueStatistics(response.data?.data);

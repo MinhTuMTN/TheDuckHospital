@@ -20,13 +20,14 @@ import {ActivitySquare, BarChart3, LogOut, Users} from 'lucide-react-native';
 import StaffListScreen from '../screens/admin/StaffManagementScreen/StaffListScreen';
 import StatisticsScreen from '../screens/admin/StatisticsScreen/StatisticsScreen';
 import ButtonComponent from '../components/ButtonComponent';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '../hooks/AuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {useAuth} from '../hooks/AuthHooks';
+import {navigationProps} from '../types';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const auth = useAuth();
   const navigation = useNavigation();
+  const {reset} = useNavigation<navigationProps>();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.logoContainer}>
@@ -37,6 +38,25 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         />
       </View>
       <DrawerItemList {...props} />
+
+      {/* <ButtonComponent
+        backgroundColor="white"
+        borderRadius={20}
+        textColor={'#F38181'}
+        containerStyles={styles.logoutButton}
+        startIcon={<LogOut size={20} color={'#F38181'} />}
+        onPress={async () => {
+          await AsyncStorage.removeItem('token');
+          auth.logout();
+          // navigation.navigate('LoginScreen' as never);
+          // reset({
+          //   index: 0,
+          //   routes: [{name: 'PatientBottom'}],
+          //   // routes: [{name: 'AdminLeftSideDrawer'}],
+          // });
+        }}>
+        Đăng xuất
+      </ButtonComponent> */}
 
       <ButtonComponent
         backgroundColor="white"
