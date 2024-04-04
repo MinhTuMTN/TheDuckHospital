@@ -30,6 +30,7 @@ import dayjs from 'dayjs';
 import {payment} from '../../../services/payment';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
@@ -39,13 +40,20 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const {aboutPayment, medicalCodeId} = route.params;
 
   const navigation = useNavigation<navigationProps>();
+  const toast = useToast();
   const handlePayment = async () => {
+    if (paymentMethod === '') {
+      toast.showToast('Vui lòng chọn phương thức thanh toán');
+      return;
+    }
     const data = {
       medicalTestCode: medicalCodeId,
       paymentMethod: paymentMethod,
     };
 
+    setPaymentLoading(true);
     const response = await payment(data);
+    setPaymentLoading(false);
     console.log('Response: ', response.data);
 
     if (response.success) {

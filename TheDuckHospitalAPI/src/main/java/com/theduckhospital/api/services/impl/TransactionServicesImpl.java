@@ -40,14 +40,10 @@ public class TransactionServicesImpl implements ITransactionServices {
         if (account == null)
             return null;
 
-        Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
-        if (transaction == null)
-            return null;
+        //        if (!transaction.getBookings().get(0).getPatientProfile().getAccount().equals(account))
+//            return null;
 
-        if (!transaction.getBookings().get(0).getPatientProfile().getAccount().equals(account))
-            return null;
-
-        return transaction;
+        return transactionRepository.findById(transactionId).orElse(null);
     }
 
     @Override
