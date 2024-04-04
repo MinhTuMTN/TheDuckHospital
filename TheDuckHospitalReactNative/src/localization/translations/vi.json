@@ -14,7 +14,9 @@
     "quickSupport": "Hỗ trợ nhanh",
     "viewMore": "Xem thêm",
     "instructionBooking": "Hướng dẫn đặt khám",
-    "bookingViaHotline": "Đặt khám qua tổng đài 1900-1234"
+    "bookingViaHotline": "Đặt khám qua tổng đài 1900-1234",
+    "ourTeam": "Đội ngũ của chúng tôi",
+    "ourDoctor": "Các bác sĩ chuyên môn của bệnh viện"
   },
   "bottomTab": {
     "home": "Trang chủ",
@@ -96,5 +98,30 @@
     "checkAndEnterCode": "Vui lòng kiểm tra và nhập mã vào ô bên dưới.",
     "notReceive": "Bạn không nhận được mã xác thực",
     "resendCode": "Gửi lại mã xác thực"
+  },
+  "chooseDoctorForBooking": {
+    "title": "Chọn bác sĩ",
+    "placeHolderSearch": "Tìm bác sĩ theo tên",
+    "filter": "Bộ lọc",
+    "academicRanks": "Học hàm/vị",
+    "departmentInFilter": "Chuyên khoa",
+    "placeHolderSearchDepartment": "Tìm kiếm chuyên khoa",
+    "department": "Chuyên khoa:",
+    "date": "Ngày khám:",
+    "gender": "Giới tính:",
+    "fee": "Phí khám:"
+  },
+
+  "chooseDate": {
+    "title": "Chọn ngày khám",
+    "note": "Vui lòng chọn ngày khám phù hợp với lịch trình của bạn. Chúng tôi hỗ trợ đặt lịch khám trước từ",
+    "noteDate": "1 đến 30.",
+    "toDay": "Hôm nay",
+    "outOfSlot": "Kín chỗ",
+    "freeSlot": "Còn trống",
+    "chooseTime": "chọn giờ khám",
+    "close": "Huỷ",
+    "morning": "Buổi sáng",
+    "afternoon": "Buổi chiều"
   }
 }

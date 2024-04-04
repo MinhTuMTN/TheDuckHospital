@@ -7,14 +7,16 @@
     "makeAppointmentNoNewLine": "Make an appointment",
     "lookupMedicalResult": "Lookup medical result",
     "lookupMedicalResultNoNewLine": "Lookup medical result",
-    "payHospitalFee": "Pay hospital fee",
+    "payHospitalFee": "Hospital payment fee",
     "payHospitalFeeNoNewLine": "Pay hospital fee",
     "medicineReminder": "Medicine reminder",
     "medicineReminderNoNewLine": "Medicine reminder",
     "quickSupport": "Quick support",
     "viewMore": "View more",
     "instructionBooking": "Instruction for booking",
-    "bookingViaHotline": "Book an examination via hotline 1900-1234"
+    "bookingViaHotline": "Book an examination via hotline 1900-1234",
+    "ourTeam": "Our hospital team",
+    "ourDoctor": "Our hospital's specialist doctors"
   },
   "bottomTab": {
     "home": "Home",
@@ -91,5 +93,29 @@
     "checkAndEnterCode": "Please check and enter the code in the box below.",
     "notReceive": "Didn't receive the verification code?",
     "resendCode": "Resend code"
+  },
+  "chooseDoctorForBooking": {
+    "title": "Choose Doctor",
+    "placeHolderSearch": "Search for a doctor by name",
+    "filter": "Filter",
+    "academicRanks": "Academic Ranks",
+    "departmentInFilter": "Departments",
+    "department": "Department:",
+    "placeHolderSearchDepartment": "Search for a department",
+    "date": "Schedule:",
+    "gender": "Gender:",
+    "fee": "Fee:"
+  },
+  "chooseDate": {
+    "title": "Choose Date",
+    "note": "Please choose an examination date that fits your schedule. We support booking appointments in advance",
+    "noteDate": " from 1st to 30th",
+    "toDay": "Today",
+    "outOfSlot": "Out of slot",
+    "freeSlot": "Free slots",
+    "chooseTime": "Choose examination time",
+    "close": "Close",
+    "morning": "Morning",
+    "afternoon": "Afternoon"
   }
 }
