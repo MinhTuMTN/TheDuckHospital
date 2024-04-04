@@ -29,6 +29,7 @@ import {appInfo} from '../../../constants/appInfo';
 import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
+import {useTranslation} from 'react-i18next';
 
 const degreeData = [
   {
@@ -68,7 +69,7 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
   const [searchText, setSearchText] = React.useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
-
+  const {t} = useTranslation();
   // Animation Filter
   const offsetValue = useSharedValue(-100);
   const displayValue = useSharedValue<'none' | 'flex' | undefined>('none');
@@ -248,14 +249,14 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
             color={appColors.black}
             textAlign="center"
             uppercase>
-            Chọn bác sĩ
+            {t('chooseDoctorForBooking.title')}
           </TextComponent>
           <Filter width={30} height={30} onPress={handleFilterClick} />
         </View>
         <Animated.View style={[styles.bodyHeard, animatedStyles]}>
           <InputComponent
             variant="rounded"
-            placeholder="Tìm kiếm bác sĩ"
+            placeholder={t('chooseDoctorForBooking.placeHolderSearch')}
             placeholderTextColor={'#A0A0A0'}
             startIcon={<Icon name="search" size={20} color={'#A0A0A0'} />}
             _inputContainerStyle={{
@@ -270,7 +271,9 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
           <View style={styles.filter}>
             <View style={styles.box}>
               <Filter width={18} height={18} />
-              <Text style={{fontSize: 14, color: appColors.black}}>Bộ lọc</Text>
+              <Text style={{fontSize: 14, color: appColors.black}}>
+                {t('chooseDoctorForBooking.filter')}
+              </Text>
             </View>
             <SelectComponent
               options={degreeData}
@@ -291,8 +294,8 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
               marginRight={8}
               selectIconColor={appColors.white}
               selectTextColor={appColors.white}
-              title="Họ hàm/Học vị"
-              placeholder="Học hàm/vị"
+              title={t('chooseDoctorForBooking.academicRanks')}
+              placeholder={t('chooseDoctorForBooking.academicRanks')}
               placeholderColor={appColors.white}
               selectTextSize={14}
             />
@@ -317,9 +320,11 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
               flex={undefined}
               selectIconColor={appColors.white}
               selectTextColor={appColors.white}
-              title="Chuyên khoa"
-              placeholder="Chuyên khoa"
-              placeholderSearch="Tìm kiếm chuyên khoa"
+              title={t('chooseDoctorForBooking.departmentInFilter')}
+              placeholder={t('chooseDoctorForBooking.departmentInFilter')}
+              placeholderSearch={t(
+                'chooseDoctorForBooking.placeHolderSearchDepartment',
+              )}
               enableSearch
               placeholderColor={appColors.white}
               selectTextSize={14}

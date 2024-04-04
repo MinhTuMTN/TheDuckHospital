@@ -8,6 +8,7 @@ import {appColors} from '../../../constants/appColors';
 import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
+import {useTranslation} from 'react-i18next';
 
 interface DoctorInfoComponentProps {
   item: any;
@@ -16,6 +17,7 @@ interface DoctorInfoComponentProps {
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
   const {item} = props;
+  const {t} = useTranslation();
   const [dayOfWeek, setDayOfWeek] = React.useState('');
   const navigation = useNavigation<navigationProps>();
 
@@ -82,7 +84,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             startIcon={
               <Stethoscope width={20} height={20} style={{marginRight: 8}} />
             }
-            label="Chuyên khoa:"
+            label={t('chooseDoctorForBooking.department')}
             labelColor={'#8F8F8F'}
             value={item.department.departmentName}
             valueColor={'#4F4F4F'}
@@ -98,7 +100,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             startIcon={
               <Calendar width={20} height={20} style={{marginRight: 8}} />
             }
-            label="Ngày khám:"
+            label={t('chooseDoctorForBooking.date')}
             labelColor={'#8F8F8F'}
             value={dayOfWeek}
             valueColor={'#4F4F4F'}
@@ -109,7 +111,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             startIcon={
               <Gender width={20} height={20} style={{marginRight: 8}} />
             }
-            label="Giới tính:"
+            label={t('chooseDoctorForBooking.gender')}
             labelColor={'#8F8F8F'}
             value={item.gender == 'MALE' ? 'Nam' : 'Nữ'}
             valueColor={'#4F4F4F'}
@@ -120,7 +122,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             startIcon={
               <CashInHand width={20} height={20} style={{marginRight: 8}} />
             }
-            label="Phí khám:"
+            label={t('chooseDoctorForBooking.fee')}
             labelColor={'#8F8F8F'}
             value={formatCurrency(item.price) + ' đ'}
             valueColor={'#00A3E7'}

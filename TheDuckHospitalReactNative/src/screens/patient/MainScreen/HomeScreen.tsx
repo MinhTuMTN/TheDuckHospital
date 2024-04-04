@@ -330,17 +330,21 @@ const HomeScreen = () => {
           <TextComponent
             fontSize={12}
             bold
-            style={{paddingTop: 25}}
+            style={{paddingTop: 25, letterSpacing: 0.5}}
             color={appColors.grayLight}>
-            ĐỘI NGŨ CỦA CHÚNG TÔI
+            {t('homeScreen.ourTeam')}
           </TextComponent>
           <TextComponent
-            fontSize={16}
+            fontSize={18}
             bold
-            style={{paddingTop: 8}}
+            style={{
+              paddingTop: 2,
+              letterSpacing: 0.5,
+              textTransform: 'capitalize',
+            }}
             color={appColors.black}
             uppercase>
-            Các bác sĩ chuyên môn của bệnh viện
+            {t('homeScreen.ourDoctor')}
           </TextComponent>
           <View style={styles.listDoctor}>
             <FlatList
