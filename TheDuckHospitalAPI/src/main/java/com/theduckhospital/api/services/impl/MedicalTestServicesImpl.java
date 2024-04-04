@@ -263,6 +263,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode() == 0 ? 400 : e.getErrorCode());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BadRequestException("Error when pay medical test", 400);
         }
     }

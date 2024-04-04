@@ -54,14 +54,22 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
     setPaymentLoading(true);
     const response = await payment(data);
     setPaymentLoading(false);
-    console.log('Response: ', response.data);
+    console.log('Response: ', response);
 
     if (response.success) {
-      console.log('Success: ', response.data.data.deepLink);
+      console.log('Deeplink: ', response.data.data.deepLink);
+      console.log('URL: ', response.data.data.paymentUrl);
 
-      Linking.openURL(response.data.data.deepLink);
+      if (paymentMethod === 'MOMO')
+        Linking.openURL(response.data.data.deepLink);
+      else {
+        navigation.navigate('HomeScreen');
+        Linking.openURL(response.data.data.paymentUrl);
+      }
     } else {
-      console.log('Error: ', response.error);
+      console.log(response.error);
+
+      toast.showToast(response.error);
     }
   };
   return (
@@ -446,7 +454,7 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
               <Pressable
                 style={styles.option}
                 onPress={() => {
-                  setPaymentMethod('VNPay');
+                  setPaymentMethod('VNPAY');
                   setModalVisible(false);
                 }}>
                 <Image
