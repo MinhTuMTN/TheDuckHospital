@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Nationalized;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -43,10 +44,16 @@ public class Account {
     private Date createdAt;
     private Date lastModifiedAt;
 
+    private BigDecimal balance;
+    private String walletPin;
+    private boolean walletLocked;
+
     @PrePersist
     private void onCreate() {
         this.createdAt = new Date();
         this.lastModifiedAt = new Date();
+        this.balance = null;
+        this.walletLocked = true;
     }
 
     @PreUpdate

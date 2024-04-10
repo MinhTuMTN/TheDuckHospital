@@ -40,6 +40,7 @@
   "account": {
     "generalSettings": "Cài đặt chung",
     "language": "Ngôn ngữ",
+    "changeLanguage": "Thay đổi ngôn ngữ",
     "changePassword": "Đổi mật khẩu",
     "deviceManagement": "Quản lý thiết bị",
     "notificationSettings": "Cài đặt thông báo",
@@ -47,7 +48,9 @@
     "hotline": "Tổng đài 1900-1234",
     "ratingApp": "Đánh giá ứng dụng",
     "shareApp": "Chia sẻ ứng dụng",
-    "signOut": "Đăng xuất"
+    "signOut": "Đăng xuất",
+    "signIn": "Đăng nhập",
+    "myWallet": "My Wallet"
   },
   "notFoundScreen": {
     "title": "Trang không tồn tại",

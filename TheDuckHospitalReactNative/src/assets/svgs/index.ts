@@ -20,6 +20,10 @@ import Trash from './Trash.svg';
 import Eye from './Eye.svg';
 import HideEye from './HideEye.svg';
 import QRScan from './QRScan.svg';
+import TopUp from './TopUp.svg';
+import Secure from './Secure.svg';
+import Clipboard from './Clipboard.svg';
+import Bookmark from './Bookmark.svg';
 
 export {
   English,
@@ -44,4 +48,8 @@ export {
   Eye,
   HideEye,
   QRScan,
+  TopUp,
+  Secure,
+  Clipboard,
+  Bookmark,
 };

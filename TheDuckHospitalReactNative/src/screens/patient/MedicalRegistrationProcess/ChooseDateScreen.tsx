@@ -268,7 +268,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                 {i18n.language === 'vi'
                   ? `Ngày ${selectedDay.get('D')} tháng ${
                       selectedDay.get('M') + 1
-                    } năm{' '}
+                    } năm 
                 ${selectedDay.get('year')}`
                   : `${selectedDay.format('MMMM')} ${selectedDay.get(
                       'D',
