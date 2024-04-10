@@ -26,6 +26,7 @@ interface InputComponentProps {
   inputContainerStyle?: StyleProp<ViewStyle>;
   inputContainerFocusStyle?: StyleProp<ViewStyle>;
   _inputStyle?: StyleProp<TextStyle>;
+  labelContainerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
   inputFocusStyle?: StyleProp<TextStyle>;
   type?: 'text' | 'password';
@@ -77,6 +78,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     },
     _inputStyle,
     inputStyle,
+    labelContainerStyle,
     inputFocusStyle,
     type = 'text',
     placeholder,
@@ -113,9 +115,11 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
   return (
     <View style={containerStyle}>
       {label && (
-        <TextComponent color={appColors.textDescription} style={labelStyle}>
-          {label}
-        </TextComponent>
+        <View style={labelContainerStyle}>
+          <TextComponent color={appColors.textDescription} style={labelStyle}>
+            {label}
+          </TextComponent>
+        </View>
       )}
       <Input
         isDisabled={disabled}

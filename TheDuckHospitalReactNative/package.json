@@ -29,6 +29,7 @@
     "@reduxjs/toolkit": "^2.2.1",
     "@types/react-native-snap-carousel": "^3.8.10",
     "axios": "^1.6.7",
+    "axios-retry": "^4.1.0",
     "dayjs": "^1.11.10",
     "deprecated-react-native-prop-types": "^5.0.0",
     "i18next": "^23.8.2",

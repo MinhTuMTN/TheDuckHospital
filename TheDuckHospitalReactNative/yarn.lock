@@ -4226,6 +4226,13 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.6.tgz"
   integrity sha512-j1QzY8iPNPG4o4xmO3ptzpRxTciqD3MgEHtifP/YnJpIo58Xu+ne4BejlbkuaLfXn/nz6HFiw29bLpj2PNMdGg==
 
+axios-retry@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/axios-retry/-/axios-retry-4.1.0.tgz#aac5a9657213913048201152ef14090f7111608f"
+  integrity sha512-svdth4H00yhlsjBbjfLQ/sMLkXqeLxhiFC1nE1JtkN/CIssGxqk0UwTEdrVjwA2gr3yJkAulwvDSIm4z4HyPvg==
+  dependencies:
+    is-retry-allowed "^2.2.0"
+
 axios@^1.6.7:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.7.tgz#7b48c2e27c96f9c68a2f8f31e2ab19f59b06b0a7"
@@ -6604,6 +6611,11 @@ is-regex@^1.1.4:
   dependencies:
     call-bind "^1.0.2"
     has-tostringtag "^1.0.0"
+
+is-retry-allowed@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/is-retry-allowed/-/is-retry-allowed-2.2.0.tgz#88f34cbd236e043e71b6932d09b0c65fb7b4d71d"
+  integrity sha512-XVm7LOeLpTW4jV19QSH38vkswxoLud8sQ57YwJVTPWdiaI9I8keEhGFpBlslyVsgdQy4Opg8QOLb8YRgsyZiQg==
 
 is-set@^2.0.1:
   version "2.0.2"

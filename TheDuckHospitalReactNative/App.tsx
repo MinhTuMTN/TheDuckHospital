@@ -47,6 +47,7 @@ import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterH
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
 import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
+import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -206,6 +207,10 @@ const App = () => {
                 />
                 <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
                 <Stack.Screen name="WalletScreen" component={WalletScreen} />
+                <Stack.Screen
+                  name="OpenWalletScreen"
+                  component={OpenWalletScreen}
+                />
               </Stack.Navigator>
             </NavigationContainer>
           </AxiosInterceptorProvider>

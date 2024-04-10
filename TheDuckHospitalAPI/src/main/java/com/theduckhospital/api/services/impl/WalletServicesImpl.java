@@ -34,6 +34,10 @@ public class WalletServicesImpl implements IWalletServices {
             throw new BadRequestException("Pin code and re-pin code must be the same", 10112);
 
         Account account = accountServices.findAccountByToken(authorization);
+
+        if (!account.isWalletLocked())
+            throw new BadRequestException("Wallet is already opened", 10113);
+        
         account.setWalletPin(passwordEncoder.encode(request.getPinCode()));
         account.setBalance(BigDecimal.ZERO);
         account.setWalletLocked(false);

@@ -20,11 +20,14 @@ const TheDuckWallet = () => {
   const navigation = useNavigation<navigationProps>();
 
   const handleWalletClick = () => {
+    console.log(userInfo.haveWallet);
+
     if (!userInfo.haveWallet) setModalVisible(true);
     else navigation.navigate('WalletScreen');
   };
   const handleOpenWallet = () => {
-    navigation.navigate('WalletScreen');
+    setModalVisible(false);
+    navigation.navigate('OpenWalletScreen');
   };
   const handleModalClose = () => {
     setModalVisible(false);
