@@ -47,6 +47,7 @@ public class Account {
     private BigDecimal balance;
     private String walletPin;
     private boolean walletLocked;
+    private byte walletPinCount;
 
     @PrePersist
     private void onCreate() {
@@ -54,6 +55,7 @@ public class Account {
         this.lastModifiedAt = new Date();
         this.balance = null;
         this.walletLocked = true;
+        this.walletPinCount = 0;
     }
 
     @PreUpdate
@@ -75,6 +77,11 @@ public class Account {
     @JsonBackReference
     @ToStringExclude
     private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "account")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Transaction> transactions;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staffId", referencedColumnName = "staffId")

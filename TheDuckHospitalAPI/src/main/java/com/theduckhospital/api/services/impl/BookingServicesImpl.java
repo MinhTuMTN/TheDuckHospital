@@ -121,6 +121,7 @@ public class BookingServicesImpl implements IBookingServices {
             transaction.setAmount(totalAmount + MomoConfig.fee);
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);
+            transaction.setAccount(patientProfile.getAccount());
             transactionRepository.save(transaction);
 
             for (TimeSlot timeSlot : timeSlots) {
@@ -354,6 +355,8 @@ public class BookingServicesImpl implements IBookingServices {
         Transaction transaction = new Transaction();
         transaction.setAmount(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
         transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setPaymentType(PaymentType.BOOKING);
+        transaction.setAccount(patientProfile.getAccount());
         transaction.setBankCode(null);
         transaction.setPaymentMethod("CASH");
         transactionRepository.save(transaction);

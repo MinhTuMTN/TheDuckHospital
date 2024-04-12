@@ -1,9 +1,11 @@
 package com.theduckhospital.api.controller.patient;
 
+import com.theduckhospital.api.dto.request.CheckWalletCodeRequest;
 import com.theduckhospital.api.dto.request.OpenWalletRequest;
 import com.theduckhospital.api.dto.request.TopUpWalletRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IWalletServices;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,13 +24,18 @@ public class WalletController {
     @PostMapping("/top-up")
     public ResponseEntity<?> topUpWallet(
             @RequestHeader("Authorization") String authorization,
-            @RequestBody @Valid TopUpWalletRequest topUpWalletRequest
+            @RequestBody @Valid TopUpWalletRequest topUpWalletRequest,
+            HttpServletRequest request
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .statusCode(200)
                 .message("Create payment url to top up wallet successfully")
-                .data(walletServices.topUpWallet(authorization, topUpWalletRequest))
+                .data(walletServices.topUpWallet(
+                        authorization,
+                        topUpWalletRequest,
+                        request.getHeader("origin")
+                ))
                 .build()
         );
     }
@@ -43,6 +50,25 @@ public class WalletController {
                 .statusCode(200)
                 .message("Create payment url to top up wallet successfully")
                 .data(walletServices.openWallet(authorization, openWalletRequest))
+                .build()
+        );
+    }
+
+    @PostMapping("/check-wallet-code")
+    public ResponseEntity<?> checkWalletCode(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody CheckWalletCodeRequest checkWalletCodeRequest
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Check wallet code successfully")
+                .data(walletServices
+                        .checkWalletCode(
+                                authorization,
+                                checkWalletCodeRequest.getPinCode()
+                        )
+                )
                 .build()
         );
     }

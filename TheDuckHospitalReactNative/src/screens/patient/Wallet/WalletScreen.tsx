@@ -1,87 +1,97 @@
-import {Image, View} from 'react-native';
+import {Banknote, Eye, EyeOff, ScanLine} from 'lucide-react-native';
 import React from 'react';
+import {Image, Pressable, StyleSheet, View} from 'react-native';
 import {ContainerComponent, Space, TextComponent} from '../../../components';
 import LoginRequireComponent from '../../../components/LoginRequireComponent';
-import {StyleSheet} from 'react-native';
+import RequestPinCodeComponent from '../../../components/patient/walletScreen/RequestPinCodeComponent';
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
-import {TopUp} from '../../../assets/svgs';
-import {Banknote, Eye, EyeOff, ScanLine} from 'lucide-react-native';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 const WalletScreen = () => {
   const [showBalance, setShowBalance] = React.useState(false);
+  const navigation = useNavigation<navigationProps>();
+
+  const handleNavigateToTopUp = () => {
+    navigation.navigate('TopUpScreen');
+  };
   return (
     <LoginRequireComponent>
-      <ContainerComponent>
-        <View style={styles.card}>
-          <View style={styles.headerCard}>
-            <Image
-              source={require('../../../assets/images/avatar-meo.jpg')}
-              style={styles.image}
-            />
-            <View>
-              <TextComponent style={styles.title} color={appColors.white}>
-                Xin chào
-              </TextComponent>
-              <TextComponent color={appColors.white} fontWeight="500">
-                Nguyễn Hạ Băng
-              </TextComponent>
+      <RequestPinCodeComponent>
+        <ContainerComponent>
+          <View style={styles.card}>
+            <View style={styles.headerCard}>
+              <Image
+                source={require('../../../assets/images/avatar-meo.jpg')}
+                style={styles.image}
+              />
+              <View>
+                <TextComponent style={styles.title} color={appColors.white}>
+                  Xin chào
+                </TextComponent>
+                <TextComponent color={appColors.white} fontWeight="500">
+                  Nguyễn Hạ Băng
+                </TextComponent>
+              </View>
             </View>
-          </View>
-          <View style={styles.currentBalance}>
-            <TextComponent color={appColors.white}>
-              Số dư hiện tại
+            <View style={styles.currentBalance}>
+              <TextComponent color={appColors.white}>
+                Số dư hiện tại
+              </TextComponent>
+              {showBalance ? (
+                <EyeOff
+                  size={18}
+                  fontWeight={400}
+                  color={appColors.white}
+                  onPress={() => setShowBalance(false)}
+                />
+              ) : (
+                <Eye
+                  size={18}
+                  fontWeight={400}
+                  color={appColors.white}
+                  onPress={() => setShowBalance(true)}
+                />
+              )}
+            </View>
+            <TextComponent
+              style={[
+                styles.balance,
+                {
+                  letterSpacing: showBalance ? 0 : 4,
+                },
+              ]}>
+              {showBalance ? formatCurrency('777777') + ' VND' : '*******'}
             </TextComponent>
-            {showBalance ? (
-              <EyeOff
-                size={18}
-                fontWeight={400}
-                color={appColors.white}
-                onPress={() => setShowBalance(false)}
-              />
-            ) : (
-              <Eye
-                size={18}
-                fontWeight={400}
-                color={appColors.white}
-                onPress={() => setShowBalance(true)}
-              />
-            )}
-          </View>
-          <TextComponent
-            style={[
-              styles.balance,
-              {
-                letterSpacing: showBalance ? 0 : 4,
-              },
-            ]}>
-            {showBalance ? formatCurrency('777777') + ' VND' : '*******'}
-          </TextComponent>
-          <Space paddingTop={8} />
-          <View style={styles.funcWrapper}>
-            <View style={styles.func}>
-              <View style={styles.funcItem}>
-                <Banknote size={28} color={appColors.white} />
-                <TextComponent
-                  fontSize={15}
-                  fontWeight="400"
-                  color={appColors.white}>
-                  Nạp tiền
-                </TextComponent>
-              </View>
-              <View style={styles.funcItem}>
-                <ScanLine size={22} color={appColors.white} />
-                <TextComponent
-                  fontSize={15}
-                  fontWeight="400"
-                  color={appColors.white}>
-                  Quét mã QR
-                </TextComponent>
+            <Space paddingTop={8} />
+            <View style={styles.funcWrapper}>
+              <View style={styles.func}>
+                <Pressable
+                  onPress={handleNavigateToTopUp}
+                  style={styles.funcItem}>
+                  <Banknote size={28} color={appColors.white} />
+                  <TextComponent
+                    fontSize={15}
+                    fontWeight="400"
+                    color={appColors.white}>
+                    Nạp tiền
+                  </TextComponent>
+                </Pressable>
+                <View style={styles.funcItem}>
+                  <ScanLine size={22} color={appColors.white} />
+                  <TextComponent
+                    fontSize={15}
+                    fontWeight="400"
+                    color={appColors.white}>
+                    Quét mã QR
+                  </TextComponent>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ContainerComponent>
+        </ContainerComponent>
+      </RequestPinCodeComponent>
     </LoginRequireComponent>
   );
 };

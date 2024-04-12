@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class TopUpWalletRequest {
+    private String pinCode;
     private double amount;
     private PaymentMethod paymentMethod;
 }

@@ -36,6 +36,7 @@ public interface IMedicalTestServices {
             String medicalTestCode
     );
     PaymentResponse patientPayMedicalTest(
+            String token,
             PayMedicalTestRequest request,
             String origin
     );

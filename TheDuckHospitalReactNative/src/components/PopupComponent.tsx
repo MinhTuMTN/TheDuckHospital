@@ -1,19 +1,17 @@
 // Create Popup Component use Modal
 import React from 'react';
 import {
-  View,
-  Text,
   Modal,
-  TouchableOpacity,
   Pressable,
-  StyleSheet,
   StyleProp,
+  StyleSheet,
   TextStyle,
+  View,
 } from 'react-native';
-import {appColors} from '../constants/appColors';
-import {Space, TextComponent} from '.';
-import {globalStyles} from '../styles/globalStyles';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {Space, TextComponent} from '.';
+import {appColors} from '../constants/appColors';
+import {globalStyles} from '../styles/globalStyles';
 
 interface PopupComponentProps {
   visible: boolean;
