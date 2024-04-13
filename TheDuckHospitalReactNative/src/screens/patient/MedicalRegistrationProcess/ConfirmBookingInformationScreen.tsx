@@ -10,11 +10,12 @@ import InfoBookingComponent from '../../../components/patient/confirmBookingScre
 import {appColors} from '../../../constants/appColors';
 import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
+import {useTranslation} from 'react-i18next';
 
 const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
   const {timeSlots} = route.params;
   const [timeSlotsState, setTimeSlotsState] = React.useState(timeSlots || []);
-
+  const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
   const totalAmount = useMemo(() => {
     return timeSlotsState.reduce((total: number, item: any) => {
@@ -39,7 +40,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
         <Header
-          title="Xác nhận thông tin"
+          title={t('confirmBookingInformationInBooking.title')}
           paddingStart={26}
           noBackground
           titleColor={appColors.textDarker}
@@ -49,7 +50,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
           <View style={styles.bodyContainer}>
             <View style={styles.bodyHeader}>
               <TextComponent fontSize={13} fontWeight="500">
-                Chuyên khoa đã chọn{' '}
+                {t('confirmBookingInformationInBooking.departmentHaveChoosen')}
                 <TextComponent fontSize={13} fontWeight="700">
                   (3)
                 </TextComponent>
@@ -66,7 +67,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
                   fontSize={13}
                   fontWeight="500"
                   color={appColors.error}>
-                  Xoá hểt
+                  {t('confirmBookingInformationInBooking.deletedAll')}
                 </TextComponent>
                 <AntDesign
                   name="close"
@@ -101,7 +102,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
               alignItems: 'center',
             }}>
             <TextComponent fontSize={17} fontWeight="500">
-              Tổng tiền tạm tính:{' '}
+              {t('confirmBookingInformationInBooking.temporaryTolal')}
             </TextComponent>
             <TextComponent
               fontSize={17}
@@ -128,7 +129,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
                   backgroundColor: appColors.white,
                 },
               ]}>
-              Thêm chuyên khoa
+              {t('confirmBookingInformationInBooking.addMoreDepartments')}
             </ButtonComponent>
           )}
           <TouchableOpacity
@@ -143,7 +144,7 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
               fontSize={17}
               fontWeight="700"
               color={appColors.white}>
-              Xác nhận
+              {t('confirmBookingInformationInBooking.confirm')}
             </TextComponent>
           </TouchableOpacity>
         </View>

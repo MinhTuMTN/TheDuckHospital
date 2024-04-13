@@ -117,5 +117,41 @@
     "close": "Close",
     "morning": "Morning",
     "afternoon": "Afternoon"
+  },
+  "chooseProfile": {
+    "title": "Choose Patient Profile"
+  },
+  "confirmBookingInformationInBooking": {
+    "title": "Confirm Booking Information",
+    "departmentHaveChoosen": "Departments have been choosen",
+    "deletedAll": "Deleted all",
+    "department": "Department:",
+    "doctor": "Doctor:",
+    "date": "Date:",
+    "time": "Time:",
+    "fee": "Fee:",
+    "temporaryTolal": "Temporary total:",
+    "addMoreDepartments": "Add more departments",
+    "confirm": "Confirm"
+  },
+  "billingInformation": {
+    "title": "Billing Information",
+    "note": "Please check the information again before paying",
+    "patientInformation": "Patient Information",
+    "bookingInformation": "Booking Information",
+    "doctor": "Doctor",
+    "typeOfService": "Type of service",
+    "serviceExamination": "Service examination",
+    "department": "Department",
+    "date": "Date",
+    "time": "Time",
+    "fee": "Examination fee",
+    "choosePaymentMethod": "Choose payment method",
+    "momoE-wallet": "Momo E-wallet",
+    "vnpayE-wallet": "Vnpay E-wallet",
+    "otherFee": "Utility fee + PTF",
+    "total": "Total",
+    "confirmNote": "I agree to the Convenience Fee TheDuck Hospital provides to book examinations and pay hospital fees, this is not a mandatory service by the medical facility.",
+    "payment": "Payment confirmation"
   }
 }

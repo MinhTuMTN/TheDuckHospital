@@ -12,6 +12,7 @@ import {formatCurrency} from '../../../utils/currencyUtils';
 import {formatDate} from '../../../utils/dateUtils';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 import LineComfirmBookingInfo from './LineComfirmBookingInfo';
+import {useTranslation} from 'react-i18next';
 
 interface InfoBookingComponentProps {
   item: any;
@@ -20,32 +21,32 @@ interface InfoBookingComponentProps {
 
 const InfoBookingComponent = (props: InfoBookingComponentProps) => {
   const {item, onDelete} = props;
-
+  const {t} = useTranslation();
   return (
     <View style={styles.container}>
       <LineComfirmBookingInfo
-        label="Chuyên khoa:"
+        label={t('confirmBookingInformationInBooking.department')}
         value={item?.departmentName}
         isDepartment
         image={<Hospital />}
       />
       <LineComfirmBookingInfo
-        label="Bác sĩ:"
+        label={t('confirmBookingInformationInBooking.doctor')}
         value={item?.doctorName}
         image={<Doctor />}
       />
       <LineComfirmBookingInfo
-        label="Ngày khám:"
+        label={t('confirmBookingInformationInBooking.date')}
         value={formatDate(item?.timeSlot?.date)}
         image={<Calendar7 />}
       />
       <LineComfirmBookingInfo
-        label="Giờ khám:"
+        label={t('confirmBookingInformationInBooking.time')}
         value={getTimeSlotById(item?.timeSlot?.timeId)}
         image={<AlarmClock />}
       />
       <LineComfirmBookingInfo
-        label="Phí khám:"
+        label={t('confirmBookingInformationInBooking.fee')}
         value={formatCurrency(item?.price) + 'đ'}
         image={<Hospital />}
       />

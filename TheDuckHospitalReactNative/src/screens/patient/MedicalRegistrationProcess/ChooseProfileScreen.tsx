@@ -40,7 +40,7 @@ const ChooseProfileScreen = ({route}: {route: any}) => {
   return (
     <ContainerComponent paddingTop={0}>
       <Header
-        title="Chọn hồ sơ bệnh nhân"
+        title={t('chooseProfile.title')}
         paddingStart={26}
         noBackground
         titleColor={appColors.textDarker}
