@@ -42,6 +42,11 @@ public class Transaction {
     @ToStringExclude
     private MedicalTest medicalTest;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Account account;
+
     private PaymentType paymentType;
 
     @PrePersist

@@ -37,6 +37,7 @@
   "account": {
     "generalSettings": "General Settings",
     "language": "Language",
+    "changeLanguage": "Change Language",
     "changePassword": "Change Password",
     "deviceManagement": "Device Management",
     "notificationSettings": "Notification Settings",
@@ -44,7 +45,9 @@
     "hotline": "Hotline 1900-1234",
     "ratingApp": "Rating App",
     "shareApp": "Share App",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "myWallet": "My Wallet"
   },
   "notification": {
     "title": "Notification"

@@ -26,6 +26,7 @@ interface InputComponentProps {
   inputContainerStyle?: StyleProp<ViewStyle>;
   inputContainerFocusStyle?: StyleProp<ViewStyle>;
   _inputStyle?: StyleProp<TextStyle>;
+  labelContainerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
   inputFocusStyle?: StyleProp<TextStyle>;
   type?: 'text' | 'password';
@@ -53,6 +54,7 @@ interface InputComponentProps {
   autoFocus?: boolean;
   onSubmitEditing?: () => void;
   onEndIconPress?: () => void;
+  errorMessageStyles?: StyleProp<TextStyle>;
 }
 
 const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
@@ -77,6 +79,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     },
     _inputStyle,
     inputStyle,
+    labelContainerStyle,
     inputFocusStyle,
     type = 'text',
     placeholder,
@@ -100,6 +103,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     maxLength,
     onSubmitEditing,
     onEndIconPress,
+    errorMessageStyles,
   } = props;
 
   const [isFocus, setIsFocus] = React.useState(false);
@@ -113,9 +117,11 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
   return (
     <View style={containerStyle}>
       {label && (
-        <TextComponent color={appColors.textDescription} style={labelStyle}>
-          {label}
-        </TextComponent>
+        <View style={labelContainerStyle}>
+          <TextComponent color={appColors.textDescription} style={labelStyle}>
+            {label}
+          </TextComponent>
+        </View>
       )}
       <Input
         isDisabled={disabled}
@@ -180,9 +186,12 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
         <TextComponent
           color={appColors.error}
           fontSize={12}
-          style={{
-            paddingLeft: 5,
-          }}>
+          style={[
+            {
+              paddingLeft: 5,
+            },
+            errorMessageStyles,
+          ]}>
           {errorMessage}
         </TextComponent>
       )}

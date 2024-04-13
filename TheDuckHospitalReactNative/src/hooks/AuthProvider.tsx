@@ -9,7 +9,10 @@ interface AuthContextProps {
   userInfo: {
     fullName: string | null;
     role: string | null;
+    balance: number;
+    haveWallet: boolean;
   };
+  handleCheckToken: () => Promise<void>;
   login: (token: string, rememberMe: boolean) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -20,7 +23,10 @@ const AuthContext = createContext<AuthContextProps>({
   userInfo: {
     fullName: null,
     role: null,
+    balance: 0,
+    haveWallet: false,
   },
+  handleCheckToken: async () => {},
   login: async () => {},
   logout: async () => {},
 });
@@ -42,6 +48,8 @@ const UserSchema: Realm.ObjectSchema = {
     rememberMe: 'bool?',
     fullName: 'string?',
     role: 'string?',
+    balance: 'int?',
+    havaWallet: 'bool?',
   },
 };
 
@@ -61,6 +69,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [userInfo, setUserInfo] = useState<any>({
     fullName: null,
     role: null,
+    balance: 0,
+    haveWallet: false,
   });
   const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
 
@@ -74,9 +84,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           user.role = response.data.data.role;
           user.fullName = response.data.data.fullName;
 
+          if (response.data.data.balance !== null) {
+            console.log('Have wallet: ');
+
+            user.balance = response.data.data.balance;
+            user.havaWallet = true;
+          } else {
+            console.log('Not Have wallet: ');
+            user.havaWallet = false;
+            user.balance = 0;
+          }
+
           setUserInfo({
             fullName: response.data.data.fullName,
             role: response.data.data.role,
+            balance: response.data.data.balance || 0,
+            haveWallet: response.data.data.balance != null ? true : false,
           });
         }
       });
@@ -163,6 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const value = {
     token,
     userInfo,
+    handleCheckToken,
     login,
     logout,
   };

@@ -1,6 +1,5 @@
 import axios from 'axios';
-import {useAuth} from '../hooks/AuthProvider';
-// import Realm from 'realm';
+import axiosRetry from 'axios-retry';
 
 interface ResultProps {
   success: boolean;
@@ -16,16 +15,12 @@ const axiosInstance = axios.create({
   timeout: 3000,
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': '69420',
-    // Authorization: "Bearer " + Realm.Sync.User.current?.accessToken,
   },
 });
 
 export const updateToken = (token: string) => {
   axiosInstance.defaults.headers['Authorization'] = 'Bearer ' + token;
 };
-
-export const logout = () => {};
 
 const handleRequest = async (
   requestMethod: any,
@@ -41,8 +36,6 @@ const handleRequest = async (
     error: null,
     statusCode: 200,
   };
-
-  logout();
 
   if (timeout) {
     axiosInstance.defaults.timeout = timeout;
@@ -70,6 +63,25 @@ const handleRequest = async (
     result.data = response.data;
     result.statusCode = requestMethod.status;
   } catch (error: any) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.log('Axios has response error');
+
+      console.log(error.response.data);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+    } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      console.log('Axios has request error');
+      console.log(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', error.message);
+    }
+
     result.error = error.message;
     result.statusCode = error.response?.status;
     if (error.response) {

@@ -9,6 +9,7 @@ import {
   MonitorSmartphone,
   Share2,
   Star,
+  WalletMinimal,
 } from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -27,6 +28,7 @@ import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import {appColors} from '../../../constants/appColors';
 import {navigationProps} from '../../../types';
+import TheDuckWallet from '../../../components/patient/accountScreen/TheDuckWallet';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -88,10 +90,18 @@ const AccountScreen = () => {
                 paddingVertical: 8,
                 borderRadius: 20,
               }}>
-              Đăng nhập
+              {t('account.signIn')}
             </ButtonComponent>
           )}
         </View>
+
+        <SectionComponent
+          title={t('account.myWallet')}
+          tilteStyle={styles.titleSection}>
+          <View style={styles.flexGap}>
+            <TheDuckWallet />
+          </View>
+        </SectionComponent>
 
         <SectionComponent
           title={t('account.generalSettings')}

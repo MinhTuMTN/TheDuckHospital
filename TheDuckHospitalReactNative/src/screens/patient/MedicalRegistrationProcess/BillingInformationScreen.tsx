@@ -37,8 +37,10 @@ const BillingInformationScreen = ({route}: {route: any}) => {
 
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [paymentMethod, setPaymentMethod] = React.useState('');
   const {t} = useTranslation();
+  const [paymentMethod, setPaymentMethod] = React.useState<
+    'MOMO' | 'VNPAY' | ''
+  >('MOMO');
   const navigation = useNavigation<navigationProps>();
   const totalAmount = React.useMemo(() => {
     return timeSlots?.reduce((total: number, item: any) => {
@@ -50,7 +52,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
     const response = await createBooking(
       profile?.patientProfileId,
       timeSlots.map((item: any) => item?.timeSlot?.timeSlotId),
-      'MOMO',
+      paymentMethod,
       true,
     );
     setPaymentLoading(false);
@@ -59,6 +61,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
       if (response.data?.data?.deepLink) {
         Linking.openURL(response.data.data.deepLink);
       } else if (response.data?.data?.paymentUrl) {
+        navigation.navigate('HomeScreen');
         Linking.openURL(response.data.data.paymentUrl);
       }
     } else {
@@ -183,6 +186,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     }}>
                     <LineInfoComponent
                       label={t('billingInformation.doctor')}
+                      valueTextAlign="right"
                       value={data?.doctorName}
                       labelStyles={{
                         fontSize: 15,
@@ -200,6 +204,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     <LineInfoComponent
                       label={t('billingInformation.typeOfService')}
                       value={t('billingInformation.serviceExamination')}
+                      valueTextAlign="right"
                       labelStyles={{
                         fontSize: 15,
                         fontWeight: '400',
@@ -215,6 +220,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     <Space paddingTop={5} />
                     <LineInfoComponent
                       label={t('billingInformation.department')}
+                      valueTextAlign="right"
                       value={data?.departmentName}
                       valueUppercase
                       labelStyles={{
@@ -232,6 +238,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     <Space paddingTop={5} />
                     <LineInfoComponent
                       label={t('billingInformation.date')}
+                      valueTextAlign="right"
                       value={data?.selectedDay}
                       labelStyles={{
                         fontSize: 15,
@@ -248,6 +255,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     <Space paddingTop={5} />
                     <LineInfoComponent
                       label={t('billingInformation.time')}
+                      valueTextAlign="right"
                       value={getTimeSlotById(data?.timeSlot?.timeId)}
                       labelStyles={{
                         fontSize: 15,
@@ -317,6 +325,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 label={t('billingInformation.fee')}
+                valueTextAlign="right"
                 value={formatCurrency(totalAmount) + 'đ'}
                 labelStyles={{
                   fontSize: 15,
@@ -335,6 +344,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label={t('billingInformation.otherFee')}
+                valueTextAlign="right"
                 value={formatCurrency('15000') + 'đ'}
                 labelStyles={{
                   fontSize: 15,
@@ -353,6 +363,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label={t('billingInformation.total')}
+                valueTextAlign="right"
                 value={
                   formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
                   'đ'
@@ -456,7 +467,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <Pressable
                 style={styles.option}
                 onPress={() => {
-                  setPaymentMethod('VNPay');
+                  setPaymentMethod('VNPAY');
                   setModalVisible(false);
                 }}>
                 <Image

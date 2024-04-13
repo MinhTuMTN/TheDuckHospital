@@ -19,7 +19,7 @@ export const getAllDepartment = async () => {
 export const createBooking = async (
   patientProfileId: string,
   timeSlotIds: string[],
-  paymentMethod: 'MOMO' | 'VNPAY',
+  paymentMethod: 'MOMO' | 'VNPAY' | '',
   mobile: boolean = true,
 ) => {
   return post('/booking', {

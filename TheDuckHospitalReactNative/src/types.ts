@@ -1,6 +1,7 @@
+type Route = {name: string};
 type resetProps = {
   index: number;
-  routes: [{name: string}];
+  routes: Route[];
 };
 
 export type navigationProps = {
@@ -71,4 +72,15 @@ export type addPatientProfileProps = {
 
 export type remoteLogoutDataProps = {
   logoutTokenId: string;
+};
+
+export type openWalletDataProps = {
+  pinCode: string;
+  rePinCode: string;
+};
+
+export type topUpWalletDataProps = {
+  pinCode: string;
+  amount: number;
+  paymentMethod: 'MOMO' | 'VNPAY' | '';
 };
