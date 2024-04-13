@@ -10,11 +10,14 @@ import {navigationProps} from '../../../types';
 import {getPaymentDetails} from '../../../services/payment';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import dayjs from 'dayjs';
+import {useAuth} from '../../../hooks/AuthProvider';
 
 const SuccessScreen = ({route}: {route: any}) => {
   const [transaction, setTransaction] = useState<any>({});
   const navigation = useNavigation<navigationProps>();
   const params = route.params;
+
+  const auth = useAuth();
 
   const navigateToHome = () => {
     navigation.navigate('HomeScreen');
@@ -44,6 +47,7 @@ const SuccessScreen = ({route}: {route: any}) => {
       if (response.success) {
         setTransaction(response.data.data);
         console.log(response.data.data);
+        await auth.handleCheckToken();
       }
     };
     handleGetPaymentDetails();

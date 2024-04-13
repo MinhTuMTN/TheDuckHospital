@@ -1,4 +1,4 @@
-import {openWalletDataProps} from '../types';
+import {openWalletDataProps, topUpWalletDataProps} from '../types';
 import {post} from './AxiosInstance';
 
 export const openWallet = async (data: openWalletDataProps) => {
@@ -7,4 +7,8 @@ export const openWallet = async (data: openWalletDataProps) => {
 
 export const checkPinCode = async (pinCode: string) => {
   return post(`/wallet/check-wallet-code`, {pinCode});
+};
+
+export const topUpWallet = async (data: topUpWalletDataProps) => {
+  return post(`/wallet/top-up`, data);
 };

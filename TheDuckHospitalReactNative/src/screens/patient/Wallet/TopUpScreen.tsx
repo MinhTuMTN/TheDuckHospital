@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 import {
   Image,
+  Linking,
   Modal,
   Pressable,
   StyleSheet,
@@ -24,10 +25,14 @@ import {appColors} from '../../../constants/appColors';
 import {useAuth} from '../../../hooks/AuthProvider';
 import {useToast} from '../../../hooks/ToastProvider';
 import {formatCurrency} from '../../../utils/currencyUtils';
+import LoadingComponent from '../../../components/LoadingComponent';
+import {topUpWallet} from '../../../services/walletServices';
 
 const TopUpScreen = () => {
   const [amount, setAmount] = React.useState(0);
-  const [paymentMethod, setPaymentMethod] = React.useState('');
+  const [paymentMethod, setPaymentMethod] = React.useState<
+    'MOMO' | 'VNPAY' | ''
+  >('');
   const [modalVisible, setModalVisible] = React.useState(false);
   const [pinCodeVisible, setPinCodeVisible] = React.useState(false);
 
@@ -71,286 +76,319 @@ const TopUpScreen = () => {
     setPinCodeVisible(false);
   }, []);
 
-  const handlePinCodeSuccess = useCallback(() => {
-    setPinCodeVisible(false);
-  }, []);
+  const handleOnPinCodeSuccess = useCallback(
+    async (pinCode: string) => {
+      setPinCodeVisible(false);
+
+      console.log(paymentMethod);
+
+      const response = await topUpWallet({
+        pinCode,
+        amount,
+        paymentMethod,
+      });
+
+      if (!response.success) {
+        toast.showToast('Nạp tiền thất bại. Vui lòng thử lại sau');
+        return;
+      }
+
+      const data = response.data.data;
+      if (data.deepLink) {
+        Linking.openURL(data.deepLink);
+        return;
+      } else {
+        Linking.openURL(data.paymentUrl);
+        return;
+      }
+    },
+    [toast, amount, paymentMethod],
+  );
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title="Nạp tiền vào ví"
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-        backgroundColor={'#f8f8f8'}
-      />
-      <FlexComponent
-        style={{backgroundColor: '#f8f8f8', flex: 1}}
-        justifyContent="space-between">
-        <View style={{paddingTop: 15, paddingHorizontal: 15}}>
-          <View style={styles.container}>
-            <FlexComponent
-              style={{marginBottom: 16}}
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between">
-              <TextComponent fontWeight="400" fontSize={18}>
-                Số dư ví
-              </TextComponent>
-              <TextComponent fontWeight="500" fontSize={24}>
-                {formatCurrency(auth.userInfo.balance.toString())} VNĐ
-              </TextComponent>
-            </FlexComponent>
-            <InputComponent
-              placeholder="Nhập số tiền"
-              value={
-                !amount || amount === 0 ? '' : formatCurrency(amount.toString())
-              }
-              onChangeText={text => {
-                setAmount(parseInt(text.replace(/\D/g, '')));
-              }}
-              _inputContainerStyle={{
-                height: 60,
-              }}
-              _inputStyle={{
-                fontSize: 24,
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-              }}
-              keyboardType="number-pad"
-              error={amount === 0 || !amount || amount > 5000000}
-              errorMessage={
-                amount > 5000000
-                  ? 'Số tiền không được vượt quá 5.000.000 VNĐ'
-                  : 'Số tiền không được để trống'
-              }
-              errorMessageStyles={{fontSize: 14}}
-            />
-          </View>
-
-          <View style={styles.container}>
-            <TextComponent fontWeight="500" fontSize={20}>
-              Chọn nhanh số tiền
-            </TextComponent>
-            <FlexComponent
-              direction="row"
-              style={{
-                flexWrap: 'wrap',
-                columnGap: 6,
-                rowGap: 6,
-                marginTop: 12,
-              }}>
-              {quickButton}
-            </FlexComponent>
-          </View>
-        </View>
-
-        <View style={[styles.bill]}>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={styles.headerBill}>
-            {paymentMethod === '' ? (
-              <>
-                <TextComponent
-                  color={appColors.primaryLable}
-                  fontWeight="600"
-                  fontSize={20}>
-                  Chọn phương thức thanh toán
+    <LoadingComponent styles={{flex: 1}}>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title="Nạp tiền vào ví"
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
+          backgroundColor={'#f8f8f8'}
+        />
+        <FlexComponent
+          style={{backgroundColor: '#f8f8f8', flex: 1}}
+          justifyContent="space-between">
+          <View style={{paddingTop: 15, paddingHorizontal: 15}}>
+            <View style={styles.container}>
+              <FlexComponent
+                style={{marginBottom: 16}}
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between">
+                <TextComponent fontWeight="400" fontSize={18}>
+                  Số dư ví
                 </TextComponent>
-              </>
-            ) : paymentMethod === 'MOMO' ? (
-              <View style={styles.isChoose}>
+                <TextComponent fontWeight="500" fontSize={24}>
+                  {formatCurrency(auth.userInfo.balance.toString())} VNĐ
+                </TextComponent>
+              </FlexComponent>
+              <InputComponent
+                placeholder="Nhập số tiền"
+                value={
+                  !amount || amount === 0
+                    ? ''
+                    : formatCurrency(amount.toString())
+                }
+                onChangeText={text => {
+                  setAmount(parseInt(text.replace(/\D/g, '')));
+                }}
+                _inputContainerStyle={{
+                  height: 60,
+                }}
+                _inputStyle={{
+                  fontSize: 24,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                }}
+                keyboardType="number-pad"
+                error={amount === 0 || !amount || amount > 5000000}
+                errorMessage={
+                  amount > 5000000
+                    ? 'Số tiền không được vượt quá 5.000.000 VNĐ'
+                    : 'Số tiền không được để trống'
+                }
+                errorMessageStyles={{fontSize: 14}}
+              />
+            </View>
+
+            <View style={styles.container}>
+              <TextComponent fontWeight="500" fontSize={20}>
+                Chọn nhanh số tiền
+              </TextComponent>
+              <FlexComponent
+                direction="row"
+                style={{
+                  flexWrap: 'wrap',
+                  columnGap: 6,
+                  rowGap: 6,
+                  marginTop: 12,
+                }}>
+                {quickButton}
+              </FlexComponent>
+            </View>
+          </View>
+
+          <View style={[styles.bill]}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.headerBill}>
+              {paymentMethod === '' ? (
+                <>
+                  <TextComponent
+                    color={appColors.primaryLable}
+                    fontWeight="600"
+                    fontSize={20}>
+                    Chọn phương thức thanh toán
+                  </TextComponent>
+                </>
+              ) : paymentMethod === 'MOMO' ? (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/MoMo_Logo.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử Momo
+                  </TextComponent>
+                </View>
+              ) : (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/VNPay.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    Ví điện tử VNPay
+                  </TextComponent>
+                </View>
+              )}
+              <MaterialIcons
+                name="navigate-next"
+                size={30}
+                color={appColors.primary}
+              />
+            </TouchableOpacity>
+            <View style={styles.mainBill}>
+              <LineInfoComponent
+                valueTextAlign="right"
+                label="Tiền khám"
+                value={
+                  amount > 0 ? formatCurrency(amount.toString()) + 'đ' : '0đ'
+                }
+                labelStyles={{
+                  fontSize: 15,
+                  fontWeight: '400',
+                  textAlign: 'left',
+                }}
+                valueStyles={{
+                  fontSize: 15,
+                  fontWeight: '500',
+                  textAlign: 'right',
+                }}
+                labelColor={appColors.grayText}
+                valueColor={appColors.grayText}
+              />
+              <View style={styles.line}></View>
+              <Space paddingTop={5} />
+              <LineInfoComponent
+                valueTextAlign="right"
+                label="Phí giao dịch"
+                value={amount > 0 ? formatCurrency('1500') + 'đ' : '0đ'}
+                labelStyles={{
+                  fontSize: 15,
+                  fontWeight: '400',
+                  textAlign: 'left',
+                }}
+                valueStyles={{
+                  fontSize: 15,
+                  fontWeight: '500',
+                  textAlign: 'right',
+                }}
+                labelColor={appColors.grayText}
+                valueColor={appColors.grayText}
+              />
+              <View style={styles.line}></View>
+              <Space paddingTop={5} />
+              <LineInfoComponent
+                valueTextAlign="right"
+                label="Tổng tiền"
+                value={
+                  amount > 0
+                    ? formatCurrency((amount + 1500).toString()) + 'đ'
+                    : '0đ'
+                }
+                labelStyles={{
+                  fontSize: 16,
+                  fontWeight: '500',
+                  textAlign: 'left',
+                }}
+                valueStyles={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  textAlign: 'right',
+                }}
+                labelColor={appColors.grayText}
+                valueColor={'red'}
+              />
+              <ButtonComponent
+                onPress={handlePayment}
+                enabled={amount > 0}
+                borderRadius={40}
+                textStyles={{
+                  textTransform: 'uppercase',
+                  fontWeight: '600',
+                }}
+                containerStyles={{
+                  marginTop: 20,
+                  padding: 15,
+                }}>
+                Thanh toán
+              </ButtonComponent>
+            </View>
+          </View>
+        </FlexComponent>
+
+        <Modal
+          onRequestClose={() => setModalVisible(false)}
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <View style={styles.containerModal}>
+            <View style={styles.modalView}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  borderBottomColor: appColors.grayLine,
+                  borderBottomWidth: 1,
+                  paddingBottom: 10,
+                }}>
+                <TextComponent
+                  color={appColors.black}
+                  fontWeight="600"
+                  fontSize={18}>
+                  Chọn Phương Thức Thanh Toán
+                </TextComponent>
+                <Pressable onPress={() => setModalVisible(false)}>
+                  <AntDesign
+                    name="close"
+                    size={22}
+                    color={appColors.grayLight}
+                  />
+                </Pressable>
+              </View>
+              <Pressable
+                style={[
+                  styles.option,
+                  {
+                    borderBottomColor: appColors.grayLine,
+                    borderBottomWidth: 1,
+                  },
+                ]}
+                onPress={() => {
+                  setPaymentMethod('MOMO');
+                  setModalVisible(false);
+                }}>
                 <Image
                   source={require('../../../assets/images/MoMo_Logo.png')}
                   style={{width: 30, height: 30}}
                 />
                 <TextComponent
-                  fontWeight="500"
-                  fontSize={17}
+                  fontWeight="400"
+                  fontSize={16}
                   color={appColors.black}
                   style={{marginLeft: 10, letterSpacing: 0.2}}>
                   Ví điện tử Momo
                 </TextComponent>
-              </View>
-            ) : (
-              <View style={styles.isChoose}>
+              </Pressable>
+              <Pressable
+                style={styles.option}
+                onPress={() => {
+                  setPaymentMethod('VNPAY');
+                  setModalVisible(false);
+                }}>
                 <Image
                   source={require('../../../assets/images/VNPay.png')}
                   style={{width: 30, height: 30}}
                 />
                 <TextComponent
-                  fontWeight="500"
-                  fontSize={17}
+                  fontWeight="400"
+                  fontSize={16}
                   color={appColors.black}
                   style={{marginLeft: 10, letterSpacing: 0.2}}>
                   Ví điện tử VNPay
                 </TextComponent>
-              </View>
-            )}
-            <MaterialIcons
-              name="navigate-next"
-              size={30}
-              color={appColors.primary}
-            />
-          </TouchableOpacity>
-          <View style={styles.mainBill}>
-            <LineInfoComponent
-              valueTextAlign="right"
-              label="Tiền khám"
-              value={
-                amount > 0 ? formatCurrency(amount.toString()) + 'đ' : '0đ'
-              }
-              labelStyles={{
-                fontSize: 15,
-                fontWeight: '400',
-                textAlign: 'left',
-              }}
-              valueStyles={{
-                fontSize: 15,
-                fontWeight: '500',
-                textAlign: 'right',
-              }}
-              labelColor={appColors.grayText}
-              valueColor={appColors.grayText}
-            />
-            <View style={styles.line}></View>
-            <Space paddingTop={5} />
-            <LineInfoComponent
-              valueTextAlign="right"
-              label="Phí giao dịch"
-              value={amount > 0 ? formatCurrency('1500') + 'đ' : '0đ'}
-              labelStyles={{
-                fontSize: 15,
-                fontWeight: '400',
-                textAlign: 'left',
-              }}
-              valueStyles={{
-                fontSize: 15,
-                fontWeight: '500',
-                textAlign: 'right',
-              }}
-              labelColor={appColors.grayText}
-              valueColor={appColors.grayText}
-            />
-            <View style={styles.line}></View>
-            <Space paddingTop={5} />
-            <LineInfoComponent
-              valueTextAlign="right"
-              label="Tổng tiền"
-              value={
-                amount > 0
-                  ? formatCurrency((amount + 1500).toString()) + 'đ'
-                  : '0đ'
-              }
-              labelStyles={{
-                fontSize: 16,
-                fontWeight: '500',
-                textAlign: 'left',
-              }}
-              valueStyles={{
-                fontSize: 16,
-                fontWeight: '700',
-                textAlign: 'right',
-              }}
-              labelColor={appColors.grayText}
-              valueColor={'red'}
-            />
-            <ButtonComponent
-              onPress={handlePayment}
-              enabled={amount > 0}
-              borderRadius={40}
-              textStyles={{
-                textTransform: 'uppercase',
-                fontWeight: '600',
-              }}
-              containerStyles={{
-                marginTop: 20,
-                padding: 15,
-              }}>
-              Thanh toán
-            </ButtonComponent>
-          </View>
-        </View>
-      </FlexComponent>
-
-      <Modal
-        onRequestClose={() => setModalVisible(false)}
-        statusBarTranslucent
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}>
-        <View style={styles.containerModal}>
-          <View style={styles.modalView}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                borderBottomColor: appColors.grayLine,
-                borderBottomWidth: 1,
-                paddingBottom: 10,
-              }}>
-              <TextComponent
-                color={appColors.black}
-                fontWeight="600"
-                fontSize={18}>
-                Chọn Phương Thức Thanh Toán
-              </TextComponent>
-              <Pressable onPress={() => setModalVisible(false)}>
-                <AntDesign name="close" size={22} color={appColors.grayLight} />
               </Pressable>
             </View>
-            <Pressable
-              style={[
-                styles.option,
-                {
-                  borderBottomColor: appColors.grayLine,
-                  borderBottomWidth: 1,
-                },
-              ]}
-              onPress={() => {
-                setPaymentMethod('MOMO');
-                setModalVisible(false);
-              }}>
-              <Image
-                source={require('../../../assets/images/MoMo_Logo.png')}
-                style={{width: 30, height: 30}}
-              />
-              <TextComponent
-                fontWeight="400"
-                fontSize={16}
-                color={appColors.black}
-                style={{marginLeft: 10, letterSpacing: 0.2}}>
-                Ví điện tử Momo
-              </TextComponent>
-            </Pressable>
-            <Pressable
-              style={styles.option}
-              onPress={() => {
-                setPaymentMethod('VNPAY');
-                setModalVisible(false);
-              }}>
-              <Image
-                source={require('../../../assets/images/VNPay.png')}
-                style={{width: 30, height: 30}}
-              />
-              <TextComponent
-                fontWeight="400"
-                fontSize={16}
-                color={appColors.black}
-                style={{marginLeft: 10, letterSpacing: 0.2}}>
-                Ví điện tử VNPay
-              </TextComponent>
-            </Pressable>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      <RequestPinCodeComponent
-        visible={pinCodeVisible}
-        onClosed={handlePinCodeClosed}
-        onSucess={handlePinCodeSuccess}
-      />
-    </ContainerComponent>
+        <RequestPinCodeComponent
+          visible={pinCodeVisible}
+          onClosed={handlePinCodeClosed}
+          onSucess={handleOnPinCodeSuccess}
+        />
+      </ContainerComponent>
+    </LoadingComponent>
   );
 };
 

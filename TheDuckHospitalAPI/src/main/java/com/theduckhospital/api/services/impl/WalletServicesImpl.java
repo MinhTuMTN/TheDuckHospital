@@ -42,7 +42,7 @@ public class WalletServicesImpl implements IWalletServices {
             Account account = accountServices.findAccountByToken(authorization);
 
             // Check wallet is available and pin code is correct
-            if (checkWalletCode(account, request.getPinCode()))
+            if (!checkWalletCode(account, request.getPinCode()))
                 throw new BadRequestException("Pin code isn't correct", 10014);
 
             // Check amount is positive

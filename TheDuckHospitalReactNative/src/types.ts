@@ -78,3 +78,9 @@ export type openWalletDataProps = {
   pinCode: string;
   rePinCode: string;
 };
+
+export type topUpWalletDataProps = {
+  pinCode: string;
+  amount: number;
+  paymentMethod: 'MOMO' | 'VNPAY' | '';
+};

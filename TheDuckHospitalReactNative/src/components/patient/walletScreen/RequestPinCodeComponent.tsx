@@ -10,7 +10,7 @@ import PopupComponent from '../../PopupComponent';
 
 interface RequestPinCodeComponentProps {
   visible?: boolean;
-  onSucess?: () => void;
+  onSucess?: (pinCode: string) => Promise<void>;
   onClosed?: () => void;
   children?: React.ReactNode;
 }
@@ -55,7 +55,7 @@ const RequestPinCodeComponent = (props: RequestPinCodeComponentProps) => {
       }
 
       if (onSucess) {
-        onSucess();
+        await onSucess(pinCode);
       } else {
         setModalVisible(false);
       }
