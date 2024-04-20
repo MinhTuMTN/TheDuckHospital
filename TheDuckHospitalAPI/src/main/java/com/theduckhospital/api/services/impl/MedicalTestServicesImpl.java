@@ -270,6 +270,11 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
     }
 
+    @Override
+    public List<MedicalService> patientGetMedicalTests() {
+        return medicalServiceServices.doctorGetAllMedicalTests();
+    }
+
     @NotNull
     private Transaction getTransaction(String token, String origin, MedicalTest medicalTest) {
         Account account = accountServices.findAccountByToken(token);
