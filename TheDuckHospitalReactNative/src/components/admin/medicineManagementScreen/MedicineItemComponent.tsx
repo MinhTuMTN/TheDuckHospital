@@ -8,11 +8,41 @@ import {globalStyles} from '../../../styles/globalStyles';
 import MedicineDialogComponent from './MedicineDialogComponent';
 import MedicineAlertDialogComponent from './MedicineAlertDialogComponent';
 import {ArchiveRestore} from 'lucide-react-native';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
-function MedicineItemComponent() {
+const medicineUnit = [
+  {
+    value: 'TUBE',
+    label: 'Tuýp',
+  },
+  {
+    value: 'BOTTLE',
+    label: 'Chai',
+  },
+  {
+    value: 'BOX',
+    label: 'Hộp',
+  },
+  {
+    value: 'BAG',
+    label: 'Túi',
+  },
+  {
+    value: 'CAPSULE',
+    label: 'Viên',
+  },
+];
+
+interface MedicineItemComponentProps {
+  medicine: any;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
+}
+
+function MedicineItemComponent(props: MedicineItemComponentProps) {
+  const {medicine, refreshList, setRefreshList} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [deleted, setDeleted] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -24,32 +54,36 @@ function MedicineItemComponent() {
 
   return (
     <ContainerComponent style={styles.medicineItemContainer}>
-      <FlexComponent style={[styles.medicineInfoContainer, {flex: 0.5}]}>
+      <FlexComponent style={[styles.medicineInfoContainer, {flex: 0.4}]}>
         <TextComponent bold fontSize={21}>
-          Paracetamol
+          {medicine.medicineName}
         </TextComponent>
-        <TextComponent fontSize={16}>x1000 viên</TextComponent>
+        <TextComponent fontSize={16}>
+          {`x${medicine.quantity} ${
+            medicineUnit.find(unit => unit.value === medicine.unit)?.label
+          }`}
+        </TextComponent>
       </FlexComponent>
 
       <FlexComponent
         style={[
           styles.medicineInfoContainer,
-          {alignItems: 'flex-end', flex: 0.3},
+          {alignItems: 'flex-end', flex: 0.4},
         ]}>
         <TextComponent bold fontSize={18}>
-          2.000 VNĐ
+          {`${formatCurrency(medicine.price)} VNĐ`}
         </TextComponent>
         <FlexComponent style={styles.statusContainer}>
           <EntypoIcon
             name="dot-single"
             size={20}
-            color={deleted ? appColors.darkRed : appColors.green}
+            color={medicine.deleted ? appColors.darkRed : appColors.green}
           />
           <TextComponent
             bold
             fontSize={12}
-            color={deleted ? appColors.darkRed : appColors.green}>
-            {deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+            color={medicine.deleted ? appColors.darkRed : appColors.green}>
+            {medicine.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>
@@ -71,7 +105,7 @@ function MedicineItemComponent() {
         </Pressable>
         <Pressable onPress={toggleAlert}>
           {({pressed}) =>
-            deleted ? (
+            medicine.deleted ? (
               <ArchiveRestore
                 size={24}
                 color={appColors.green}
@@ -91,14 +125,19 @@ function MedicineItemComponent() {
 
       <MedicineDialogComponent
         edit
+        medicine={medicine}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
       />
       <MedicineAlertDialogComponent
         setShowAlertDialog={setShowAlertDialog}
         showAlertDialog={showAlertDialog}
-        deleted={deleted}
-        setDeleted={setDeleted}
+        deleted={medicine.deleted}
+        medicineId={medicine.medicineId}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
       />
     </ContainerComponent>
   );

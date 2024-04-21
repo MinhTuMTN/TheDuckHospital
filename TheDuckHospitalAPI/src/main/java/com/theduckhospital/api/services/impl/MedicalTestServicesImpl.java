@@ -11,6 +11,7 @@ import com.theduckhospital.api.dto.response.doctor.SearchMedicalTestResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
+import com.theduckhospital.api.repository.LaboratoryTechnicianRepository;
 import com.theduckhospital.api.repository.MedicalTestRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
@@ -31,6 +32,7 @@ import java.util.*;
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final MedicalTestRepository medicalTestRepository;
+    private final ILaboratoryTechnicianServices laboratoryTechnicianServices;
     private final TransactionRepository transactionRepository;
     private final ICloudinaryServices cloudinaryServices;
     private final IPaymentServices paymentServices;
@@ -38,13 +40,16 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
             MedicalTestRepository medicalTestRepository,
-            TransactionRepository transactionRepository, ICloudinaryServices cloudinaryServices,
+            TransactionRepository transactionRepository,
+            ILaboratoryTechnicianServices laboratoryTechnicianServices,
+            ICloudinaryServices cloudinaryServices,
             IPaymentServices paymentServices) {
         this.medicalServiceServices = medicalServiceServices;
         this.medicalTestRepository = medicalTestRepository;
         this.transactionRepository = transactionRepository;
         this.cloudinaryServices = cloudinaryServices;
         this.paymentServices = paymentServices;
+        this.laboratoryTechnicianServices = laboratoryTechnicianServices;
     }
 
     @Override
@@ -133,10 +138,12 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     }
 
     @Override
-    public List<MedicalTest> acceptMedicalTest(AcceptMedicalTestsRequest request) {
+    public List<MedicalTest> acceptMedicalTest(String authorization, AcceptMedicalTestsRequest request) {
+        LaboratoryTechnician laboratoryTechnician = laboratoryTechnicianServices.getLaboratoryTechnicianByToken(authorization);
         List<MedicalTest> medicalTests = new ArrayList<>();
         for (UUID medicalTestId : request.getMedicalTestIds()) {
             MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+            medicalTest.setLaboratoryTechnician(laboratoryTechnician);
             medicalTests.add(updateStateMedicalTest(
                     medicalTest,
                     MedicalTestState.PROCESSING

@@ -2,17 +2,28 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import AlertDialogComponent from '../../AlertDialogComponent';
-import { ActivitySquare, Users } from 'lucide-react-native';
+import {ActivitySquare, Users} from 'lucide-react-native';
+import {deleteStaff, restoreStaff} from '../../../services/staffServices';
 
 interface StaffAlertDialogComponentProps {
   showAlertDialog?: boolean;
   deleted?: boolean;
-  setDeleted?: (deleted: boolean) => void;
-  setShowAlertDialog?: (showAlertDialog: boolean) => void;
+  staffId: string;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
+  setShowAlertDialog: (showAlertDialog: boolean) => void;
 }
 
 const StaffAlertDialogComponent = (props: StaffAlertDialogComponentProps) => {
-  const {showAlertDialog, deleted, setDeleted, setShowAlertDialog} = props;
+  const {
+    showAlertDialog,
+    deleted,
+    staffId,
+    refreshList,
+    setRefreshList,
+    setShowAlertDialog,
+  } = props;
+  const [isLoadingAPI, setIsLoadingAPI] = React.useState(false);
 
   const onClose = () => {
     if (setShowAlertDialog) {
@@ -20,22 +31,36 @@ const StaffAlertDialogComponent = (props: StaffAlertDialogComponentProps) => {
     }
   };
 
-  const onAccept = () => {
-    if (setDeleted) {
-      setDeleted(!deleted);
-    }
-    if (setShowAlertDialog) {
-      setShowAlertDialog(false);
+  const onAccept = async () => {
+    if (deleted) {
+      setIsLoadingAPI(true);
+      const response = await restoreStaff(staffId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+        onClose();
+      } else {
+        console.log(response);
+      }
+    } else {
+      setIsLoadingAPI(true);
+      const response = await deleteStaff(staffId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+        onClose();
+      } else {
+        console.log(response);
+      }
     }
   };
 
   return (
     <AlertDialogComponent
+      isLoading={isLoadingAPI}
       showAlertDialog={showAlertDialog}
       headerBackgroundColor={appColors.primary}
-      headerIcon={
-        <Users size={24} color={appColors.white} />
-      }
+      headerIcon={<Users size={24} color={appColors.white} />}
       headerLabel={deleted ? 'Khôi phục nhân viên' : 'Khóa nhân viên'}
       bodyTextSize={18}
       bodyText={

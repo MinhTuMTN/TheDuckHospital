@@ -14,6 +14,7 @@ public class DepartmentResponse {
     private String description;
     private UUID headDoctorId;
     private String headDoctorName;
+    private Doctor headDoctor;
     private List<Doctor> doctors;
     private int totalDoctors;
     private boolean deleted;
@@ -25,6 +26,7 @@ public class DepartmentResponse {
         if (headDoctor != null) {
             this.headDoctorId = headDoctor.getStaffId();
             this.headDoctorName = headDoctor.getFullName();
+            this.headDoctor = headDoctor;
         }
         this.totalDoctors = department.getDoctors().size();
         this.doctors = department.getDoctors();

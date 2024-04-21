@@ -30,7 +30,7 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 // Hook for the context
-export function useAuth() {
+export function useAuth1() {
   return useContext(AuthContext);
 }
 

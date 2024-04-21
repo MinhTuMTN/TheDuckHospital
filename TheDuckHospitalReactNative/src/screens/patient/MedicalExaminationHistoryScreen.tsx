@@ -153,7 +153,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
             <LineInfoComponent
               label="Giới tính:"
               value={
-                (medicalRecord?.patientProfile.gender === 0 ? 'Nam' : 'Nữ') ||
+                (medicalRecord?.patientProfile.gender === "MALE" ? 'Nam' : 'Nữ') ||
                 'Nam'
               }
               valueColor={appColors.textGray}

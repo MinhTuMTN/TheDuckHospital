@@ -9,18 +9,20 @@ import DepartmentAlertDialogComponent from './DepartmentAlertDialogComponent';
 import {ArchiveRestore} from 'lucide-react-native';
 import {useNavigation} from '@react-navigation/native';
 import DepartmentDialogComponent from './DepartmentDialogComponent';
+import {navigationProps} from '../../../types';
 
 interface DepartmentItemComponentProps {
   department: any;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
 }
 
 function DepartmentItemComponent(props: DepartmentItemComponentProps) {
-  const {department} = props;
+  const {department, refreshList, setRefreshList} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [deleted, setDeleted] = useState(false);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<navigationProps>();
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -31,7 +33,7 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
   };
 
   const handleDetailsClick = () => {
-    navigation.navigate('DepartmentDetailScreen' as never);
+    navigation.navigate('DepartmentDetailScreen', {department: department});
   };
 
   return (
@@ -42,7 +44,9 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
             {department.departmentName}
           </TextComponent>
           <TextComponent fontSize={16}>
-            {department.headDoctorName}
+            {department.headDoctorName
+              ? department.headDoctorName
+              : 'Chưa cập nhật'}
           </TextComponent>
         </FlexComponent>
 
@@ -103,14 +107,19 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
 
         <DepartmentDialogComponent
           edit
+          department={department}
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}
+          refreshList={refreshList}
+          setRefreshList={setRefreshList}
         />
 
         <DepartmentAlertDialogComponent
-          deleted={deleted}
-          setDeleted={setDeleted}
+          departmentId={department.departmentId}
+          deleted={department.deleted}
           setShowAlertDialog={setShowAlertDialog}
+          refreshList={refreshList}
+          setRefreshList={setRefreshList}
           showAlertDialog={showAlertDialog}
         />
       </ContainerComponent>

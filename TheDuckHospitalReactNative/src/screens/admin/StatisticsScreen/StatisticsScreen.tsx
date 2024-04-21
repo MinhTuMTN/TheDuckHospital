@@ -77,6 +77,8 @@ function StatisticsScreen() {
     const handleGetAllStatistics = async () => {
       const response = await getAllStatistics();
 
+      console.log(response);
+
       if (response.success) {
         setStatistics(response.data?.data);
         let pieDataAPI = response.data?.data.paymentMethodStatistics;
@@ -107,6 +109,8 @@ function StatisticsScreen() {
         dayjs(endDate1).format('YYYY/MM/DD'),
       );
 
+      console.log(response);
+      
       if (response.success) {
         setRevenueStatistics(response.data?.data);
       }

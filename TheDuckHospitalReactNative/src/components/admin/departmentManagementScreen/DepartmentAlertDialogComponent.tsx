@@ -3,16 +3,32 @@ import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AlertDialogComponent from '../../AlertDialogComponent';
+import {
+  deleteDepartment,
+  restoreDepartment,
+} from '../../../services/departmentServices';
 
 interface DepartmentAlertDialogComponentProps {
   showAlertDialog?: boolean;
   deleted?: boolean;
-  setDeleted?: (deleted: boolean) => void;
-  setShowAlertDialog?: (showAlertDialog: boolean) => void;
+  departmentId: number;
+  refreshList: boolean;
+  setShowAlertDialog: (showAlertDialog: boolean) => void;
+  setRefreshList: (refreshList: boolean) => void;
 }
 
-const DepartmentAlertDialogComponent = (props: DepartmentAlertDialogComponentProps) => {
-  const {showAlertDialog, deleted, setDeleted, setShowAlertDialog} = props;
+const DepartmentAlertDialogComponent = (
+  props: DepartmentAlertDialogComponentProps,
+) => {
+  const {
+    showAlertDialog,
+    deleted,
+    departmentId,
+    refreshList,
+    setShowAlertDialog,
+    setRefreshList,
+  } = props;
+  const [isLoadingAPI, setIsLoadingAPI] = React.useState(false);
 
   const onClose = () => {
     if (setShowAlertDialog) {
@@ -20,9 +36,25 @@ const DepartmentAlertDialogComponent = (props: DepartmentAlertDialogComponentPro
     }
   };
 
-  const onAccept = () => {
-    if (setDeleted) {
-      setDeleted(!deleted);
+  const onAccept = async () => {
+    if (deleted) {
+      setIsLoadingAPI(true);
+      const response = await restoreDepartment(departmentId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+      } else {
+        console.log(response);
+      }
+    } else {
+      setIsLoadingAPI(true);
+      const response = await deleteDepartment(departmentId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+      } else {
+        console.log(response);
+      }
     }
     if (setShowAlertDialog) {
       setShowAlertDialog(false);
@@ -31,6 +63,7 @@ const DepartmentAlertDialogComponent = (props: DepartmentAlertDialogComponentPro
 
   return (
     <AlertDialogComponent
+      isLoading={isLoadingAPI}
       showAlertDialog={showAlertDialog}
       headerBackgroundColor={appColors.primary}
       headerIcon={

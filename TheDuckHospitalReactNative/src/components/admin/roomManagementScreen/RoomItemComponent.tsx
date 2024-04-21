@@ -9,7 +9,14 @@ import RoomDialogComponent from './RoomDialogComponent';
 import RoomAlertDialogComponent from './RoomAlertDialogComponent';
 import {ArchiveRestore} from 'lucide-react-native';
 
-function RoomItemComponent() {
+interface RoomItemComponentProps {
+  room: any;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
+}
+
+function RoomItemComponent(props: RoomItemComponentProps) {
+  const {room, refreshList, setRefreshList} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -26,9 +33,9 @@ function RoomItemComponent() {
     <ContainerComponent style={styles.roomItemContainer}>
       <FlexComponent style={[styles.roomInfoContainer, {flex: 0.5}]}>
         <TextComponent bold fontSize={21}>
-          A302
+          {room.roomName}
         </TextComponent>
-        <TextComponent fontSize={16}>Khoa tai mũi họng</TextComponent>
+        <TextComponent fontSize={16}>{room.departmentName}</TextComponent>
       </FlexComponent>
 
       <FlexComponent
@@ -37,13 +44,13 @@ function RoomItemComponent() {
           <EntypoIcon
             name="dot-single"
             size={20}
-            color={deleted ? appColors.darkRed : appColors.green}
+            color={room.deleted ? appColors.darkRed : appColors.green}
           />
           <TextComponent
             bold
             fontSize={12}
-            color={deleted ? appColors.darkRed : appColors.green}>
-            {deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+            color={room.deleted ? appColors.darkRed : appColors.green}>
+            {room.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>
@@ -62,7 +69,7 @@ function RoomItemComponent() {
         </Pressable>
         <Pressable onPress={toggleAlert}>
           {({pressed}) =>
-            deleted ? (
+            room.deleted ? (
               <ArchiveRestore
                 size={24}
                 color={appColors.green}
@@ -82,14 +89,19 @@ function RoomItemComponent() {
 
       <RoomDialogComponent
         edit
+        room={room}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
       />
       <RoomAlertDialogComponent
-        deleted={deleted}
-        setDeleted={setDeleted}
+        deleted={room.deleted}
         setShowAlertDialog={setShowAlertDialog}
         showAlertDialog={showAlertDialog}
+        roomId={room.roomId}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
       />
     </ContainerComponent>
   );

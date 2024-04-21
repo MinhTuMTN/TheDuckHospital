@@ -1,4 +1,5 @@
-import { AuthState } from "./store/authSlice";
+import {AuthState} from './store/authSlice';
+import { RefreshListState } from './store/refreshListSlice';
 
 type resetProps = {
   index: number;
@@ -77,4 +78,63 @@ export type remoteLogoutDataProps = {
 
 export interface RootState {
   auth: AuthState;
+  refreshList: RefreshListState;
 }
+
+export type createDepartmentDataProps = {
+  departmentName: string;
+  description: string;
+};
+
+export type updateDepartmentDataProps = {
+  departmentName: string;
+  description: string;
+  staffId: string;
+};
+
+export type createOrUpdateMedicineDataProps = {
+  medicineName: string;
+  price: number;
+  quantity: number;
+  unit: string;
+};
+
+export type createOrUpdateRoomDataProps = {
+  roomName: string;
+  description: string;
+  departmentId: number;
+};
+
+export type createStaffDataProps = {
+  role: string;
+  fullName: string;
+  phoneNumber: string;
+  identityNumber: string;
+  dateOfBirth: string;
+  gender: number;
+  email: string;
+  degree: string;
+  departmentId: number;
+};
+
+export type updateStaffDataProps = {
+  role: string;
+  fullName: string;
+  phoneNumber: string;
+  identityNumber: string;
+  dateOfBirth: string;
+  gender: number;
+  degree: string;
+  departmentId: number;
+};
+
+export type createServiceDataProps = {
+  serviceName: string;
+  price: number;
+  serviceType: string;
+  departmentId: number;
+};
+
+export type updateServiceDataProps = {
+  price: number;
+};

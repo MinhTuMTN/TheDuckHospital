@@ -40,11 +40,6 @@ export const useAuth = () => {
 
   const login = async (newToken: string, rememberMe: boolean) => {
     try {
-      // Đảm bảo rằng realmInstance đã sẵn sàng và không null
-      if (realm == null) {
-        console.error('Realm instance is not initialized yet.');
-        return;
-      }
       realm.write(() => {
         // Kiểm tra sự tồn tại của User
         let user = realm.objects(User)[0];

@@ -10,8 +10,11 @@ import {appColors} from '../../../constants/appColors';
 import {ScrollView} from '@gluestack-ui/themed';
 import {Calendar, Info} from 'lucide-react-native';
 import ScheduleItemComponent from '../../../components/admin/staffManagementScreen/ScheduleItemComponent';
+import { useRoute } from '@react-navigation/native';
 
 function StaffDetailScreen() {
+  const route = useRoute();
+  const {staff} = route.params as {staff: any};
   return (
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết nhân viên'} paddingTop={40} />
@@ -28,7 +31,7 @@ function StaffDetailScreen() {
             Họ tên:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Trần Ngũ
+            {staff.fullName}
           </TextComponent>
         </FlexComponent>
 
@@ -37,7 +40,7 @@ function StaffDetailScreen() {
             Chức vụ:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Bác sĩ
+            {staff.role}
           </TextComponent>
         </FlexComponent>
 
@@ -46,7 +49,7 @@ function StaffDetailScreen() {
             Số điện thoại:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            0123456789
+            {staff.phoneNumber}
           </TextComponent>
         </FlexComponent>
 
@@ -55,7 +58,7 @@ function StaffDetailScreen() {
             Bằng cấp:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            BS
+            {staff.degree}
           </TextComponent>
         </FlexComponent>
 
@@ -64,7 +67,7 @@ function StaffDetailScreen() {
             CCCD/CMND:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            123456789101
+            {staff.identityNumber}
           </TextComponent>
         </FlexComponent>
 
@@ -73,7 +76,7 @@ function StaffDetailScreen() {
             Email:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6, flexWrap: 'wrap'}}>
-            ngut@theduckhospital.onmicrosoft.com
+            {staff.email}
           </TextComponent>
         </FlexComponent>
 
@@ -82,7 +85,7 @@ function StaffDetailScreen() {
             Giới tính:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Nam
+            {staff.gender === 0 ? "Nam" : "Nữ"}
           </TextComponent>
         </FlexComponent>
       </ContainerComponent>

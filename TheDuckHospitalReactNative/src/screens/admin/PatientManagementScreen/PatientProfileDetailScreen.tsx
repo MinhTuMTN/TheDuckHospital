@@ -10,8 +10,12 @@ import {appColors} from '../../../constants/appColors';
 import {Accordion, ScrollView} from '@gluestack-ui/themed';
 import {FileSpreadsheet, Info} from 'lucide-react-native';
 import ExaminationItemComponent from '../../../components/admin/patientManagementScreen/ExaminationItemComponent';
+import { useRoute } from '@react-navigation/native';
+import { formatDate } from '../../../utils/dateUtils';
 
 function PatientProfileDetailScreen() {
+  const route = useRoute();
+  const {profile} = route.params as {profile: any};
   return (
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết hồ sơ'} paddingTop={40} />
@@ -29,7 +33,7 @@ function PatientProfileDetailScreen() {
               Họ tên:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              Trần Ngũ
+              {profile.fullName}
             </TextComponent>
           </FlexComponent>
 
@@ -38,7 +42,7 @@ function PatientProfileDetailScreen() {
               Số điện thoại:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              0123456789
+              {profile.phoneNumber}
             </TextComponent>
           </FlexComponent>
 
@@ -47,7 +51,7 @@ function PatientProfileDetailScreen() {
               CCCD/CMND:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              123456789101
+              {profile.identityNumber}
             </TextComponent>
           </FlexComponent>
 
@@ -56,7 +60,7 @@ function PatientProfileDetailScreen() {
               Giới tính:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              Nam
+              {profile.gender === "FEMALE" ?  "Nữ" : "Name"}
             </TextComponent>
           </FlexComponent>
 
@@ -65,7 +69,7 @@ function PatientProfileDetailScreen() {
               Ngày sinh:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              01/01/2000
+              {formatDate(profile.dateOfBirth)}
             </TextComponent>
           </FlexComponent>
 
@@ -74,7 +78,7 @@ function PatientProfileDetailScreen() {
               Dân tộc:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              Kinh
+              {profile.nation}
             </TextComponent>
           </FlexComponent>
 
@@ -83,7 +87,7 @@ function PatientProfileDetailScreen() {
               Địa chỉ:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6, flexWrap: 'wrap'}}>
-              Số 1 Võ Văn Ngân, phường Linh Chiểu, thành phố Thủ Đức
+              {profile.address}
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>

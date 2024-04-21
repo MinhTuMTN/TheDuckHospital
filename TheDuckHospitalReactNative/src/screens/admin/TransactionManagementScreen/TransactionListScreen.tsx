@@ -1,5 +1,12 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
@@ -13,10 +20,87 @@ import {ScrollView} from '@gluestack-ui/themed';
 import Popover from 'react-native-popover-view';
 import {Filter} from 'lucide-react-native';
 import ButtonComponent from '../../../components/ButtonComponent';
+import {useDebounce} from 'use-debounce';
+import {getPaginationTransactions} from '../../../services/transactionServices';
 
 function TransactionListScreen() {
   const [showPopover, setShowPopover] = useState(false);
   const [selected, setSelected] = useState('all');
+  const [isLoadingAPI, setIsLoadingAPI] = useState(true);
+  const [searchText, setSearchText] = useState('');
+  const [debouncedSearchText] = useDebounce(searchText, 500);
+  const [refreshList, setRefreshList] = useState(false);
+  const [transactions, setTransactions] = useState<any>([]);
+  const [paginationParams, setPaginationParams] = useState({
+    page: 0,
+    limit: 5,
+    totalPages: 0,
+  });
+
+  const listFooterComponent = useMemo(() => {
+    let _renderUI;
+    if (isLoadingAPI) {
+      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
+    } else {
+      _renderUI = null;
+    }
+    return <View>{_renderUI}</View>;
+  }, [isLoadingAPI, transactions, paginationParams.page]);
+
+  const handleChangedText = (text: string) => {
+    setSearchText(text);
+    setPaginationParams((prevState: any) => ({
+      ...prevState,
+      page: 0,
+    }));
+  };
+
+  const handleGetTransactions = async () => {
+    if (
+      paginationParams.page + 1 > paginationParams.totalPages &&
+      paginationParams.totalPages !== 0
+    )
+      return;
+    setIsLoadingAPI(true);
+    const response = await getPaginationTransactions(
+      debouncedSearchText.trim(),
+      paginationParams.limit,
+      paginationParams.page,
+      [],
+      [],
+    );
+    setIsLoadingAPI(false);
+
+    console.log(response);
+
+    if (response.success) {
+      if (paginationParams.page === 0) {
+        setTransactions(response.data?.data.transactions);
+      } else {
+        setTransactions((prev: any) => [
+          ...prev,
+          ...response.data.data.transactions,
+        ]);
+      }
+      setPaginationParams({
+        ...paginationParams,
+        totalPages: Math.ceil(
+          response.data.data.total / paginationParams.limit,
+        ),
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    setPaginationParams((prevState: any) => ({
+      ...prevState,
+      page: 0,
+    }));
+  }, [refreshList]);
+
+  React.useEffect(() => {
+    handleGetTransactions();
+  }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
 
   return (
     <ContainerComponent>
@@ -120,7 +204,7 @@ function TransactionListScreen() {
         </ContainerComponent>
       </ContainerComponent>
 
-      <ScrollView style={styles.scrollViewContainer}>
+      {/* <ScrollView style={styles.scrollViewContainer}>
         <TransactionItemComponent />
         <TransactionItemComponent />
         <TransactionItemComponent />
@@ -131,7 +215,40 @@ function TransactionListScreen() {
         <TransactionItemComponent />
         <TransactionItemComponent />
         <TransactionItemComponent />
-      </ScrollView>
+      </ScrollView> */}
+
+<SafeAreaView style={styles.flatListContainer}>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item: any, index: number) =>
+            `transaction-${item.id}-${index}`
+          }
+          extraData={transactions}
+          refreshing={true}
+          renderItem={({item}) => (
+            <TransactionItemComponent
+              refreshList={refreshList}
+              setRefreshList={setRefreshList}
+              transaction={item}
+            />
+          )}
+          style={{width: '100%'}}
+          initialNumToRender={5}
+          onEndReached={e => {
+            if (
+              paginationParams.page < paginationParams.totalPages - 1 &&
+              !isLoadingAPI
+            ) {
+              setPaginationParams((prevState: any) => ({
+                ...prevState,
+                page: prevState.page + 1,
+              }));
+            }
+          }}
+          onEndReachedThreshold={0.7}
+          ListFooterComponent={listFooterComponent}
+        />
+      </SafeAreaView>
     </ContainerComponent>
   );
 }
@@ -205,7 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollViewContainer: {
+  flatListContainer: {
     flex: 0.7,
     marginBottom: 20,
     paddingHorizontal: 20,

@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.response.HomeStatisticsResponse;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
@@ -88,8 +89,17 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public RevenueStatisticsResponse getRevenueStatistics(Date startDate, Date endDate) {
+        Calendar startDateCalendar = DateCommon.getCalendar(startDate);
+        Calendar endDateCalendar = DateCommon.getCalendar(endDate);
 
-        List<Transaction> transactions = transactionRepository.findByCreatedAtBetween(startDate, endDate);
+        endDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endDateCalendar.set(Calendar.MINUTE, 59);
+        endDateCalendar.set(Calendar.SECOND, 59);
+        endDateCalendar.set(Calendar.MILLISECOND, 99);
+
+        List<Transaction> transactions = transactionRepository.findByCreatedAtBetween(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -119,7 +129,17 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public BookingStatisticsResponse getBookingStatistics(Date startDate, Date endDate) {
-        List<Object[]> bookings = bookingRepository.countBookingsByCreatedAtBetweenAndDeletedIsFalse(startDate, endDate);
+        Calendar startDateCalendar = DateCommon.getCalendar(startDate);
+        Calendar endDateCalendar = DateCommon.getCalendar(endDate);
+
+        endDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endDateCalendar.set(Calendar.MINUTE, 59);
+        endDateCalendar.set(Calendar.SECOND, 59);
+        endDateCalendar.set(Calendar.MILLISECOND, 99);
+
+        List<Object[]> bookings = bookingRepository.countBookingsByCreatedAtBetweenAndDeletedIsFalse(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 

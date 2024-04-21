@@ -27,7 +27,7 @@ public interface IMedicalTestServices {
 
     long getCurrentQueueNumber(int serviceId);
 
-    List<MedicalTest> acceptMedicalTest(AcceptMedicalTestsRequest request);
+    List<MedicalTest> acceptMedicalTest(String authorization, AcceptMedicalTestsRequest request);
 
     MedicalTestRecordResponse getMedicalTestRecordById(UUID medicalTestId);
 

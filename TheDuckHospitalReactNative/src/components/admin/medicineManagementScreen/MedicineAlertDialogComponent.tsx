@@ -1,18 +1,34 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import Icon from 'react-native-vector-icons/AntDesign';
 import AlertDialogComponent from '../../AlertDialogComponent';
+import {
+  deleteMedicine,
+  restoreMedicine,
+} from '../../../services/medicineServices';
 
 interface MedicineAlertDialogComponentProps {
   showAlertDialog?: boolean;
   deleted?: boolean;
+  medicineId: number;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
   setShowAlertDialog?: (showAlertDialog: boolean) => void;
-  setDeleted?: (deleted: boolean) => void;
 }
 
-const MedicineAlertDialogComponent = (props: MedicineAlertDialogComponentProps) => {
-  const {showAlertDialog, deleted, setDeleted, setShowAlertDialog} = props;
+const MedicineAlertDialogComponent = (
+  props: MedicineAlertDialogComponentProps,
+) => {
+  const {
+    showAlertDialog,
+    deleted,
+    medicineId,
+    refreshList,
+    setShowAlertDialog,
+    setRefreshList,
+  } = props;
+  const [isLoadingAPI, setIsLoadingAPI] = useState(false);
 
   const onClose = () => {
     if (setShowAlertDialog) {
@@ -20,9 +36,25 @@ const MedicineAlertDialogComponent = (props: MedicineAlertDialogComponentProps) 
     }
   };
 
-  const onAccept = () => {
-    if (setDeleted) {
-      setDeleted(!deleted);
+  const onAccept = async () => {
+    if (deleted) {
+      setIsLoadingAPI(true);
+      const response = await restoreMedicine(medicineId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+      } else {
+        console.log(response);
+      }
+    } else {
+      setIsLoadingAPI(true);
+      const response = await deleteMedicine(medicineId);
+      setIsLoadingAPI(false);
+      if (response.success) {
+        setRefreshList(!refreshList);
+      } else {
+        console.log(response);
+      }
     }
     if (setShowAlertDialog) {
       setShowAlertDialog(false);
@@ -31,6 +63,7 @@ const MedicineAlertDialogComponent = (props: MedicineAlertDialogComponentProps) 
 
   return (
     <AlertDialogComponent
+      isLoading={isLoadingAPI}
       showAlertDialog={showAlertDialog}
       headerBackgroundColor={appColors.primary}
       headerIcon={<Icon name="medicinebox" size={24} color={appColors.white} />}

@@ -7,7 +7,12 @@ import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
 import {globalStyles} from '../../../styles/globalStyles';
 import DoctorAlertDialogComponent from './DoctorAlertDialogComponent';
 
-function DoctorItemComponent() {
+interface DoctorItemComponentProps {
+  doctor: any;
+}
+
+function DoctorItemComponent(props: DoctorItemComponentProps) {
+  const {doctor} = props;
   const [showDoctorAlertDialog, setShowDoctorAlertDialog] = useState(false);
 
   const toggleAlert = () => {
@@ -18,9 +23,9 @@ function DoctorItemComponent() {
     <ContainerComponent style={styles.doctorItemContainer}>
       <FlexComponent style={[styles.doctorInfoContainer, {flex: 0.5}]}>
         <TextComponent bold fontSize={21}>
-          Trương Tam
+          {doctor.fullName}
         </TextComponent>
-        <TextComponent fontSize={16}>0123456789</TextComponent>
+        <TextComponent fontSize={16}>{doctor.phoneNumber}</TextComponent>
       </FlexComponent>
 
       <FlexComponent
@@ -29,9 +34,9 @@ function DoctorItemComponent() {
           {alignItems: 'flex-end', flex: 0.3},
         ]}>
         <FlexComponent style={styles.statusContainer}>
-          <EntypoIcon name="dot-single" size={20} color={appColors.green} />
-          <TextComponent bold fontSize={12} color={appColors.green}>
-            Còn hoạt động
+          <EntypoIcon name="dot-single" size={20} color={doctor.deleted ? appColors.darkRed : appColors.green} />
+          <TextComponent bold fontSize={12} color={doctor.deleted ? appColors.darkRed : appColors.green}>
+            {doctor.deleted? "Ngưng hoạt động" : "Còn hoạt động"}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>

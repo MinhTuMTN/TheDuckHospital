@@ -7,7 +7,12 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {
+  FlexComponent,
+  InputComponent,
+  SelectComponent,
+  TextComponent,
+} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -17,44 +22,133 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
+import FormControlComponent from '../../FormControlComponent';
+import {
+  createDepartment,
+  getDoctorWithinDepartment,
+  updateDepartment,
+} from '../../../services/departmentServices';
+import {ChevronDownIcon} from 'lucide-react-native';
 
-const headDoctors = [
-  'Lâm Mộc Văn',
-  'Lý Đại Bàng',
-  'Lý Thị Định',
-  'Đinh Văn Hoan',
-];
+// const headDoctors = [
+//   {staffId: '1', fullName: 'Lâm Mộc Văn'},
+//   {staffId: '2', fullName: 'Lý Đại Bàng'},
+//   {staffId: '3', fullName: 'Lý Thị Định'},
+//   {staffId: '4', fullName: 'Đinh Văn Hoan'},
+// ];
 
 interface DepartmentDialogComponentProps {
   modalVisible?: boolean;
   edit?: boolean;
+  refreshList: boolean;
+  department?: any;
+  setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
 const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
-  const {modalVisible, setModalVisible, edit = false} = props;
-  const [name, setName] = useState(edit ? 'Tai mũi họng' : '');
+  const {
+    modalVisible,
+    refreshList,
+    department,
+    setRefreshList,
+    setModalVisible,
+    edit = false,
+  } = props;
+  const [name, setName] = useState(edit ? department?.departmentName : '');
   const [description, setDescription] = useState(
-    edit ? 'Khoa tai mũi họng' : '',
+    edit ? department?.description : '',
   );
+  const [headDoctors, setHeadDoctors] = useState([]);
   const [headDoctor, setHeadDoctor] = useState(
-    edit ? headDoctors[1] : headDoctors[0],
+    edit ? department?.headDoctor : {fullName: 'Chưa cập nhật', staffId: ''},
   );
+  const [error, setError] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
       if (edit) {
-        setName('Tai mũi họng');
-        setDescription('Khoa tai mũi họng');
-        setHeadDoctor(headDoctors[1]);
+        setName(department?.departmentName);
+        setDescription(department?.description);
+        setHeadDoctor(department?.headDoctor);
       } else {
         setName('');
         setDescription('');
-        setHeadDoctor(headDoctors[0]);
+        setHeadDoctor({fullName: 'Chưa cập nhật', staffId: ''});
       }
     }
   };
+
+  const handleCreateOrUpdateDepartment = async () => {
+    try {
+      if (!firstClick) setFirstClick(true);
+      if (error) {
+        console.log('error1');
+
+        return;
+      }
+
+      console.log('error2');
+      if (!edit) {
+        const data = {
+          departmentName: name,
+          description: description,
+        };
+
+        setIsLoading(true);
+        const responseCreateDepartment = await createDepartment(data);
+        setIsLoading(false);
+
+        if (responseCreateDepartment.success) {
+          setRefreshList(!refreshList);
+          closeModal();
+        } else {
+          console.log(responseCreateDepartment);
+        }
+      } else {
+        const data = {
+          departmentName: name,
+          description: description,
+          staffId: headDoctor?.staffId,
+        };
+
+        setIsLoading(true);
+        const responseUpdateDepartment = await updateDepartment(
+          department.departmentId,
+          data,
+        );
+        setIsLoading(false);
+
+        if (responseUpdateDepartment.success) {
+          setRefreshList(!refreshList);
+          closeModal();
+        } else {
+          console.log(responseUpdateDepartment);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  React.useEffect(() => {
+    const handleGetDoctorWithinDepartment = async () => {
+      const response = await getDoctorWithinDepartment(department.departmentId);
+      if (response.success) {
+        setHeadDoctors(response.data.data);
+      } else {
+        console.log(response);
+      }
+    };
+    try {
+      handleGetDoctorWithinDepartment();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <Modal
@@ -63,7 +157,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
       visible={modalVisible}
       onRequestClose={closeModal}>
       <View style={styles.centeredView}>
-        <View style={[styles.modalView, {height: edit ? '65%' : '50%'}]}>
+        <View style={[styles.modalView, {height: edit ? '70%' : '60%'}]}>
           <FlexComponent style={styles.modalHeader}>
             <FlexComponent style={{flexDirection: 'row', alignItems: 'center'}}>
               <MaterialCommunityIcons
@@ -83,112 +177,138 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
           </FlexComponent>
 
           <ScrollView style={styles.modalBody}>
-            <InputComponent
-              label="Tên khoa*"
-              labelStyle={styles.labelInput}
-              size="md"
-              placeholder="Tên khoa*"
-              value={name}
-              onChangeText={newValue => setName(newValue)}
-              startIcon={
-                <MaterialCommunityIcons
-                  name="account-group-outline"
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+            <FormControlComponent onErrors={error => setError(error)}>
+              <InputComponent
+                label="Tên khoa*"
+                labelStyle={styles.labelInput}
+                size="md"
+                placeholder="Tên khoa*"
+                value={name}
+                onChangeText={newValue => setName(newValue)}
+                startIcon={
+                  <MaterialCommunityIcons
+                    name="account-group-outline"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            <InputComponent
-              label="Mô tả"
-              labelStyle={styles.labelInput}
-              placeholder="Mô tả"
-              value={description}
-              onChangeText={newValue => setDescription(newValue)}
-              startIcon={
-                <MaterialIcons
-                  name="description"
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+              <InputComponent
+                label="Mô tả"
+                labelStyle={styles.labelInput}
+                placeholder="Mô tả"
+                value={description}
+                onChangeText={newValue => setDescription(newValue)}
+                startIcon={
+                  <MaterialIcons
+                    name="description"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            {edit && (
-              <View style={{height: '10%'}}>
-                <TextComponent bold style={styles.labelText}>
-                  Trưởng khoa*
-                </TextComponent>
-                <SelectDropdown
-                  data={headDoctors}
-                  onSelect={(selectedItem, index) => {
-                    setHeadDoctor(selectedItem);
-                  }}
-                  buttonTextAfterSelection={(selectedItem, index) => {
-                    return selectedItem;
-                  }}
-                  rowTextForSelection={(item, index) => {
-                    return item;
-                  }}
-                  renderDropdownIcon={() => (
-                    <FontAwesomeIcon
-                      name="chevron-down"
-                      color={appColors.black}
-                      size={18}
-                    />
-                  )}
-                  buttonStyle={{
-                    backgroundColor: appColors.white,
-                    borderColor: appColors.black,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    width: '100%',
-                    marginBottom: 25,
-                  }}
-                  buttonTextStyle={{
-                    textAlign: 'left',
-                  }}
-                  renderCustomizedButtonChild={(selectedItem, index) => {
-                    return (
-                      <View style={styles.dropdownBtnChildStyle}>
-                        <FontistoIcon
-                          name="doctor"
-                          color={appColors.black}
-                          size={24}
-                        />
-                        <Text style={styles.dropdownBtnTxt}>
-                          {selectedItem ? selectedItem : headDoctor}
-                        </Text>
-                      </View>
-                    );
-                  }}
-                />
-              </View>
-            )}
+              {edit && (
+                <>
+                  <TextComponent bold style={styles.labelText}>
+                    Trưởng khoa*
+                  </TextComponent>
+                  <SelectDropdown
+                    data={headDoctors}
+                    onSelect={(selectedItem, index) => {
+                      setHeadDoctor(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem.fullName;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item.fullName;
+                    }}
+                    renderDropdownIcon={() => (
+                      <FontAwesomeIcon
+                        name="chevron-down"
+                        color={appColors.black}
+                        size={18}
+                      />
+                    )}
+                    buttonStyle={{
+                      backgroundColor: appColors.white,
+                      borderColor: appColors.black,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      width: '100%',
+                      marginBottom: 25,
+                    }}
+                    buttonTextStyle={{
+                      textAlign: 'left',
+                    }}
+                    renderCustomizedButtonChild={(selectedItem, index) => {
+                      return (
+                        <View style={styles.dropdownBtnChildStyle}>
+                          <FontistoIcon
+                            name="doctor"
+                            color={appColors.black}
+                            size={24}
+                          />
+                          <Text style={styles.dropdownBtnTxt}>
+                            {selectedItem
+                              ? selectedItem.fullName
+                              : headDoctor?.fullName}
+                          </Text>
+                        </View>
+                      );
+                    }}
+                  />
+
+                  {/* <SelectComponent
+                    options={headDoctors}
+                    keyTitle="fullName"
+                    value={headDoctor.fullName}
+                    selectInputStyle={{paddingHorizontal: 10}}
+                    placeholderColor={appColors.darkGray}
+                    title="Chọn trưởng khoa"
+                    error={headDoctor.staffId === '' && firstClick}
+                    errorMessage="Trưởng khoa không được để trống"
+                    onChange={value => setHeadDoctor(value)}
+                    selectTextColor={'black'}
+                    placeholder="Trưởng khoa"
+                    marginRight={8}
+                    selectInputIcon={
+                      <ChevronDownIcon color={appColors.black} size={20} />
+                    }
+                  /> */}
+                </>
+              )}
+            </FormControlComponent>
           </ScrollView>
           <ButtonGroup
             space="lg"
@@ -205,7 +325,9 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
-              containerStyles={[styles.button, {marginRight: 15}]}>
+              isLoading={isLoading}
+              containerStyles={[styles.button, {marginRight: 15}]}
+              onPress={handleCreateOrUpdateDepartment}>
               <TextComponent style={styles.buttonTextStyle}>
                 {edit ? 'Sửa' : 'Thêm'}
               </TextComponent>
@@ -255,6 +377,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     marginBottom: 5,
+    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',

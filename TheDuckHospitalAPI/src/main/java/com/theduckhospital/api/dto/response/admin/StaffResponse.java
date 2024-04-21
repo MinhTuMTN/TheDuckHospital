@@ -15,6 +15,8 @@ public class StaffResponse {
     private String identityNumber;
     private String role;
     private int gender;
+    private String email;
+    private Department department;
     private String departmentName;
     private Date dateOfBirth;
     private boolean headOfDepartment;
@@ -28,11 +30,13 @@ public class StaffResponse {
         this.identityNumber = staff.getIdentityNumber();
         this.dateOfBirth = staff.getDateOfBirth();
         this.gender = staff.getGender().ordinal();
+        this.email = staff.getAccount().getEmail();
         this.deleted = staff.isDeleted();
 
         if (staff instanceof Doctor) {
             this.role = "Bác sĩ";
             this.departmentName = ((Doctor) staff).getDepartment().getDepartmentName();
+            this.department = ((Doctor) staff).getDepartment();
             this.headOfDepartment = ((Doctor) staff).isHeadOfDepartment();
             this.degree = ((Doctor) staff).getDegree();
         } else if (staff instanceof Nurse) {

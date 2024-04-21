@@ -86,12 +86,15 @@ public class MedicalTestController {
     }
 
     @PutMapping("/accept")
-    public ResponseEntity<?> acceptMedicalTest(@RequestBody AcceptMedicalTestsRequest request) {
+    public ResponseEntity<?> acceptMedicalTest(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody AcceptMedicalTestsRequest request
+    ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.acceptMedicalTest(request))
+                        .data(medicalTestServices.acceptMedicalTest(authorization, request))
                         .build()
         );
     }

@@ -7,7 +7,12 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {
+  FlexComponent,
+  InputComponent,
+  SelectComponent,
+  TextComponent,
+} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -18,35 +23,117 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
+import {
+  createMedicine,
+  updateMedicine,
+} from '../../../services/medicineServices';
+import FormControlComponent from '../../FormControlComponent';
 
-const units = ['Viên', 'Vỉ', 'Chai', 'Hộp'];
+const units = [
+  {
+    value: 'TUBE',
+    label: 'Tuýp',
+  },
+  {
+    value: 'BOTTLE',
+    label: 'Chai',
+  },
+  {
+    value: 'BOX',
+    label: 'Hộp',
+  },
+  {
+    value: 'BAG',
+    label: 'Túi',
+  },
+  {
+    value: 'CAPSULE',
+    label: 'Viên',
+  },
+];
 
 interface MedicineDialogComponentProps {
   modalVisible?: boolean;
   edit?: boolean;
+  refreshList: boolean;
+  medicine?: any;
+  setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
 const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
-  const {modalVisible, setModalVisible, edit = false} = props;
-  const [name, setName] = useState(edit ? 'Paracetamol' : '');
-  const [quanity, setQuantity] = useState(edit ? '1000' : '0');
-  const [unit, setUnit] = useState(edit ? units[1] : units[0]);
-  const [price, setPrice] = useState(edit ? '2000' : '0');
+  const {
+    modalVisible,
+    refreshList,
+    medicine,
+    setRefreshList,
+    setModalVisible,
+    edit = false,
+  } = props;
+  const [name, setName] = useState(edit ? medicine.medicineName : '');
+  const [quantity, setQuantity] = useState(edit ? medicine.quantity + '' : '0');
+  const [unit, setUnit] = useState(
+    edit ? units.find(unit => unit.value === medicine.unit) : units[0],
+  );
+  const [price, setPrice] = useState(edit ? medicine.price + '' : '0');
+  const [error, setError] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
+      console.log(medicine);
+
       if (edit) {
-        setName('Paracetamol');
-        setQuantity('1000');
-        setUnit(units[1]);
-        setPrice('2000');
+        setName(medicine.medicineName);
+        setQuantity(medicine.quantity + '');
+        setUnit(units.find(unit => unit.value === medicine.unit));
+        setPrice(medicine.price + '');
       } else {
         setName('');
         setQuantity('0');
         setUnit(units[0]);
         setPrice('0');
+      }
+    }
+  };
+
+  const handleCreateOrUpdateMedicine = async () => {
+    if (!firstClick) setFirstClick(true);
+    if (error) {
+      return;
+    }
+
+    let medicinePrice: number = +price;
+    let medicineQuantity: number = +quantity;
+    const data = {
+      medicineName: name,
+      price: medicinePrice,
+      quantity: medicineQuantity,
+      unit: unit ? unit.value : 'CAPSULE',
+    };
+
+    if (!edit) {
+      setIsLoading(true);
+      const responseCreateMedicine = await createMedicine(data);
+      setIsLoading(false);
+
+      if (responseCreateMedicine.success) {
+        setRefreshList(!refreshList);
+        closeModal();
+      }
+    } else {
+      setIsLoading(true);
+      const responseUpdateMedicine = await updateMedicine(
+        medicine.medicineId,
+        data,
+      );
+      setIsLoading(false);
+
+      if (responseUpdateMedicine.success) {
+        setRefreshList(!refreshList);
+        closeModal();
       }
     }
   };
@@ -78,136 +165,166 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
           </FlexComponent>
 
           <ScrollView style={styles.modalBody}>
-            <InputComponent
-              size="md"
-              label="Tên thuốc*"
-              labelStyle={styles.labelInput}
-              placeholder="Tên thuốc*"
-              value={name}
-              onChangeText={newValue => setName(newValue)}
-              startIcon={
-                <MaterialCommunityIcons
-                  name="pill"
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+            <FormControlComponent onErrors={error => setError(error)}>
+              <InputComponent
+                size="md"
+                label="Tên thuốc*"
+                labelStyle={styles.labelInput}
+                placeholder="Tên thuốc*"
+                value={name}
+                onChangeText={newValue => setName(newValue)}
+                startIcon={
+                  <MaterialCommunityIcons
+                    name="pill"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            <InputComponent
-              size="md"
-              label="Số lượng*"
-              labelStyle={styles.labelInput}
-              placeholder="Số lượng*"
-              value={quanity}
-              onChangeText={newValue => setQuantity(newValue)}
-              startIcon={
-                <OcticonsIcon name="number" size={24} color={appColors.black} />
-              }
-              keyboardType="numeric"
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+              <InputComponent
+                size="md"
+                label="Số lượng*"
+                labelStyle={styles.labelInput}
+                placeholder="Số lượng*"
+                value={quantity}
+                onChangeText={newValue => setQuantity(newValue)}
+                startIcon={
+                  <OcticonsIcon
+                    name="number"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                keyboardType="numeric"
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            <TextComponent bold style={styles.modalText}>
-              Đơn vị*
-            </TextComponent>
-            <SelectDropdown
-              data={units}
-              onSelect={(selectedItem, index) => {
-                setUnit(selectedItem);
-              }}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={() => (
-                <FontAwesomeIcon
-                  name="chevron-down"
-                  color={appColors.black}
-                  size={18}
-                />
-              )}
-              buttonStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderWidth: 1,
-                borderRadius: 10,
-                height: '14%',
-                width: '100%',
-                marginBottom: 15,
-              }}
-              buttonTextStyle={{
-                textAlign: 'left',
-              }}
-              renderCustomizedButtonChild={(selectedItem, index) => {
-                return (
-                  <View style={styles.dropdownBtnChildStyle}>
-                    <FontistoIcon
-                      name="pills"
-                      color={appColors.black}
-                      size={24}
-                    />
-                    <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem : unit}
-                    </Text>
-                  </View>
-                );
-              }}
-            />
+              <TextComponent bold style={styles.modalText}>
+                Đơn vị*
+              </TextComponent>
+              <SelectDropdown
+                data={units}
+                onSelect={(selectedItem, index) => {
+                  setUnit(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.label;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.label;
+                }}
+                renderDropdownIcon={() => (
+                  <FontAwesomeIcon
+                    name="chevron-down"
+                    color={appColors.black}
+                    size={18}
+                  />
+                )}
+                buttonStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  height: '12%',
+                  width: '100%',
+                  marginBottom: 15,
+                }}
+                buttonTextStyle={{
+                  textAlign: 'left',
+                }}
+                renderCustomizedButtonChild={(selectedItem, index) => {
+                  return (
+                    <View style={styles.dropdownBtnChildStyle}>
+                      <FontistoIcon
+                        name="pills"
+                        color={appColors.black}
+                        size={24}
+                      />
+                      <Text style={styles.dropdownBtnTxt}>
+                        {selectedItem ? selectedItem.label : unit?.label}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
 
-            <InputComponent
-              size="md"
-              label="Giá*"
-              labelStyle={styles.labelInput}
-              placeholder="Giá*"
-              value={price}
-              onChangeText={newValue => setPrice(newValue)}
-              startIcon={
-                <FoundationIcon
-                  name="dollar-bill"
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              keyboardType="numeric"
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 15,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 15,
-              }}
-            />
+              {/* <SelectComponent
+                options={units}
+                keyTitle="label"
+                value={unit.label}
+                selectInputStyle={{paddingHorizontal: 10}}
+                placeholderColor={appColors.darkGray}
+                title="Chọn đơn vị"
+                error={unit.label === '' && firstClick}
+                errorMessage="Đơn vị không được để trống"
+                onChange={value => setUnit(value)}
+                selectTextColor={'black'}
+                placeholder="Đơn vị"
+                marginRight={8}
+                selectInputIcon={
+                  <ChevronDownIcon color={appColors.black} size={20} />
+                }
+              /> */}
+
+              <InputComponent
+                size="md"
+                label="Giá*"
+                labelStyle={styles.labelInput}
+                placeholder="Giá*"
+                value={price}
+                onChangeText={newValue => setPrice(newValue)}
+                startIcon={
+                  <FoundationIcon
+                    name="dollar-bill"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                keyboardType="numeric"
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 15,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 15,
+                  width: '100%',
+                }}
+              />
+            </FormControlComponent>
           </ScrollView>
           <ButtonGroup
             space="lg"
@@ -224,6 +341,8 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              isLoading={isLoading}
+              onPress={handleCreateOrUpdateMedicine}
               containerStyles={[styles.button, {marginRight: 15}]}>
               <TextComponent style={styles.buttonTextStyle}>
                 {edit ? 'Sửa' : 'Thêm'}
@@ -249,7 +368,7 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     width: '90%',
-    height: '70%',
+    height: '75%',
     backgroundColor: appColors.white,
     borderRadius: 10,
     borderColor: appColors.gray,
@@ -275,6 +394,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 5,
+    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',

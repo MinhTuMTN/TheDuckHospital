@@ -1,6 +1,5 @@
 import {View, Text} from 'react-native';
 import React, {useEffect} from 'react';
-// import {useAuth} from './AuthProvider';
 import axios from 'axios';
 import axiosInstance from '../services/AxiosInstance';
 import {ignoreAxiosIntercepter} from '../services/ignoreAxiosIntercepter';
@@ -11,7 +10,6 @@ interface AxiosInterceptorProviderProps {
 }
 
 const AxiosInterceptorProvider = (props: AxiosInterceptorProviderProps) => {
-  // const auth = useAuth();
   const auth = useAuth();
 
   useEffect(() => {

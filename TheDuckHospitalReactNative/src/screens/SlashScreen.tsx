@@ -18,6 +18,7 @@ import { useAuth } from '../hooks/AuthHooks';
 const SlashScreen = () => {
   const realm = useRealm();
   const auth = useAuth();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const {reset} = useNavigation<navigationProps>();
 
@@ -38,9 +39,11 @@ const SlashScreen = () => {
     const timeoutId = setTimeout(() => {
       reset({
         index: 0,
+        // routes: [{name: 'LoginScreen'}],
         routes: [{name: 'PatientBottom'}],
         // routes: [{name: 'AdminLeftSideDrawer'}],
       });
+      // navigation.navigate('LoginScreen' as never);
     }, 1500);
 
     return () => clearTimeout(timeoutId);

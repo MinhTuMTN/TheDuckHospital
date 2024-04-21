@@ -7,47 +7,124 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {
+  FlexComponent,
+  InputComponent,
+  SelectComponent,
+  TextComponent,
+} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
+import {ChevronDownIcon} from 'lucide-react-native';
+import {createRoom, updateRoom} from '../../../services/roomServices';
+import FormControlComponent from '../../FormControlComponent';
 import SelectDropdown from 'react-native-select-dropdown';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getAllDepartments} from '../../../services/departmentServices';
 
-const departments = ['Tim mạch', 'Tai mũi họng', 'Nhi', 'Ung bướu'];
+// const departments = [
+//   {departmentId: 1, departmentName: 'Tim mạch'},
+//   {departmentId: 2, departmentName: 'Tai mũi họng'},
+//   {departmentId: 3, departmentName: 'Nhi'},
+//   {departmentId: 4, departmentName: 'Ung bướu'},
+// ];
 
 interface RoomDialogComponentProps {
   modalVisible?: boolean;
   edit?: boolean;
+  refreshList: boolean;
+  room?: any;
+  setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
 const RoomDialogComponent = (props: RoomDialogComponentProps) => {
-  const {modalVisible, setModalVisible, edit = false} = props;
-  const [name, setName] = useState(edit ? 'A302' : '');
-  const [description, setDescription] = useState(edit ? 'Khu A lầu 3' : '');
+  const {
+    modalVisible,
+    refreshList,
+    room,
+    setRefreshList,
+    setModalVisible,
+    edit = false,
+  } = props;
+  const [name, setName] = useState(edit ? room.roomName : '');
+  const [description, setDescription] = useState(edit ? room.description : '');
+  const [departments, setDepartments] = useState([]);
   const [department, setDepartment] = useState(
-    edit ? departments[1] : departments[0],
+    edit ? room.department : {departmentId: null, departmentName: ''},
   );
+  const [error, setError] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
       if (edit) {
-        setName('A302');
-        setDescription('Khu A lầu 3');
-        setDepartment(departments[1]);
+        setName(room.roomName);
+        setDescription(room.description);
+        setDepartment(room.department);
       } else {
         setName('');
         setDescription('');
-        setDepartment(departments[0]);
+        setDepartment({departmentId: null, departmentName: ''});
       }
     }
   };
+
+  const handleCreateOrUpdateRoom = async () => {
+    if (!firstClick) setFirstClick(true);
+    if (error) {
+      return;
+    }
+
+    const data = {
+      roomName: name,
+      description: description,
+      departmentId: department.departmentId,
+    };
+
+    if (!edit) {
+      setIsLoading(true);
+      const responseCreateRoom = await createRoom(data);
+      setIsLoading(false);
+
+      if (responseCreateRoom.success) {
+        setRefreshList(!refreshList);
+        closeModal();
+      }
+    } else {
+      setIsLoading(true);
+      const responseUpdateRoom = await updateRoom(room.roomId, data);
+      setIsLoading(false);
+
+      if (responseUpdateRoom.success) {
+        setRefreshList(!refreshList);
+        closeModal();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const handleGetAllDepartments = async () => {
+      const response = await getAllDepartments();
+      if (response.success) {
+        setDepartments(response.data.data);
+      } else {
+        console.log(response);
+      }
+    };
+    try {
+      handleGetAllDepartments();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <Modal
@@ -59,7 +136,11 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
         <View style={styles.modalView}>
           <FlexComponent style={styles.modalHeader}>
             <FlexComponent style={{flexDirection: 'row', alignItems: 'center'}}>
-              <MaterialIcons name="meeting-room" size={24} color={appColors.white} />
+              <MaterialIcons
+                name="meeting-room"
+                size={24}
+                color={appColors.white}
+              />
               <TextComponent style={styles.headerText}>
                 {edit ? 'Chỉnh sửa phòng' : 'Thêm phòng'}
               </TextComponent>
@@ -72,106 +153,132 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
           </FlexComponent>
 
           <ScrollView style={styles.modalBody}>
-            <InputComponent
-              size="md"
-              label="Tên phòng*"
-              labelStyle={styles.labelInput}
-              placeholder="Tên phòng*"
-              value={name}
-              onChangeText={newValue => setName(newValue)}
-              startIcon={
-                <FontistoIcon name="room" size={24} color={appColors.black} />
-              }
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+            <FormControlComponent onErrors={error => setError(error)}>
+              <InputComponent
+                size="md"
+                label="Tên phòng*"
+                labelStyle={styles.labelInput}
+                placeholder="Tên phòng*"
+                value={name}
+                onChangeText={newValue => setName(newValue)}
+                startIcon={
+                  <FontistoIcon name="room" size={24} color={appColors.black} />
+                }
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            <InputComponent
-              size="md"
-              label="Mô tả"
-              labelStyle={styles.labelInput}
-              placeholder="Mô tả"
-              value={description}
-              onChangeText={newValue => setDescription(newValue)}
-              startIcon={
-                <MaterialIcons
-                  name="description"
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 5,
-              }}
-            />
+              <InputComponent
+                size="md"
+                label="Mô tả"
+                labelStyle={styles.labelInput}
+                placeholder="Mô tả"
+                value={description}
+                onChangeText={newValue => setDescription(newValue)}
+                startIcon={
+                  <MaterialIcons
+                    name="description"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
 
-            <TextComponent bold style={styles.modalText}>
-              Khoa*
-            </TextComponent>
-            <SelectDropdown
-              data={departments}
-              onSelect={(selectedItem, index) => {
-                setDepartment(selectedItem);
-              }}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={() => (
-                <FontAwesomeIcon
-                  name="chevron-down"
-                  color={appColors.black}
-                  size={18}
-                />
-              )}
-              buttonStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderWidth: 1,
-                borderRadius: 10,
-                height: '18%',
-                width: '100%',
-                marginBottom: 25,
-              }}
-              buttonTextStyle={{
-                textAlign: 'left',
-              }}
-              renderCustomizedButtonChild={(selectedItem, index) => {
-                return (
-                  <View style={styles.dropdownBtnChildStyle}>
-                    <MaterialCommunityIcons
-                      name="google-classroom"
-                      size={24}
-                      color={appColors.black}
-                    />
-                    <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem : department}
-                    </Text>
-                  </View>
-                );
-              }}
-            />
+              <TextComponent bold style={styles.modalText}>
+                Khoa*
+              </TextComponent>
+              <SelectDropdown
+                data={departments}
+                onSelect={(selectedItem, index) => {
+                  setDepartment(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.departmentName;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.departmentName;
+                }}
+                renderDropdownIcon={() => (
+                  <FontAwesomeIcon
+                    name="chevron-down"
+                    color={appColors.black}
+                    size={18}
+                  />
+                )}
+                buttonStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  height: '18%',
+                  width: '100%',
+                  marginBottom: 25,
+                }}
+                buttonTextStyle={{
+                  textAlign: 'left',
+                }}
+                renderCustomizedButtonChild={(selectedItem, index) => {
+                  return (
+                    <View style={styles.dropdownBtnChildStyle}>
+                      <MaterialCommunityIcons
+                        name="google-classroom"
+                        size={24}
+                        color={appColors.black}
+                      />
+                      <Text style={styles.dropdownBtnTxt}>
+                        {selectedItem
+                          ? selectedItem.departmentName
+                          : department?.departmentName}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+
+              {/* <SelectComponent
+                options={departments}
+                keyTitle="departmentName"
+                value={department.departmentName}
+                selectInputStyle={{paddingHorizontal: 10}}
+                placeholderColor={appColors.darkGray}
+                title="Chọn khoa"
+                error={department.departmentId === null && firstClick}
+                errorMessage="Khoa không được để trống"
+                onChange={value => setDepartment(value)}
+                selectTextColor={'black'}
+                placeholder="Khoa"
+                marginRight={8}
+                selectInputIcon={
+                  <ChevronDownIcon color={appColors.black} size={20} />
+                }
+              /> */}
+            </FormControlComponent>
           </ScrollView>
           <ButtonGroup
             space="lg"
@@ -180,11 +287,16 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
               marginVertical: 15,
             }}>
             <ButtonComponent
-              containerStyles={[styles.button, {backgroundColor: appColors.darkRed}]}
+              containerStyles={[
+                styles.button,
+                {backgroundColor: appColors.darkRed},
+              ]}
               onPress={closeModal}>
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              isLoading={isLoading}
+              onPress={handleCreateOrUpdateRoom}
               containerStyles={[styles.button, {marginRight: 15}]}>
               <TextComponent style={styles.buttonTextStyle}>
                 {edit ? 'Sửa' : 'Thêm'}
@@ -206,7 +318,7 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     width: '90%',
-    height: '55%',
+    height: '65%',
     backgroundColor: appColors.white,
     borderRadius: 10,
     borderColor: appColors.gray,
@@ -236,6 +348,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 5,
+    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',

@@ -23,6 +23,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../hooks/AuthHooks';
 import {navigationProps} from '../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const auth = useAuth();
@@ -65,6 +66,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         containerStyles={styles.logoutButton}
         startIcon={<LogOut size={20} color={'#F38181'} />}
         onPress={async () => {
+          await AsyncStorage.removeItem('token');
           auth.logout();
           navigation.navigate('LoginScreen' as never);
         }}>

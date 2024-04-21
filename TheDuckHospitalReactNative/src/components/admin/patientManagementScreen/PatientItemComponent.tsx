@@ -5,49 +5,67 @@ import {appColors} from '../../../constants/appColors';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import {globalStyles} from '../../../styles/globalStyles';
 import {Cake, Fingerprint, Phone} from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {formatDate} from '../../../utils/dateUtils';
+import {navigationProps} from '../../../types';
 
-function PatientItemComponent() {
-  const navigation = useNavigation();
+interface PatientItemComponentProps {
+  patient: any;
+}
+
+function PatientItemComponent(props: PatientItemComponentProps) {
+  const {patient} = props;
+  const navigation = useNavigation<navigationProps>();
 
   const handleDetailsClick = () => {
-    navigation.navigate('PatientDetailScreen' as never);
+    navigation.navigate('PatientDetailScreen', {patient});
   };
 
   return (
     <Pressable onPress={handleDetailsClick}>
-    <ContainerComponent style={styles.patientItemContainer}>
-      <FlexComponent style={[styles.patientInfoContainer, {flex: 0.6}]}>
-        <TextComponent bold fontSize={21}>
-          Trương Đại
-        </TextComponent>
-        <FlexComponent style={styles.flexCenter}>
-          <EntypoIcon name="dot-single" size={20} color={appColors.green} />
-          <TextComponent bold fontSize={12} color={appColors.green}>
-            Còn hoạt động
+      <ContainerComponent style={styles.patientItemContainer}>
+        <FlexComponent style={[styles.patientInfoContainer, {flex: 0.6}]}>
+          <TextComponent bold fontSize={21}>
+            {patient.fullName}
           </TextComponent>
+          <FlexComponent style={styles.flexCenter}>
+            <EntypoIcon
+              name="dot-single"
+              size={20}
+              color={patient.deleted ? appColors.darkRed : appColors.green}
+            />
+            <TextComponent
+              bold
+              fontSize={12}
+              color={patient.deleted ? appColors.darkRed : appColors.green}>
+              {patient.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+            </TextComponent>
+          </FlexComponent>
         </FlexComponent>
-      </FlexComponent>
 
-      <FlexComponent style={[styles.patientInfoContainer, {flex: 0.4}]}>
-        <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
-          <Phone size={16} color={appColors.black} style={{marginRight: 5}} />
-          <TextComponent fontSize={16}>0123456789</TextComponent>
+        <FlexComponent style={[styles.patientInfoContainer, {flex: 0.4}]}>
+          <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
+            <Phone size={16} color={appColors.black} style={{marginRight: 5}} />
+            <TextComponent fontSize={16}>{patient.phoneNumber}</TextComponent>
+          </FlexComponent>
+          <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
+            <Fingerprint
+              size={16}
+              color={appColors.black}
+              style={{marginRight: 5}}
+            />
+            <TextComponent fontSize={16}>
+              {patient.identityNumber}
+            </TextComponent>
+          </FlexComponent>
+          <FlexComponent style={styles.flexCenter}>
+            <Cake size={16} color={appColors.black} style={{marginRight: 5}} />
+            <TextComponent fontSize={16}>
+              {formatDate(patient.dateOfBirth)}
+            </TextComponent>
+          </FlexComponent>
         </FlexComponent>
-        <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
-          <Fingerprint
-            size={16}
-            color={appColors.black}
-            style={{marginRight: 5}}
-          />
-          <TextComponent fontSize={16}>123456789011</TextComponent>
-        </FlexComponent>
-        <FlexComponent style={styles.flexCenter}>
-          <Cake size={16} color={appColors.black} style={{marginRight: 5}} />
-          <TextComponent fontSize={16}>01/01/2000</TextComponent>
-        </FlexComponent>
-      </FlexComponent>
-    </ContainerComponent>
+      </ContainerComponent>
     </Pressable>
   );
 }

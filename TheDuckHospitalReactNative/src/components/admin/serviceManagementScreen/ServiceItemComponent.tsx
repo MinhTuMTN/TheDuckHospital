@@ -8,8 +8,31 @@ import {globalStyles} from '../../../styles/globalStyles';
 import {ArchiveRestore} from 'lucide-react-native';
 import ServiceDialogComponent from './ServiceDialogComponent';
 import ServiceAlertDialogComponent from './ServiceAlertDialogComponent';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
-function ServiceItemComponent() {
+const serviceTypes = [
+  {
+    value: 'MedicalExamination',
+    label: 'Dịch vụ khám',
+  },
+  {
+    value: 'MedicalTest',
+    label: 'Dịch vụ xét nghiệm',
+  },
+  {
+    value: 'Other',
+    label: 'Dịch vụ khác',
+  },
+];
+
+interface ServiceItemComponentProps {
+  service: any;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
+}
+
+function ServiceItemComponent(props: ServiceItemComponentProps) {
+  const {service, refreshList, setRefreshList} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [deleted, setDeleted] = useState(false);
@@ -25,9 +48,11 @@ function ServiceItemComponent() {
     <ContainerComponent style={styles.serviceItemContainer}>
       <FlexComponent style={[styles.serviceInfoContainer, {flex: 0.6}]}>
         <TextComponent bold fontSize={19}>
-          Khám tai mũi họng
+          {service.serviceName}
         </TextComponent>
-        <TextComponent fontSize={16}>Dịch vụ khám</TextComponent>
+        <TextComponent fontSize={16}>
+          {serviceTypes.find(type => type.value === service.serviceType)?.label}
+        </TextComponent>
       </FlexComponent>
 
       <FlexComponent
@@ -36,19 +61,19 @@ function ServiceItemComponent() {
           {alignItems: 'flex-end', flex: 0.4},
         ]}>
         <TextComponent bold fontSize={18}>
-          20.000 VNĐ
+          {`${formatCurrency(service.price)} VNĐ`}
         </TextComponent>
         <FlexComponent style={styles.statusContainer}>
           <EntypoIcon
             name="dot-single"
             size={20}
-            color={deleted ? appColors.darkRed : appColors.green}
+            color={service.deleted ? appColors.darkRed : appColors.green}
           />
           <TextComponent
             bold
             fontSize={12}
-            color={deleted ? appColors.darkRed : appColors.green}>
-            {deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+            color={service.deleted ? appColors.darkRed : appColors.green}>
+            {service.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>
@@ -70,7 +95,7 @@ function ServiceItemComponent() {
         </Pressable>
         <Pressable onPress={toggleAlert}>
           {({pressed}) =>
-            deleted ? (
+            service.deleted ? (
               <ArchiveRestore
                 size={24}
                 color={appColors.green}
@@ -90,14 +115,19 @@ function ServiceItemComponent() {
 
       <ServiceDialogComponent
         edit
+        service={service}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
       />
       <ServiceAlertDialogComponent
-        deleted={deleted}
-        setDeleted={setDeleted}
+        deleted={service.deleted}
         setShowAlertDialog={setShowAlertDialog}
         showAlertDialog={showAlertDialog}
+        serviceId={service.serviceId}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
       />
     </ContainerComponent>
   );

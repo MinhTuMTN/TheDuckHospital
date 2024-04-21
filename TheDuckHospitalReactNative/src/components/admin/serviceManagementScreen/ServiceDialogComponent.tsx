@@ -7,7 +7,12 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import {FlexComponent, InputComponent, TextComponent} from '../..';
+import {
+  FlexComponent,
+  InputComponent,
+  SelectComponent,
+  TextComponent,
+} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -16,42 +21,140 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
-import {ActivitySquare, CircleDollarSign} from 'lucide-react-native';
+import {
+  ActivitySquare,
+  ChevronDownIcon,
+  CircleDollarSign,
+} from 'lucide-react-native';
+import FormControlComponent from '../../FormControlComponent';
+import {
+  createService,
+  updateService,
+} from '../../../services/medicalServiceServices';
+import {getDepartmentWithoutService} from '../../../services/departmentServices';
 
-const serviceTypes = ['Dịch vụ khám', 'Dịch vụ xét nghiệm'];
-const departments = ['Tim mạch', 'Tai mũi họng', 'Nhi', 'Ung bướu'];
+const serviceTypes = [
+  {value: 'MedicalExamination', label: 'Dịch vụ khám'},
+  {value: 'MedicalTest', label: 'Dịch vụ xét nghiệm'},
+];
+
+// const departments = [
+//   {departmentId: 1, departmentName: 'Tim mạch'},
+//   {departmentId: 2, departmentName: 'Tai mũi họng'},
+//   {departmentId: 3, departmentName: 'Nhi'},
+//   {departmentId: 4, departmentName: 'Ung bướu'},
+// ];
 
 interface ServiceDialogComponentProps {
   modalVisible?: boolean;
   edit?: boolean;
+  refreshList: boolean;
+  service?: any;
+  setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
 const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
-  const {modalVisible, setModalVisible, edit = false} = props;
-  const [name, setName] = useState(edit ? 'Xét nghiệm máu' : '');
-  const [price, setPrice] = useState(edit ? '20000' : '');
+  const {
+    modalVisible,
+    refreshList,
+    service,
+    setRefreshList,
+    setModalVisible,
+    edit = false,
+  } = props;
+  const [name, setName] = useState(edit ? service.serviceName : '');
+  const [price, setPrice] = useState(edit ? service.price + '' : '');
+  const [departments, setDepartments] = useState([]);
   const [department, setDepartment] = useState(
-    edit ? departments[1] : departments[0],
+    edit ? service.department : {departmentName: '', departmentId: null},
   );
-  const [serviceType, setServiceType] = useState(serviceTypes[0]);
+  const [serviceType, setServiceType] = useState(
+    edit
+      ? serviceTypes.find(type => type.value === service.serviceType)
+      : {value: 'MedicalExamination', label: 'Dịch vụ khám'},
+  );
+  const [error, setError] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
       if (edit) {
-        setName('Xét nghiệm máu');
-        setPrice('20000');
-        setDepartment(departments[1]);
-        setServiceType(serviceTypes[0]);
+        setName(service.serviceName);
+        setPrice(service.price + '');
+        setDepartment(service.department);
+        setServiceType(
+          serviceTypes.find(type => type.value === service.serviceType),
+        );
       } else {
         setName('');
         setPrice('');
-        setServiceType(serviceTypes[0]);
-        setDepartment(departments[0]);
+        setServiceType({value: 'MedicalExamination', label: 'Dịch vụ khám'});
+        setDepartment({departmentName: '', departmentId: null});
       }
     }
   };
+
+  const handleCreateOrUpdateService = async () => {
+    if (!firstClick) setFirstClick(true);
+    if (error) {
+      return;
+    }
+
+    if (!edit) {
+      let medicinePrice: number = +price;
+
+      const data = {
+        serviceName: name,
+        price: medicinePrice,
+        serviceType: serviceType ? serviceType.value : 'MedicalExamination',
+        departmentId: department.departmentId,
+      };
+      setIsLoading(true);
+      const responseCreateService = await createService(data);
+      setIsLoading(false);
+
+      if (responseCreateService.success) {
+        setRefreshList(!refreshList);
+        closeModal();
+      }
+    } else {
+      let medicinePrice: number = +price;
+
+      const data = {
+        price: medicinePrice,
+      };
+      setIsLoading(true);
+      const responseUpdateService = await updateService(
+        service.serviceId,
+        data,
+      );
+      setIsLoading(false);
+
+      if (responseUpdateService.success) {
+        setRefreshList(!refreshList);
+        closeModal();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const handleGetDepartmentWithoutService = async () => {
+      const response = await getDepartmentWithoutService();
+      if (response.success) {
+        setDepartments(response.data.data);
+      } else {
+        console.log(response);
+      }
+    };
+    try {
+      handleGetDepartmentWithoutService();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <Modal
@@ -60,7 +163,13 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
       visible={modalVisible}
       onRequestClose={closeModal}>
       <View style={styles.centeredView}>
-        <View style={styles.modalView}>
+        <View
+          style={[
+            styles.modalView,
+            {
+              height: edit ? '50%' : '60%',
+            },
+          ]}>
           <FlexComponent style={styles.modalHeader}>
             <FlexComponent style={{flexDirection: 'row', alignItems: 'center'}}>
               <ActivitySquare size={24} color={appColors.white} />
@@ -76,157 +185,208 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
           </FlexComponent>
 
           <ScrollView style={styles.modalBody}>
-            <TextComponent bold style={styles.modalText}>
-              Loại dịch vụ*
-            </TextComponent>
-            <SelectDropdown
-              data={serviceTypes}
-              onSelect={(selectedItem, index) => {
-                setServiceType(selectedItem);
-              }}
-              buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
-              }}
-              rowTextForSelection={(item, index) => {
-                return item;
-              }}
-              renderDropdownIcon={() => (
-                <FontAwesomeIcon
-                  name="chevron-down"
-                  color={appColors.black}
-                  size={18}
-                />
-              )}
-              buttonStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderWidth: 1,
-                borderRadius: 10,
-                width: '100%',
-                marginBottom: 15,
-              }}
-              buttonTextStyle={{
-                textAlign: 'left',
-              }}
-              renderCustomizedButtonChild={(selectedItem, index) => {
-                return (
-                  <View style={styles.dropdownBtnChildStyle}>
-                    <MaterialCommunityIcons
-                      name="format-list-bulleted-type"
-                      size={24}
-                      color={appColors.black}
-                    />
-                    <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem : serviceType}
-                    </Text>
-                  </View>
-                );
-              }}
-            />
+            <FormControlComponent onErrors={error => setError(error)}>
+              {!edit && (
+                <>
+                  <TextComponent bold style={styles.modalText}>
+                    Loại dịch vụ*
+                  </TextComponent>
+                  <SelectDropdown
+                    data={serviceTypes}
+                    onSelect={(selectedItem, index) => {
+                      setServiceType(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem.label;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item.label;
+                    }}
+                    renderDropdownIcon={() => (
+                      <FontAwesomeIcon
+                        name="chevron-down"
+                        color={appColors.black}
+                        size={18}
+                      />
+                    )}
+                    buttonStyle={{
+                      backgroundColor: appColors.white,
+                      borderColor: appColors.black,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      width: '100%',
+                      marginBottom: 15,
+                    }}
+                    buttonTextStyle={{
+                      textAlign: 'left',
+                    }}
+                    renderCustomizedButtonChild={(selectedItem, index) => {
+                      return (
+                        <View style={styles.dropdownBtnChildStyle}>
+                          <MaterialCommunityIcons
+                            name="format-list-bulleted-type"
+                            size={24}
+                            color={appColors.black}
+                          />
+                          <Text style={styles.dropdownBtnTxt}>
+                            {selectedItem
+                              ? selectedItem.label
+                              : serviceType?.label}
+                          </Text>
+                        </View>
+                      );
+                    }}
+                  />
 
-            {serviceType === 'Dịch vụ khám' ? (
-              <>
-                <TextComponent bold style={styles.modalText}>
-                  Khoa*
-                </TextComponent>
-                <SelectDropdown
-                  data={departments}
-                  onSelect={(selectedItem, index) => {
-                    setDepartment(selectedItem);
-                  }}
-                  buttonTextAfterSelection={(selectedItem, index) => {
-                    return selectedItem;
-                  }}
-                  rowTextForSelection={(item, index) => {
-                    return item;
-                  }}
-                  renderDropdownIcon={() => (
-                    <FontAwesomeIcon
-                      name="chevron-down"
-                      color={appColors.black}
-                      size={18}
-                    />
-                  )}
-                  buttonStyle={{
-                    backgroundColor: appColors.white,
-                    borderColor: appColors.black,
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    width: '100%',
-                    marginBottom: 15,
-                  }}
-                  buttonTextStyle={{
-                    textAlign: 'left',
-                  }}
-                  renderCustomizedButtonChild={(selectedItem, index) => {
-                    return (
-                      <View style={styles.dropdownBtnChildStyle}>
-                        <MaterialCommunityIcons
-                          name="google-classroom"
+                  {/* <SelectComponent
+                options={serviceTypes}
+                keyTitle="label"
+                value={serviceType.label}
+                selectInputStyle={{paddingHorizontal: 10}}
+                placeholderColor={appColors.darkGray}
+                title="Chọn loại dịch vụ"
+                error={serviceType.value === '' && firstClick}
+                errorMessage="Chọn loại dịch vụ không được để trống"
+                onChange={value => setServiceType(value)}
+                selectTextColor={'black'}
+                placeholder="Loại dịch vụ"
+                marginRight={8}
+                selectInputIcon={
+                  <ChevronDownIcon color={appColors.black} size={20} />
+                }
+              /> */}
+
+                  {serviceType?.value === 'MedicalExamination' ? (
+                    <>
+                      <TextComponent bold style={styles.modalText}>
+                        Khoa*
+                      </TextComponent>
+                      <SelectDropdown
+                        data={departments}
+                        onSelect={(selectedItem, index) => {
+                          setDepartment(selectedItem);
+                        }}
+                        buttonTextAfterSelection={(selectedItem, index) => {
+                          return selectedItem.departmentName;
+                        }}
+                        rowTextForSelection={(item, index) => {
+                          return item.departmentName;
+                        }}
+                        renderDropdownIcon={() => (
+                          <FontAwesomeIcon
+                            name="chevron-down"
+                            color={appColors.black}
+                            size={18}
+                          />
+                        )}
+                        buttonStyle={{
+                          backgroundColor: appColors.white,
+                          borderColor: appColors.black,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                          width: '100%',
+                          marginBottom: 15,
+                        }}
+                        buttonTextStyle={{
+                          textAlign: 'left',
+                        }}
+                        renderCustomizedButtonChild={(selectedItem, index) => {
+                          return (
+                            <View style={styles.dropdownBtnChildStyle}>
+                              <MaterialCommunityIcons
+                                name="google-classroom"
+                                size={24}
+                                color={appColors.black}
+                              />
+                              <Text style={styles.dropdownBtnTxt}>
+                                {selectedItem
+                                  ? selectedItem.departmentName
+                                  : department?.departmentName}
+                              </Text>
+                            </View>
+                          );
+                        }}
+                      />
+
+                      {/* <SelectComponent
+                    options={departments}
+                    keyTitle="departmentName"
+                    value={department.departmentName}
+                    selectInputStyle={{paddingHorizontal: 10}}
+                    placeholderColor={appColors.darkGray}
+                    title="Chọn khoa"
+                    error={department.departmentId === null && firstClick}
+                    errorMessage="Khoa không được để trống"
+                    onChange={value => setDepartment(value)}
+                    selectTextColor={'black'}
+                    placeholder="Khoa"
+                    marginRight={8}
+                    selectInputIcon={
+                      <ChevronDownIcon color={appColors.black} size={20} />
+                    }
+                  /> */}
+                    </>
+                  ) : (
+                    <InputComponent
+                      size="md"
+                      label="Tên dịch vụ*"
+                      labelStyle={styles.labelInput}
+                      placeholder="Tên dịch vụ*"
+                      value={name}
+                      onChangeText={newValue => setName(newValue)}
+                      startIcon={
+                        <MaterialIcons
+                          name="bloodtype"
                           size={24}
                           color={appColors.black}
                         />
-                        <Text style={styles.dropdownBtnTxt}>
-                          {selectedItem ? selectedItem : department}
-                        </Text>
-                      </View>
-                    );
-                  }}
-                />
-              </>
-            ) : (
+                      }
+                      inputContainerStyle={{
+                        backgroundColor: appColors.white,
+                        borderColor: appColors.black,
+                        borderRadius: 10,
+                        marginBottom: 5,
+                        width: '100%',
+                      }}
+                      inputContainerFocusStyle={{
+                        backgroundColor: appColors.white,
+                        borderColor: appColors.primary,
+                        borderRadius: 10,
+                        marginBottom: 5,
+                        width: '100%',
+                      }}
+                    />
+                  )}
+                </>
+              )}
+
               <InputComponent
                 size="md"
-                label="Tên dịch vụ*"
+                label="Giá*"
                 labelStyle={styles.labelInput}
-                placeholder="Tên dịch vụ*"
-                value={name}
-                onChangeText={newValue => setName(newValue)}
+                placeholder="Giá*"
+                value={price}
+                onChangeText={newValue => setPrice(newValue)}
                 startIcon={
-                  <MaterialIcons name="bloodtype" size={24} color={appColors.black} />
+                  <CircleDollarSign size={24} color={appColors.black} />
                 }
+                keyboardType="numeric"
                 inputContainerStyle={{
                   backgroundColor: appColors.white,
                   borderColor: appColors.black,
                   borderRadius: 10,
-                  marginBottom: 5,
+                  marginBottom: 20,
+                  width: '100%',
                 }}
                 inputContainerFocusStyle={{
                   backgroundColor: appColors.white,
                   borderColor: appColors.primary,
                   borderRadius: 10,
-                  marginBottom: 5,
+                  marginBottom: 20,
+                  width: '100%',
                 }}
               />
-            )}
-
-            <InputComponent
-              size="md"
-              label="Giá*"
-              labelStyle={styles.labelInput}
-              placeholder="Giá*"
-              value={price}
-              onChangeText={newValue => setPrice(newValue)}
-              startIcon={
-                <CircleDollarSign
-                  size={24}
-                  color={appColors.black}
-                />
-              }
-              keyboardType="numeric"
-              inputContainerStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.black,
-                borderRadius: 10,
-                marginBottom: 20,
-              }}
-              inputContainerFocusStyle={{
-                backgroundColor: appColors.white,
-                borderColor: appColors.primary,
-                borderRadius: 10,
-                marginBottom: 20,
-              }}
-            />
+            </FormControlComponent>
           </ScrollView>
           <ButtonGroup
             space="lg"
@@ -243,6 +403,8 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              isLoading={isLoading}
+              onPress={handleCreateOrUpdateService}
               containerStyles={[styles.button, {marginRight: 15}]}>
               <TextComponent style={styles.buttonTextStyle}>
                 {edit ? 'Sửa' : 'Thêm'}
@@ -264,7 +426,6 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     width: '90%',
-    height: '60%',
     backgroundColor: appColors.white,
     borderRadius: 10,
     borderColor: appColors.gray,
@@ -294,6 +455,7 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 5,
+    width: '100%',
   },
   modalHeader: {
     flexDirection: 'row',

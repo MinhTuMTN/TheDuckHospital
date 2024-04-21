@@ -5,26 +5,31 @@ import {appColors} from '../../../constants/appColors';
 import {globalStyles} from '../../../styles/globalStyles';
 import {Fingerprint, Phone} from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import { navigationProps } from '../../../types';
+interface PatientProfileItemComponentProps {
+  profile: any;
+}
 
-const PatientProfileItemComponent = () => {
-  const navigation = useNavigation();
+const PatientProfileItemComponent = (props: PatientProfileItemComponentProps) => {
+  const {profile} = props;
+  const navigation = useNavigation<navigationProps>();
 
   const handleDetailsClick = () => {
-    navigation.navigate('PatientProfileDetailScreen' as never);
+    navigation.navigate('PatientProfileDetailScreen', {profile});
   };
   return (
     <Pressable onPress={handleDetailsClick}>
       <ContainerComponent style={styles.scheduleItemContainer}>
         <FlexComponent style={[styles.scheduleInfoContainer]}>
           <TextComponent bold fontSize={21}>
-            Hà Bị Bệnh
+            {profile.fullName}
           </TextComponent>
         </FlexComponent>
 
         <FlexComponent style={[styles.scheduleInfoContainer]}>
           <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
             <Phone size={18} color={appColors.black} style={{marginRight: 5}} />
-            <TextComponent fontSize={16}>0123456789</TextComponent>
+            <TextComponent fontSize={16}>{profile.phoneNumber}</TextComponent>
           </FlexComponent>
           <FlexComponent style={[styles.flexCenter, {marginBottom: 5}]}>
             <Fingerprint
@@ -32,7 +37,7 @@ const PatientProfileItemComponent = () => {
               color={appColors.black}
               style={{marginRight: 5}}
             />
-            <TextComponent fontSize={16}>123456789011</TextComponent>
+            <TextComponent fontSize={16}>{profile.identityNumber}</TextComponent>
           </FlexComponent>
         </FlexComponent>
       </ContainerComponent>

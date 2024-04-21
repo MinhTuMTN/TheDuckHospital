@@ -9,13 +9,20 @@ import {ArchiveRestore} from 'lucide-react-native';
 import StaffDialogComponent from './StaffDialogComponent';
 import StaffAlertDialogComponent from './StaffAlertDialogComponent';
 import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
-function StaffItemComponent() {
+interface StaffItemComponentProps {
+  staff: any;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
+}
+
+function StaffItemComponent(props: StaffItemComponentProps) {
+  const {staff, refreshList, setRefreshList} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [deleted, setDeleted] = useState(false);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<navigationProps>();
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -26,7 +33,7 @@ function StaffItemComponent() {
   };
 
   const handleDetailsClick = () => {
-    navigation.navigate('StaffDetailScreen' as never);
+    navigation.navigate('StaffDetailScreen', {staff: staff});
   };
 
   return (
@@ -34,9 +41,9 @@ function StaffItemComponent() {
       <ContainerComponent style={styles.serviceItemContainer}>
         <FlexComponent style={[styles.serviceInfoContainer, {flex: 0.6}]}>
           <TextComponent bold fontSize={19}>
-            Tiểu Đại
+            {staff.fullName}
           </TextComponent>
-          <TextComponent fontSize={16}>0123456789</TextComponent>
+          <TextComponent fontSize={16}>{staff.phoneNumber}</TextComponent>
         </FlexComponent>
 
         <FlexComponent
@@ -44,18 +51,18 @@ function StaffItemComponent() {
             styles.serviceInfoContainer,
             {alignItems: 'center', flex: 0.4},
           ]}>
-          <TextComponent fontSize={18}>Bác sĩ</TextComponent>
+          <TextComponent fontSize={18}>{staff.role}</TextComponent>
           <FlexComponent style={styles.statusContainer}>
             <EntypoIcon
               name="dot-single"
               size={20}
-              color={deleted ? appColors.darkRed : appColors.green}
+              color={staff.deleted ? appColors.darkRed : appColors.green}
             />
             <TextComponent
               bold
               fontSize={12}
-              color={deleted ? appColors.darkRed : appColors.green}>
-              {deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+              color={staff.deleted ? appColors.darkRed : appColors.green}>
+              {staff.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
             </TextComponent>
           </FlexComponent>
         </FlexComponent>
@@ -77,7 +84,7 @@ function StaffItemComponent() {
           </Pressable>
           <Pressable onPress={toggleAlert}>
             {({pressed}) =>
-              deleted ? (
+              staff.deleted ? (
                 <ArchiveRestore
                   size={24}
                   color={appColors.green}
@@ -97,14 +104,19 @@ function StaffItemComponent() {
 
         <StaffDialogComponent
           edit
+          staff={staff}
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}
+          refreshList={refreshList}
+          setRefreshList={setRefreshList}
         />
         <StaffAlertDialogComponent
-          deleted={deleted}
-          setDeleted={setDeleted}
+          deleted={staff.deleted}
           setShowAlertDialog={setShowAlertDialog}
           showAlertDialog={showAlertDialog}
+          staffId={staff.staffId}
+          refreshList={refreshList}
+          setRefreshList={setRefreshList}
         />
       </ContainerComponent>
     </Pressable>

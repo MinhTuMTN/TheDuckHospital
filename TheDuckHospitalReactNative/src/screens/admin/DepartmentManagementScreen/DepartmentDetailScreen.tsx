@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, SafeAreaView, FlatList} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
@@ -11,14 +11,16 @@ import {appColors} from '../../../constants/appColors';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import DoctorItemComponent from '../../../components/admin/departmentManagementScreen/DoctorItemComponent';
-import {ScrollView} from '@gluestack-ui/themed';
 import {Info} from 'lucide-react-native';
 import HeadDoctorAlertDialogComponent from '../../../components/admin/departmentManagementScreen/HeadDoctorAlertDialogComponent';
 import DoctorDialogComponent from '../../../components/admin/departmentManagementScreen/DoctorDialogComponent';
+import {useRoute} from '@react-navigation/native';
 
 function DepartmentDetailScreen() {
+  const route = useRoute();
+  const {department} = route.params as {department: any};
+  const [departmentDetail, setDepartmentDetail] = useState(department);
   const [modalVisible, setModalVisible] = useState(false);
-
   const [showHeadDoctorAlertDialog, setShowHeadDoctorAlertDialog] =
     useState(false);
 
@@ -38,39 +40,51 @@ function DepartmentDetailScreen() {
 
       <ContainerComponent style={styles.detailContainer}>
         <FlexComponent style={styles.departmentInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+          <TextComponent bold fontSize={20} style={{flex: 0.35}}>
             Tên khoa:
           </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Tai mũi họng
+          <TextComponent fontSize={20} style={{flex: 0.65}}>
+            {department?.departmentName}
           </TextComponent>
         </FlexComponent>
 
         <FlexComponent style={styles.departmentInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+          <TextComponent bold fontSize={20} style={{flex: 0.35}}>
             Trưởng khoa:
           </TextComponent>
           <FlexComponent
-            style={{flexDirection: 'row', flex: 0.6, alignItems: 'center'}}>
-            <TextComponent fontSize={20}>Trương Tam</TextComponent>
-            <ButtonComponent
-              containerStyles={styles.deleteButtonContainer}
-              onPress={() => setShowHeadDoctorAlertDialog(true)}>
-              <View>
-                <TextComponent bold fontSize={16} color={appColors.darkRed}>
-                  Xóa
-                </TextComponent>
-              </View>
-            </ButtonComponent>
+            style={{
+              flexDirection: 'row',
+              flex: departmentDetail?.headDoctor ? 0.45 : 0.65,
+              alignItems: 'center',
+            }}>
+            <TextComponent fontSize={20}>
+              {departmentDetail?.headDoctorName}
+            </TextComponent>
+            {departmentDetail?.headDoctor ? (
+              <ButtonComponent
+                containerStyles={styles.deleteButtonContainer}
+                onPress={() => setShowHeadDoctorAlertDialog(true)}>
+                <View>
+                  <TextComponent bold fontSize={16} color={appColors.darkRed}>
+                    Xóa
+                  </TextComponent>
+                </View>
+              </ButtonComponent>
+            ) : (
+              <TextComponent fontSize={20}>Chưa cập nhật</TextComponent>
+            )}
           </FlexComponent>
         </FlexComponent>
 
         <FlexComponent style={styles.departmentInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+          <TextComponent bold fontSize={20} style={{flex: 0.35}}>
             Mô tả:
           </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Khoa tai mũi họng của bệnh viện
+          <TextComponent fontSize={20} style={{flex: 0.65}}>
+            {department?.description
+              ? department?.description
+              : 'Chưa cập nhật'}
           </TextComponent>
         </FlexComponent>
       </ContainerComponent>
@@ -99,7 +113,7 @@ function DepartmentDetailScreen() {
           </FlexComponent>
         </ButtonComponent>
       </ContainerComponent>
-      <ScrollView style={styles.scrollViewContainer}>
+      {/* <ScrollView style={styles.scrollViewContainer}>
         <DoctorItemComponent />
         <DoctorItemComponent />
         <DoctorItemComponent />
@@ -110,7 +124,17 @@ function DepartmentDetailScreen() {
         <DoctorItemComponent />
         <DoctorItemComponent />
         <DoctorItemComponent />
-      </ScrollView>
+      </ScrollView> */}
+      <SafeAreaView style={styles.scrollViewContainer}>
+        <FlatList
+          data={department?.doctors}
+          keyExtractor={(item: any, index: number) =>
+            `doctor-${item.id}-${index}`
+          }
+          renderItem={({item}) => <DoctorItemComponent doctor={item} />}
+          style={{width: '100%'}}
+        />
+      </SafeAreaView>
 
       <DoctorDialogComponent
         setModalVisible={setModalVisible}
@@ -118,6 +142,8 @@ function DepartmentDetailScreen() {
       />
 
       <HeadDoctorAlertDialogComponent
+        staffId={department.headDoctorId}
+        setDepartmentDetail={setDepartmentDetail}
         setShowAlertDialog={setShowHeadDoctorAlertDialog}
         showAlertDialog={showHeadDoctorAlertDialog}
       />
@@ -139,13 +165,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailContainer: {
-    flex: 0.45,
+    flex: 0.35,
     paddingTop: 0,
     justifyContent: 'space-around',
     paddingLeft: 40,
   },
   scrollViewContainer: {
-    flex: 0.5,
+    flex: 0.65,
     marginBottom: 20,
     paddingHorizontal: 20,
   },
@@ -166,7 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 15,
     borderColor: appColors.primary,
-    height: 45,
+    height: 50,
     width: '23%',
   },
   addButtonText: {

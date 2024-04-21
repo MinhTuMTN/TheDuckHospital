@@ -1,26 +1,20 @@
 import React, {useMemo, useState} from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  DimensionValue,
-  ActivityIndicator,
-} from 'react-native';
+import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
 import {
   ContainerComponent,
   InputComponent,
-  NotFoundComponent,
   TextComponent,
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import Icon from 'react-native-vector-icons/AntDesign';
 import DepartmentItemComponent from '../../../components/admin/departmentManagementScreen/DepartmentItemComponent';
-import {ScrollView} from '@gluestack-ui/themed';
 import DepartmentDialogComponent from '../../../components/admin/departmentManagementScreen/DepartmentDialogComponent';
 import {getPaginationDepartments} from '../../../services/departmentServices';
-import {appInfo} from '../../../constants/appInfo';
 import {SafeAreaView} from 'react-native';
+import {useDebounce} from 'use-debounce';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../types';
 
 function DepartmentListScreen() {
   const [departments, setDepartments] = React.useState<any>([]);
@@ -31,6 +25,13 @@ function DepartmentListScreen() {
     totalPages: 0,
   });
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
+  const [searchText, setSearchText] = React.useState('');
+  const [debouncedSearchText] = useDebounce(searchText, 500);
+  const [refreshList, setRefreshList] = React.useState(false);
+
+  const refreshListDetailChanged = useSelector(
+    (state: RootState) => state.refreshList.refreshList,
+  );
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
@@ -46,41 +47,71 @@ function DepartmentListScreen() {
     return <View>{_renderUI}</View>;
   }, [isLoadingAPI, departments, paginationParams.page]);
 
-  React.useEffect(() => {
-    const handleGetDepartments = async () => {
-      if (
-        paginationParams.page + 1 >= paginationParams.totalPages &&
-        paginationParams.totalPages !== 0
-      )
-        return;
-      setIsLoadingAPI(true);
-      const response = await getPaginationDepartments(
-        '',
-        paginationParams.limit,
-        paginationParams.page,
-      );
-      setIsLoadingAPI(false);
+  const handleGetDepartments = async () => {
+    if (
+      paginationParams.page + 1 > paginationParams.totalPages &&
+      paginationParams.totalPages !== 0
+    )
+      return;
+    setIsLoadingAPI(true);
+    const response = await getPaginationDepartments(
+      debouncedSearchText.trim(),
+      paginationParams.limit,
+      paginationParams.page,
+    );
+    setIsLoadingAPI(false);
 
-      if (response.success) {
-        if (paginationParams.page === 0) {
-          setDepartments(response.data?.data.departments);
-        } else {
-          setDepartments((prev: any) => [
-            ...prev,
-            ...response.data.data.departments,
-          ]);
-        }
-        setPaginationParams({
-          ...paginationParams,
-          totalPages: Math.ceil(
-            response.data.data.total / paginationParams.limit,
-          ),
-        });
+    console.log(response);
+
+    if (response.success) {
+      if (paginationParams.page === 0) {
+        setDepartments(response.data?.data.departments);
+      } else {
+        setDepartments((prev: any) => [
+          ...prev,
+          ...response.data.data.departments,
+        ]);
       }
-    };
+      setPaginationParams({
+        ...paginationParams,
+        totalPages: Math.ceil(
+          response.data.data.total / paginationParams.limit,
+        ),
+      });
+      // console.log(paginationParams.totalPages);
+      // console.log(paginationParams.page);
+    }
+  };
 
-    handleGetDepartments();
-  }, [paginationParams.page, paginationParams.limit]);
+  const handleChangedText = (text: string) => {
+    setSearchText(text);
+    setPaginationParams((prevState: any) => ({
+      ...prevState,
+      page: 0,
+    }));
+  };
+
+  React.useEffect(() => {
+    setPaginationParams((prevState: any) => ({
+      ...prevState,
+      page: 0,
+    }));
+  }, [refreshList]);
+
+  React.useEffect(() => {
+    try {
+      console.log(refreshListDetailChanged);
+      
+      handleGetDepartments();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [
+    debouncedSearchText,
+    paginationParams.page,
+    paginationParams.limit,
+    refreshListDetailChanged,
+  ]);
 
   return (
     <ContainerComponent>
@@ -123,6 +154,8 @@ function DepartmentListScreen() {
             borderColor: appColors.primary,
           }}
           variant="rounded"
+          value={searchText}
+          onChangeText={handleChangedText}
         />
       </ContainerComponent>
 
@@ -132,23 +165,41 @@ function DepartmentListScreen() {
           keyExtractor={(item: any, index: number) =>
             `department-${item.id}-${index}`
           }
-          renderItem={({item}) => <DepartmentItemComponent department={item} />}
+          extraData={departments}
+          refreshing={true}
+          renderItem={({item}) => (
+            <DepartmentItemComponent
+              refreshList={refreshList}
+              setRefreshList={setRefreshList}
+              department={item}
+            />
+          )}
           style={{width: '100%'}}
           initialNumToRender={5}
           onEndReached={e => {
-            if (paginationParams.page + 1 < paginationParams.totalPages) {
-              setPaginationParams({
-                ...paginationParams,
-                page: paginationParams.page + 1,
-              });
+            console.log(paginationParams.page);
+            console.log(paginationParams.totalPages);
+            if (
+              paginationParams.page < paginationParams.totalPages - 1 &&
+              !isLoadingAPI
+            ) {
+              console.log(paginationParams.page);
+              console.log(paginationParams.totalPages);
+
+              setPaginationParams((prevState: any) => ({
+                ...prevState,
+                page: prevState.page + 1,
+              }));
             }
           }}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={1}
           ListFooterComponent={listFooterComponent}
         />
       </SafeAreaView>
 
       <DepartmentDialogComponent
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
       />
@@ -158,18 +209,18 @@ function DepartmentListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.1,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingTop: 0,
   },
   searchContainer: {
-    flex: 0.2,
+    flex: 1,
     paddingTop: 0,
     justifyContent: 'center',
   },
   flatListContainer: {
-    flex: 1,
+    flex: 8,
     paddingHorizontal: 20,
   },
   listLabel: {

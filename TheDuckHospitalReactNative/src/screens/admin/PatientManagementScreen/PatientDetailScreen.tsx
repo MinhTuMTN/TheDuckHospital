@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {FlatList, SafeAreaView, StyleSheet} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
@@ -10,8 +10,13 @@ import {appColors} from '../../../constants/appColors';
 import {ScrollView} from '@gluestack-ui/themed';
 import {FileSpreadsheet, Info} from 'lucide-react-native';
 import PatientProfileItemComponent from '../../../components/admin/patientManagementScreen/PatientProfileItemComponent';
+import {useRoute} from '@react-navigation/native';
+import {formatDate} from '../../../utils/dateUtils';
 
 function PatientDetailScreen() {
+  const route = useRoute();
+  const {patient} = route.params as {patient: any};
+
   return (
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết bệnh nhân'} paddingTop={40} />
@@ -28,7 +33,7 @@ function PatientDetailScreen() {
             Mã bệnh nhân:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            BN12345678
+            {patient.patientCode}
           </TextComponent>
         </FlexComponent>
 
@@ -37,7 +42,7 @@ function PatientDetailScreen() {
             Họ tên:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Trần Ngũ
+            {patient.fullName}
           </TextComponent>
         </FlexComponent>
 
@@ -46,7 +51,7 @@ function PatientDetailScreen() {
             Số điện thoại:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            0123456789
+            {patient.phoneNumber}
           </TextComponent>
         </FlexComponent>
 
@@ -55,7 +60,7 @@ function PatientDetailScreen() {
             CCCD/CMND:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            123456789101
+            {patient.identityNumber}
           </TextComponent>
         </FlexComponent>
 
@@ -64,7 +69,7 @@ function PatientDetailScreen() {
             Giới tính:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            Nam
+            {patient.gender === 0 ? 'Nam' : 'Nữ'}
           </TextComponent>
         </FlexComponent>
 
@@ -73,7 +78,7 @@ function PatientDetailScreen() {
             Ngày sinh:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            01/01/2000
+            {formatDate(patient.dateOfBirth)}
           </TextComponent>
         </FlexComponent>
       </ContainerComponent>
@@ -84,12 +89,25 @@ function PatientDetailScreen() {
           Hồ sơ bệnh nhân
         </TextComponent>
       </ContainerComponent>
-      <ScrollView style={styles.scrollViewContainer}>
+      {/* <ScrollView style={styles.scrollViewContainer}>
         <PatientProfileItemComponent />
         <PatientProfileItemComponent />
         <PatientProfileItemComponent />
         <PatientProfileItemComponent />
-      </ScrollView>
+      </ScrollView> */}
+
+      <SafeAreaView style={styles.scrollViewContainer}>
+        <FlatList
+          data={patient.patientProfiles}
+          keyExtractor={(item: any, index: number) =>
+            `patient-profile-${item.id}-${index}`
+          }
+          renderItem={({item}) => (
+            <PatientProfileItemComponent profile={item} />
+          )}
+          style={{width: '100%'}}
+        />
+      </SafeAreaView>
     </ContainerComponent>
   );
 }
