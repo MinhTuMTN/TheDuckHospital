@@ -8,15 +8,15 @@ import PopupComponent from '../../PopupComponent';
 import {Image} from 'react-native';
 import ButtonComponent from '../../ButtonComponent';
 import {Bookmark, Clipboard, Secure} from '../../../assets/svgs';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
+import { useSelector } from 'react-redux';
 
 const TheDuckWallet = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const {t, i18n} = useTranslation();
-  const {userInfo} = useAuth();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
   const navigation = useNavigation<navigationProps>();
 
   const handleWalletClick = () => {

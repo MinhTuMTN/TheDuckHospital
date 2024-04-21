@@ -14,27 +14,38 @@ export const useAuth = () => {
 
     if (response.success && response.data?.data?.valid) {
       realm?.write(() => {
-        const user = realm.objects(User)[0];
+        const user = realm.objects('User')[0];
         if (user) {
           user.role = response.data.data.role;
           user.fullName = response.data.data.fullName;
 
-          dispatch(
-            setUserInfo({
-              fullName: response.data.data.fullName,
-              role: response.data.data.role,
-            }),
-          );
+          if (response.data.data.balance !== null) {
+            console.log('Have wallet: ');
+
+            user.balance = response.data.data.balance;
+            user.havaWallet = true;
+          } else {
+            console.log('Not Have wallet: ');
+            user.havaWallet = false;
+            user.balance = 0;
+          }
+
+          setUserInfo({
+            fullName: response.data.data.fullName,
+            role: response.data.data.role,
+            balance: response.data.data.balance || 0,
+            haveWallet: response.data.data.balance != null ? true : false,
+          });
         }
       });
     } else {
-      dispatch(setToken(null));
-      dispatch(
-        setUserInfo({
-          fullName: '',
-          role: '',
-        }),
-      );
+      setToken(null);
+      setUserInfo({
+        fullName: null,
+        role: null,
+        balance: 0,
+        haveWallet: false,
+      });
     }
   };
 
@@ -78,8 +89,10 @@ export const useAuth = () => {
       dispatch(setToken(null));
       dispatch(
         setUserInfo({
-          fullName: '',
-          role: '',
+          fullName: null,
+          role: null,
+          balance: 0,
+          haveWallet: false,
         }),
       );
     } catch (error) {

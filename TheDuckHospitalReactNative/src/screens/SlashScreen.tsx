@@ -10,15 +10,13 @@ import {navigationProps} from '../types';
 import {checkToken} from '../services/authServices';
 import {connect, useDispatch} from 'react-redux';
 import {useRealm} from '@realm/react';
-import {setToken, setUserInfo} from '../store/authSlice';
 import {updateToken} from '../services/AxiosInstance';
-import {User} from '../realm/User';
 import { useAuth } from '../hooks/AuthHooks';
+import { setToken } from '../store/authSlice';
 
 const SlashScreen = () => {
   const realm = useRealm();
   const auth = useAuth();
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const {reset} = useNavigation<navigationProps>();
 
@@ -66,11 +64,6 @@ const SlashScreen = () => {
       <Spinner color={appColors.darkGreen} size={'large'} />
     </ImageBackground>
   );
-};
-
-const mapDispatchToProps = {
-  setUserInfo,
-  setToken,
 };
 
 export default connect()(SlashScreen);

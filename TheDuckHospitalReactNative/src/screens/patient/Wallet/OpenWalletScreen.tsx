@@ -14,7 +14,7 @@ import {Eye, EyeOff} from 'lucide-react-native';
 import {openWallet} from '../../../services/walletServices';
 import {useToast} from '../../../hooks/ToastProvider';
 import {CommonActions, useNavigation} from '@react-navigation/native';
-import {useAuth} from '../../../hooks/AuthProvider';
+import { useAuth } from '../../../hooks/AuthHooks';
 
 const OpenWalletScreen = () => {
   const [info, setInfo] = React.useState({

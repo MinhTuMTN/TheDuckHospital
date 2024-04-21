@@ -5,6 +5,8 @@ export class User extends Realm.Object<User> {
   rememberMe?: boolean;
   fullName?: string;
   role?: string;
+  balance?: number;
+  haveWallet?: boolean;
   static schema: ObjectSchema = {
     name: 'User',
     properties: {
@@ -12,6 +14,8 @@ export class User extends Realm.Object<User> {
       rememberMe: 'bool',
       role: 'string',
       fullName: {type: 'string', indexed: 'full-text'},
+      balance: 'int?',
+      haveWallet: 'bool?',
     },
   };
 }

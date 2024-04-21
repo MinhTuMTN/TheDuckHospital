@@ -22,11 +22,12 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
 import RequestPinCodeComponent from '../../../components/patient/walletScreen/RequestPinCodeComponent';
 import {appColors} from '../../../constants/appColors';
-import {useAuth} from '../../../hooks/AuthProvider';
 import {useToast} from '../../../hooks/ToastProvider';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LoadingComponent from '../../../components/LoadingComponent';
 import {topUpWallet} from '../../../services/walletServices';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../types';
 
 const TopUpScreen = () => {
   const [amount, setAmount] = React.useState(0);
@@ -62,7 +63,7 @@ const TopUpScreen = () => {
   }, [amount]);
 
   const toast = useToast();
-  const auth = useAuth();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
   const handlePayment = async () => {
     if (paymentMethod === '') {
@@ -128,7 +129,7 @@ const TopUpScreen = () => {
                   Số dư ví
                 </TextComponent>
                 <TextComponent fontWeight="500" fontSize={24}>
-                  {formatCurrency(auth.userInfo.balance.toString())} VNĐ
+                  {formatCurrency(userInfo.balance ? userInfo.balance.toString() : '0')} VNĐ
                 </TextComponent>
               </FlexComponent>
               <InputComponent

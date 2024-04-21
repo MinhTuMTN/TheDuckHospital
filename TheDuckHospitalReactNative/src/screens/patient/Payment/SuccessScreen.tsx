@@ -10,7 +10,7 @@ import {navigationProps} from '../../../types';
 import {getPaymentDetails} from '../../../services/payment';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import dayjs from 'dayjs';
-import {useAuth} from '../../../hooks/AuthProvider';
+import { useAuth } from '../../../hooks/AuthHooks';
 
 const SuccessScreen = ({route}: {route: any}) => {
   const [transaction, setTransaction] = useState<any>({});
