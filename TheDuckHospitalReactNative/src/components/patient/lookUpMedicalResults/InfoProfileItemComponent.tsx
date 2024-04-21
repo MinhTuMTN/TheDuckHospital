@@ -8,9 +8,19 @@ import {FlexComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
 import LineInfoComponent from '../../LineInfoComponent';
 
-const InfoProfileItemComponent = () => {
+interface InfoProfileItemComponentProps {
+  profile: any;
+  onPress?: () => void;
+}
+
+const InfoProfileItemComponent = (props: InfoProfileItemComponentProps) => {
+  const {profile, onPress} = props;
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => {
+        onPress && onPress();
+      }}>
       <LineInfoComponent
         startIcon={
           <Ionicons
@@ -20,7 +30,7 @@ const InfoProfileItemComponent = () => {
             color={appColors.textLight}
           />
         }
-        label="Nguyễn Thị Ngọc Ánh"
+        label={profile?.fullName}
         labelUppercase
         labelStyles={{
           fontSize: 18,
@@ -38,7 +48,7 @@ const InfoProfileItemComponent = () => {
               color={appColors.textLight}
             />
           }
-          label="N12-123456"
+          label={profile?.patientCode}
           labelStyles={{
             fontSize: 18,
             fontWeight: '500',
@@ -55,7 +65,7 @@ const InfoProfileItemComponent = () => {
               color={appColors.textLight}
             />
           }
-          label="037****123"
+          label={profile?.phoneNumber}
           labelUppercase
           labelStyles={{
             fontSize: 18,
@@ -85,6 +95,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'column',
     elevation: 7,
+    marginBottom: 12,
   },
   buttonNext: {
     position: 'absolute',

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -121,6 +122,7 @@ public class BookingServicesImpl implements IBookingServices {
             transaction.setAmount(totalAmount + MomoConfig.fee);
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);
+            transaction.setAccount(patientProfile.getAccount());
             transactionRepository.save(transaction);
 
             for (TimeSlot timeSlot : timeSlots) {
@@ -354,6 +356,8 @@ public class BookingServicesImpl implements IBookingServices {
         Transaction transaction = new Transaction();
         transaction.setAmount(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
         transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setPaymentType(PaymentType.BOOKING);
+        transaction.setAccount(patientProfile.getAccount());
         transaction.setBankCode(null);
         transaction.setPaymentMethod("CASH");
         transactionRepository.save(transaction);
@@ -405,6 +409,11 @@ public class BookingServicesImpl implements IBookingServices {
                 timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
                 timeSlotRepository.save(timeSlot);
             }
+        }
+        else if (transaction.getPaymentType() == PaymentType.TOP_UP) {
+            Account account = transaction.getAccount();
+            account.setBalance(account.getBalance().add(BigDecimal.valueOf(transaction.getAmount() - MomoConfig.medicalTestFee)));
+            accountServices.saveAccount(account);
         }
 
         return transaction;

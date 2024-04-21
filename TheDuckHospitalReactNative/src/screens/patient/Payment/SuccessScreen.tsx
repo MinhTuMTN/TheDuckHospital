@@ -1,11 +1,57 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
 import {appColors} from '../../../constants/appColors';
+import {BackHandler} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
+import {getPaymentDetails} from '../../../services/payment';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import dayjs from 'dayjs';
+import {useAuth} from '../../../hooks/AuthProvider';
 
-const SuccessScreen = () => {
+const SuccessScreen = ({route}: {route: any}) => {
+  const [transaction, setTransaction] = useState<any>({});
+  const navigation = useNavigation<navigationProps>();
+  const params = route.params;
+
+  const auth = useAuth();
+
+  const navigateToHome = () => {
+    navigation.navigate('HomeScreen');
+  };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.navigate('HomeScreen');
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  useEffect(() => {
+    const handleGetPaymentDetails = async () => {
+      const response = await getPaymentDetails(
+        params?.id ? params.id : '0FAE79C3-6929-4FA6-854D-A3399307F2D8',
+      );
+      console.log(response);
+
+      if (response.success) {
+        setTransaction(response.data.data);
+        console.log(response.data.data);
+        await auth.handleCheckToken();
+      }
+    };
+    handleGetPaymentDetails();
+  }, []);
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -38,7 +84,10 @@ const SuccessScreen = () => {
         <View style={styles.aboutPayment}>
           <LineInfoComponent
             label="Phương thức thanh toán:"
-            value="Ví điện tử MOMO"
+            value={
+              'Ví điện tử ' +
+              (transaction.paymentMethod === 'MOMO' ? 'MOMO' : 'VNPay')
+            }
             justifyContent="space-between"
             valueTextAlign="right"
             containerStyles={{
@@ -58,7 +107,9 @@ const SuccessScreen = () => {
           />
           <LineInfoComponent
             label="Ngày thanh toán:"
-            value="20/10/2021"
+            value={dayjs(transaction.lastModifiedAt).format(
+              'DD/MM/YYYY HH:mm:ss',
+            )}
             justifyContent="space-between"
             valueTextAlign="right"
             containerStyles={{
@@ -78,7 +129,7 @@ const SuccessScreen = () => {
           />
           <LineInfoComponent
             label="Tiền khám:"
-            value="150.000 đ"
+            value={formatCurrency(transaction.amount) + ' đ'}
             justifyContent="space-between"
             valueTextAlign="right"
             containerStyles={{
@@ -99,7 +150,7 @@ const SuccessScreen = () => {
           <View style={styles.line}></View>
           <LineInfoComponent
             label="Tổng tiền:"
-            value="150.000 đ"
+            value={formatCurrency(transaction.amount) + ' đ'}
             justifyContent="space-between"
             valueTextAlign="right"
             containerStyles={{
@@ -119,6 +170,7 @@ const SuccessScreen = () => {
           />
         </View>
         <ButtonComponent
+          onPress={navigateToHome}
           fontSize={16}
           fontWeight="600"
           borderRadius={15}

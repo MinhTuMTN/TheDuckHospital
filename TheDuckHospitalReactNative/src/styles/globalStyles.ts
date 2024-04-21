@@ -31,4 +31,9 @@ export const globalStyles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'flex-end',
   },
+  containetModalDefault: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
 });

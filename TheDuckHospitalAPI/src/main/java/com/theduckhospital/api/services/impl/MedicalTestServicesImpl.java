@@ -31,6 +31,7 @@ import java.util.*;
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
+    private final IAccountServices accountServices;
     private final MedicalTestRepository medicalTestRepository;
     private final ILaboratoryTechnicianServices laboratoryTechnicianServices;
     private final TransactionRepository transactionRepository;
@@ -43,8 +44,10 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             TransactionRepository transactionRepository,
             ILaboratoryTechnicianServices laboratoryTechnicianServices,
             ICloudinaryServices cloudinaryServices,
+            IAccountServices accountServices,
             IPaymentServices paymentServices) {
         this.medicalServiceServices = medicalServiceServices;
+        this.accountServices = accountServices;
         this.medicalTestRepository = medicalTestRepository;
         this.transactionRepository = transactionRepository;
         this.cloudinaryServices = cloudinaryServices;
@@ -212,7 +215,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
     @Override
     @Transactional
-    public PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin) {
+    public PaymentResponse patientPayMedicalTest(String token, PayMedicalTestRequest request, String origin) {
         try {
             Optional<MedicalTest> optional = medicalTestRepository
                     .findByMedicalTestCodeAndDeletedIsFalse(
@@ -230,7 +233,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             }
 
             int totalAmount = (int) (medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
-            Transaction transaction = getTransaction(origin, medicalTest);
+            Transaction transaction = getTransaction(token, origin, medicalTest);
             transactionRepository.save(transaction);
 
             UUID oldTransactionId = medicalTest.getTransaction() != null ?
@@ -270,13 +273,22 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode() == 0 ? 400 : e.getErrorCode());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BadRequestException("Error when pay medical test", 400);
         }
     }
 
+    @Override
+    public List<MedicalService> patientGetMedicalTests() {
+        return medicalServiceServices.doctorGetAllMedicalTests();
+    }
+
     @NotNull
-    private static Transaction getTransaction(String origin, MedicalTest medicalTest) {
+    private Transaction getTransaction(String token, String origin, MedicalTest medicalTest) {
+        Account account = accountServices.findAccountByToken(token);
+
         Transaction transaction = new Transaction();
+        transaction.setAccount(account);
         transaction.setAmount(medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
         transaction.setOrigin(origin);
         transaction.setPaymentType(PaymentType.MEDICAL_TEST);

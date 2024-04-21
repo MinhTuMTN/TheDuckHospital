@@ -51,6 +51,10 @@ import store from './src/store/store';
 import {RealmProvider} from '@realm/react';
 import {User} from './src/realm/User';
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
+import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
+import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
+import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
+import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -214,6 +218,16 @@ const App = () => {
                     component={HospitalFeePaymentInformationScreen}
                   />
                   <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+                  <Stack.Screen name="WalletScreen" component={WalletScreen} />
+                <Stack.Screen
+                  name="OpenWalletScreen"
+                  component={OpenWalletScreen}
+                />
+                <Stack.Screen name="TopUpScreen" component={TopUpScreen} />
+                <Stack.Screen
+                  name="MedicalTestResultScreen"
+                  component={MedicalTestResultScreen}
+                />
                 </Stack.Navigator>
               </NavigationContainer>
             </AxiosInterceptorProvider>

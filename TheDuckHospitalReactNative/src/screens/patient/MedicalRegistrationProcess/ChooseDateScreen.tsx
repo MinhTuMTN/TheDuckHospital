@@ -19,12 +19,14 @@ import {appInfo} from '../../../constants/appInfo';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {useTranslation} from 'react-i18next';
 
 const ChooseDateScreen = ({route}: {route: any}) => {
   const {selectedDoctor, timeSlots} = route.params;
 
   const [availableDates, setAvailableDates] = React.useState<string[]>([]);
   const [selectedDay, setSelectedDay] = React.useState<dayjs.Dayjs>(dayjs());
+  const {t, i18n} = useTranslation();
   const [selectedDoctorSchedule, setSelectedDoctorSchedule] =
     React.useState<any[]>();
 
@@ -105,7 +107,10 @@ const ChooseDateScreen = ({route}: {route: any}) => {
   const _customHeaderTitle = useMemo(
     () => (
       <TextComponent bold>
-        Tháng {month.month} - {month.year}
+        {i18n.language === 'vi'
+          ? `Tháng ${month.month}`
+          : dayjs(`2000/${month.month}/01`).format('MMMM')}{' '}
+        - {month.year}
       </TextComponent>
     ),
     [month],
@@ -155,7 +160,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
         <Header
-          title="Chọn ngày khám"
+          title={t('chooseDate.title')}
           noBackground
           titleColor={appColors.textDarker}
           backButtonColor={appColors.textDarker}
@@ -175,9 +180,8 @@ const ChooseDateScreen = ({route}: {route: any}) => {
             <View style={styles.infoContainer}>
               <Info size={25} color={appColors.primary} />
               <TextComponent flex={1} textAlign="justify">
-                Vui lòng chọn ngày khám phù hợp với lịch trình của bạn. Chúng
-                tôi hỗ trợ đặt lịch khám trước từ{' '}
-                <TextComponent bold>1 đến 30 ngày</TextComponent>.
+                {t('chooseDate.note')}
+                <TextComponent bold>{t('chooseDate.noteDate')}</TextComponent>.
               </TextComponent>
             </View>
 
@@ -186,14 +190,14 @@ const ChooseDateScreen = ({route}: {route: any}) => {
             <View style={styles.noteContainer}>
               <FlexComponent direction="row" alignItems="center" columnGap={4}>
                 <View style={[styles.square]} />
-                <TextComponent>Hôm nay</TextComponent>
+                <TextComponent>{t('chooseDate.toDay')}</TextComponent>
               </FlexComponent>
 
               <FlexComponent direction="row" alignItems="center" columnGap={4}>
                 <View
                   style={[styles.square, {backgroundColor: appColors.gray}]}
                 />
-                <TextComponent>Kín lịch</TextComponent>
+                <TextComponent>{t('chooseDate.outOfSlot')}</TextComponent>
               </FlexComponent>
 
               <FlexComponent direction="row" alignItems="center" columnGap={4}>
@@ -203,7 +207,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                     {backgroundColor: appColors.lightPrimary},
                   ]}
                 />
-                <TextComponent>Còn trống</TextComponent>
+                <TextComponent>{t('chooseDate.freeSlot')}</TextComponent>
               </FlexComponent>
             </View>
 
@@ -248,11 +252,11 @@ const ChooseDateScreen = ({route}: {route: any}) => {
               }}
               width={'100%'}>
               <TextComponent bold color={appColors.textGray} fontSize={18}>
-                Chọn giờ khám
+                {t('chooseDate.chooseTime')}
               </TextComponent>
               <Pressable onPress={() => bottomSheetModalRef.current?.close()}>
                 <TextComponent color={appColors.error} bold>
-                  Huỷ
+                  {t('chooseDate.close')}
                 </TextComponent>
               </Pressable>
             </FlexComponent>
@@ -261,8 +265,14 @@ const ChooseDateScreen = ({route}: {route: any}) => {
 
             <ScrollView>
               <TextComponent color={appColors.textDarker} bold>
-                Ngày {selectedDay.get('D')} tháng {selectedDay.get('M') + 1} năm{' '}
-                {selectedDay.get('year')}
+                {i18n.language === 'vi'
+                  ? `Ngày ${selectedDay.get('D')} tháng ${
+                      selectedDay.get('M') + 1
+                    } năm 
+                ${selectedDay.get('year')}`
+                  : `${selectedDay.format('MMMM')} ${selectedDay.get(
+                      'D',
+                    )}, ${selectedDay.get('year')}`}
               </TextComponent>
 
               <Space paddingTop={16} />
@@ -272,7 +282,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                   alignItems="center"
                   columnGap={4}>
                   <View style={[styles.square]} />
-                  <TextComponent>Còn trống</TextComponent>
+                  <TextComponent>{t('chooseDate.freeSlot')}</TextComponent>
                 </FlexComponent>
 
                 <FlexComponent
@@ -280,7 +290,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                   alignItems="center"
                   columnGap={4}>
                   <View style={[styles.square, {backgroundColor: '#8b8b8b'}]} />
-                  <TextComponent>Kín lịch</TextComponent>
+                  <TextComponent>{t('chooseDate.outOfSlot')}</TextComponent>
                 </FlexComponent>
               </View>
 
@@ -294,7 +304,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                       bold
                       fontSize={15}
                       color={appColors.textDescription}>
-                      Buổi sáng
+                      {t('chooseDate.morning')}
                     </TextComponent>
                     <Space paddingTop={8} />
                     <FlexComponent
@@ -395,12 +405,12 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     backgroundColor: appColors.lightPrimary,
     paddingVertical: 16,
     overflow: 'hidden',
     borderRadius: 10,
-    columnGap: 8,
+    columnGap: 10,
   },
   noteContainer: {
     flexDirection: 'row',

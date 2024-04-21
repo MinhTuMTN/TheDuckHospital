@@ -30,6 +30,7 @@ import dayjs from 'dayjs';
 import {payment} from '../../../services/payment';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
@@ -39,21 +40,36 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const {aboutPayment, medicalCodeId} = route.params;
 
   const navigation = useNavigation<navigationProps>();
+  const toast = useToast();
   const handlePayment = async () => {
+    if (paymentMethod === '') {
+      toast.showToast('Vui lòng chọn phương thức thanh toán');
+      return;
+    }
     const data = {
       medicalTestCode: medicalCodeId,
       paymentMethod: paymentMethod,
     };
 
+    setPaymentLoading(true);
     const response = await payment(data);
-    console.log('Response: ', response.data);
+    setPaymentLoading(false);
+    console.log('Response: ', response);
 
     if (response.success) {
-      console.log('Success: ', response.data.data.deepLink);
+      console.log('Deeplink: ', response.data.data.deepLink);
+      console.log('URL: ', response.data.data.paymentUrl);
 
-      Linking.openURL(response.data.data.deepLink);
+      if (paymentMethod === 'MOMO')
+        Linking.openURL(response.data.data.deepLink);
+      else {
+        navigation.navigate('HomeScreen');
+        Linking.openURL(response.data.data.paymentUrl);
+      }
     } else {
-      console.log('Error: ', response.error);
+      console.log(response.error);
+
+      toast.showToast(response.error);
     }
   };
   return (
@@ -438,7 +454,7 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
               <Pressable
                 style={styles.option}
                 onPress={() => {
-                  setPaymentMethod('VNPay');
+                  setPaymentMethod('VNPAY');
                   setModalVisible(false);
                 }}>
                 <Image

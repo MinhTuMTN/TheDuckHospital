@@ -1,53 +1,61 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
-import Realm from 'realm';
-import {updateToken} from '../services/AxiosInstance';
-import {checkToken, logoutServer} from '../services/authServices';
-import {useRealm} from '@realm/react';
-import {User} from '../realm/User';
-import {useDispatch, useSelector} from 'react-redux';
-import {setToken, setUserInfo} from '../store/authSlice';
+// import React, {createContext, useContext, useEffect, useState} from 'react';
+// import Realm from 'realm';
+// import {updateToken} from '../services/AxiosInstance';
+// import {checkToken, logoutServer} from '../services/authServices';
+// import {useRealm} from '@realm/react';
+// import {User} from '../realm/User';
+// import {useDispatch, useSelector} from 'react-redux';
+// import {setToken, setUserInfo} from '../store/authSlice';
 
 // Interface definition for the context
-interface AuthContextProps {
-  // token: string | null;
-  // userInfo: {
-  //   fullName: string | null;
-  //   role: string | null;
-  // };
-  login: (token: string, rememberMe: boolean) => Promise<void>;
-  logout: () => Promise<void>;
-}
+// interface AuthContextProps {
+//   token: string | null;
+//   userInfo: {
+//     fullName: string | null;
+//     role: string | null;
+//     balance: number;
+//     haveWallet: boolean;
+//   };
+//   handleCheckToken: () => Promise<void>;
+//   login: (token: string, rememberMe: boolean) => Promise<void>;
+//   logout: () => Promise<void>;
+// }
 
 // Default values for the context
-const AuthContext = createContext<AuthContextProps>({
-  // token: null,
-  // userInfo: {
-  //   fullName: null,
-  //   role: null,
-  // },
-  login: async () => {},
-  logout: async () => {},
-});
+// const AuthContext = createContext<AuthContextProps>({
+//   token: null,
+//   userInfo: {
+//     fullName: null,
+//     role: null,
+//     balance: 0,
+//     haveWallet: false,
+//   },
+//   handleCheckToken: async () => {},
+//   login: async () => {},
+//   logout: async () => {},
+// });
 
 // Hook for the context
-export function useAuth1() {
-  return useContext(AuthContext);
-}
+// export function useAuth1() {
+//   return useContext(AuthContext);
+// }
 
 // Props for the provider component
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
+// interface AuthProviderProps {
+//   children: React.ReactNode;
+// }
 
-const UserSchema: Realm.ObjectSchema = {
-  name: 'User',
-  properties: {
-    token: 'string',
-    rememberMe: 'bool?',
-    fullName: 'string?',
-    role: 'string?',
-  },
-};
+// const UserSchema: Realm.ObjectSchema = {
+//   name: 'User',
+//   properties: {
+//     token: 'string',
+//     rememberMe: 'bool?',
+//     fullName: 'string?',
+//     role: 'string?',
+//     balance: 'int?',
+//     havaWallet: 'bool?',
+//   },
+// };
 
 // const realmConfig: Realm.Configuration = {
 //   schema: [UserSchema],
@@ -59,59 +67,72 @@ const UserSchema: Realm.ObjectSchema = {
 //   },
 // };
 
-const realmConfig: Realm.Configuration = {
-  schema: [UserSchema],
-  schemaVersion: 2, // Tăng lên từ 1 lên 2 vì bạn đã thay đổi schema
-  onMigration: (oldRealm, newRealm) => {
-    // Chỉ áp dụng cho version 1 đến version 2
-    if (oldRealm.schemaVersion < 2) {
-      const oldObjects = oldRealm.objects('User');
-      const newObjects = newRealm.objects('User');
+// const realmConfig: Realm.Configuration = {
+//   schema: [UserSchema],
+//   schemaVersion: 2, // Tăng lên từ 1 lên 2 vì bạn đã thay đổi schema
+//   onMigration: (oldRealm, newRealm) => {
+//     // Chỉ áp dụng cho version 1 đến version 2
+//     if (oldRealm.schemaVersion < 2) {
+//       const oldObjects = oldRealm.objects('User');
+//       const newObjects = newRealm.objects('User');
 
-      // Loop through all objects and set the default values for new fields
-      for (let i = 0; i < oldObjects.length; i++) {
-        newObjects[i].fullName = oldObjects[i].fullName || ''; // Đặt giá trị mặc định nếu cần
-        newObjects[i].role = oldObjects[i].role || ''; // Đặt giá trị mặc định nếu cần
-      }
-    }
-  },
-};
+//       // Loop through all objects and set the default values for new fields
+//       for (let i = 0; i < oldObjects.length; i++) {
+//         newObjects[i].fullName = oldObjects[i].fullName || ''; // Đặt giá trị mặc định nếu cần
+//         newObjects[i].role = oldObjects[i].role || ''; // Đặt giá trị mặc định nếu cần
+//       }
+//     }
+//   },
+// };
 
 // Provider component
-export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-  const realm = useRealm();
-  const dispatch = useDispatch();
-  // const token = useSelector((state: RootState) => state.auth.token);
-  // const userInfo = useSelector((state: RootState) => state.auth.userInfo);
-  // const [token, setToken] = useState<string | null>(null);
-  // const [userInfo, setUserInfo] = useState<any>({
-  //   fullName: null,
-  //   role: null,
-  // });
-  const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
+// export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
+//   const [token, setToken] = useState<string | null>(null);
+//   const [userInfo, setUserInfo] = useState<any>({
+//     fullName: null,
+//     role: null,
+//     balance: 0,
+//     haveWallet: false,
+//   });
+//   const [realmInstance, setRealmInstance] = useState<Realm | null>(null);
 
-  const handleCheckToken = async () => {
-    // const response = await checkToken();
-    // if (response.success && response.data?.data?.valid) {
-    //   realmInstance?.write(() => {
-    //     const user = realmInstance.objects('User')[0];
-    //     if (user) {
-    //       user.role = response.data.data.role;
-    //       user.fullName = response.data.data.fullName;
-    //       setUserInfo({
-    //         fullName: response.data.data.fullName,
-    //         role: response.data.data.role,
-    //       });
-    //     }
-    //   });
-    // } else {
-    //   setToken(null);
-    //   setUserInfo({
-    //     fullName: null,
-    //     role: null,
-    //   });
-    // }
-  };
+//   const handleCheckToken = async () => {
+//     const response = await checkToken();
+
+//     if (response.success && response.data?.data?.valid) {
+//       realmInstance?.write(() => {
+//         const user = realmInstance.objects('User')[0];
+//         if (user) {
+//           user.role = response.data.data.role;
+//           user.fullName = response.data.data.fullName;
+
+//           if (response.data.data.balance !== null) {
+//             console.log('Have wallet: ');
+
+//             user.balance = response.data.data.balance;
+//             user.havaWallet = true;
+//           } else {
+//             console.log('Not Have wallet: ');
+//             user.havaWallet = false;
+//             user.balance = 0;
+//           }
+
+//           setUserInfo({
+//             fullName: response.data.data.fullName,
+//             role: response.data.data.role,
+//             balance: response.data.data.balance || 0,
+//             haveWallet: response.data.data.balance != null ? true : false,
+//           });
+//         }
+//       });
+//     } else {
+//       setToken(null);
+//       setUserInfo({
+//         fullName: null,
+//         role: null,
+//       });
+//     }
+//   };
 
   // const login = async (newToken: string, rememberMe: boolean) => {
   //   try {
@@ -134,7 +155,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   //   }
   // };
 
-  const login = async (newToken: string, rememberMe: boolean) => {
+  // const login = async (newToken: string, rememberMe: boolean) => {
     // try {
     //   // Đảm bảo rằng realmInstance đã sẵn sàng và không null
     //   if (realmInstance == null) {
@@ -166,28 +187,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     // } catch (error) {
     //   console.error('Lỗi xảy ra khi đăng nhập: ', error);
     // }
-  };
+  // };
 
-  const logout = async () => {
-    try {
-      await logoutServer();
-      realm.write(() => {
-        const user = realm.objects(User)[0];
-        if (user) {
-          realm.delete(user);
-        }
-      });
-      dispatch(setToken(null));
-      dispatch(
-        setUserInfo({
-          fullName: '',
-          role: '',
-        }),
-      );
-    } catch (error) {
-      console.error('Lỗi xảy ra khi đăng xuất');
-    }
-  };
+  // const logout = async () => {
+  //   try {
+  //     await logoutServer();
+  //     realm.write(() => {
+  //       const user = realm.objects(User)[0];
+  //       if (user) {
+  //         realm.delete(user);
+  //       }
+  //     });
+  //     dispatch(setToken(null));
+  //     dispatch(
+  //       setUserInfo({
+  //         fullName: '',
+  //         role: '',
+  //       }),
+  //     );
+  //   } catch (error) {
+  //     console.error('Lỗi xảy ra khi đăng xuất');
+  //   }
+  // };
 
   // useEffect(() => {
   //   const initializeRealm = async () => {
@@ -206,7 +227,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   //   };
   // }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
     // let isInitializationAborted = false;
     // const initializeRealm = async () => {
     //   try {
@@ -226,28 +247,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     //     realmInstance.close();
     //   }
     // };
-  }, []);
+  // }, []);
 
-  useEffect(() => {
-    const getToken = () => {
+  // useEffect(() => {
+  //   const getToken = () => {
       // const user = realmInstance?.objects('User')[0];
       // if (user) {
       //   setToken(user.token as string);
       //   updateToken(user.token as string);
       //   handleCheckToken();
       // }
-    };
+    // };
 
-    getToken();
-  }, [realmInstance]);
+  //   getToken();
+  // }, [realmInstance]);
 
   // The value provided to the context consumers
-  const value = {
+  // const value = {
     // token,
     // userInfo,
-    login,
-    logout,
-  };
+    // handleCheckToken,
+    // login,
+    // logout,
+  // };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+  // return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+// };

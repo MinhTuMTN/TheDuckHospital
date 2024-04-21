@@ -37,6 +37,7 @@ public class PatientMedicalTestController {
 
     @PostMapping("/payment")
     public ResponseEntity<?> payMedicalTest(
+            @RequestHeader(name = "Authorization") String token,
             @RequestBody PayMedicalTestRequest payMedicalTestRequest,
             HttpServletRequest request
     ) {
@@ -45,10 +46,22 @@ public class PatientMedicalTestController {
                 .message("Pay medical test successfully")
                 .data(medicalTestServices
                         .patientPayMedicalTest(
+                                token,
                                 payMedicalTestRequest,
                                 request.getHeader("origin")
                         )
                 )
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getMedicalTests() {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get medical tests successfully")
+                .data(medicalTestServices.patientGetMedicalTests())
                 .statusCode(200)
                 .build()
         );

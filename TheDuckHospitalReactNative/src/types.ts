@@ -1,9 +1,11 @@
 import {AuthState} from './store/authSlice';
-import { RefreshListState } from './store/refreshListSlice';
+import {RefreshListState} from './store/refreshListSlice';
+
+type Route = {name: string};
 
 type resetProps = {
   index: number;
-  routes: [{name: string}];
+  routes: Route[];
 };
 
 export type navigationProps = {
@@ -137,4 +139,15 @@ export type createServiceDataProps = {
 
 export type updateServiceDataProps = {
   price: number;
+};
+
+export type openWalletDataProps = {
+  pinCode: string;
+  rePinCode: string;
+};
+
+export type topUpWalletDataProps = {
+  pinCode: string;
+  amount: number;
+  paymentMethod: 'MOMO' | 'VNPAY' | '';
 };

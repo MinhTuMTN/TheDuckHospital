@@ -17,6 +17,7 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -231,6 +232,8 @@ public class AccountServicesImpl implements IAccountServices {
             return CheckTokenResponse.builder()
                     .valid(false)
                     .role(null)
+                    .fullName(null)
+                    .balance(null)
                     .build();
         }
 
@@ -239,6 +242,7 @@ public class AccountServicesImpl implements IAccountServices {
                 .valid(true)
                 .role(role)
                 .fullName(account.getFullName())
+                .balance(account.getBalance())
                 .build();
     }
 
@@ -538,5 +542,10 @@ public class AccountServicesImpl implements IAccountServices {
         String tokenId = tokenProvider.getTokenIdFromJwt(token.substring(7));
 
         return deviceServices.remoteLogoutAll(account, tokenId);
+    }
+
+    @Override
+    public void saveAccount(Account account) {
+        accountRepository.save(account);
     }
 }
