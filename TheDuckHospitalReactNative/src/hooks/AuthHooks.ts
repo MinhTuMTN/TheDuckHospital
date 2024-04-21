@@ -14,8 +14,17 @@ export const useAuth = () => {
 
     if (response.success && response.data?.data?.valid) {
       realm?.write(() => {
-        const user = realm.objects('User')[0];
+        const user = realm.objects(User)[0];
         if (user) {
+          // dispatch(
+          //   setUserInfo({
+          //     fullName: response.data.data.fullName,
+          //     role: response.data.data.role,
+          //     haveWallet: false,
+          //     balance: 0,
+          //   }),
+          // );
+
           user.role = response.data.data.role;
           user.fullName = response.data.data.fullName;
 
@@ -23,29 +32,51 @@ export const useAuth = () => {
             console.log('Have wallet: ');
 
             user.balance = response.data.data.balance;
-            user.havaWallet = true;
+            user.haveWallet = true;
+
+            dispatch(
+              setUserInfo({
+                fullName: response.data.data.fullName,
+                role: response.data.data.role,
+                balance: response.data.data.balance,
+                haveWallet: true,
+              }),
+            );
+
           } else {
             console.log('Not Have wallet: ');
-            user.havaWallet = false;
+            user.haveWallet = false;
             user.balance = 0;
+            dispatch(
+              setUserInfo({
+                fullName: response.data.data.fullName,
+                role: response.data.data.role,
+                haveWallet: false,
+                balance: 0,
+              }),
+            );
           }
 
-          setUserInfo({
-            fullName: response.data.data.fullName,
-            role: response.data.data.role,
-            balance: response.data.data.balance || 0,
-            haveWallet: response.data.data.balance != null ? true : false,
-          });
+          dispatch(
+            setUserInfo({
+              fullName: response.data.data.fullName,
+              role: response.data.data.role,
+              balance: response.data.data.balance || 0,
+              haveWallet: response.data.data.balance != null ? true : false,
+            }),
+          );
         }
       });
     } else {
-      setToken(null);
-      setUserInfo({
-        fullName: null,
-        role: null,
-        balance: 0,
-        haveWallet: false,
-      });
+      dispatch(setToken(null));
+      dispatch(
+        setUserInfo({
+          fullName: null,
+          role: null,
+          balance: 0,
+          haveWallet: false,
+        }),
+      );
     }
   };
 
