@@ -51,11 +51,17 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
             BookingRepository bookingRepository,
-            IMedicalServiceServices medicalServiceServices, MedicalTestRepository medicalTestRepository, MedicalExaminationRepository medicalExaminationRepository,
+            IMedicalServiceServices medicalServiceServices,
+            MedicalTestRepository medicalTestRepository,
+            MedicalExaminationRepository medicalExaminationRepository,
             IPatientServices patientServices,
             PatientProfileRepository patientProfileRepository,
             IDoctorServices doctorServices,
-            PrescriptionRepository prescriptionRepository, PrescriptionItemRepository prescriptionItemRepository, MedicineRepository medicineRepository, IAccountServices accountServices) {
+            PrescriptionRepository prescriptionRepository,
+            PrescriptionItemRepository prescriptionItemRepository,
+            MedicineRepository medicineRepository,
+            IAccountServices accountServices
+    ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
         this.medicalServiceServices = medicalServiceServices;
@@ -201,7 +207,6 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 authorization,
                 medicalExaminationId
         );
-
         Date today = DateCommon.getToday();
         MedicalService medicalService = medicalServiceServices
                 .getMedicalServiceByIdAndServiceType(

@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
+import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
 import com.theduckhospital.api.dto.response.PaymentResponse;
@@ -11,7 +12,6 @@ import com.theduckhospital.api.dto.response.doctor.SearchMedicalTestResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.LaboratoryTechnicianRepository;
 import com.theduckhospital.api.repository.MedicalTestRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
@@ -37,6 +38,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final TransactionRepository transactionRepository;
     private final ICloudinaryServices cloudinaryServices;
     private final IPaymentServices paymentServices;
+    private final IPatientServices patientServices;
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
@@ -45,7 +47,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             ILaboratoryTechnicianServices laboratoryTechnicianServices,
             ICloudinaryServices cloudinaryServices,
             IAccountServices accountServices,
-            IPaymentServices paymentServices) {
+            IPaymentServices paymentServices,
+            IPatientServices patientServices) {
         this.medicalServiceServices = medicalServiceServices;
         this.accountServices = accountServices;
         this.medicalTestRepository = medicalTestRepository;
@@ -53,6 +56,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         this.cloudinaryServices = cloudinaryServices;
         this.paymentServices = paymentServices;
         this.laboratoryTechnicianServices = laboratoryTechnicianServices;
+        this.patientServices = patientServices;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     ) {
         MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
 
-        if(medicalService.getServiceType() != ServiceType.MedicalTest) {
+        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
             throw new BadRequestException("This is not medical test");
         }
 
@@ -79,7 +83,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                                 pageable
                         );
         List<SearchMedicalTestResponse> searchMedicalTestResponses = new ArrayList<>();
-        for(MedicalTest medicalTest : medicalTests.getContent()) {
+        for (MedicalTest medicalTest : medicalTests.getContent()) {
             SearchMedicalTestResponse medicalTestResponse = new SearchMedicalTestResponse(
                     medicalTest.getMedicalExaminationRecord(),
                     medicalTest
@@ -100,7 +104,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     public Map<String, String> countMedicalExaminationTest(int serviceId) {
         MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
 
-        if(medicalService.getServiceType() != ServiceType.MedicalTest) {
+        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
             throw new BadRequestException("This is not medical test");
         }
 
@@ -124,7 +128,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     public long getCurrentQueueNumber(int serviceId) {
         MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
 
-        if(medicalService.getServiceType() != ServiceType.MedicalTest) {
+        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
             throw new BadRequestException("This is not medical test");
         }
 
@@ -133,7 +137,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 MedicalTestState.PROCESSING
         );
 
-        if(medicalTests.isEmpty()) {
+        if (medicalTests.isEmpty()) {
             return 0;
         }
 
@@ -169,7 +173,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     private MedicalTest getMedicalTestById(UUID medicalTestId) {
         Optional<MedicalTest> optional = medicalTestRepository.findById(medicalTestId);
 
-        if(optional.isEmpty()) {
+        if (optional.isEmpty()) {
             throw new NotFoundException("Not found medical test");
         }
         return optional.get();
@@ -202,7 +206,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                         medicalTestCode
                 );
 
-        if(optional.isEmpty()) {
+        if (optional.isEmpty()) {
             throw new BadRequestException("Not found medical test", 10010);
         }
 
@@ -222,7 +226,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                             request.getMedicalTestCode()
                     );
 
-            if(optional.isEmpty()) {
+            if (optional.isEmpty()) {
                 throw new BadRequestException("Not found medical test", 10010);
             }
             MedicalTest medicalTest = optional.get();
@@ -281,6 +285,44 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     @Override
     public List<MedicalService> patientGetMedicalTests() {
         return medicalServiceServices.doctorGetAllMedicalTests();
+    }
+
+    @Override
+    public List<MedicalTestResultResponse> patientGetMedicalTestResults(
+            String patientCode,
+            Date fromDate,
+            Date toDate,
+            String sort,
+            int serviceId
+    ) {
+        Calendar fromDateCalendar = DateCommon.getCalendar(fromDate);
+        Calendar toDateCalendar = DateCommon.getCalendar(toDate);
+
+        toDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        toDateCalendar.set(Calendar.MINUTE, 59);
+        toDateCalendar.set(Calendar.SECOND, 59);
+        toDateCalendar.set(Calendar.MILLISECOND, 99);
+
+        Patient patient = patientServices.findPatientByPatientCode(patientCode);
+
+        List<MedicalTest> medicalTests = patient.getMedicalExaminationRecords().stream()
+                .flatMap(record -> record.getMedicalTest().stream())
+                .filter(test -> test.getDate().compareTo(fromDateCalendar.getTime()) >= 0 &&
+                        test.getDate().compareTo(toDateCalendar.getTime()) <= 0)
+                .filter(test -> (serviceId == -1 || test.getMedicalService().getServiceId() == serviceId))
+                .sorted(sort.equals("ASC") ? Comparator.comparing(MedicalTest::getDate) :
+                        Comparator.comparing(MedicalTest::getDate).reversed())
+                .toList();
+
+        List<MedicalTestResultResponse> medicalTestResultList = new ArrayList<>();
+        for (MedicalTest test : medicalTests) {
+            MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
+                    test.getMedicalExaminationRecord().getDoctorSchedule().getDoctor(),
+                    test.getLaboratoryTechnician(),
+                    test.getMedicalService());
+            medicalTestResultList.add(medicalTestResultResponse);
+        }
+        return medicalTestResultList;
     }
 
     @NotNull

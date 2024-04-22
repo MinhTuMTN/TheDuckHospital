@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {
   ContainerComponent,
@@ -9,8 +9,13 @@ import LookupFilterComponent from '../../../components/patient/lookUpMedicalResu
 import {appColors} from '../../../constants/appColors';
 import dayjs from 'dayjs';
 import GroupMedicalTestResult from '../../../components/patient/lookUpMedicalResults/GroupMedicalTestResult';
+import {getMedicalTestResults} from '../../../services/medicalTestServices';
 
 const MedicalTestResultScreen = ({route}: {route: any}) => {
+  const [medicalTests, setMedicalTest] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [fromDate, setFromDate] = useState(dayjs());
+  const [toDate, setToDate] = useState(dayjs());
   const profile = route.params?.profile;
   const fullName = useMemo(() => {
     const originName = profile?.fullName;
@@ -20,6 +25,31 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
     }`;
   }, [profile]);
 
+  const handleGetMedicalTestResult = async (
+    sort: 'DESC' | 'ASC',
+    fromDate: dayjs.Dayjs,
+    toDate: dayjs.Dayjs,
+    serviceId: number,
+  ) => {
+    setFromDate(fromDate);
+    setToDate(toDate);
+
+    setLoading(true);
+    const response = await getMedicalTestResults(profile.patientCode, {
+      sort,
+      fromDate: fromDate.format('YYYY/MM/DD'),
+      toDate: toDate.format('YYYY/MM/DD'),
+      serviceId,
+    });
+    setLoading(false);
+
+    if (response.success) {
+      setMedicalTest(response.data.data);
+    } else {
+      console.log(response);
+    }
+  };
+
   const filterOnChange = (
     sort: 'DESC' | 'ASC',
     fromDate: dayjs.Dayjs,
@@ -27,7 +57,14 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
     serviceId: number,
   ) => {
     console.log(sort, fromDate, toDate, serviceId);
+    handleGetMedicalTestResult(sort, fromDate, toDate, serviceId);
   };
+
+  React.useEffect(() => {
+    if (medicalTests.length === 0)
+      handleGetMedicalTestResult('DESC', dayjs(), dayjs(), -1);
+  }, []);
+
   return (
     <ContainerComponent paddingTop={0}>
       <Header
@@ -38,7 +75,12 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
       />
       <ContentComponent>
         <LookupFilterComponent onChange={filterOnChange} />
-        <GroupMedicalTestResult />
+        <GroupMedicalTestResult
+          medicalTests={medicalTests}
+          fromDate={fromDate}
+          toDate={toDate}
+          loading={loading}
+        />
       </ContentComponent>
     </ContainerComponent>
   );

@@ -151,3 +151,10 @@ export type topUpWalletDataProps = {
   amount: number;
   paymentMethod: 'MOMO' | 'VNPAY' | '';
 };
+
+export type medicalTestResultDataProps = {
+  fromDate: string;
+  toDate: string;
+  sort: string;
+  serviceId: number;
+};

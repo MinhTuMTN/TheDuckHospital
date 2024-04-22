@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/medical-tests")
 @PreAuthorize("hasRole('ROLE_USER')")
@@ -62,6 +64,23 @@ public class PatientMedicalTestController {
                 .success(true)
                 .message("Get medical tests successfully")
                 .data(medicalTestServices.patientGetMedicalTests())
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @GetMapping("/results/{patientCode}")
+    public ResponseEntity<?> getMedicalTestResults(
+            @PathVariable("patientCode") String patientCode,
+            @RequestParam Date fromDate,
+            @RequestParam Date toDate,
+            @RequestParam(defaultValue = "DESC") String sort,
+            @RequestParam int serviceId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get medical test results successfully")
+                .data(medicalTestServices.patientGetMedicalTestResults(patientCode, fromDate, toDate, sort, serviceId))
                 .statusCode(200)
                 .build()
         );

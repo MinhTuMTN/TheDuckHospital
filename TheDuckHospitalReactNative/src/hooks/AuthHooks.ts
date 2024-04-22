@@ -42,7 +42,6 @@ export const useAuth = () => {
                 haveWallet: true,
               }),
             );
-
           } else {
             console.log('Not Have wallet: ');
             user.haveWallet = false;
