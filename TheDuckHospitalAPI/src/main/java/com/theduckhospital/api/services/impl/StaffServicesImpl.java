@@ -73,6 +73,7 @@ public class StaffServicesImpl implements IStaffServices {
                 case CASHIER -> staff = new Cashier();
                 case PHARMACIST -> staff = new Pharmacist();
                 case LABORATORY_TECHNICIAN ->  staff = new LaboratoryTechnician();
+                case SUPPORT_AGENT -> staff = new SupportAgent();
                 default -> staff = new Staff();
             }
 
