@@ -104,4 +104,20 @@ public class ChatController {
                         .build()
         );
     }
+
+    @PreAuthorize("hasRole('ROLE_SUPPORT_AGENT')")
+    @DeleteMapping("/{conversationId}")
+    public ResponseEntity<?> getWaitingConversations(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable UUID conversationId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Conversations retrieved")
+                        .data(chatServices.closeConversation(token, conversationId))
+                        .statusCode(200)
+                        .build()
+        );
+    }
 }

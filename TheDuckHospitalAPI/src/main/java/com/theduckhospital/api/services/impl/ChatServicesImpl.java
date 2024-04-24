@@ -87,12 +87,13 @@ public class ChatServicesImpl implements IChatServices {
     public UUID acceptConversation(String token, UUID conversationId) {
         Account account = accountServices.findAccountByToken(token);
 
-        Optional<Conversation> optionalConversation = conversationRepository.findByConversationId(conversationId);
+        Optional<Conversation> optionalConversation = conversationRepository
+                .findByConversationId(conversationId);
         if (optionalConversation.isEmpty())
             throw new BadRequestException("Conversation not found", 10017);
 
         Conversation conversation = optionalConversation.get();
-        if (conversation.getSupportAgent() != null)
+        if (conversation.getSupportAgent() != null || conversation.getState() != ConversationState.WAITING_FOR_AGENT)
             throw new BadRequestException("Conversation already accepted", 10018);
 
         conversation.setSupportAgent((SupportAgent) account.getStaff());
@@ -135,6 +136,8 @@ public class ChatServicesImpl implements IChatServices {
 
             conversation = optionalConversation.get();
         }
+        if (conversation.getState() == ConversationState.CLOSED)
+            throw new BadRequestException("Conversation is closed", 10019);
 
         Pageable pageable = PageRequest.of(0, 15);
         sequenceNumber = sequenceNumber == -1 ? conversation.getMaxSequenceNumber(): sequenceNumber;
@@ -185,6 +188,23 @@ public class ChatServicesImpl implements IChatServices {
         return getConversationResponses(waitingConversation);
     }
 
+    @Override
+    public boolean closeConversation(String token, UUID conversationId) {
+        Account account = accountServices.findAccountByToken(token);
+        Optional<Conversation> conversation = conversationRepository.findByConversationId(conversationId);
+        if (conversation.isEmpty())
+            throw new BadRequestException("Conversation not found", 10017);
+        if (account.getStaff() == null || !conversation.get().getSupportAgent().getStaffId().equals(account.getStaff().getStaffId()))
+            throw new BadRequestException("Conversation not found", 10017);
+        if (conversation.get().getState() == ConversationState.CLOSED)
+            throw new BadRequestException("Conversation is already closed", 10019);
+
+        Conversation conversationToClose = conversation.get();
+        conversationToClose.setState(ConversationState.CLOSED);
+        conversationRepository.save(conversationToClose);
+        return true;
+    }
+
     @NotNull
     private List<ConversationResponse> getConversationResponses(List<Conversation> waitingConversation) {
         return waitingConversation.stream().map(conversation ->
@@ -209,10 +229,13 @@ public class ChatServicesImpl implements IChatServices {
     }
 
     private UUID sendAndNotify(Conversation conversation, SendMessageRequest request, boolean isStaff) {
+        if (conversation.getState() == ConversationState.CLOSED)
+            throw new BadRequestException("Conversation is closed", 10019);
+
         // Create and save the message
         Message message = new Message();
         message.setConversation(conversation);
-        message.setMessage(request.getMessage());
+        message.setMessage(request.getMessage().trim());
         message.setSupportAgent(isStaff);
         message.setSequenceNumber(conversation.getMaxSequenceNumber() + 1);
         messageRepository.save(message);

@@ -12,7 +12,6 @@ import {
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getConversations } from "../../services/supportAgent/ChatServices";
-
 const NotFound = () => {
   return (
     <Stack
@@ -123,6 +122,10 @@ function ActiveConversationList() {
                   fontSize: "12px",
                   color: "#8c8c8c",
                   textAlign: "left",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  width: "50%",
                 }}
               >
                 {conversation.lastMessageIsMine && "Bạn: "}

@@ -5,19 +5,17 @@ import {
   Box,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   Stack,
   Typography,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   acceptConversation,
-  getConversations,
   getWaitingConversations,
 } from "../../services/supportAgent/ChatServices";
-import { useSnackbar } from "notistack";
 
 const NotFound = () => {
   return (
@@ -145,6 +143,10 @@ function WaitingConversationList() {
                     fontSize: "12px",
                     color: "#8c8c8c",
                     textAlign: "left",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    width: "50%",
                   }}
                 >
                   {conversation.lastMessageIsMine && "Bạn: "}

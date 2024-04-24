@@ -18,4 +18,5 @@ public interface IChatServices {
     );
     List<ConversationResponse> getConversations(String token);
     List<ConversationResponse> getWaitingConversations();
+    boolean closeConversation(String token, UUID conversationId);
 }

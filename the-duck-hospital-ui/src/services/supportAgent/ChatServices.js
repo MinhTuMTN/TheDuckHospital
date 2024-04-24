@@ -1,4 +1,4 @@
-import { get, post } from "../AxiosInstance";
+import { del, get, post } from "../AxiosInstance";
 
 export const getConversations = () => {
   return get("/chat/conversations");
@@ -30,4 +30,8 @@ export const sendMessage = (conversationId, message) => {
     {},
     5000
   );
+};
+
+export const closeConversation = (conversationId) => {
+  return del(`/chat/${conversationId}`);
 };
