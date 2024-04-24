@@ -17,7 +17,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             Pageable pageable
     );
 
-    Page<Message> getMessagesByConversationAndSequenceNumberLessThanOrderBySequenceNumberDesc(
+    Page<Message> getMessagesByConversationAndSequenceNumberLessThanEqualOrderBySequenceNumberDesc(
             Conversation conversation,
             int sequenceNumber,
             Pageable pageable

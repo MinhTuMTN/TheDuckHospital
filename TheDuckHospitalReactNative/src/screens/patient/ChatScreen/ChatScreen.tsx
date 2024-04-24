@@ -1,23 +1,21 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
 import React, {useCallback, useEffect, useRef} from 'react';
+import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
-import {appColors} from '../../../constants/appColors';
-import InputChatComponent from '../../../components/patient/chatScreen/InputChatComponent';
 import ChatMessageComponent from '../../../components/patient/chatScreen/ChatMessageComponent';
-import {AppNotification} from '../../../utils/appNotification';
-import {getMessages} from '../../../services/chatServices';
+import InputChatComponent from '../../../components/patient/chatScreen/InputChatComponent';
+import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
+import {useToast} from '../../../hooks/ToastProvider';
+import {getMessages, sendMessage} from '../../../services/chatServices';
+import {AppNotification} from '../../../utils/appNotification';
 
 const ChatScreen = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [messages, setMessages] = React.useState<any[]>([]);
-  const [conversation, setConversation] = React.useState<any>(null);
+  const [conversation, setConversation] = React.useState<any>({
+    minSequenceNumber: 1,
+    maxSequenceNumber: 0,
+  });
   const flatListRef = useRef<FlatList>(null);
 
   const _renderItem = useCallback(({item}: {item: any}) => {
@@ -70,6 +68,27 @@ const ChatScreen = () => {
       };
     });
   }, [conversation, isLoading]);
+  const toast = useToast();
+  const handleSendMessage = useCallback(async (message: string) => {
+    if (!message.trim()) return;
+
+    setMessages((prev: any) => [
+      {
+        message,
+        supportAgent: false,
+        sequenceNumber: prev.maxSequenceNumber + 1,
+      },
+      ...prev,
+    ]);
+    setConversation((prev: any) => {
+      const newConversation = {...prev};
+      newConversation.maxSequenceNumber += 1;
+      return newConversation;
+    });
+    const response = await sendMessage(message);
+
+    if (!response.success) toast.showToast('Gửi tin nhắn thất bại');
+  }, []);
 
   useEffect(() => {
     AppNotification.subscribeToNotification(data => {
@@ -100,6 +119,7 @@ const ChatScreen = () => {
 
       if (response.success) {
         const listMessages = response.data.data.messages;
+        if (!listMessages || listMessages.length === 0) return;
         setMessages(listMessages);
         setConversation({
           ...response.data.data.conversation,
@@ -138,7 +158,11 @@ const ChatScreen = () => {
           ListFooterComponent={_footerComponent}
         />
       </View>
-      <InputChatComponent />
+      <InputChatComponent
+        onSend={(message: string) => {
+          handleSendMessage(message);
+        }}
+      />
     </ContainerComponent>
   );
 };

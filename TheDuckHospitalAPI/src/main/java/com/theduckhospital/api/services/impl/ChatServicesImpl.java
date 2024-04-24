@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.theduckhospital.api.constant.ConversationState;
 import com.theduckhospital.api.dto.request.chat.MessagesResponse;
 import com.theduckhospital.api.dto.request.chat.SendMessageRequest;
+import com.theduckhospital.api.dto.response.chat.ConversationResponse;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Conversation;
 import com.theduckhospital.api.entity.Message;
@@ -14,6 +15,7 @@ import com.theduckhospital.api.repository.MessageRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IChatServices;
 import com.theduckhospital.api.services.IFirebaseServices;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -104,9 +106,20 @@ public class ChatServicesImpl implements IChatServices {
     public MessagesResponse getMessages(String token, String conversationId, int sequenceNumber, String direction) {
         Account account = accountServices.findAccountByToken(token);
 
+        Conversation conversation;
         if (account.getStaff() != null)
         {
-            return null;
+            if (conversationId == null)
+                throw new BadRequestException("Conversation ID is required for staff", 10016);
+
+            Optional<Conversation> optionalConversation = conversationRepository
+                    .findByConversationId(UUID.fromString(conversationId));
+            if (optionalConversation.isEmpty())
+                throw new BadRequestException("Conversation not found", 10017);
+
+            conversation = optionalConversation.get();
+            if (conversation.getSupportAgent() == null || !conversation.getSupportAgent().getStaffId().equals(account.getStaff().getStaffId()))
+                throw new BadRequestException("Conversation not found", 10017);
         }
         else
         {
@@ -120,35 +133,79 @@ public class ChatServicesImpl implements IChatServices {
                         .conversation(null)
                         .build();
 
-            Conversation conversation = optionalConversation.get();
-
-            Pageable pageable = PageRequest.of(0, 15);
-            sequenceNumber = sequenceNumber == -1 ? conversation.getMaxSequenceNumber() : sequenceNumber;
-            if (direction.equals("next"))
-                return MessagesResponse.builder()
-                        .messages(messageRepository
-                                .getMessagesByConversationAndSequenceNumberGreaterThanOrderBySequenceNumber(
-                                        conversation,
-                                        sequenceNumber,
-                                        pageable
-                                ).getContent()
-                        )
-                        .conversation(conversation)
-                        .build();
-            else {
-                List<Message> messages = messageRepository
-                        .getMessagesByConversationAndSequenceNumberLessThanOrderBySequenceNumberDesc(
-                                conversation,
-                                sequenceNumber,
-                                pageable
-                        ).getContent();
-
-                return MessagesResponse.builder()
-                        .messages(messages)
-                        .conversation(conversation)
-                        .build();
-            }
+            conversation = optionalConversation.get();
         }
+
+        Pageable pageable = PageRequest.of(0, 15);
+        sequenceNumber = sequenceNumber == -1 ? conversation.getMaxSequenceNumber(): sequenceNumber;
+        if (direction.equals("next"))
+            return MessagesResponse.builder()
+                    .messages(messageRepository
+                            .getMessagesByConversationAndSequenceNumberGreaterThanOrderBySequenceNumber(
+                                    conversation,
+                                    sequenceNumber,
+                                    pageable
+                            ).getContent()
+                    )
+                    .conversation(conversation)
+                    .build();
+        else {
+            List<Message> messages = messageRepository
+                    .getMessagesByConversationAndSequenceNumberLessThanEqualOrderBySequenceNumberDesc(
+                            conversation,
+                            sequenceNumber,
+                            pageable
+                    ).getContent();
+
+            return MessagesResponse.builder()
+                    .messages(messages)
+                    .conversation(conversation)
+                    .build();
+        }
+    }
+
+    @Override
+    public List<ConversationResponse> getConversations(String token) {
+        Account account = accountServices.findAccountByToken(token);
+
+        List<Conversation> conversations = conversationRepository
+                .findBySupportAgentAndState(
+                        (SupportAgent) account.getStaff(),
+                        ConversationState.IN_PROGRESS
+                );
+
+        return getConversationResponses(conversations);
+    }
+
+    @Override
+    public List<ConversationResponse> getWaitingConversations() {
+        List<Conversation> waitingConversation = conversationRepository
+                .findBySupportAgentAndState(null, ConversationState.WAITING_FOR_AGENT);
+
+        return getConversationResponses(waitingConversation);
+    }
+
+    @NotNull
+    private List<ConversationResponse> getConversationResponses(List<Conversation> waitingConversation) {
+        return waitingConversation.stream().map(conversation ->
+        {
+            List<Message> messages = messageRepository
+                    .getMessagesByConversationAndSequenceNumberLessThanEqualOrderBySequenceNumberDesc(
+                            conversation,
+                            conversation.getMaxSequenceNumber(),
+                            PageRequest.of(0, 1)
+                    ).getContent();
+            Message lastMessage = messages.isEmpty() ? null : messages.get(0);
+
+            return ConversationResponse.builder()
+                    .conversationId(conversation.getConversationId())
+                    .userName(conversation.getAccount().getFullName())
+                    .userId(conversation.getAccount().getUserId())
+                    .lastMessage(lastMessage == null ? "" : lastMessage.getMessage())
+                    .lastMessageDate(lastMessage == null ? null : lastMessage.getCreatedAt())
+                    .lastMessageIsMine(lastMessage == null || lastMessage.isSupportAgent())
+                    .build();
+        }).toList();
     }
 
     private UUID sendAndNotify(Conversation conversation, SendMessageRequest request, boolean isStaff) {

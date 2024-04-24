@@ -1,4 +1,4 @@
-import {get} from './AxiosInstance';
+import {get, post} from './AxiosInstance';
 
 export const getMessages = async (
   sequenceNumber: number = -1,
@@ -7,5 +7,11 @@ export const getMessages = async (
   return get('/chat/messages', {
     sequenceNumber,
     direction,
+  });
+};
+
+export const sendMessage = async (message: string) => {
+  return post('/chat/send-message', {
+    message,
   });
 };

@@ -74,4 +74,34 @@ public class ChatController {
                         .build()
         );
     }
+
+    @PreAuthorize("hasRole('ROLE_SUPPORT_AGENT')")
+    @GetMapping("/conversations")
+    public ResponseEntity<?> getConversations(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Conversations retrieved")
+                        .data(chatServices.getConversations(token))
+                        .statusCode(200)
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPPORT_AGENT')")
+    @GetMapping("/waiting-conversations")
+    public ResponseEntity<?> getWaitingConversations(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Conversations retrieved")
+                        .data(chatServices.getWaitingConversations())
+                        .statusCode(200)
+                        .build()
+        );
+    }
 }

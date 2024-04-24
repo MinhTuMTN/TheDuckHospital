@@ -1,10 +1,15 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
-import InputComponent from '../../InputComponent';
 import {Send} from 'lucide-react-native';
+import React, {memo, useState} from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
 import {appColors} from '../../../constants/appColors';
+import InputComponent from '../../InputComponent';
 
-const InputChatComponent = () => {
+interface InputChatComponentProps {
+  onSend?: (message: string) => void;
+}
+
+const InputChatComponent = (props: InputChatComponentProps) => {
+  const {onSend} = props;
   const [message, setMessage] = useState<string>('');
   return (
     <View style={styles.wrapper}>
@@ -15,8 +20,18 @@ const InputChatComponent = () => {
           placeholder="Nhập tin nhắn"
           containerStyle={styles.inputContainer}
           _inputContainerStyle={{borderWidth: 0}}
+          returnKeyType="send"
+          onSubmitEditing={() => {
+            onSend && onSend(message);
+            setMessage('');
+          }}
         />
-        <Pressable style={styles.sendButton}>
+        <Pressable
+          style={styles.sendButton}
+          onPress={() => {
+            onSend && onSend(message);
+            setMessage('');
+          }}>
           <Send size={24} color={appColors.white} />
         </Pressable>
       </View>
@@ -24,7 +39,7 @@ const InputChatComponent = () => {
   );
 };
 
-export default InputChatComponent;
+export default memo(InputChatComponent);
 
 const styles = StyleSheet.create({
   wrapper: {
