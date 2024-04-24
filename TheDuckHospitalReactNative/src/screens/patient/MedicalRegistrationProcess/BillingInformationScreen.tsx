@@ -30,12 +30,14 @@ import {createBooking} from '../../../services/bookingServices';
 import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
+import {useTranslation} from 'react-i18next';
 
 const BillingInformationScreen = ({route}: {route: any}) => {
   const {timeSlots, profile} = route.params;
 
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const {t} = useTranslation();
   const [paymentMethod, setPaymentMethod] = React.useState<
     'MOMO' | 'VNPAY' | ''
   >('MOMO');
@@ -70,7 +72,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
     <GestureHandlerRootView style={{flex: 1}}>
       <ContainerComponent paddingTop={0}>
         <Header
-          title="Thông tin thanh toán"
+          title={t('billingInformation.title')}
           paddingStart={15}
           paddingTop={40}
           noBackground
@@ -86,7 +88,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               style={{color: appColors.primary}}
               italic
               fontWeight="400">
-              Vui lòng kiểm tra lại thông tin trước khi thanh toán
+              {t('billingInformation.note')}
             </TextComponent>
           </View>
           <View style={styles.overlay}>
@@ -96,7 +98,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   color={appColors.primaryLable}
                   fontWeight="600"
                   fontSize={20}>
-                  Thông tin bệnh nhân
+                  {t('billingInformation.patientInformation')}
                 </TextComponent>
                 <Space paddingTop={5} />
                 <LineInfoComponent
@@ -173,7 +175,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   color={appColors.primaryLable}
                   fontWeight="600"
                   fontSize={20}>
-                  Thông tin đặt khám
+                  {t('billingInformation.bookingInformation')}
                 </TextComponent>
                 <Space paddingTop={5} />
                 {timeSlots?.map((data: any, index: number) => (
@@ -183,8 +185,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                       marginBottom: 16,
                     }}>
                     <LineInfoComponent
+                      label={t('billingInformation.doctor')}
                       valueTextAlign="right"
-                      label="Bác sĩ"
                       value={data?.doctorName}
                       labelStyles={{
                         fontSize: 15,
@@ -200,9 +202,9 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                     <Space paddingTop={5} />
                     <LineInfoComponent
+                      label={t('billingInformation.typeOfService')}
+                      value={t('billingInformation.serviceExamination')}
                       valueTextAlign="right"
-                      label="Dịch vụ khám"
-                      value="Khám dịch vụ"
                       labelStyles={{
                         fontSize: 15,
                         fontWeight: '400',
@@ -217,8 +219,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                     <Space paddingTop={5} />
                     <LineInfoComponent
+                      label={t('billingInformation.department')}
                       valueTextAlign="right"
-                      label="Chuyên khoa"
                       value={data?.departmentName}
                       valueUppercase
                       labelStyles={{
@@ -235,8 +237,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                     <Space paddingTop={5} />
                     <LineInfoComponent
+                      label={t('billingInformation.date')}
                       valueTextAlign="right"
-                      label="Ngày khám"
                       value={data?.selectedDay}
                       labelStyles={{
                         fontSize: 15,
@@ -252,8 +254,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     />
                     <Space paddingTop={5} />
                     <LineInfoComponent
+                      label={t('billingInformation.time')}
                       valueTextAlign="right"
-                      label="Giờ khám"
                       value={getTimeSlotById(data?.timeSlot?.timeId)}
                       labelStyles={{
                         fontSize: 15,
@@ -282,7 +284,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     color={appColors.primaryLable}
                     fontWeight="600"
                     fontSize={20}>
-                    Chọn phương thức thanh toán
+                    {t('billingInformation.choosePaymentMethod')}
                   </TextComponent>
                 </>
               ) : paymentMethod === 'MOMO' ? (
@@ -296,7 +298,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     fontSize={17}
                     color={appColors.black}
                     style={{marginLeft: 10, letterSpacing: 0.2}}>
-                    Ví điện tử Momo
+                    {t('billingInformation.momoE-wallet')}
                   </TextComponent>
                 </View>
               ) : (
@@ -310,7 +312,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     fontSize={17}
                     color={appColors.black}
                     style={{marginLeft: 10, letterSpacing: 0.2}}>
-                    Ví điện tử VNPay
+                    {t('billingInformation.vnpayE-wallet')}
                   </TextComponent>
                 </View>
               )}
@@ -322,8 +324,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             </TouchableOpacity>
             <View style={styles.mainBill}>
               <LineInfoComponent
+                label={t('billingInformation.fee')}
                 valueTextAlign="right"
-                label="Tiền khám"
                 value={formatCurrency(totalAmount) + 'đ'}
                 labelStyles={{
                   fontSize: 15,
@@ -341,8 +343,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <View style={styles.line}></View>
               <Space paddingTop={5} />
               <LineInfoComponent
+                label={t('billingInformation.otherFee')}
                 valueTextAlign="right"
-                label="Phí tiện ích + TGTT"
                 value={formatCurrency('15000') + 'đ'}
                 labelStyles={{
                   fontSize: 15,
@@ -360,8 +362,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <View style={styles.line}></View>
               <Space paddingTop={5} />
               <LineInfoComponent
+                label={t('billingInformation.total')}
                 valueTextAlign="right"
-                label="Tổng tiền"
                 value={
                   formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
                   'đ'
@@ -388,9 +390,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   flex={1}
                   textAlign="justify"
                   flexWrap="wrap">
-                  Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám,
-                  thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ
-                  sở ý tế.
+                  {t('billingInformation.confirmNote')}
                 </TextComponent>
               </View>
               <ButtonComponent
@@ -405,7 +405,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   marginTop: 20,
                   padding: 15,
                 }}>
-                Thanh toán
+                {t('billingInformation.payment')}
               </ButtonComponent>
             </View>
           </View>

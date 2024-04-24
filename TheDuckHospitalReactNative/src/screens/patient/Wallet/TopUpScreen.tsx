@@ -50,8 +50,8 @@ const TopUpScreen = () => {
               setAmount(item);
             }}>
             <TextComponent
-              fontWeight={amount === item ? '500' : '300'}
-              fontSize={20}
+              fontWeight={amount === item ? '400' : '300'}
+              fontSize={17}
               color={amount === item ? appColors.primary : appColors.grayText}>
               {formatCurrency(item.toString())}
             </TextComponent>
@@ -228,7 +228,7 @@ const TopUpScreen = () => {
             <View style={styles.mainBill}>
               <LineInfoComponent
                 valueTextAlign="right"
-                label="Tiền khám"
+                label="Số tiền nạp"
                 value={
                   amount > 0 ? formatCurrency(amount.toString()) + 'đ' : '0đ'
                 }
@@ -287,6 +287,7 @@ const TopUpScreen = () => {
                 labelColor={appColors.grayText}
                 valueColor={'red'}
               />
+
               <ButtonComponent
                 onPress={handlePayment}
                 enabled={amount > 0}
@@ -296,7 +297,8 @@ const TopUpScreen = () => {
                   fontWeight: '600',
                 }}
                 containerStyles={{
-                  marginTop: 20,
+                  marginBottom: 16,
+                  marginTop: 12,
                   padding: 15,
                 }}>
                 Thanh toán

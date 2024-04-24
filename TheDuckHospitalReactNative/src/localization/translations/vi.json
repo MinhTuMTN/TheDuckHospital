@@ -126,5 +126,41 @@
     "close": "Huỷ",
     "morning": "Buổi sáng",
     "afternoon": "Buổi chiều"
+  },
+  "chooseProfile": {
+    "title": "Chọn hồ sơ bệnh nhân"
+  },
+  "confirmBookingInformationInBooking": {
+    "title": "Xác nhận thông tin",
+    "departmentHaveChoosen": "Chuyên khoa đã chọn",
+    "deletedAll": "Xoá hết",
+    "department": "Chuyên khoa:",
+    "doctor": "Bác sĩ:",
+    "date": "Ngày khám:",
+    "time": "Giờ khám:",
+    "fee": "Phí khám:",
+    "temporaryTolal": "Tổng tiền tạm tính:",
+    "addMoreDepartments": "Thêm chuyên khoa",
+    "confirm": "Xác nhận"
+  },
+  "billingInformation": {
+    "title": "Thông tin thanh toán",
+    "note": "Vui lòng kiểm tra lại thông tin trước khi thanh toán",
+    "patientInformation": "Thông tin bệnh nhân",
+    "bookingInformation": "Thông tin đặt khám",
+    "doctor": "Bác sĩ",
+    "typeOfService": "Dịch vụ khám",
+    "serviceExamination": "Khám dịch vụ",
+    "department": "Chuyên khoa",
+    "date": "Ngày khám",
+    "time": "Giờ khám",
+    "fee": "Tiền khám:",
+    "choosePaymentMethod": "Chọn phương thức thanh toán",
+    "momoE-wallet": "Ví điện tử Momo",
+    "vnpayE-wallet": "Ví điện tử VNPay",
+    "otherFee": "Phí tiện ích + TGTT",
+    "total": "Tổng tiền",
+    "confirmNote": "Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám, thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ sở ý tế.",
+    "payment": "Thanh toán"
   }
 }
