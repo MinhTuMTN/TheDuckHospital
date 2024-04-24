@@ -55,4 +55,15 @@ public class PatientMedicalTestController {
                 .build()
         );
     }
+
+    @GetMapping
+    public ResponseEntity<?> getMedicalTests() {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get medical tests successfully")
+                .data(medicalTestServices.patientGetMedicalTests())
+                .statusCode(200)
+                .build()
+        );
+    }
 }

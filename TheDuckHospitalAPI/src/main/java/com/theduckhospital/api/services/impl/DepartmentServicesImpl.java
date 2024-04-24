@@ -127,11 +127,11 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         List<DepartmentResponse> departments = new ArrayList<>();
 
         for (Department department : departmentRepository.findAll()) {
-            Doctor headDoctor = department.getDoctors().stream()
-                    .filter(Doctor::isHeadOfDepartment)
-                    .findFirst()
-                    .orElse(null);
-            departments.add(new DepartmentResponse(department, headDoctor));
+//            Doctor headDoctor = department.getDoctors().stream()
+//                    .filter(Doctor::isHeadOfDepartment)
+//                    .findFirst()
+//                    .orElse(null);
+            departments.add(new DepartmentResponse(department, null));
         }
 
         return departments;

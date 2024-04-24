@@ -1,5 +1,13 @@
-import React, {useState} from 'react';
-import {Alert, Modal, Pressable, StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import InfoProfileItemComponent from '../../../components/patient/lookUpMedicalResults/InfoProfileItemComponent';
@@ -8,9 +16,12 @@ import {appInfo} from '../../../constants/appInfo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {getAllPatientProfile} from '../../../services/patientProfileServices';
 
 const AllPatientProfilesScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigation<navigationProps>();
 
   const handleEnterProfileCode = () => {
@@ -24,16 +35,67 @@ const AllPatientProfilesScreen = () => {
   const handleOpenPopup = () => {
     setModalVisible(true);
   };
+
+  // FlatList props
+  const handleOnPress = useCallback((item: any) => {
+    navigate.navigate('MedicalTestResultScreen', {
+      profile: item,
+    });
+  }, []);
+  const _keyExtractor = useCallback((item: any) => item.patientProfileId, []);
+  const _renderItem = useCallback(
+    ({item}: any) => (
+      <InfoProfileItemComponent
+        profile={item}
+        onPress={() => handleOnPress(item)}
+      />
+    ),
+    [],
+  );
+  const _footerComponent = useCallback(() => {
+    if (loading) {
+      return (
+        <View
+          style={{
+            height: 500,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color={appColors.primary} />
+        </View>
+      );
+    }
+    return null;
+  }, [loading]);
+
+  useEffect(() => {
+    const handleGetAllPatientProfile = async () => {
+      setLoading(true);
+      const response = await getAllPatientProfile();
+      setLoading(false);
+      if (response.success)
+        setProfiles(response.data.data.filter((item: any) => item.patientCode));
+    };
+    handleGetAllPatientProfile();
+  }, []);
   return (
-    <ContainerComponent paddingTop={0}>
+    <ContainerComponent paddingTop={4}>
       <Header
         title={`Tra cứu kết quả\nkhám bệnh`}
         titleSize={20}
-        paddingTop={24}
+        paddingTop={32}
+        noBackground
+        titleColor={appColors.textDarker}
+        backButtonColor={appColors.textDarker}
       />
       <View style={styles.container}>
-        <InfoProfileItemComponent />
-        <InfoProfileItemComponent />
+        <FlatList
+          data={profiles}
+          keyExtractor={_keyExtractor}
+          renderItem={_renderItem}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={_footerComponent}
+        />
       </View>
 
       <View style={styles.buttonAddProfile}>
@@ -110,10 +172,9 @@ export default AllPatientProfilesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 16,
     paddingHorizontal: 20,
     backgroundColor: 'white',
-    rowGap: 16,
   },
   buttonAddProfile: {
     position: 'absolute',

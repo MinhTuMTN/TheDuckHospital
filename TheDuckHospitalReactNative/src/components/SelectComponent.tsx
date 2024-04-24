@@ -58,6 +58,8 @@ interface SelectComponentProps {
   borderColor?: ColorValue | undefined;
   error?: boolean;
   errorMessage?: string;
+  iconSize?: number;
+  triggerIcon?: any;
 }
 
 interface CustomSelectItemComponentProps {
@@ -125,6 +127,8 @@ const SelectComponent = (props: SelectComponentProps) => {
     borderColor,
     error,
     errorMessage,
+    iconSize,
+    triggerIcon,
   } = props;
 
   const handleOnChange = useCallback(
@@ -134,15 +138,18 @@ const SelectComponent = (props: SelectComponentProps) => {
     },
     [onChange],
   );
-  const renderItem = useCallback(({item}: {item: any}) => {
-    return (
-      <CustomSelectItemComponent
-        option={item}
-        title={typeof item === 'string' ? item : item[keyTitle]}
-        onPress={handleOnChange}
-      />
-    );
-  }, []);
+  const renderItem = useCallback(
+    ({item}: {item: any}) => {
+      return (
+        <CustomSelectItemComponent
+          option={item}
+          title={typeof item === 'string' ? item : item[keyTitle]}
+          onPress={handleOnChange}
+        />
+      );
+    },
+    [keyTitle, handleOnChange],
+  );
   const keyExtractor = useCallback(
     (item: any, index: any) =>
       typeof item === 'string'
@@ -212,7 +219,8 @@ const SelectComponent = (props: SelectComponentProps) => {
               },
               selectInputStyle,
             ]}>
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, alignItems: 'center', flexDirection: 'row'}}>
+              {triggerIcon && triggerIcon}
               <TextComponent
                 numberOfLines={1}
                 ellipsizeMode="tail"
@@ -228,8 +236,8 @@ const SelectComponent = (props: SelectComponentProps) => {
             <SelectIcon>
               {selectInputIcon || (
                 <ChevronDownIcon
-                  width={20}
-                  height={20}
+                  width={iconSize}
+                  height={iconSize}
                   color={selectIconColor || '#000000'}
                 />
               )}

@@ -97,7 +97,7 @@ public class WalletServicesImpl implements IWalletServices {
 
         Account account = accountServices.findAccountByToken(authorization);
 
-        if (!account.isWalletLocked())
+        if (!account.getWalletLocked())
             throw new BadRequestException("Wallet is already opened", 10113);
         
         account.setWalletPin(passwordEncoder.encode(request.getPinCode()));
@@ -117,12 +117,12 @@ public class WalletServicesImpl implements IWalletServices {
 
     @Override
     public boolean checkWalletCode(Account account, String code) {
-        if (account.isWalletLocked()) {
+        if (account.getWalletLocked()) {
             throw new BadRequestException("Wallet is locked", 10113);
         }
 
         if (!passwordEncoder.matches(code, account.getWalletPin())) {
-            account.setWalletPinCount((byte) (account.getWalletPinCount() + 1));
+            account.setWalletPinCount((account.getWalletPinCount() + 1));
 
             if (account.getWalletPinCount() >= 3) {
                 account.setWalletLocked(true);
@@ -132,7 +132,7 @@ public class WalletServicesImpl implements IWalletServices {
             return false;
         }
 
-        account.setWalletPinCount((byte) 0);
+        account.setWalletPinCount(0);
         accountServices.saveAccount(account);
         return true;
     }

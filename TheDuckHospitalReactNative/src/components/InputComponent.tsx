@@ -1,10 +1,9 @@
-import {Input, InputField, InputIcon, InputSlot} from '@gluestack-ui/themed';
+import {Input, InputSlot} from '@gluestack-ui/themed';
 import React, {forwardRef} from 'react';
 import {
   ColorValue,
   KeyboardTypeOptions,
   NativeSyntheticEvent,
-  Pressable,
   ReturnKeyTypeOptions,
   StyleProp,
   TextInput,
@@ -13,8 +12,8 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import {appColors} from '../constants/appColors';
 import {TextComponent} from '.';
+import {appColors} from '../constants/appColors';
 
 interface InputComponentProps {
   editabled?: boolean;
@@ -146,6 +145,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={type === 'password'}
+          showSoftInputOnFocus={editabled}
           value={value}
           style={[
             {

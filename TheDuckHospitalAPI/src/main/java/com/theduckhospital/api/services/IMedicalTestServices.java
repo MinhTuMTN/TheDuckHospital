@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
 import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.doctor.MedicalTestRecordResponse;
+import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.entity.MedicalTest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,4 +41,5 @@ public interface IMedicalTestServices {
             PayMedicalTestRequest request,
             String origin
     );
+    List<MedicalService> patientGetMedicalTests();
 }

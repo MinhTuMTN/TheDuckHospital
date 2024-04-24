@@ -1,13 +1,19 @@
-import notifee, {
-  AndroidDefaults,
-  AndroidImportance,
-} from '@notifee/react-native';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
-import DeviceInfo from 'react-native-device-info';
 
 export class AppNotification {
+  static subscribe: null | ((data: any) => void) = null;
+
+  static subscribeToNotification(callback: (data: any) => void) {
+    this.subscribe = callback;
+  }
+
+  static unsubscribeToNotification() {
+    this.subscribe = null;
+  }
+
   static async requestPermission() {
     await notifee.requestPermission();
     await notifee.createChannel({
@@ -19,6 +25,12 @@ export class AppNotification {
     await notifee.createChannel({
       id: 'booking',
       name: 'Booking Channel',
+      importance: AndroidImportance.HIGH,
+      sound: 'notifications',
+    });
+    await notifee.createChannel({
+      id: 'chat',
+      name: 'Chat Channel',
       importance: AndroidImportance.HIGH,
       sound: 'notifications',
     });
@@ -44,11 +56,16 @@ export class AppNotification {
       return;
     }
 
+    if (this.subscribe !== null && remoteMessage.data?.channelId === 'chat') {
+      this.subscribe(remoteMessage);
+      return;
+    }
+
     notifee.displayNotification({
       id: remoteMessage.messageId,
       title: (remoteMessage.data?.title as string) || 'Default Title',
       data: {
-        notificationId: remoteMessage.data?.notificationId,
+        notificationId: remoteMessage.data?.notificationId || '',
       },
       body: (remoteMessage.data?.body as string) || 'Default Body',
       android: {

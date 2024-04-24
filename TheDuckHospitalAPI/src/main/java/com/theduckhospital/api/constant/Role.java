@@ -8,4 +8,5 @@ public enum Role {
     CASHIER,
     LABORATORY_TECHNICIAN,
     PATIENT,
+    SUPPORT_AGENT
 }
