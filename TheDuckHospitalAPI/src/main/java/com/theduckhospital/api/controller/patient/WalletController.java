@@ -72,4 +72,17 @@ public class WalletController {
                 .build()
         );
     }
+
+    @GetMapping("/wallet-info")
+    public ResponseEntity<?> getWalletInfo(
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get wallet info successfully")
+                .data(walletServices.getWalletInfo(authorization))
+                .build()
+        );
+    }
 }

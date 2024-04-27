@@ -48,6 +48,7 @@ public class Account {
     private String walletPin;
     private Boolean walletLocked;
     private Integer walletPinCount;
+    private Date walletCreatedAt;
 
     @PrePersist
     private void onCreate() {
@@ -56,6 +57,7 @@ public class Account {
         this.balance = null;
         this.walletLocked = true;
         this.walletPinCount = 0;
+        this.walletCreatedAt = null;
     }
 
     @PreUpdate

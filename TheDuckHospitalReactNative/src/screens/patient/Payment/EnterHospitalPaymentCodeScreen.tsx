@@ -156,6 +156,9 @@ const EnterHospitalPaymentCodeScreen = () => {
         </View>
       </View>
       <Modal
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
         statusBarTranslucent
         animationType="slide"
         transparent={true}
