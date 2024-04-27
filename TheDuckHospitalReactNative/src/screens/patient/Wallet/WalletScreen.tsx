@@ -23,9 +23,8 @@ import RequestPinCodeComponent from '../../../components/patient/walletScreen/Re
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
 import LoadingComponent from '../../../components/LoadingComponent';
-import {useAuth} from '../../../hooks/AuthProvider';
 import ButtonComponent from '../../../components/ButtonComponent';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {getWalletInfo} from '../../../services/walletServices';
@@ -34,6 +33,7 @@ import {set} from '@gluestack-style/react';
 import NotFoundTransaction from '../../../components/patient/walletScreen/NotFoundTransaction';
 import TransactionInfoComponent from '../../../components/patient/walletScreen/TransactionInfoComponent';
 import {TimeMachine} from '../../../assets/svgs';
+import {useSelector} from 'react-redux';
 
 const WalletScreen = () => {
   const [showBalance, setShowBalance] = React.useState(false);
@@ -48,7 +48,7 @@ const WalletScreen = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [pinCodeVisible, setPinCodeVisible] = React.useState(true);
   const navigation = useNavigation<navigationProps>();
-  const auth = useAuth();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
   const handleNavigateToTopUp = () => {
     navigation.navigate('TopUpScreen');
@@ -105,7 +105,7 @@ const WalletScreen = () => {
                           color={appColors.black}
                           fontWeight="500"
                           fontSize={18}>
-                          {auth.userInfo.fullName}
+                          {userInfo.fullName}
                         </TextComponent>
                       </View>
                     </View>
@@ -139,8 +139,11 @@ const WalletScreen = () => {
                         },
                       ]}>
                       {showBalance
-                        ? formatCurrency(auth.userInfo.balance.toString()) +
-                          ' VND'
+                        ? formatCurrency(
+                            userInfo.balance
+                              ? userInfo.balance.toString()
+                              : '0',
+                          ) + ' VND'
                         : '*******'}
                     </TextComponent>
                     <Space paddingTop={6} />
