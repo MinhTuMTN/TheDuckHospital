@@ -14,6 +14,7 @@ public class BookingItemResponse {
     private Date date;
     private int queueNumber;
     private boolean status;
+    private boolean cancelled;
 
     public BookingItemResponse(Booking booking) {
         this.bookingId = booking.getBookingId();
@@ -22,5 +23,6 @@ public class BookingItemResponse {
         this.date = booking.getTimeSlot().getDoctorSchedule().getDate();
         this.queueNumber = booking.getQueueNumber();
         this.status = booking.getMedicalExaminationRecord() != null;
+        this.cancelled = booking.isCancelled();
     }
 }

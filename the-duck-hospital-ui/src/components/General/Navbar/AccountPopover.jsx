@@ -6,6 +6,7 @@ import NurseMenuList from "./NurseMenuList";
 import DoctorMenuList from "./DoctorMenuList";
 import AdminMenuList from "./AdminMenuList";
 import LaboratoryTechnicalList from "./LaboratoryTechnicalList";
+import SupportAgentList from "./SupportAgentList";
 
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
@@ -62,6 +63,9 @@ function AccountPopover(props) {
         )}
         {role === "LaboratoryTechnician" && (
           <LaboratoryTechnicalList onClose={onClose} setToken={setToken} />
+        )}
+        {role === "SupportAgent" && (
+          <SupportAgentList onClose={onClose} setToken={setToken} />
         )}
       </Stack>
     </Popover>

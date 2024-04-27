@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.UUID;
@@ -33,7 +34,10 @@ public class Booking {
     private TimeSlot timeSlot;
 
     @OneToOne
-    @JoinColumn(name = "medicalExaminationRecordId", referencedColumnName = "medicalExaminationRecordId")
+    @JoinColumn(
+            name = "medicalExaminationRecordId",
+            referencedColumnName = "medicalExaminationRecordId"
+    )
     @JsonBackReference
     @ToStringExclude
     private MedicalExaminationRecord medicalExaminationRecord;
@@ -41,6 +45,12 @@ public class Booking {
     private Date createdAt;
     private Date updatedAt;
     private boolean deleted;
+    private boolean cancelled;
+    private UUID refundedTransactionId;
+    private UUID refundedConversationId;
+
+    @Nationalized
+    private String refundReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
@@ -56,6 +66,8 @@ public class Booking {
                 .toUpperCase();
         this.createdAt = new Date();
         this.updatedAt = new Date();
+        this.cancelled = false;
+        this.deleted = false;
     }
 
     @PreUpdate

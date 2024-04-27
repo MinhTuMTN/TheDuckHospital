@@ -25,7 +25,7 @@ const TheDuckWallet = () => {
   };
   const handleOpenWallet = () => {
     setModalVisible(false);
-    navigation.navigate('OpenWalletScreen');
+    navigation.navigate('WalletScreen');
   };
   const handleModalClose = () => {
     setModalVisible(false);

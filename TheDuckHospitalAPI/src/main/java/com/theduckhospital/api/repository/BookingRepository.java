@@ -57,4 +57,11 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             PatientProfile patientProfile,
             DoctorSchedule doctorSchedule
     );
+    @Query("SELECT b FROM Booking b " +
+            "JOIN b.timeSlot ds " +
+            "WHERE ds.date < :date " +
+            "AND b.cancelled = false " +
+            "AND b.medicalExaminationRecord IS NULL "
+    )
+    List<Booking> findExpiredBookings(Date date);
 }

@@ -24,6 +24,9 @@ import TopUp from './TopUp.svg';
 import Secure from './Secure.svg';
 import Clipboard from './Clipboard.svg';
 import Bookmark from './Bookmark.svg';
+import TimeMachine from './TimeMachine.svg';
+import Up from './Up.svg';
+import Down from './Down.svg';
 
 export {
   English,
@@ -52,4 +55,7 @@ export {
   Secure,
   Clipboard,
   Bookmark,
+  TimeMachine,
+  Up,
+  Down,
 };

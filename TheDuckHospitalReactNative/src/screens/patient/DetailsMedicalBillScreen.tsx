@@ -10,6 +10,7 @@ import {
 } from '../../components';
 import {appColors} from '../../constants/appColors';
 import {getDetailsMedicalBill} from '../../services/bookingServices';
+import RequestRefundBookingComponent from '../../components/patient/detailsMedicalBillScreen/RequestRefundBookingComponent';
 
 const DetailsMedicalBillScreen = ({route}: {route: any}) => {
   const {bookingId, bookingCode} = route.params;
@@ -29,6 +30,7 @@ const DetailsMedicalBillScreen = ({route}: {route: any}) => {
 
     handleGetDetailsMedicalBill();
   }, []);
+
   return (
     <ContainerComponent paddingTop={0}>
       <Header title={`PK-${bookingCode}`} />
@@ -40,6 +42,9 @@ const DetailsMedicalBillScreen = ({route}: {route: any}) => {
           </FlexComponent>
         ) : (
           <ScrollView showsVerticalScrollIndicator={false}>
+            {medicalBill.cancelled && (
+              <RequestRefundBookingComponent booking={medicalBill} />
+            )}
             <DetailsMedicalBillComponent booking={medicalBill} />
           </ScrollView>
         )}

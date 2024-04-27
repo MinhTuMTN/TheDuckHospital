@@ -15,6 +15,7 @@ import {openWallet} from '../../../services/walletServices';
 import {useToast} from '../../../hooks/ToastProvider';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 import { useAuth } from '../../../hooks/AuthHooks';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const OpenWalletScreen = () => {
   const [info, setInfo] = React.useState({
@@ -64,166 +65,169 @@ const OpenWalletScreen = () => {
     }
   };
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title={'Tạo mật khẩu cho ví'}
-        showBackButton={true}
-        paddingTop={0}
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-      />
-      <ContentComponent>
-        <View style={styles.infoContainer}>
-          <Image
-            source={require('../../../assets/images/duck_hi.png')}
-            style={styles.image}
-          />
-          <View style={styles.info}>
-            <TextComponent color={appColors.textDarker}>
-              Tạo mật khẩu gồm 6 chữ số để bảo vệ ví của bạn
-            </TextComponent>
-            <View style={styles.triangle} />
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={'Tạo mật khẩu cho ví'}
+          showBackButton={true}
+          paddingTop={0}
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
+        />
+        <ContentComponent>
+          <View style={styles.infoContainer}>
+            <Image
+              source={require('../../../assets/images/duck_hi.png')}
+              style={styles.image}
+            />
+            <View style={styles.info}>
+              <TextComponent color={appColors.textDarker}>
+                Tạo mật khẩu gồm 6 chữ số để bảo vệ ví của bạn
+              </TextComponent>
+              <View style={styles.triangle} />
+            </View>
           </View>
-        </View>
-        <Space paddingTop={32} />
-        <InputComponent
-          value={info.password}
-          onChangeText={text => setInfo({...info, password: text})}
-          error={info.password.length < 6}
-          errorMessage="Mật khẩu phải có 6 chữ số"
-          label="Mật khẩu"
-          placeholder="******"
-          labelStyle={{
-            fontWeight: '400',
-          }}
-          type={info.passwordShow ? 'text' : 'password'}
-          maxLength={6}
-          keyboardType="number-pad"
-          labelContainerStyle={{
-            backgroundColor: appColors.white,
-            position: 'absolute',
-            top: -10,
-            left: 16,
-            paddingHorizontal: 8,
-            zIndex: 1,
-          }}
-          _inputContainerStyle={{
-            borderRadius: 10,
-            borderColor: appColors.primary,
-            height: 56,
-          }}
-          _inputStyle={{
-            paddingLeft: 16,
-            fontSize: 20,
-            letterSpacing: 10,
-          }}
-          endIcon={
-            info.passwordShow ? (
-              <EyeOff
-                size={24}
-                color={appColors.black}
-                onPress={() => {
-                  setInfo(prev => ({
-                    ...prev,
-                    passwordShow: !prev.passwordShow,
-                  }));
-                }}
-              />
-            ) : (
-              <Eye
-                size={24}
-                color={appColors.black}
-                onPress={() => {
-                  setInfo(prev => ({
-                    ...prev,
-                    passwordShow: !prev.passwordShow,
-                  }));
-                }}
-              />
-            )
-          }
-        />
-        <Space paddingTop={24} />
-        <InputComponent
-          label="Nhập lại mật khẩu"
-          placeholder="******"
-          value={info.confirmPassword}
-          onChangeText={text => setInfo({...info, confirmPassword: text})}
-          error={info.password !== info.confirmPassword}
-          errorMessage="Mật khẩu không khớp"
-          labelStyle={{
-            fontWeight: '400',
-          }}
-          type={info.confirmPasswordShow ? 'text' : 'password'}
-          maxLength={6}
-          keyboardType="number-pad"
-          labelContainerStyle={{
-            backgroundColor: appColors.white,
-            position: 'absolute',
-            top: -10,
-            left: 16,
-            paddingHorizontal: 8,
-            zIndex: 1,
-          }}
-          _inputContainerStyle={{
-            borderRadius: 10,
-            borderColor: appColors.primary,
-            height: 56,
-          }}
-          _inputStyle={{
-            paddingLeft: 16,
-            fontSize: 20,
-            letterSpacing: 10,
-          }}
-          endIcon={
-            info.confirmPasswordShow ? (
-              <EyeOff
-                size={24}
-                color={appColors.black}
-                onPress={() => {
-                  setInfo(prev => ({
-                    ...prev,
-                    confirmPasswordShow: !prev.confirmPasswordShow,
-                  }));
-                }}
-              />
-            ) : (
-              <Eye
-                size={24}
-                color={appColors.black}
-                onPress={() => {
-                  setInfo(prev => ({
-                    ...prev,
-                    confirmPasswordShow: !prev.confirmPasswordShow,
-                  }));
-                }}
-              />
-            )
-          }
-        />
-        <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 24}}>
-          <TextComponent
-            color={appColors.textDescription}
-            fontSize={15}
-            textAlign="center">
-            Bằng việc nhấn nút "Tiếp tục" bạn đã đồng ý với các điều khoản và
-            điều kiện của chúng tôi
-          </TextComponent>
-          <Space paddingTop={16} />
-          <ButtonComponent
-            isLoading={loading}
-            onPress={handleOpenWallet}
-            borderRadius={10}
-            enabled={
-              info.password.length === 6 &&
-              info.password === info.confirmPassword
-            }>
-            Tiếp tục
-          </ButtonComponent>
-        </View>
-      </ContentComponent>
-    </ContainerComponent>
+          <Space paddingTop={32} />
+          <InputComponent
+            value={info.password}
+            onChangeText={text => setInfo({...info, password: text})}
+            error={info.password.length < 6}
+            errorMessage="Mật khẩu phải có 6 chữ số"
+            label="Mật khẩu"
+            placeholder="******"
+            labelStyle={{
+              fontWeight: '400',
+            }}
+            type={info.passwordShow ? 'text' : 'password'}
+            maxLength={6}
+            keyboardType="number-pad"
+            labelContainerStyle={{
+              backgroundColor: appColors.white,
+              position: 'absolute',
+              top: -10,
+              left: 16,
+              paddingHorizontal: 8,
+              zIndex: 1,
+            }}
+            _inputContainerStyle={{
+              borderRadius: 10,
+              borderColor: appColors.primary,
+              height: 56,
+            }}
+            _inputStyle={{
+              paddingLeft: 16,
+              fontSize: 20,
+              letterSpacing: 10,
+            }}
+            endIcon={
+              info.passwordShow ? (
+                <EyeOff
+                  size={24}
+                  color={appColors.black}
+                  onPress={() => {
+                    setInfo(prev => ({
+                      ...prev,
+                      passwordShow: !prev.passwordShow,
+                    }));
+                  }}
+                />
+              ) : (
+                <Eye
+                  size={24}
+                  color={appColors.black}
+                  onPress={() => {
+                    setInfo(prev => ({
+                      ...prev,
+                      passwordShow: !prev.passwordShow,
+                    }));
+                  }}
+                />
+              )
+            }
+          />
+          <Space paddingTop={24} />
+          <InputComponent
+            label="Nhập lại mật khẩu"
+            placeholder="******"
+            value={info.confirmPassword}
+            onChangeText={text => setInfo({...info, confirmPassword: text})}
+            error={info.password !== info.confirmPassword}
+            errorMessage="Mật khẩu không khớp"
+            labelStyle={{
+              fontWeight: '400',
+            }}
+            type={info.confirmPasswordShow ? 'text' : 'password'}
+            maxLength={6}
+            keyboardType="number-pad"
+            labelContainerStyle={{
+              backgroundColor: appColors.white,
+              position: 'absolute',
+              top: -10,
+              left: 16,
+              paddingHorizontal: 8,
+              zIndex: 1,
+            }}
+            _inputContainerStyle={{
+              borderRadius: 10,
+              borderColor: appColors.primary,
+              height: 56,
+            }}
+            _inputStyle={{
+              paddingLeft: 16,
+              fontSize: 20,
+              letterSpacing: 10,
+            }}
+            endIcon={
+              info.confirmPasswordShow ? (
+                <EyeOff
+                  size={24}
+                  color={appColors.black}
+                  onPress={() => {
+                    setInfo(prev => ({
+                      ...prev,
+                      confirmPasswordShow: !prev.confirmPasswordShow,
+                    }));
+                  }}
+                />
+              ) : (
+                <Eye
+                  size={24}
+                  color={appColors.black}
+                  onPress={() => {
+                    setInfo(prev => ({
+                      ...prev,
+                      confirmPasswordShow: !prev.confirmPasswordShow,
+                    }));
+                  }}
+                />
+              )
+            }
+          />
+          <View
+            style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 24}}>
+            <TextComponent
+              color={appColors.textDescription}
+              fontSize={15}
+              textAlign="center">
+              Bằng việc nhấn nút "Tiếp tục" bạn đã đồng ý với các điều khoản và
+              điều kiện của chúng tôi
+            </TextComponent>
+            <Space paddingTop={16} />
+            <ButtonComponent
+              isLoading={loading}
+              onPress={handleOpenWallet}
+              borderRadius={10}
+              enabled={
+                info.password.length === 6 &&
+                info.password === info.confirmPassword
+              }>
+              Tiếp tục
+            </ButtonComponent>
+          </View>
+        </ContentComponent>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

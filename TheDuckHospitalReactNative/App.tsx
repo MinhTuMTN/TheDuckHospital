@@ -54,6 +54,7 @@ import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
 import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
+import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -216,17 +217,21 @@ const App = () => {
                     name="HospitalFeePaymentInformationScreen"
                     component={HospitalFeePaymentInformationScreen}
                   />
-                  <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+                  <Stack.Screen
+                    name="SuccessScreen"
+                    component={SuccessScreen}
+                  />
                   <Stack.Screen name="WalletScreen" component={WalletScreen} />
-                <Stack.Screen
-                  name="OpenWalletScreen"
-                  component={OpenWalletScreen}
-                />
-                <Stack.Screen name="TopUpScreen" component={TopUpScreen} />
-                <Stack.Screen
-                  name="MedicalTestResultScreen"
-                  component={MedicalTestResultScreen}
-                />
+                  <Stack.Screen
+                    name="OpenWalletScreen"
+                    component={OpenWalletScreen}
+                  />
+                  <Stack.Screen name="TopUpScreen" component={TopUpScreen} />
+                  <Stack.Screen
+                    name="MedicalTestResultScreen"
+                    component={MedicalTestResultScreen}
+                  />
+                  <Stack.Screen name="ChatScreen" component={ChatScreen} />
                 </Stack.Navigator>
               </NavigationContainer>
             </AxiosInterceptorProvider>

@@ -42,6 +42,7 @@ interface ButtonComponentProps {
   onPress?: () => void | any;
   isLoading?: boolean;
   startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
   loadingColor?: ColorValue | undefined;
   letterSpacing?: number;
 }
@@ -65,6 +66,7 @@ const ButtonComponent = (props: ButtonComponentProps) => {
     onPress,
     isLoading,
     startIcon,
+    endIcon,
     letterSpacing,
   } = props;
   return (
@@ -112,6 +114,7 @@ const ButtonComponent = (props: ButtonComponentProps) => {
           {children}
         </Text>
       </View>
+      {endIcon && !isLoading && endIcon}
     </TouchableOpacity>
   );
 };

@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import {Check, CircleDashed} from 'lucide-react-native';
+import {Check, CircleDashed, X} from 'lucide-react-native';
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {Space, TextComponent} from '../..';
@@ -42,13 +42,17 @@ const MedicalBillComponent = (props: MedicalBillComponentProps) => {
             <View
               style={[
                 {
-                  backgroundColor: booking.status
+                  backgroundColor: booking.cancelled
+                    ? appColors.error
+                    : booking.status
                     ? appColors.green
                     : appColors.yellow,
                 },
                 styles.status,
               ]}>
-              {booking.status ? (
+              {booking.cancelled ? (
+                <X size={20} color={appColors.white} />
+              ) : booking.status ? (
                 <Check size={20} color={appColors.white} />
               ) : (
                 <CircleDashed size={20} color={appColors.white} />
@@ -103,8 +107,18 @@ const MedicalBillComponent = (props: MedicalBillComponentProps) => {
               <Space paddingBottom={0} />
               <TextComponent
                 fontWeight="500"
-                color={booking.status ? appColors.green : appColors.primary}>
-                {booking.status ? 'Đã khám' : 'Chưa khám'}
+                color={
+                  booking.cancelled
+                    ? appColors.error
+                    : booking.status
+                    ? appColors.green
+                    : appColors.primary
+                }>
+                {booking.cancelled
+                  ? 'Bị huỷ'
+                  : booking.status
+                  ? 'Đã khám'
+                  : 'Chưa khám'}
               </TextComponent>
             </View>
           </View>

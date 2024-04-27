@@ -59,6 +59,9 @@ import VerifyInformation from "../pages/customer/VerifyInformation";
 import FindPatientIdPage from "../pages/customer/FindPatientIdPage";
 import IntroducePage from "../pages/customer/IntroducePage";
 import SupportPage from "../pages/customer/SupportPage";
+import ChatPage from "../pages/SupportAgent/ChatPage";
+import SupportAgentLayout from "../layouts/SupportAgentLayout";
+import WelcomePage from "../pages/SupportAgent/WelcomePage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -185,6 +188,27 @@ function Router(props) {
         {
           path: "/auth/login",
           element: <LoginPage />,
+        },
+      ],
+    },
+    {
+      path: "/",
+      element: <ProtectedLayout forRole={["SupportAgent"]} />,
+      children: [
+        {
+          path: "/support-agent",
+          element: <SupportAgentLayout />,
+          children: [
+            {
+              path: "",
+              element: <WelcomePage />,
+              index: true,
+            },
+            {
+              path: "chat/:chatId",
+              element: <ChatPage />,
+            },
+          ],
         },
       ],
     },

@@ -87,6 +87,14 @@ const laboratoryTechnicianMainItems = [
   },
 ];
 
+const supportAgentMainItems = [
+  {
+    display: "Hỗ trợ khách hàng",
+    icon: <HeadsetMicOutlinedIcon />,
+    to: "/support-agent",
+  },
+];
+
 const headDoctorMainItems = [
   {
     display: "Tạo lịch trực",
@@ -214,6 +222,9 @@ function RightNavBar(props) {
       break;
     case "LaboratoryTechnician":
       mainItems = laboratoryTechnicianMainItems;
+      break;
+    case "SupportAgent":
+      mainItems = supportAgentMainItems;
       break;
     default:
       break;

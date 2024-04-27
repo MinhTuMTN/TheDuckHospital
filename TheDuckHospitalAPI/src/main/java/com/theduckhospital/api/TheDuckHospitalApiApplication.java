@@ -15,12 +15,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.Date;
 
 @SpringBootApplication
+@EnableScheduling
 public class TheDuckHospitalApiApplication implements CommandLineRunner {
 	@Bean
 	FirebaseMessaging firebaseMessaging() throws IOException {

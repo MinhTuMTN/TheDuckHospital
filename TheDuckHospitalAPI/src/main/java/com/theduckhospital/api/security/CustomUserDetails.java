@@ -35,6 +35,8 @@ public class CustomUserDetails implements UserDetails {
                 role = "NURSE";
             else if (staff instanceof LaboratoryTechnician)
                 role = "LABORATORY_TECHNICIAN";
+            else if (staff instanceof SupportAgent)
+                role = "SUPPORT_AGENT";
             else
                 role = "USER";
         } else

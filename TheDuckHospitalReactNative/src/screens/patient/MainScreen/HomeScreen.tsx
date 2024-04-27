@@ -87,8 +87,8 @@ const HomeScreen = () => {
     navigation.navigate('AllPatientProfilesScreen');
   };
 
-  const handlNavigateConfirmBookingInformationScreen = () => {
-    navigation.navigate('TestScreen');
+  const handlNavigateQuickSupportScreen = () => {
+    navigation.navigate('ChatScreen');
   };
 
   useEffect(() => {
@@ -266,7 +266,7 @@ const HomeScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={handlNavigateConfirmBookingInformationScreen}
+              onPress={handlNavigateQuickSupportScreen}
               className="w-1/3 h-1/2 items-center justify-center py-4 border-r-2 border-[#D5CFCF]">
               <Image
                 source={require('../../../assets/images/chat.png')}

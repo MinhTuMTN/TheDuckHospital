@@ -46,8 +46,9 @@ public class Account {
 
     private BigDecimal balance;
     private String walletPin;
-    private boolean walletLocked;
-    private byte walletPinCount;
+    private Boolean walletLocked;
+    private Integer walletPinCount;
+    private Date walletCreatedAt;
 
     @PrePersist
     private void onCreate() {
@@ -56,6 +57,7 @@ public class Account {
         this.balance = null;
         this.walletLocked = true;
         this.walletPinCount = 0;
+        this.walletCreatedAt = null;
     }
 
     @PreUpdate
@@ -87,4 +89,9 @@ public class Account {
     @JoinColumn(name = "staffId", referencedColumnName = "staffId")
     @JsonBackReference
     private Staff staff;
+
+    @OneToMany(mappedBy = "account")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Conversation> conversations;
 }
