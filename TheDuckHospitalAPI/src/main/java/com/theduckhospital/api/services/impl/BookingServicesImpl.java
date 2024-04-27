@@ -269,7 +269,7 @@ public class BookingServicesImpl implements IBookingServices {
                             return 0;
                     })
                     .toList()
-                    .stream().limit(15).toList();
+                    .stream().limit(30).toList();
 
             if (bookings.isEmpty())
                 continue;
@@ -313,6 +313,9 @@ public class BookingServicesImpl implements IBookingServices {
 
         if (booking == null)
             throw new NotFoundException("Booking not found");
+
+        if (booking.isCancelled())
+            throw new StatusCodeException("Booking is cancelled", 400);
 
 
         // Check date booking with current date
@@ -372,6 +375,7 @@ public class BookingServicesImpl implements IBookingServices {
         booking.setTransaction(transaction);
         booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
         booking.setDeleted(false);
+        booking.setCancelled(false);
         bookingRepository.save(booking);
 
         timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);

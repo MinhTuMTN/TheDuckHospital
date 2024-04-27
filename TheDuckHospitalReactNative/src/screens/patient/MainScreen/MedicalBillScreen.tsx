@@ -18,7 +18,7 @@ import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
-  const [fillter, setFillter] = useState('Tất cả');
+  const [fillter, setFillter] = useState('Chưa khám');
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatientName, setSelectedPatientName] = useState({
     fullName: null,
@@ -83,38 +83,58 @@ const MedicalBillScreen = () => {
 
   useEffect(() => {
     setIsLoadingAPI(true);
-    switch (fillter) {
-      case 'Tất cả':
-        setBookingToDisplay(bookings[0]?.bookings);
-        break;
-      case 'Đã khám':
-        setBookingToDisplay(
-          bookings[0]?.bookings.filter((booking: any) => booking.status),
-        );
-        break;
-      case 'Chưa khám':
-        setBookingToDisplay(
-          bookings[0]?.bookings.filter((booking: any) => !booking.status),
-        );
-        break;
-    }
-    setIsLoadingAPI(false);
-  }, [fillter]);
-
-  useEffect(() => {
     const temp = bookings.filter(
       (booking: any) =>
         booking.patientProfileId === selectedPatientName.patientProfileId,
     );
-    let bookingToDisplayTemp = temp[0]?.bookings;
-    bookingToDisplayTemp?.sort((a: any, b: any) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
+    var bookingToDisplayTemp = temp[0]?.bookings;
+    if (fillter === 'Chưa khám') {
+      bookingToDisplayTemp?.sort((a: any, b: any) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
 
-      return dateB.getTime() - dateA.getTime();
-    });
-    setBookingToDisplay(bookingToDisplayTemp);
-  }, [selectedPatientName]);
+        return dateA.getTime() - dateB.getTime();
+      });
+    } else {
+      bookingToDisplayTemp?.sort((a: any, b: any) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
+
+    switch (fillter) {
+      case 'Tất cả':
+        setBookingToDisplay(bookingToDisplayTemp);
+        break;
+      case 'Đã khám':
+        setBookingToDisplay(
+          bookingToDisplayTemp?.filter(
+            (booking: any) => booking.status && !booking.cancelled,
+          ),
+        );
+        break;
+      case 'Chưa khám':
+        setBookingToDisplay(
+          bookingToDisplayTemp?.filter(
+            (booking: any) => !booking.status && !booking.cancelled,
+          ),
+        );
+        break;
+      case 'Bị hủy':
+        setBookingToDisplay(
+          bookingToDisplayTemp?.filter((booking: any) => booking.cancelled),
+        );
+        break;
+    }
+    setIsLoadingAPI(false);
+  }, [fillter, selectedPatientName, bookings]);
+
+  // useEffect(() => {
+
+  //   setBookingToDisplay(bookingToDisplayTemp);
+  // }, [selectedPatientName, bookings]);
   return (
     <LoginRequireComponent>
       <ContainerComponent paddingTop={0}>
@@ -151,7 +171,7 @@ const MedicalBillScreen = () => {
         </FlexComponent>
 
         <FilterComponent
-          items={['Tất cả', 'Đã khám', 'Chưa khám']}
+          items={['Chưa khám', 'Tất cả', 'Đã khám', 'Bị hủy']}
           value={fillter}
           onChange={value => setFillter(value)}
         />

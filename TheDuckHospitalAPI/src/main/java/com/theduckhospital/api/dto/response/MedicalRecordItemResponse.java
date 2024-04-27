@@ -27,6 +27,8 @@ public class MedicalRecordItemResponse {
     private String patientProvince;
     private String patientCode;
     private int timeId;
+    private boolean cancelled;
+    private boolean refunded;
 
     public MedicalRecordItemResponse(Booking booking) {
         this.bookingId = booking.getBookingId();
@@ -46,5 +48,7 @@ public class MedicalRecordItemResponse {
         this.patientProvince = booking.getPatientProfile().getWard().getDistrict().getProvince().getProvinceName();
         this.patientCode = booking.getPatientProfile().getPatient() != null ? booking.getPatientProfile().getPatient().getPatientCode() : null;
         this.timeId = booking.getTimeSlot().getTimeId();
+        this.cancelled = booking.isCancelled();
+        this.refunded = booking.getRefundedTransactionId() != null;
     }
 }

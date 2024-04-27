@@ -60,7 +60,11 @@ const DetailsMedicalBillComponent = (
           {(booking?.queueNumber as string)?.toString().padStart(2, '0')}
         </TextComponent>
         <TextComponent italic>
-          {booking.status ? '(Đã khám)' : `(Chưa khám)`}
+          {booking.cancelled
+            ? '(Bị huỷ)'
+            : booking.status
+            ? '(Đã khám)'
+            : `(Chưa khám)`}
         </TextComponent>
         {booking.status && (
           <Pressable onPress={handleClickViewDetails}>
