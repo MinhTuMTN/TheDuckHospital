@@ -10,7 +10,6 @@ import {
 import {
   FlexComponent,
   InputComponent,
-  SelectComponent,
   TextComponent,
 } from '../..';
 import ButtonComponent from '../../ButtonComponent';
@@ -117,7 +116,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
 
         setIsLoading(true);
         const responseUpdateDepartment = await updateDepartment(
-          department.departmentId,
+          department?.departmentId,
           data,
         );
         setIsLoading(false);
@@ -136,7 +135,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
 
   React.useEffect(() => {
     const handleGetDoctorWithinDepartment = async () => {
-      const response = await getDoctorWithinDepartment(department.departmentId);
+      const response = await getDoctorWithinDepartment(department?.departmentId);
       if (response.success) {
         setHeadDoctors(response.data.data);
       } else {

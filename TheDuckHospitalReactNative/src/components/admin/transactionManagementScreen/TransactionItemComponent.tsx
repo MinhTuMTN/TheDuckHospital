@@ -6,6 +6,8 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import {globalStyles} from '../../../styles/globalStyles';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import { formatDate } from '../../../utils/dateUtils';
+import { formatCurrency } from '../../../utils/currencyUtils';
 
 interface TransactionItemComponentProps {
   transaction: any;
@@ -25,9 +27,9 @@ function TransactionItemComponent(props: TransactionItemComponentProps) {
       <ContainerComponent style={styles.transactionItemContainer}>
         <FlexComponent style={[styles.transactionInfoContainer, {flex: 0.6}]}>
           <TextComponent bold fontSize={21}>
-            {transaction.fullName}
+            {transaction.userName}
           </TextComponent>
-          <TextComponent fontSize={16}>{transaction.date}</TextComponent>
+          <TextComponent fontSize={16}>{formatDate(transaction.createdAt)}</TextComponent>
         </FlexComponent>
 
         <FlexComponent
@@ -36,30 +38,36 @@ function TransactionItemComponent(props: TransactionItemComponentProps) {
             {alignItems: 'flex-end', flex: 0.4},
           ]}>
           <TextComponent bold fontSize={18}>
-            {`${transaction.price} VNĐ`}
+            {`${formatCurrency(transaction.amount)} VNĐ`}
           </TextComponent>
           <FlexComponent style={styles.statusContainer}>
             <EntypoIcon
               name="dot-single"
               size={20}
               color={
-                transaction.transactionState === 'SUCCESS'
+                transaction.status === 'SUCCESS'
                   ? appColors.green
-                  : appColors.darkRed
+                  : transaction.status === 'FAILED'
+                  ? appColors.darkRed
+                  : appColors.yellow
               }
             />
             <TextComponent
               bold
               fontSize={12}
               color={
-                transaction.transactionState === 'SUCCESS'
+                transaction.status === 'SUCCESS'
                   ? appColors.green
-                  : appColors.darkRed
+                  : transaction.status === 'FAILED'
+                  ? appColors.darkRed
+                  : appColors.yellow
               }>
               {`${
-                transaction.transactionState === 'SUCCESS'
+                transaction.status === 'SUCCESS'
                   ? 'Thành công'
-                  : 'Thất bại'
+                  : transaction.status === 'FAILED'
+                  ? 'Thất bại'
+                  : 'Đang chờ'
               }`}
             </TextComponent>
           </FlexComponent>

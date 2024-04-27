@@ -23,7 +23,7 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   const {medicalTests, fromDate, toDate, loading} = props;
 
   const _keyExtractor = useCallback(
-    (item: any, index: number) => item.medicalTestId,
+    (item: any, index: number) => `${item.medicalTestId}-${index}`,
     [],
   );
   const _renderItem = useCallback(
@@ -35,7 +35,7 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
       return (
         <View
           style={{
-            height: medicalTests === 0 ? 400 : 100,
+            height: 100,
             justifyContent: 'center',
             alignItems: 'center',
           }}>

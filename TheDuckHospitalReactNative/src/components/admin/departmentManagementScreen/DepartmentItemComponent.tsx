@@ -33,7 +33,7 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
   };
 
   const handleDetailsClick = () => {
-    navigation.navigate('DepartmentDetailScreen', {department: department});
+    navigation.navigate('DepartmentDetailScreen', {departmentId: department.departmentId});
   };
 
   return (

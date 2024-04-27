@@ -21,7 +21,6 @@ import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
-import 'react-native-gesture-handler';
 import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
 import StatisticsScreen from './src/screens/admin/StatisticsScreen/StatisticsScreen';
 import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';

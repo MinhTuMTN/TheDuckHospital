@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,13 +25,26 @@ public class MedicalRecordResponse {
     private String symptom;
     private MedicalExamState state;
 
-    public MedicalRecordResponse(MedicalExaminationRecord record, List<PrescriptionItemResponse> prescription) {
+    public MedicalRecordResponse(MedicalExaminationRecord record, List<PrescriptionItemResponse> prescription2) {
         this.roomName = record.getDoctorSchedule().getRoom().getRoomName();
         this.departmentName = record.getDoctorSchedule().getRoom().getDepartment().getDepartmentName();
         this.doctor = record.getDoctorSchedule().getDoctor();
         this.doctorEmail = record.getDoctorSchedule().getDoctor().getAccount().getEmail();
         this.doctorSchedule = record.getDoctorSchedule();
-        this.prescription = prescription;
+
+        Prescription prescription = record.getPrescription();
+        List<PrescriptionItem> prescriptionItems;
+        List<PrescriptionItemResponse> prescriptionItemResponses = new ArrayList<>();
+        if (prescription != null) {
+            prescriptionItems = record.getPrescription().getPrescriptionItems();
+            for (PrescriptionItem prescriptionItem : prescriptionItems) {
+                if(!prescriptionItem.isDeleted()) {
+                    prescriptionItemResponses.add(new PrescriptionItemResponse(prescriptionItem));
+                }
+            }
+        }
+        this.prescription = prescriptionItemResponses;
+
         if(record.getPrescription() != null) {
             this.price = record.getPrescription().getTotalCost();
         } else {

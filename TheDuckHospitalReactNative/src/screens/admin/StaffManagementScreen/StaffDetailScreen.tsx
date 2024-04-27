@@ -90,7 +90,7 @@ function StaffDetailScreen() {
         </FlexComponent>
       </ContainerComponent>
 
-      <ContainerComponent style={styles.container}>
+      {/* <ContainerComponent style={styles.container}>
         <Calendar size={32} color={appColors.black} />
         <TextComponent bold fontSize={28} style={styles.listLabel}>
           Lịch trực
@@ -99,7 +99,7 @@ function StaffDetailScreen() {
       <ScrollView style={styles.scrollViewContainer}>
         <ScheduleItemComponent morning />
         <ScheduleItemComponent />
-      </ScrollView>
+      </ScrollView> */}
     </ContainerComponent>
   );
 }

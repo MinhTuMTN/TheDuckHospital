@@ -217,7 +217,7 @@ function TransactionListScreen() {
         <TransactionItemComponent />
       </ScrollView> */}
 
-<SafeAreaView style={styles.flatListContainer}>
+      <SafeAreaView style={styles.flatListContainer}>
         <FlatList
           data={transactions}
           keyExtractor={(item: any, index: number) =>
@@ -255,7 +255,7 @@ function TransactionListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.1,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingTop: 0,
@@ -316,14 +316,14 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   searchContainer: {
-    flex: 0.2,
+    flex: 1,
     paddingTop: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   flatListContainer: {
-    flex: 0.7,
+    flex: 7,
     marginBottom: 20,
     paddingHorizontal: 20,
   },

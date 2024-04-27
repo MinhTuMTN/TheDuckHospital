@@ -13,6 +13,7 @@ import java.util.UUID;
 public class DoctorScheduleRoomResponse {
     private UUID doctorScheduleId;
     private ScheduleType scheduleType;
+    private int dayOfWeek;
     private String doctorName;
     private Gender doctorGender;
     private Degree doctorDegree;
@@ -21,6 +22,7 @@ public class DoctorScheduleRoomResponse {
     private String serviceName;
     private String roomName;
     private String phoneNumber;
+    private String identityNumber;
     private int queueNumber;
     private long numberOfBookings;
     private int slot;
@@ -29,6 +31,7 @@ public class DoctorScheduleRoomResponse {
     public DoctorScheduleRoomResponse(DoctorSchedule schedule, long numberOfBookings) {
         this.doctorScheduleId = schedule.getDoctorScheduleId();
         this.scheduleType = schedule.getScheduleType();
+        this.dayOfWeek = schedule.getDayOfWeek();
         this.doctorName = schedule.getDoctor().getFullName();
         this.doctorGender = schedule.getDoctor().getGender();
         this.doctorDegree = schedule.getDoctor().getDegree();
@@ -37,6 +40,7 @@ public class DoctorScheduleRoomResponse {
         this.roomName = schedule.getRoom().getRoomName();
         this.departmentName = schedule.getDoctor().getDepartment().getDepartmentName();
         this.phoneNumber = schedule.getDoctor().getPhoneNumber();
+        this.identityNumber = schedule.getDoctor().getIdentityNumber();
         this.queueNumber = schedule.getQueueNumber();
         this.date = schedule.getDate();
         this.numberOfBookings = numberOfBookings;

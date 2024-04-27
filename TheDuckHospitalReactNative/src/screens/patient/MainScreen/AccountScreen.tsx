@@ -100,13 +100,13 @@ const AccountScreen = () => {
           )}
         </View>
 
-        <SectionComponent
+        {/* <SectionComponent
           title={t('account.myWallet')}
           tilteStyle={styles.titleSection}>
           <View style={styles.flexGap}>
             <TheDuckWallet />
           </View>
-        </SectionComponent>
+        </SectionComponent> */}
 
         <SectionComponent
           title={t('account.generalSettings')}

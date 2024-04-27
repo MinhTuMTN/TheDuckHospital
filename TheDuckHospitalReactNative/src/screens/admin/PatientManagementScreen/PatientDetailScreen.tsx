@@ -7,7 +7,6 @@ import {
   TextComponent,
 } from '../../../components';
 import {appColors} from '../../../constants/appColors';
-import {ScrollView} from '@gluestack-ui/themed';
 import {FileSpreadsheet, Info} from 'lucide-react-native';
 import PatientProfileItemComponent from '../../../components/admin/patientManagementScreen/PatientProfileItemComponent';
 import {useRoute} from '@react-navigation/native';
@@ -114,7 +113,7 @@ function PatientDetailScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.15,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -127,12 +126,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailContainer: {
-    flex: 0.55,
+    flex: 2,
     paddingTop: 0,
     paddingLeft: 40,
   },
   scrollViewContainer: {
-    flex: 0.1,
+    flex: 1,
     paddingHorizontal: 20,
   },
   listLabel: {

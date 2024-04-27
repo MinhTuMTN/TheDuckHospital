@@ -101,9 +101,9 @@ function PatientProfileDetailScreen() {
 
         <ContainerComponent style={styles.listExamination}>
           <Accordion type="single" width={'100%'} shadowColor="transparent">
-            <ExaminationItemComponent value="a" />
+            {/* <ExaminationItemComponent value="a" />
             <ExaminationItemComponent value="b" />
-            <ExaminationItemComponent value="c" />
+            <ExaminationItemComponent value="c" /> */}
           </Accordion>
         </ContainerComponent>
       </ScrollView>

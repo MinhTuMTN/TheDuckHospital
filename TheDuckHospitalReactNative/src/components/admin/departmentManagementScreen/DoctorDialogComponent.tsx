@@ -15,24 +15,68 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
+import {
+  addDoctorToDepartment,
+  getDoctorWithoutDepartment,
+} from '../../../services/departmentServices';
 
-const doctors = ['Lâm Mộc Văn', 'Lý Đại Bàng', 'Lý Thị Định', 'Đinh Văn Hoan'];
+// const doctors = ['Lâm Mộc Văn', 'Lý Đại Bàng', 'Lý Thị Định', 'Đinh Văn Hoan'];
 
 interface DoctorDialogComponentProps {
+  departmentId: number;
   modalVisible?: boolean;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
 const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
-  const {modalVisible, setModalVisible} = props;
-  const [doctor, setDoctor] = useState(doctors[0]);
+  const {
+    departmentId,
+    refreshList,
+    modalVisible,
+    setRefreshList,
+    setModalVisible,
+  } = props;
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [doctor, setDoctor] = useState({staffId: '', fullName: 'Chọn bác sĩ'});
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
-      setDoctor(doctors[0]);
+      setDoctor({staffId: '', fullName: 'Chọn bác sĩ'});
     }
   };
+
+  const handleAddDoctorToDepartment = async () => {
+    setLoading(true);
+    const response = await addDoctorToDepartment(departmentId, doctor.staffId);
+    setLoading(false);
+    if (response.success) {
+      setDoctors(response.data.data);
+      setRefreshList(!refreshList);
+      closeModal();
+    } else {
+      console.log(response);
+    }
+  };
+
+  React.useEffect(() => {
+    const handleGetDoctorWithoutDepartment = async () => {
+      const response = await getDoctorWithoutDepartment(departmentId);
+      if (response.success) {
+        setDoctors(response.data.data);
+      } else {
+        console.log(response);
+      }
+    };
+    try {
+      handleGetDoctorWithoutDepartment();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [refreshList]);
 
   return (
     <Modal
@@ -66,10 +110,10 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                 setDoctor(selectedItem);
               }}
               buttonTextAfterSelection={(selectedItem, index) => {
-                return selectedItem;
+                return selectedItem.fullName;
               }}
               rowTextForSelection={(item, index) => {
-                return item;
+                return item.fullName;
               }}
               renderDropdownIcon={() => (
                 <FontAwesomeIcon
@@ -98,7 +142,7 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                       size={24}
                     />
                     <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem : doctor}
+                      {selectedItem ? selectedItem.fullName : doctor.fullName}
                     </Text>
                   </View>
                 );
@@ -120,6 +164,8 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              isLoading={loading}
+              onPress={handleAddDoctorToDepartment}
               containerStyles={[styles.button, {marginRight: 15}]}>
               <TextComponent style={styles.buttonTextStyle}>Thêm</TextComponent>
             </ButtonComponent>

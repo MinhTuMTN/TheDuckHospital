@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, FlatList, SafeAreaView} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
@@ -10,8 +10,13 @@ import {appColors} from '../../../constants/appColors';
 import {Accordion, ScrollView} from '@gluestack-ui/themed';
 import {FileSpreadsheet, Heart, Info} from 'lucide-react-native';
 import ExaminationItemComponent from '../../../components/admin/patientManagementScreen/ExaminationItemComponent';
+import {useRoute} from '@react-navigation/native';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import {formatDate} from '../../../utils/dateUtils';
 
 function TransactionDetailScreen() {
+  const route = useRoute();
+  const {transaction} = route.params as {transaction: any};
   return (
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết giao dịch'} paddingTop={40} />
@@ -29,7 +34,7 @@ function TransactionDetailScreen() {
               Phương thức:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              VNPay
+              {transaction.paymentMethod}
             </TextComponent>
           </FlexComponent>
 
@@ -38,7 +43,7 @@ function TransactionDetailScreen() {
               Tổng tiền:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              200.000 VNĐ
+              {`${formatCurrency(transaction.amount)} VNĐ`}
             </TextComponent>
           </FlexComponent>
 
@@ -47,7 +52,7 @@ function TransactionDetailScreen() {
               Ngày tạo:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              31/01/2000
+              {formatDate(transaction.createdAt)}
             </TextComponent>
           </FlexComponent>
 
@@ -58,8 +63,18 @@ function TransactionDetailScreen() {
             <TextComponent
               fontSize={20}
               style={{flex: 0.6}}
-              color={appColors.green}>
-              Thành công
+              color={
+                transaction.status === 'SUCCESS'
+                  ? appColors.green
+                  : transaction.status === 'FAILED'
+                  ? appColors.darkRed
+                  : appColors.yellow
+              }>
+              {transaction.status === 'SUCCESS'
+                ? 'Thành công'
+                : transaction.status === 'FAILED'
+                ? 'Thất bại'
+                : 'Đang chờ'}
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>
@@ -73,9 +88,32 @@ function TransactionDetailScreen() {
 
         <ContainerComponent style={styles.listExamination}>
           <Accordion type="single" width={'100%'} shadowColor="transparent">
-            <ExaminationItemComponent value="a" />
+            {/* <ExaminationItemComponent value="a" />
             <ExaminationItemComponent value="b" />
-            <ExaminationItemComponent value="c" />
+            <ExaminationItemComponent value="c" /> */}
+
+            {/* <SafeAreaView>
+              <FlatList
+                data={transaction.bookings}
+                keyExtractor={(item: any, index: number) =>
+                  `booking-${item.id}-${index}`
+                }
+                renderItem={({item}) => (
+                  <ExaminationItemComponent
+                    value={item.booking.bookingId}
+                    
+                  />
+                )}
+                style={{width: '100%'}}
+              />
+            </SafeAreaView> */}
+            {transaction.bookings.map((item: any, index: number) => (
+              <ExaminationItemComponent
+                key={index}
+                value={item.booking.bookingId}
+                item={item}
+              />
+            ))}
           </Accordion>
         </ContainerComponent>
       </ScrollView>

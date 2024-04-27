@@ -10,13 +10,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@gluestack-ui/themed';
+import {formatDate} from '../../../utils/dateUtils';
+import {formatCurrency} from '../../../utils/currencyUtils';
+import PrescriptionItemComponent from './PrescriptionItemComponent';
 
 interface ExaminationItemComponentProps {
   value: string;
+  item: any;
 }
 
 const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
-  const {value} = props;
+  const {value, item} = props;
 
   return (
     <AccordionItem value={value} mt="$5">
@@ -25,20 +29,43 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
           {({isExpanded}) => {
             return (
               <>
-                <FlexComponent>
-                  <TextComponent bold fontSize={21}>
-                    BS. Lâm Lục
+                <FlexComponent flex={0.55}>
+                  <TextComponent bold fontSize={18}>
+                    {`${item.doctorSchedule.doctorDegree}. ${item.doctorSchedule.doctorName}`}
                   </TextComponent>
-                  <TextComponent fontSize={16}>Buổi sáng - Thứ 2</TextComponent>
-                  <TextComponent fontSize={16}>31/01/2000</TextComponent>
+                  <TextComponent fontSize={16}>{`${
+                    item.doctorSchedule.scheduleType === 'MORNING'
+                      ? 'Buổi sáng'
+                      : 'Buổi chiều'
+                  } - Thứ ${item.doctorSchedule.dayOfWeek}`}</TextComponent>
+                  <TextComponent fontSize={16}>
+                    {formatDate(item.doctorSchedule.date)}
+                  </TextComponent>
                 </FlexComponent>
 
-                <FlexComponent>
+                <FlexComponent flex={0.45} alignItems='center'>
                   <TextComponent bold fontSize={18}>
-                    200.000 VNĐ
+                    {`${formatCurrency(item.doctorSchedule.price)} VNĐ`}
                   </TextComponent>
-                  <TextComponent bold fontSize={18} color={appColors.green}>
-                    Đã hoàn thành
+                  <TextComponent
+                    bold
+                    fontSize={16}
+                    color={
+                      item.medicalRecord === null
+                        ? appColors.yellow
+                        : item.medicalRecord.state === 'DONE'
+                        ? appColors.green
+                        : item.medicalRecord.state === 'PROCESSING'
+                        ? appColors.darkBlue
+                        : appColors.yellow
+                    }>
+                    {item.medicalRecord === null
+                      ? 'Đang chờ khám'
+                      : item.medicalRecord.state === 'DONE'
+                      ? 'Đang hoàn thành'
+                      : item.medicalRecord.state === 'PROCESSING'
+                      ? 'Đang khám'
+                      : 'Đang chờ khám'}
                   </TextComponent>
                 </FlexComponent>
               </>
@@ -56,7 +83,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
           borderBottomRightRadius: 10,
         }}>
         <ContainerComponent style={styles.container}>
-        <FontistoIcon name="doctor" size={24} color={appColors.black} />
+          <FontistoIcon name="doctor" size={24} color={appColors.black} />
           <TextComponent bold fontSize={24} style={styles.listLabel}>
             Thông tin bác sĩ
           </TextComponent>
@@ -68,7 +95,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Họ tên:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              Trần Bát
+              {item.doctorSchedule.doctorName}
             </TextComponent>
           </FlexComponent>
 
@@ -77,7 +104,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Bằng cấp:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              BS
+              {item.doctorSchedule.doctorDegree}
             </TextComponent>
           </FlexComponent>
 
@@ -86,7 +113,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Giới tính:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              Nam
+              {item.doctorSchedule.doctor === 'MALE' ? 'Nam' : 'Nữ'}
             </TextComponent>
           </FlexComponent>
 
@@ -95,7 +122,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Số điện thoại:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              0123456789
+              {item.doctorSchedule.phoneNumber}
             </TextComponent>
           </FlexComponent>
 
@@ -104,7 +131,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               CCCD/CMND:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              123456789101
+              {item.doctorSchedule.identityNumber}
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>
@@ -122,7 +149,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Khoa:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              Tai mũi họng
+              {item.doctorSchedule.departmentName}
             </TextComponent>
           </FlexComponent>
 
@@ -131,7 +158,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               Phòng:
             </TextComponent>
             <TextComponent fontSize={18} style={{flex: 0.5}}>
-              A302
+              {item.doctorSchedule.roomName}
             </TextComponent>
           </FlexComponent>
 
@@ -142,8 +169,18 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
             <TextComponent
               fontSize={18}
               style={{flex: 0.5}}
-              color={appColors.darkRed}>
-              Ngứa họng, ho ra máu
+              color={
+                item.medicalRecord === null
+                  ? appColors.black
+                  : item.medicalRecord.symptom === null
+                  ? appColors.black
+                  : appColors.darkRed
+              }>
+              {item.medicalRecord === null
+                ? 'Chưa cập nhật'
+                : item.medicalRecord.symptom === null
+                ? 'Chưa cập nhật'
+                : item.medicalRecord.symptom}
             </TextComponent>
           </FlexComponent>
 
@@ -154,51 +191,57 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
             <TextComponent
               fontSize={18}
               style={{flex: 0.5}}
-              color={appColors.darkRed}>
-              Ung thu vòm họng
+              color={
+                item.medicalRecord === null
+                  ? appColors.black
+                  : item.medicalRecord.diagnosis === null
+                  ? appColors.black
+                  : appColors.darkRed
+              }>
+              {item.medicalRecord === null
+                ? 'Chưa cập nhật'
+                : item.medicalRecord.diagnosis === null
+                ? 'Chưa cập nhật'
+                : item.medicalRecord.diagnosis}
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>
 
-        <ContainerComponent style={styles.container}>
-          <Pill size={24} color={appColors.black} />
-          <TextComponent bold fontSize={24} style={styles.listLabel}>
-            Đơn thuốc
-          </TextComponent>
-        </ContainerComponent>
+        {item.medicalRecord?.prescription && (
+          <>
+            <ContainerComponent style={styles.container}>
+              <Pill size={24} color={appColors.black} />
+              <TextComponent bold fontSize={24} style={styles.listLabel}>
+                Đơn thuốc
+              </TextComponent>
+            </ContainerComponent>
 
-        <ContainerComponent style={styles.detailContainer}>
-          <FlexComponent style={styles.presciptionInfoContainer}>
-            <TextComponent bold fontSize={18}>
-              Paracetamol (x10 viên)
-            </TextComponent>
-            <TextComponent fontSize={18}>20.000 VNĐ</TextComponent>
-          </FlexComponent>
+            <ContainerComponent style={styles.detailContainer}>
+              {item.medicalRecord?.prescription.map(
+                (item: any, index: number) => (
+                  <PrescriptionItemComponent item={item} key={index} />
+                ),
+              )}
 
-          <FlexComponent style={styles.presciptionInfoContainer}>
-            <TextComponent bold fontSize={18}>
-              Methorphan (x5 viên)
-            </TextComponent>
-            <TextComponent fontSize={18}>5.500 VNĐ</TextComponent>
-          </FlexComponent>
+              <View
+                style={{
+                  borderBottomColor: appColors.black,
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+                  paddingVertical: 5,
+                }}
+              />
 
-          <View
-            style={{
-              borderBottomColor: appColors.black,
-              borderBottomWidth: StyleSheet.hairlineWidth,
-              paddingVertical: 5,
-            }}
-          />
-
-          <FlexComponent style={styles.presciptionInfoContainer}>
-            <TextComponent bold fontSize={18}>
-              Tổng cộng
-            </TextComponent>
-            <TextComponent bold fontSize={18}>
-              25.500 VNĐ
-            </TextComponent>
-          </FlexComponent>
-        </ContainerComponent>
+              <FlexComponent style={styles.presciptionInfoContainer}>
+                <TextComponent bold fontSize={18}>
+                  Tổng cộng
+                </TextComponent>
+                <TextComponent bold fontSize={18}>
+                  {`${formatCurrency(item.medicalRecord.price)} VNĐ`}
+                </TextComponent>
+              </FlexComponent>
+            </ContainerComponent>
+          </>
+        )}
       </AccordionContent>
     </AccordionItem>
   );

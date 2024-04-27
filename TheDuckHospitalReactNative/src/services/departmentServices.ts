@@ -61,3 +61,7 @@ export const getDepartmentWithoutService = async () => {
 export const getAllDepartments = async () => {
   return get(`/admin/departments`);
 }
+
+export const getDepartmentById = async (departmentId: number) => {
+  return get(`/admin/departments/${departmentId}`);
+}

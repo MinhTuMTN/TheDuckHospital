@@ -9,10 +9,13 @@ import DoctorAlertDialogComponent from './DoctorAlertDialogComponent';
 
 interface DoctorItemComponentProps {
   doctor: any;
+  departmentId: number;
+  refreshList: boolean;
+  setRefreshList: (refreshList: boolean) => void;
 }
 
 function DoctorItemComponent(props: DoctorItemComponentProps) {
-  const {doctor} = props;
+  const {doctor, departmentId, refreshList, setRefreshList} = props;
   const [showDoctorAlertDialog, setShowDoctorAlertDialog] = useState(false);
 
   const toggleAlert = () => {
@@ -34,9 +37,16 @@ function DoctorItemComponent(props: DoctorItemComponentProps) {
           {alignItems: 'flex-end', flex: 0.3},
         ]}>
         <FlexComponent style={styles.statusContainer}>
-          <EntypoIcon name="dot-single" size={20} color={doctor.deleted ? appColors.darkRed : appColors.green} />
-          <TextComponent bold fontSize={12} color={doctor.deleted ? appColors.darkRed : appColors.green}>
-            {doctor.deleted? "Ngưng hoạt động" : "Còn hoạt động"}
+          <EntypoIcon
+            name="dot-single"
+            size={20}
+            color={doctor.deleted ? appColors.darkRed : appColors.green}
+          />
+          <TextComponent
+            bold
+            fontSize={12}
+            color={doctor.deleted ? appColors.darkRed : appColors.green}>
+            {doctor.deleted ? 'Ngưng hoạt động' : 'Còn hoạt động'}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>
@@ -59,6 +69,10 @@ function DoctorItemComponent(props: DoctorItemComponentProps) {
       </FlexComponent>
 
       <DoctorAlertDialogComponent
+        staffId={doctor.staffId}
+        departmentId={departmentId}
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
         setShowAlertDialog={setShowDoctorAlertDialog}
         showAlertDialog={showDoctorAlertDialog}
       />
