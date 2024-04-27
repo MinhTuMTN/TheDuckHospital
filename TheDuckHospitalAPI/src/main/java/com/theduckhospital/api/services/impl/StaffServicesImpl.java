@@ -90,7 +90,7 @@ public class StaffServicesImpl implements IStaffServices {
             account.setPhoneNumber(request.getPhoneNumber());
             account.setEmail(request.getEmail());
             account.setWalletLocked(true);
-            account.setWalletPinCount((byte) 0);
+            account.setWalletPinCount(0);
 //            String password = generatePassword();
             String password = "MinhTu@3005";
             account.setPassword(passwordEncoder.encode(password));
