@@ -28,6 +28,7 @@ const handleRequest = async (
     data: null,
     error: null,
     statusCode: 200,
+    errorCode: null,
   };
 
   if (timeout) {
@@ -60,6 +61,7 @@ const handleRequest = async (
     result.statusCode = error.response?.status;
     if (error.response) {
       result.error = error.response.data.message;
+      result.errorCode = error.response.data.statusCode;
     }
   }
 

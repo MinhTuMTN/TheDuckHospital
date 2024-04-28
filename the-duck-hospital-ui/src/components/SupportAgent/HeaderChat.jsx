@@ -2,16 +2,25 @@ import { CloseOutlined, LocalAtmOutlined } from "@mui/icons-material";
 import {
   Avatar,
   Box,
+  Card,
   CircularProgress,
   Modal,
   Stack,
+  TextField,
   Typography,
   styled,
 } from "@mui/material";
-import React, { memo, useMemo, useState } from "react";
-import { closeConversation } from "../../services/supportAgent/ChatServices";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  checkRefundBooking,
+  closeConversation,
+} from "../../services/supportAgent/ChatServices";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import MuiTextFeild from "../General/MuiTextFeild";
+// imp dayjs
+import dayjs from "dayjs";
+import { formatCurrency } from "../General/FormatCurrency";
 
 const StyledIcon = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -35,12 +44,45 @@ const style = {
   py: 2,
 };
 
+function Loading() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <CircularProgress
+        sx={{
+          color: "#0184c6",
+          marginBottom: 2,
+        }}
+      />
+      <Typography sx={{ fontWeight: "500" }}>
+        Đang xử lý. Vui lòng chờ...
+      </Typography>
+    </Box>
+  );
+}
+
 function HeaderChat(props) {
   const { conversation } = props;
-  const [closeConversationModal, setCloseConversationModal] = useState(false);
+  const [openConversationModal, setOpenConversationModal] = useState(false);
+
+  const [openRefundModal, setOpenRefundModal] = useState(false);
+  const [refundErrorMessages, setRefundErrorMessages] = useState("");
+  const [bookingCode, setBookingCode] = useState("");
+  const [bookingCodeChecking, setBookingCodeChecking] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [refundReasonError, setRefundReasonError] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+
   const handleCloseConversation = async () => {
     setIsLoading(true);
     const response = await closeConversation(conversation.conversationId);
@@ -52,11 +94,70 @@ function HeaderChat(props) {
       });
     handleCloseConversationModal();
   };
-  const handleCloseConversationModal = () => setCloseConversationModal(false);
+
+  const handleCheckBookingRefund = useCallback(async () => {
+    if (bookingCode.length !== 12) {
+      return;
+    }
+
+    setBookingCodeChecking(true);
+    const response = await checkRefundBooking(
+      conversation.conversationId,
+      bookingCode
+    );
+    setBookingCodeChecking(false);
+    if (response.success) {
+      setBookingData(response.data.data);
+    } else {
+      switch (response.errorCode) {
+        case 10020:
+          setRefundErrorMessages("Mã đặt khám không tồn tại");
+          break;
+        case 10021:
+          setRefundErrorMessages("Mã đặt khám đã được hoàn tiền");
+          break;
+        case 10022:
+          setRefundErrorMessages(
+            "Mã đặt khám không thuộc về tài khoản của khách hàng"
+          );
+          break;
+        case 10023:
+          setRefundErrorMessages("Mã đặt khám đã hết hạn hoàn tiền");
+          break;
+        default:
+          setRefundErrorMessages("Có lỗi xảy ra. Vui lòng thử lại");
+          break;
+      }
+    }
+  }, [bookingCode, conversation.conversationId]);
+
+  const handleCloseConversationModal = () => setOpenConversationModal(false);
+  const handleCloseRefundModal = () => setOpenRefundModal(false);
   const avatarName = useMemo(() => {
     const name = conversation.userName.split(" ");
     return name[name.length - 2].charAt(0) + name[name.length - 1].charAt(0);
   }, [conversation.userName]);
+
+  useEffect(() => {
+    handleCheckBookingRefund();
+  }, [handleCheckBookingRefund]);
+
+  const handleRefund = async () => {
+    if (refundReason.length === 0) {
+      enqueueSnackbar("Lý do hoàn tiền không được để trống", {
+        variant: "error",
+      });
+      return;
+    }
+
+    if (!bookingData) {
+      enqueueSnackbar("Không thể hoàn tiền cho mã đặt khám này", {
+        variant: "error",
+      });
+      return;
+    }
+  };
+
   return (
     <>
       <Stack
@@ -79,7 +180,7 @@ function HeaderChat(props) {
           </Typography>
         </Stack>
         <Stack direction={"row"} columnGap={"8px"}>
-          <StyledIcon>
+          <StyledIcon onClick={() => setOpenRefundModal(true)}>
             <LocalAtmOutlined
               sx={{
                 color: "#0184c6",
@@ -89,7 +190,7 @@ function HeaderChat(props) {
           </StyledIcon>
           <StyledIcon
             onClick={() => {
-              setCloseConversationModal(true);
+              setOpenConversationModal(true);
             }}
           >
             <CloseOutlined color="error" />
@@ -99,33 +200,14 @@ function HeaderChat(props) {
       </Stack>
 
       <Modal
-        open={closeConversationModal}
+        open={openConversationModal}
         onClose={handleCloseConversationModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
           {isLoading ? (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "column",
-                }}
-              >
-                <CircularProgress
-                  sx={{
-                    color: "#0184c6",
-                    marginBottom: 2,
-                  }}
-                />
-                <Typography sx={{ fontWeight: "500" }}>
-                  Đang xử lý. Vui lòng chờ...
-                </Typography>
-              </Box>
-            </>
+            <Loading />
           ) : (
             <>
               {" "}
@@ -148,6 +230,139 @@ function HeaderChat(props) {
                   <Typography color={"error"}>Hủy</Typography>
                 </StyledIcon>
                 <StyledIcon onClick={handleCloseConversation}>
+                  <Typography color={"#0184c6"}>Xác nhận</Typography>
+                </StyledIcon>
+              </Stack>
+            </>
+          )}
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openRefundModal}
+        onClose={handleCloseRefundModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Hoàn tiền
+              </Typography>
+              <MuiTextFeild
+                autoComplete="off"
+                value={bookingCode}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length !== 12) {
+                    setRefundErrorMessages("Mã đặt khám không hợp lệ");
+                    setBookingData(null);
+                  } else {
+                    setRefundErrorMessages("");
+                  }
+
+                  setBookingCode(value);
+                }}
+                placeholder="Mã đặt khám"
+                variant="outlined"
+                fullWidth
+                label="Mã đặt khám"
+                size="medium"
+                margin="normal"
+              />
+              {refundErrorMessages && (
+                <Typography color={"error"} fontSize={"14px"}>
+                  {refundErrorMessages}
+                </Typography>
+              )}
+
+              {bookingData && (
+                <Card
+                  sx={{
+                    padding: 2,
+                    marginTop: 1,
+                  }}
+                >
+                  <Typography>
+                    Chuyên khoa: <strong>{bookingData.departmentName}</strong>
+                  </Typography>
+                  <Typography>
+                    Bác sĩ: <strong>{bookingData.doctorName}</strong>
+                  </Typography>
+                  <Typography>
+                    Bệnh nhân: <strong>{bookingData.patientName}</strong>
+                  </Typography>
+                  <Typography>
+                    Ngày đặt khám:{" "}
+                    <strong>
+                      {dayjs(bookingData.bookingDate).format("DD/MM/YYYY")}
+                    </strong>
+                  </Typography>
+                  <Typography>
+                    Số tiền hoàn trả:{" "}
+                    <strong>{formatCurrency(bookingData.refundAmount)}</strong>
+                  </Typography>
+                </Card>
+              )}
+
+              {bookingCodeChecking && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    marginTop: 2,
+                  }}
+                >
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      color: "#0184c6",
+                    }}
+                  />
+                </Box>
+              )}
+
+              <MuiTextFeild
+                autoComplete="off"
+                value={refundReason}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length === 0)
+                    setRefundReasonError("Lý do hoàn tiền không được để trống");
+                  else setRefundReasonError("");
+                  setRefundReason(value);
+                }}
+                placeholder="Lý do hoàn tiền"
+                variant="outlined"
+                fullWidth
+                label="Lý do hoàn tiền"
+                size="medium"
+                margin="normal"
+              />
+              {refundReasonError && (
+                <Typography color={"error"} fontSize={"14px"}>
+                  {refundReasonError}
+                </Typography>
+              )}
+
+              <Stack
+                direction={"row"}
+                justifyContent={"flex-end"}
+                marginTop={2}
+              >
+                <StyledIcon
+                  onClick={() => {
+                    handleCloseRefundModal();
+                  }}
+                >
+                  <Typography color={"error"}>Hủy</Typography>
+                </StyledIcon>
+                <StyledIcon onClick={handleRefund}>
                   <Typography color={"#0184c6"}>Xác nhận</Typography>
                 </StyledIcon>
               </Stack>
