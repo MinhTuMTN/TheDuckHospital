@@ -6,9 +6,7 @@ import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.request.OpenWalletRequest;
 import com.theduckhospital.api.dto.request.TopUpWalletRequest;
-import com.theduckhospital.api.dto.response.PaymentResponse;
-import com.theduckhospital.api.dto.response.TransactionInfoResponse;
-import com.theduckhospital.api.dto.response.WalletInfoResponse;
+import com.theduckhospital.api.dto.response.*;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Transaction;
 import com.theduckhospital.api.error.BadRequestException;
@@ -26,9 +24,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class WalletServicesImpl implements IWalletServices {
@@ -151,16 +147,14 @@ public class WalletServicesImpl implements IWalletServices {
     public WalletInfoResponse getWalletInfo(String authorization) {
         Account account = accountServices.findAccountByToken(authorization);
 
-        // Start day of this month
-        Calendar startDay = DateCommon.getCalendar(DateCommon.getToday());
-        startDay.set(Calendar.DAY_OF_MONTH, 1);
+        Calendar today = DateCommon.getCalendar(DateCommon.getToday());
+        List<Calendar> startEndDay = getStartEndDayOfMonth(
+                today.get(Calendar.MONTH) + 1,
+                today.get(Calendar.YEAR)
+        );
 
-        // End day of this month at 23:59:59
-        Calendar endDay = DateCommon.getCalendar(DateCommon.getToday());
-        endDay.set(Calendar.DAY_OF_MONTH, endDay.getActualMaximum(Calendar.DAY_OF_MONTH));
-        endDay.set(Calendar.HOUR_OF_DAY, 23);
-        endDay.set(Calendar.MINUTE, 59);
-        endDay.set(Calendar.SECOND, 59);
+        Calendar startDay = startEndDay.get(0);
+        Calendar endDay = startEndDay.get(1);
 
         // Get total amount of transactions in this month
         double totalThisMonth = transactionRepository
@@ -193,5 +187,64 @@ public class WalletServicesImpl implements IWalletServices {
                 .totalThisMonth(totalThisMonth)
                 .transactions(last5Transactions)
                 .build();
+    }
+
+    @Override
+    public WalletStatisticResponse getWalletStatistic(String authorization, int month, int year) {
+        List<Calendar> startEndDay = getStartEndDayOfMonth(month, year);
+        Calendar startDay = startEndDay.get(0);
+        Calendar endDay = startEndDay.get(1);
+
+        List<Transaction> transactions = transactionRepository
+                .findByCreatedAtBetweenAndAccountAndStatusOrderByCreatedAtDesc(
+                        startDay.getTime(),
+                        endDay.getTime(),
+                        accountServices.findAccountByToken(authorization),
+                        TransactionStatus.SUCCESS
+                );
+
+        Map<PaymentType, Integer> paymentTypeCount = new HashMap<>(Map.of(
+                PaymentType.TOP_UP, 0,
+                PaymentType.MEDICAL_TEST, 0,
+                PaymentType.REFUND, 0,
+                PaymentType.BOOKING, 0
+        ));
+
+        for (Transaction transaction : transactions)
+            paymentTypeCount.put(
+                    transaction.getPaymentType(),
+                    paymentTypeCount.get(transaction.getPaymentType()) + 1
+            );
+
+        List<TransactionInfoResponse> transactionInfoResponses = transactions.stream()
+                .map(TransactionInfoResponse::new)
+                .toList();
+        List<WalletChartResponse> walletChartResponses = paymentTypeCount.entrySet().stream()
+                .map(entry -> new WalletChartResponse(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return WalletStatisticResponse.builder()
+                .month(month)
+                .year(year)
+                .charts(walletChartResponses)
+                .transactions(transactionInfoResponses)
+                .build();
+    }
+
+    private List<Calendar> getStartEndDayOfMonth(int month, int year) {
+        Calendar startDay = DateCommon.getCalendar(DateCommon.getToday());
+        startDay.set(Calendar.MONTH, month - 1);
+        startDay.set(Calendar.YEAR, year);
+        startDay.set(Calendar.DAY_OF_MONTH, 1);
+
+        Calendar endDay = DateCommon.getCalendar(DateCommon.getToday());
+        endDay.set(Calendar.MONTH, month - 1);
+        endDay.set(Calendar.YEAR, year);
+        endDay.set(Calendar.DAY_OF_MONTH, endDay.getActualMaximum(Calendar.DAY_OF_MONTH));
+        endDay.set(Calendar.HOUR_OF_DAY, 23);
+        endDay.set(Calendar.MINUTE, 59);
+        endDay.set(Calendar.SECOND, 59);
+
+        return List.of(startDay, endDay);
     }
 }

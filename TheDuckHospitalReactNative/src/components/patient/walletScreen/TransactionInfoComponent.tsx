@@ -1,22 +1,23 @@
-import {View, Text, StyleSheet} from 'react-native';
+import dayjs from 'dayjs';
 import React from 'react';
-import TextComponent from '../../TextComponent';
+import {StyleSheet, View} from 'react-native';
+import {Down, Up} from '../../../assets/svgs';
+import {appColors} from '../../../constants/appColors';
 import {
   getTransactionAmount,
   getTransactionType,
 } from '../../../utils/transactionUtils';
-import dayjs from 'dayjs';
-import {appColors} from '../../../constants/appColors';
-import {Down, Up} from '../../../assets/svgs';
+import TextComponent from '../../TextComponent';
 
 interface TransactionInfoComponentProps {
   transaction: any;
+  variant?: 'normal' | 'underline';
 }
 
 const TransactionInfoComponent = (props: TransactionInfoComponentProps) => {
-  const {transaction} = props;
+  const {transaction, variant = 'normal'} = props;
   return (
-    <View style={styles.container}>
+    <View style={variant === 'normal' ? styles.container : styles.container2}>
       <View style={styles.left}>
         {transaction?.paymentType === 'TOP_UP' ||
         transaction?.paymentType === 'REFUND' ? (
@@ -73,6 +74,18 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderRadius: 8,
     marginVertical: 8,
+  },
+  container2: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: appColors.white,
+    borderRadius: 8,
+    marginVertical: 8,
+    borderBottomWidth: 2,
+    borderBottomColor: appColors.gray,
   },
   left: {
     flexDirection: 'row',

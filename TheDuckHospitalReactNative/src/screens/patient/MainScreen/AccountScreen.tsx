@@ -14,7 +14,7 @@ import {
 } from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {Linking, StyleSheet, View} from 'react-native';
 import {
   AccountScreenRowComponent,
   ContainerComponent,
@@ -139,7 +139,7 @@ const AccountScreen = () => {
               <AccountScreenRowComponent
                 title={t('account.hotline')}
                 icon={<Headset size={20} color={appColors.black} />}
-                onPress={() => navigation.navigate('TestScreen')}
+                onPress={() => Linking.openURL('tel:19001234')}
               />
               <AccountScreenRowComponent
                 title={t('account.ratingApp')}

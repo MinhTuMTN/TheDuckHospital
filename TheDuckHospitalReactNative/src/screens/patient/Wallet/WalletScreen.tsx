@@ -50,6 +50,9 @@ const WalletScreen = () => {
   const navigation = useNavigation<navigationProps>();
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
+  const handleNavigateToTransactionStatisticScreen = () => {
+    navigation.navigate('TransactionStatisticScreen');
+  };
   const handleNavigateToTopUp = () => {
     navigation.navigate('TopUpScreen');
   };
@@ -62,7 +65,6 @@ const WalletScreen = () => {
 
     if (response.success) {
       const data = response.data.data;
-      console.log(data);
 
       setWalletInfo({
         balance: data.balance,
@@ -223,16 +225,12 @@ const WalletScreen = () => {
                   </View>
 
                   <ButtonComponent
+                    onPress={handleNavigateToTransactionStatisticScreen}
                     borderRadius={24}
                     backgroundColor="#00C2FF"
                     fontWeight="500"
                     fontSize={16}
                     textAlignment="center"
-                    textStyles={
-                      {
-                        //backgroundColor: '#ff6200',
-                      }
-                    }
                     containerStyles={{
                       elevation: 10,
                       shadowColor: appColors.primary,
@@ -300,7 +298,8 @@ const WalletScreen = () => {
                       Giao dịch gần đây
                     </TextComponent>
                   </FlexComponent>
-                  <Pressable>
+                  <Pressable
+                    onPress={handleNavigateToTransactionStatisticScreen}>
                     <TextComponent
                       fontSize={18}
                       fontWeight="600"

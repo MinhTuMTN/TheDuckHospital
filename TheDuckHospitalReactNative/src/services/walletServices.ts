@@ -16,3 +16,7 @@ export const topUpWallet = async (data: topUpWalletDataProps) => {
 export const getWalletInfo = async () => {
   return get(`/wallet/wallet-info`);
 };
+
+export const getWalletStatistic = async (month: number, year: number) => {
+  return get(`/wallet/statistic`, {month, year});
+};

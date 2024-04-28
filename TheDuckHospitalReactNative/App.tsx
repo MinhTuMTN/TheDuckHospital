@@ -55,6 +55,7 @@ import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
 import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
 import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
+import TransactionStatisticScreen from './src/screens/patient/Wallet/TransactionStatisticScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -232,6 +233,10 @@ const App = () => {
                     component={MedicalTestResultScreen}
                   />
                   <Stack.Screen name="ChatScreen" component={ChatScreen} />
+                  <Stack.Screen
+                    name="TransactionStatisticScreen"
+                    component={TransactionStatisticScreen}
+                  />
                 </Stack.Navigator>
               </NavigationContainer>
             </AxiosInterceptorProvider>

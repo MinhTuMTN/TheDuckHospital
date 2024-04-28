@@ -8,9 +8,9 @@ import {
   FlexComponent,
   Header,
 } from '../../components';
+import RequestRefundBookingComponent from '../../components/patient/detailsMedicalBillScreen/RequestRefundBookingComponent';
 import {appColors} from '../../constants/appColors';
 import {getDetailsMedicalBill} from '../../services/bookingServices';
-import RequestRefundBookingComponent from '../../components/patient/detailsMedicalBillScreen/RequestRefundBookingComponent';
 
 const DetailsMedicalBillScreen = ({route}: {route: any}) => {
   const {bookingId, bookingCode} = route.params;

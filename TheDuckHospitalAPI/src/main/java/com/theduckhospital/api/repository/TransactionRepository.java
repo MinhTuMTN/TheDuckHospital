@@ -33,6 +33,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             TransactionStatus status,
             Pageable pageable
     );
+    List<Transaction> findByCreatedAtBetweenAndAccountAndStatusOrderByCreatedAtDesc(
+            Date startDate,
+            Date endDate,
+            Account account,
+            TransactionStatus status
+    );
     @Query("SELECT SUM(t.amount) " +
             "FROM Transaction t " +
             "WHERE t.createdAt BETWEEN ?1 AND ?2 " +
