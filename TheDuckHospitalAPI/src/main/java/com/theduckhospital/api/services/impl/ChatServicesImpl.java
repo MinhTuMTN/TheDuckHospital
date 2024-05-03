@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -37,7 +38,10 @@ public class ChatServicesImpl implements IChatServices {
     public ChatServicesImpl(
             MessageRepository messageRepository,
             ConversationRepository conversationRepository,
-            IBookingServices bookingServices, BookingRepository bookingRepository, TransactionRepository transactionRepository, NotificationRepository notificationRepository, IAccountServices accountServices,
+            BookingRepository bookingRepository,
+            TransactionRepository transactionRepository,
+            NotificationRepository notificationRepository,
+            IAccountServices accountServices,
             IFirebaseServices firebaseServices) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
@@ -236,16 +240,20 @@ public class ChatServicesImpl implements IChatServices {
     public boolean refundBooking(String token, UUID conversationId, RefundDataRequest request) {
         try {
             Account account = accountServices.findAccountByToken(token);
-            if (account.getWalletLocked())
-                throw new BadRequestException("Wallet is locked", 10013);
 
             Conversation conversationToCheck = getConversation(conversationId, account);
+            Account userAccount = conversationToCheck.getAccount();
+            if (userAccount.getWalletLocked())
+                throw new BadRequestException("User wallet is locked", 10013);
+
             Booking bookingToCheck = checkBookingRefundable(request.getBookingCode(), conversationToCheck);
 
             // Create a refund transaction
             Transaction refundTransaction = new Transaction();
             refundTransaction.setAmount(bookingToCheck.getTimeSlot().getDoctorSchedule().getMedicalService().getPrice());
             refundTransaction.setPaymentType(PaymentType.REFUND);
+            refundTransaction.setAccount(userAccount);
+            transactionRepository.save(refundTransaction);
             refundTransaction.setStatus(TransactionStatus.SUCCESS);
             transactionRepository.save(refundTransaction);
 
@@ -254,18 +262,21 @@ public class ChatServicesImpl implements IChatServices {
             bookingToCheck.setRefundedConversationId(conversationId);
             bookingRepository.save(bookingToCheck);
 
-            account.setBalance(account.getBalance().add(BigDecimal.valueOf(refundTransaction.getAmount())));
-            accountServices.saveAccount(account);
+            userAccount.setBalance(userAccount.getBalance().add(BigDecimal.valueOf(refundTransaction.getAmount())));
+            accountServices.saveAccount(userAccount);
 
             DoctorSchedule doctorSchedule = bookingToCheck.getTimeSlot().getDoctorSchedule();
             Doctor doctor = doctorSchedule.getDoctor();
             MedicalService medicalService = doctorSchedule.getMedicalService();
             Department department = doctor.getDepartment();
 
+            // Format date to dd/MM/yyyy
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String formattedDate = simpleDateFormat.format(doctorSchedule.getDate());
             String body = "Số tiền đặt khám khoa "
                     + department.getDepartmentName()
                     + " với bác sĩ " + doctor.getFullName()
-                    + " vào ngày " + doctorSchedule.getDate()
+                    + " vào ngày " + formattedDate
                     + " đã được hoàn lại vào tài khoản của bạn";
             Map<String, String> data = Map.of(
                     "title", "Hoàn tiền thành công",
@@ -280,14 +291,14 @@ public class ChatServicesImpl implements IChatServices {
             notification.setTitle("Hoàn tiền thành công");
             notification.setContent(body);
             notification.setData(data.toString());
-            notification.setAccount(account);
+            notification.setAccount(userAccount);
             notification.setCreatedAt(new Date());
             notification.setLastModifiedAt(new Date());
             notification.setDeleted(false);
             notification.setState(NotificationState.NOT_RECEIVED);
             notificationRepository.save(notification);
 
-            firebaseServices.sendNotificationToAccount(account, data);
+            firebaseServices.sendNotificationToAccount(userAccount, data);
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode());

@@ -1,7 +1,8 @@
-import notifee, {AndroidImportance} from '@notifee/react-native';
+import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
+import {confirmReceivedReminder} from '../services/medicineReminderServices';
 
 export class AppNotification {
   static subscribe: null | ((data: any) => void) = null;
@@ -34,6 +35,12 @@ export class AppNotification {
       importance: AndroidImportance.HIGH,
       sound: 'notifications',
     });
+    await notifee.createChannel({
+      id: 'reminder',
+      name: 'Medicine Reminder Channel',
+      importance: AndroidImportance.HIGH,
+      sound: 'notifications',
+    });
 
     const status = await messaging().requestPermission();
     if (
@@ -48,6 +55,7 @@ export class AppNotification {
 
     return null;
   }
+
   static async displayNotification(
     remoteMessage: FirebaseMessagingTypes.RemoteMessage,
   ) {
@@ -59,6 +67,18 @@ export class AppNotification {
     if (this.subscribe !== null && remoteMessage.data?.channelId === 'chat') {
       this.subscribe(remoteMessage);
       return;
+    }
+
+    if (remoteMessage.data?.channelId === 'reminder') {
+      const notificationId: string = remoteMessage.data
+        ?.notificationId as string;
+      const comfirmId: string = remoteMessage.data?.confirmId as string;
+      console.log('notificationId', notificationId);
+      console.log('comfirmId', comfirmId);
+
+      if (notificationId && comfirmId) {
+        await confirmReceivedReminder(notificationId, comfirmId);
+      }
     }
 
     notifee.displayNotification({
@@ -76,6 +96,10 @@ export class AppNotification {
         },
         sound: 'notifications',
         importance: AndroidImportance.HIGH,
+        style: {
+          type: AndroidStyle.BIGTEXT,
+          text: remoteMessage.data?.body as string,
+        },
       },
     });
   }

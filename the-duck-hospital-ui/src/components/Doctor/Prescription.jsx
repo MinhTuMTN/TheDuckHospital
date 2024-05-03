@@ -141,6 +141,18 @@ function Prescription(props) {
       medicineId: selectedMedicineId,
       quantity: totalForOneMedicine,
       note: note,
+      timesPerDay: [
+        selectedBuoi.sang,
+        selectedBuoi.trua,
+        selectedBuoi.chieu,
+        selectedBuoi.toi,
+      ].filter(Boolean).length,
+      days: daysForOneMedicine,
+      quantityPerTime: medicineOneTime || 0,
+      morning: selectedBuoi.sang,
+      noon: selectedBuoi.trua,
+      afternoon: selectedBuoi.chieu,
+      evening: selectedBuoi.toi,
     };
 
     const response = await addMedicine(medicalRecordId, data);

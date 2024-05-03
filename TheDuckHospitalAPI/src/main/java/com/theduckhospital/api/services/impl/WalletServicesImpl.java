@@ -224,6 +224,7 @@ public class WalletServicesImpl implements IWalletServices {
                 .toList();
 
         return WalletStatisticResponse.builder()
+                .balance(accountServices.findAccountByToken(authorization).getBalance().doubleValue())
                 .month(month)
                 .year(year)
                 .charts(walletChartResponses)

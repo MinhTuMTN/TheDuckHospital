@@ -60,7 +60,7 @@ const TransactionStatisticScreen = () => {
                 backgroundColor: '#f8f8f8',
                 flex: 1,
               }}>
-              <CurrentBalanceComponent />
+              <CurrentBalanceComponent balance={statistic.balance} />
               <View style={styles.container}>
                 <ChooseMonthStatisticComponent
                   selectedMonth={month}

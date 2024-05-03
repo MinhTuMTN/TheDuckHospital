@@ -27,6 +27,16 @@ public class PrescriptionItem {
     private double price;
     private double totalCost;
 
+    private int timesPerDay;
+    private int days;
+    private float quantityPerTime;
+
+    private boolean morning;
+    private boolean noon;
+    private boolean afternoon;
+    private boolean evening;
+
+
     @Nationalized
     private String dosageInstruction;
 

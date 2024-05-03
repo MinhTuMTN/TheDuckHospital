@@ -6,19 +6,18 @@ import {
   CircularProgress,
   Modal,
   Stack,
-  TextField,
   Typography,
   styled,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   checkRefundBooking,
   closeConversation,
+  refundBooking,
 } from "../../services/supportAgent/ChatServices";
-import { useNavigate } from "react-router-dom";
-import { useSnackbar } from "notistack";
 import MuiTextFeild from "../General/MuiTextFeild";
-// imp dayjs
 import dayjs from "dayjs";
 import { formatCurrency } from "../General/FormatCurrency";
 
@@ -155,6 +154,28 @@ function HeaderChat(props) {
         variant: "error",
       });
       return;
+    }
+
+    setIsLoading(true);
+    const response = await refundBooking(
+      conversation.conversationId,
+      bookingCode,
+      refundReason
+    );
+    setIsLoading(false);
+
+    if (response.success) {
+      enqueueSnackbar("Hoàn tiền thành công", {
+        variant: "success",
+      });
+      handleCloseRefundModal();
+    } else {
+      enqueueSnackbar(
+        "Có lỗi xảy ra. Vui lòng kiểm tra lại thông tin và thử lại",
+        {
+          variant: "error",
+        }
+      );
     }
   };
 

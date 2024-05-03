@@ -1,5 +1,5 @@
 import {Fab} from '@gluestack-ui/themed';
-import notifee from '@notifee/react-native';
+import notifee, {TriggerType} from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
@@ -29,8 +29,10 @@ import {
   updateNotificationState,
 } from '../../../services/notificationServices';
 import {useSelector} from 'react-redux';
-import { RootState } from '../../../types';
+import {RootState} from '../../../types';
 import {navigationProps} from '../../../types';
+import {getMedicineReminder} from '../../../services/medicineReminderServices';
+import dayjs from 'dayjs';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -149,7 +151,7 @@ const HomeScreen = () => {
       AppNotification.displayNotification(remoteMessage);
       const notificationId: string | undefined =
         (remoteMessage.data?.notificationId as string) || undefined;
-      if (notificationId) {
+      if (notificationId && remoteMessage.data?.channelId !== 'reminder') {
         const response = await updateNotificationState(
           notificationId,
           NotificationState.RECEIVED,
@@ -163,8 +165,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     notifee.getInitialNotification().then(notification => {
-      console.log('Initial notification', notification);
-
       if (notification) {
         navigation.navigate('NotificationScreen');
       }
@@ -364,6 +364,9 @@ const HomeScreen = () => {
         />
       </ScrollView>
       <Fab
+        onPress={() => {
+          navigation.navigate('TestScreen');
+        }}
         size="md"
         placement="bottom right"
         style={{

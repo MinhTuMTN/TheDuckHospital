@@ -1,16 +1,17 @@
-import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
-import FlexComponent from '../../FlexComponent';
-import TextComponent from '../../TextComponent';
-import {useSelector} from 'react-redux';
-import {AuthState} from '../../../store/authSlice';
 import {Eye, EyeOff} from 'lucide-react-native';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import {formatCurrency} from '../../../utils/currencyUtils';
-import {RootState} from '../../../types';
+import FlexComponent from '../../FlexComponent';
+import TextComponent from '../../TextComponent';
 
-const CurrentBalanceComponent = () => {
-  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+interface CurrentBalanceComponentProps {
+  balance: number;
+}
+
+const CurrentBalanceComponent = (props: CurrentBalanceComponentProps) => {
+  const {balance} = props;
   const [showBalance, setShowBalance] = React.useState(false);
 
   return (
@@ -42,11 +43,7 @@ const CurrentBalanceComponent = () => {
             letterSpacing: showBalance ? 0.5 : 6,
           },
         ]}>
-        {showBalance
-          ? formatCurrency(
-              userInfo.balance ? userInfo.balance.toString() : '0',
-            ) + ' VND'
-          : '*******'}
+        {showBalance ? formatCurrency(balance.toString()) + ' VND' : '*******'}
       </TextComponent>
     </View>
   );

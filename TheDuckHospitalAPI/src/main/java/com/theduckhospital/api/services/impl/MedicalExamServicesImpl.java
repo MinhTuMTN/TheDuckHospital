@@ -537,6 +537,15 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         prescriptionItem.setTotalCost(
                 medicine.getPrice() * request.getQuantity()
         );
+
+        prescriptionItem.setTimesPerDay(request.getTimesPerDay());
+        prescriptionItem.setDays(request.getDays());
+        prescriptionItem.setQuantityPerTime(request.getQuantityPerTime());
+        prescriptionItem.setMorning(request.isMorning());
+        prescriptionItem.setNoon(request.isNoon());
+        prescriptionItem.setAfternoon(request.isAfternoon());
+        prescriptionItem.setEvening(request.isEvening());
+
         prescriptionItem.setDosageInstruction(
                 request.getNote()
         );

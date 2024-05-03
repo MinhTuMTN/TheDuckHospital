@@ -141,11 +141,7 @@ const WalletScreen = () => {
                         },
                       ]}>
                       {showBalance
-                        ? formatCurrency(
-                            userInfo.balance
-                              ? userInfo.balance.toString()
-                              : '0',
-                          ) + ' VND'
+                        ? formatCurrency(walletInfo.balance.toString()) + ' VND'
                         : '*******'}
                     </TextComponent>
                     <Space paddingTop={6} />

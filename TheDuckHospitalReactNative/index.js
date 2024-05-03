@@ -12,7 +12,7 @@ import {
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   AppNotification.displayNotification(remoteMessage);
   const notificationId = remoteMessage.data?.notificationId;
-  if (notificationId) {
+  if (notificationId && remoteMessage.data?.channelId !== 'reminder') {
     const response = await updateNotificationState(
       notificationId,
       NotificationState.RECEIVED,
