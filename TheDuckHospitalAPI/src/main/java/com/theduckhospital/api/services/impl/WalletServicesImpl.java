@@ -157,7 +157,7 @@ public class WalletServicesImpl implements IWalletServices {
         Calendar endDay = startEndDay.get(1);
 
         // Get total amount of transactions in this month
-        double totalThisMonth = transactionRepository
+        Double totalThisMonth = transactionRepository
                 .sumAmountByCreatedAtBetweenAndAccount(
                         startDay.getTime(),
                         endDay.getTime(),
@@ -184,7 +184,7 @@ public class WalletServicesImpl implements IWalletServices {
                 .fullName(account.getFullName())
                 .walletCreatedAt(account.getWalletCreatedAt())
                 .balance(account.getBalance().doubleValue())
-                .totalThisMonth(totalThisMonth)
+                .totalThisMonth(totalThisMonth == null ? 0 : totalThisMonth)
                 .transactions(last5Transactions)
                 .build();
     }

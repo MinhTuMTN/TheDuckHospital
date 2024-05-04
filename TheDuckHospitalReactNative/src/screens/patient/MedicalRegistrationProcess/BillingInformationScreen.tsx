@@ -57,6 +57,8 @@ const BillingInformationScreen = ({route}: {route: any}) => {
     );
     setPaymentLoading(false);
 
+    console.log(response);
+
     if (response.success) {
       if (response.data?.data?.deepLink) {
         Linking.openURL(response.data.data.deepLink);

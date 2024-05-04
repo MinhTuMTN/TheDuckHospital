@@ -2,12 +2,13 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.MedicineReminderDetailsRequest;
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
-import com.theduckhospital.api.dto.response.MedicineReminderResponse;
+import com.theduckhospital.api.dto.response.*;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.MedicineReminderDetailRepository;
 import com.theduckhospital.api.repository.MedicineReminderRepository;
 import com.theduckhospital.api.repository.PrescriptionItemRepository;
+import com.theduckhospital.api.repository.PrescriptionRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IFirebaseServices;
 import com.theduckhospital.api.services.IMedicineReminderServices;
@@ -25,14 +26,16 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
     private final MedicineReminderRepository medicineReminderRepository;
     private final MedicineReminderDetailRepository medicineReminderDetailRepository;
     private final PrescriptionItemRepository prescriptionItemRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
-    public MedicineReminderServicesImpl(IAccountServices accountServices, IFirebaseServices firebaseServices, IPatientProfileServices patientProfileServices, MedicineReminderRepository medicineReminderRepository, MedicineReminderDetailRepository medicineReminderDetailRepository, PrescriptionItemRepository prescriptionItemRepository) {
+    public MedicineReminderServicesImpl(IAccountServices accountServices, IFirebaseServices firebaseServices, IPatientProfileServices patientProfileServices, MedicineReminderRepository medicineReminderRepository, MedicineReminderDetailRepository medicineReminderDetailRepository, PrescriptionItemRepository prescriptionItemRepository, PrescriptionRepository prescriptionRepository) {
         this.accountServices = accountServices;
         this.firebaseServices = firebaseServices;
         this.patientProfileServices = patientProfileServices;
         this.medicineReminderRepository = medicineReminderRepository;
         this.medicineReminderDetailRepository = medicineReminderDetailRepository;
         this.prescriptionItemRepository = prescriptionItemRepository;
+        this.prescriptionRepository = prescriptionRepository;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 .getPatientProfile()
                 .getPatientProfileId()
                 .equals(
-                    patientProfile.getPatientProfileId()
+                        patientProfile.getPatientProfileId()
                 )
         ) {
             throw new BadRequestException("Prescription item not found", 10024);
@@ -72,8 +75,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
         String fullName = patientProfile.getFullName();
 
         while (amount > 0) {
-            for (MedicineReminderDetailsRequest detail: request.getDetails())
-            {
+            for (MedicineReminderDetailsRequest detail : request.getDetails()) {
                 if (amount <= 0)
                     break;
 
@@ -116,7 +118,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
         List<MedicineReminderResponse> result = new ArrayList<>();
 
         Date currentDate = new Date();
-        for (PatientProfile patientProfile: account.getPatientProfile()) {
+        for (PatientProfile patientProfile : account.getPatientProfile()) {
             if (patientProfile.isDeleted())
                 continue;
 
@@ -127,7 +129,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                     );
 
             List<MedicineReminder> medicineReminderResult = new ArrayList<>();
-            for (MedicineReminder medicineReminder: medicineReminders) {
+            for (MedicineReminder medicineReminder : medicineReminders) {
                 List<MedicineReminderDetail> medicineReminderDetails = medicineReminder.getListMedicineReminderDetail()
                         .stream().map(medicineReminderDetail -> {
                             if (medicineReminderDetail.getReminderTime().before(currentDate))
@@ -150,7 +152,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
             );
         }
 
-       return result;
+        return result;
     }
 
     @Override
@@ -167,7 +169,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                         currentDatePlus10.getTime()
                 );
 
-        for (MedicineReminderDetail medicineReminderDetail: medicineReminderDetails) {
+        for (MedicineReminderDetail medicineReminderDetail : medicineReminderDetails) {
             String title = "Nhắc nhở uống thuốc";
             String fullName = medicineReminderDetail.getFullName();
             String medicineName = medicineReminderDetail.getMedicineName();
@@ -211,5 +213,69 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
             throw new BadRequestException("Medicine reminder detail not found", 10025);
 
         return true;
+    }
+
+    @Override
+    public List<PrescriptionResponse> searchPrescription(String token, UUID patientProfileId, Date fromDate, Date toDate) {
+        PatientProfile patientProfile = patientProfileServices.getPatientProfileById(token, patientProfileId);
+        List<Prescription> prescriptions = prescriptionRepository
+                .findByPatientProfileAndDateBetween(
+                        patientProfile,
+                        fromDate,
+                        toDate
+                );
+
+        return prescriptions.stream().map(PrescriptionResponse::new).toList();
+    }
+
+    @Override
+    public PrescriptionDetailForReminderResponse getReminderPrescription(String token, UUID prescriptionId, UUID patientProfileId) {
+        PatientProfile patientProfile = patientProfileServices.getPatientProfileById(
+                token,
+                patientProfileId
+        );
+
+        Prescription prescription = prescriptionRepository
+                .findByPatientProfileAndPrescriptionId(
+                        patientProfile,
+                        prescriptionId
+                ).orElseThrow(() -> new BadRequestException("Prescription not found", 10026));
+
+        List<PrescriptionItemForReminderResponse> remindedPrescriptionItems = new ArrayList<>();
+        List<PrescriptionItemForReminderResponse> notRemindedPrescriptionItems = new ArrayList<>();
+
+        for (PrescriptionItem prescriptionItem : prescription.getPrescriptionItems()) {
+            if (prescriptionItem.isDeleted())
+                continue;
+
+            Optional<MedicineReminder> medicineReminder = medicineReminderRepository
+                    .findByPatientProfileAndPrescriptionItem(
+                            patientProfile,
+                            prescriptionItem
+                    );
+
+            if (medicineReminder.isEmpty()) {
+                notRemindedPrescriptionItems.add(
+                        PrescriptionItemForReminderResponse.builder()
+                                .prescriptionItem(prescriptionItem)
+                                .build()
+                );
+            } else {
+                remindedPrescriptionItems.add(
+                        PrescriptionItemForReminderResponse.builder()
+                                .prescriptionItem(prescriptionItem)
+                                .medicineReminder(new MedicineReminderDetailsResponse(
+                                        medicineReminder.get())
+                                )
+                                .build()
+                );
+            }
+        }
+
+        return PrescriptionDetailForReminderResponse.builder()
+                .prescription(prescription)
+                .remindedPrescriptionItems(remindedPrescriptionItems)
+                .notRemindedPrescriptionItems(notRemindedPrescriptionItems)
+                .build();
     }
 }

@@ -131,6 +131,8 @@ public class BookingServicesImpl implements IBookingServices {
                 booking.setTimeSlot(timeSlot);
                 booking.setTransaction(transaction);
                 booking.setQueueNumber(-1);
+                bookingRepository.save(booking);
+
                 booking.setDeleted(true);
                 bookingRepository.save(booking);
             }

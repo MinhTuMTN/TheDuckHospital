@@ -3,10 +3,12 @@ package com.theduckhospital.api.controller.patient;
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicineReminderServices;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -61,4 +63,41 @@ public class MedicineReminderController {
         );
     }
 
+    @GetMapping("/prescription")
+    public ResponseEntity<?> searchPrescription(
+            @RequestParam(name = "patientProfileId") UUID patientProfileId,
+            @RequestParam(name = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
+            @RequestParam(name = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate,
+            @RequestHeader(name = "Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Search prescription successfully")
+                .data(medicineReminderServices.searchPrescription(
+                        authorization,
+                        patientProfileId,
+                        startDate,
+                        endDate
+                ))
+                .build()
+        );
+    }
+
+    @GetMapping("/prescription/{prescriptionId}")
+    public ResponseEntity<?> getPrescription(
+            @PathVariable(name = "prescriptionId") UUID prescriptionId,
+            @RequestHeader(name = "Authorization") String authorization,
+            @RequestParam(name = "patientProfileId") UUID patientProfileId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get prescription successfully")
+                .data(medicineReminderServices.getReminderPrescription(
+                        authorization,
+                        prescriptionId,
+                        patientProfileId
+                ))
+                .build()
+        );
+    }
 }

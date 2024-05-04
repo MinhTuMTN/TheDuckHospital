@@ -118,11 +118,11 @@
   "chooseDate": {
     "title": "Chọn ngày khám",
     "note": "Vui lòng chọn ngày khám phù hợp với lịch trình của bạn. Chúng tôi hỗ trợ đặt lịch khám trước từ",
-    "noteDate": "1 đến 30.",
+    "noteDate": "1 đến 30 ngày",
     "toDay": "Hôm nay",
     "outOfSlot": "Kín chỗ",
     "freeSlot": "Còn trống",
-    "chooseTime": "chọn giờ khám",
+    "chooseTime": "Chọn giờ khám",
     "close": "Huỷ",
     "morning": "Buổi sáng",
     "afternoon": "Buổi chiều"

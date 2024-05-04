@@ -180,7 +180,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
             <View style={styles.infoContainer}>
               <Info size={25} color={appColors.primary} />
               <TextComponent flex={1} textAlign="justify">
-                {t('chooseDate.note')}
+                {t('chooseDate.note')}{' '}
                 <TextComponent bold>{t('chooseDate.noteDate')}</TextComponent>.
               </TextComponent>
             </View>
@@ -268,8 +268,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                 {i18n.language === 'vi'
                   ? `Ngày ${selectedDay.get('D')} tháng ${
                       selectedDay.get('M') + 1
-                    } năm 
-                ${selectedDay.get('year')}`
+                    } năm ${selectedDay.get('year')}`
                   : `${selectedDay.format('MMMM')} ${selectedDay.get(
                       'D',
                     )}, ${selectedDay.get('year')}`}

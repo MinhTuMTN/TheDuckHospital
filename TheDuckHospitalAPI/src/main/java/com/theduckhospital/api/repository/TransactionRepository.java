@@ -43,7 +43,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "FROM Transaction t " +
             "WHERE t.createdAt BETWEEN ?1 AND ?2 " +
             "AND t.account = ?3 AND t.status = ?4")
-    double sumAmountByCreatedAtBetweenAndAccount(
+    Double sumAmountByCreatedAtBetweenAndAccount(
             Date startDate,
             Date endDate,
             Account account,
