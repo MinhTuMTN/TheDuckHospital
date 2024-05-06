@@ -22,7 +22,6 @@ interface MedicineReminderChooseDateProps {
 
 const MedicineReminderChooseDate = (props: MedicineReminderChooseDateProps) => {
   const {selectedDate} = props;
-  // Value in [-4; 4], 0 is the current week
   const [indexShow, setIndexShow] = useState(0);
   const [datesContainerWidth, setDatesContainerWidth] = useState(0);
   const dates = useMemo(() => {
@@ -165,6 +164,8 @@ const MedicineReminderChooseDate = (props: MedicineReminderChooseDateProps) => {
         </View>
 
         <TextComponent bold color={appColors.white}>
+          {selectedDate.format('DD/MM/YYYY') === dayjs().format('DD/MM/YYYY') &&
+            'Hôm nay'}{' '}
           {selectedDate.format('DD/MM/YYYY')}
         </TextComponent>
 

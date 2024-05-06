@@ -12,6 +12,7 @@ import ToastProvider from './src/hooks/ToastProvider';
 import linking from './src/linking';
 import './src/localization/i18n';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
+import MedicineRemiderNavigator from './src/navigator/MedicineRemiderNavigator';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
 import NotFoundScreen from './src/screens/NotFoundScreen';
 import SlashScreen from './src/screens/SlashScreen';
@@ -28,6 +29,7 @@ import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
+import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import DeviceManagementScreen from './src/screens/patient/DeviceManagementScreen';
@@ -35,6 +37,7 @@ import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults
 import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
 import EnterProfileCode from './src/screens/patient/LookUpMedicalResults/EnterProfileCode';
 import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
+import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
 import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
 import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
@@ -42,15 +45,16 @@ import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProces
 import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
-import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import ChooseProfileForMedicineReminderScreen from './src/screens/patient/MedicineReminder/ChooseProfileForMedicineReminderScreen';
+import ManageMedicationSchedulingScreen from './src/screens/patient/MedicineReminder/ManageMedicationSchedulingScreen';
+import YourPrescriptionScreen from './src/screens/patient/MedicineReminder/YourPrescriptionScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
-import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
-import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
-import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
+import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
+import ScheduleMedicationRemindersScreen from './src/screens/patient/MedicineReminder/ScheduleMedicationRemindersScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -157,8 +161,8 @@ const App = () => {
                   component={ChooseDateScreen}
                 />
                 <Stack.Screen
-                  name="MedicineReminderScreen"
-                  component={MedicineReminderScreen}
+                  name="MedicineRemiderNavigator"
+                  component={MedicineRemiderNavigator}
                 />
                 <Stack.Screen
                   name="ConfirmBookingInformationScreen"
@@ -220,6 +224,22 @@ const App = () => {
                   component={MedicalTestResultScreen}
                 />
                 <Stack.Screen name="ChatScreen" component={ChatScreen} />
+                <Stack.Screen
+                  name="ChooseProfileForMedicineReminderScreen"
+                  component={ChooseProfileForMedicineReminderScreen}
+                />
+                <Stack.Screen
+                  name="YourPrescriptionScreen"
+                  component={YourPrescriptionScreen}
+                />
+                <Stack.Screen
+                  name="ManageMedicationSchedulingScreen"
+                  component={ManageMedicationSchedulingScreen}
+                />
+                <Stack.Screen
+                  name="ScheduleMedicationRemindersScreen"
+                  component={ScheduleMedicationRemindersScreen}
+                />
               </Stack.Navigator>
             </NavigationContainer>
           </AxiosInterceptorProvider>

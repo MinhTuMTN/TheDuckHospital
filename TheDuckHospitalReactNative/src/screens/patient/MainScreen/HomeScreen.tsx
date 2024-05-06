@@ -79,7 +79,7 @@ const HomeScreen = () => {
     navigation.navigate('EnterHospitalPaymentCodeScreen');
   };
   const handleNavigateMidicineReminderScreen = () => {
-    navigation.navigate('MedicineReminderScreen');
+    navigation.navigate('MedicineRemiderNavigator');
   };
   const handleNavigateMedicalExaminationHistoryScreen = () => {
     navigation.navigate('AllPatientProfilesScreen');

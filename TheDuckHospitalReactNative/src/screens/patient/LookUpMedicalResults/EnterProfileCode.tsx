@@ -33,8 +33,12 @@ const EnterProfileCode = () => {
       <Header
         title={`Nhập mã hồ sơ`}
         titleSize={20}
-        paddingTop={35}
-        paddingBottom={20}
+        paddingTop={32}
+        paddingStart={20}
+        noBackground
+        backgroundColor={appColors.darkBlue}
+        titleColor={appColors.white}
+        backButtonColor={appColors.white}
       />
       <View style={styles.container}>
         <View style={styles.noteContainer}>
@@ -75,7 +79,7 @@ const EnterProfileCode = () => {
                 name="search"
                 color={appColors.grayLight}
                 style={{
-                  color: appColors.primaryDark,
+                  color: appColors.darkerBlue,
                   fontSize: 18,
                 }}
               />
@@ -86,8 +90,9 @@ const EnterProfileCode = () => {
 
           <ButtonComponent
             onPress={handleSearch}
-            backgroundColor={appColors.primaryDark}
+            backgroundColor={appColors.darkerBlue}
             borderRadius={10}
+            fontWeight="600"
             containerStyles={{marginLeft: 10, paddingVertical: 12}}>
             Tra cứu
           </ButtonComponent>
