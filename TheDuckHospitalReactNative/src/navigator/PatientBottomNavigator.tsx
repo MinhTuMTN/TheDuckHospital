@@ -1,18 +1,13 @@
-import {
-  BottomTabBarProps,
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
+import {useTranslation} from 'react-i18next';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {appColors} from '../constants/appColors';
 import AccountScreen from '../screens/patient/MainScreen/AccountScreen';
 import HomeScreen from '../screens/patient/MainScreen/HomeScreen';
 import MedicalBillScreen from '../screens/patient/MainScreen/MedicalBillScreen';
 import NotificationScreen from '../screens/patient/MainScreen/NotificationScreen';
 import ProfileScreen from '../screens/patient/MainScreen/ProfileScreen';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTranslation} from 'react-i18next';
-import {TextComponent} from '../components';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {appColors} from '../constants/appColors';
 
 const Tab = createBottomTabNavigator();
 

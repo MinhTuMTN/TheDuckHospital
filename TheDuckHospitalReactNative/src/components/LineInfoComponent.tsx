@@ -26,6 +26,8 @@ interface Props {
   alignItems?: FlexAlignType | undefined;
   labelUppercase?: boolean;
   valueUppercase?: boolean;
+  numberOfValueLines?: number | undefined;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip' | undefined;
   containerStyles?: StyleProp<ViewStyle>;
   containerFlex?: number;
   paddingStart?: number;
@@ -60,6 +62,8 @@ const LineInfoComponent = (props: Props) => {
     containerStyles,
     paddingStart,
     valueTextAlign,
+    numberOfValueLines = 1,
+    ellipsizeMode,
   } = props;
   return (
     <View
@@ -90,6 +94,8 @@ const LineInfoComponent = (props: Props) => {
             alignItems: 'center',
           }}>
           <TextComponent
+            numberOfLines={numberOfValueLines}
+            ellipsizeMode={ellipsizeMode}
             color={valueColor}
             style={[
               valueStyles,

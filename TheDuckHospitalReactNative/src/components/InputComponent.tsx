@@ -7,6 +7,7 @@ import {
   ReturnKeyTypeOptions,
   StyleProp,
   TextInput,
+  TextInputKeyPressEventData,
   TextInputTextInputEventData,
   TextStyle,
   View,
@@ -53,6 +54,7 @@ interface InputComponentProps {
   autoFocus?: boolean;
   onSubmitEditing?: () => void;
   onEndIconPress?: () => void;
+  onKeyPress?: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
   errorMessageStyles?: StyleProp<TextStyle>;
 }
 
@@ -102,6 +104,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
     maxLength,
     onSubmitEditing,
     onEndIconPress,
+    onKeyPress,
     errorMessageStyles,
   } = props;
 
@@ -141,6 +144,7 @@ const InputComponent = forwardRef((props: InputComponentProps, ref: any) => {
           </InputSlot>
         )}
         <TextInput
+          onKeyPress={onKeyPress}
           autoFocus={autoFocus}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
