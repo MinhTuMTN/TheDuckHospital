@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface IMedicineReminderServices {
     MedicineReminder patientCreateMedicineReminder(String token, MedicineReminderRequest request);
-    List<MedicineReminderResponse> patientGetMedicineReminders(String token);
+    List<MedicineReminderResponse> patientGetMedicineReminders(String token, Date date);
     void checkAndSendMedicineReminder();
     boolean confirmReceivedMedicineReminder(UUID reminderId, UUID confirmId);
     List<PrescriptionResponse> searchPrescription(
@@ -21,5 +21,16 @@ public interface IMedicineReminderServices {
             Date fromDate,
             Date toDate
     );
-    PrescriptionDetailForReminderResponse getReminderPrescription(String token, UUID prescriptionId, UUID patientProfileId);
+    PrescriptionDetailForReminderResponse getReminderPrescription(
+            String token,
+            UUID prescriptionId,
+            UUID patientProfileId
+    );
+    boolean deleteMedicineReminderDetails(
+            String token,
+            UUID medicineReminderId,
+            UUID medicineReminderDetailId,
+            String type
+    );
+    boolean deleteMedicineReminder(String token, UUID medicineReminderId);
 }

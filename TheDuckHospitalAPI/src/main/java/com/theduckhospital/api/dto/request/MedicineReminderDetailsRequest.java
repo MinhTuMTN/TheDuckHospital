@@ -7,5 +7,4 @@ public class MedicineReminderDetailsRequest {
     private int hour;
     private int minute;
     private float amount;
-    private int index;
 }

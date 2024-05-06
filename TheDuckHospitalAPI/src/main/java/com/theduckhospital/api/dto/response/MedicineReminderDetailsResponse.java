@@ -4,6 +4,7 @@ import com.theduckhospital.api.entity.MedicineReminder;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,8 +17,12 @@ public class MedicineReminderDetailsResponse {
     private Date createdAt;
     private Date updatedAt;
     private boolean deleted;
+    private List<MedicineDetailsIndexTime> indexTimes;
 
-    public MedicineReminderDetailsResponse(MedicineReminder medicineReminder) {
+    public MedicineReminderDetailsResponse(
+            MedicineReminder medicineReminder,
+            List<MedicineDetailsIndexTime> indexTimes
+    ) {
         this.medicineReminderId = medicineReminder.getMedicineReminderId();
         this.startDate = medicineReminder.getStartDate();
         this.endDate = medicineReminder.getEndDate();
@@ -26,5 +31,6 @@ public class MedicineReminderDetailsResponse {
         this.createdAt = medicineReminder.getCreatedAt();
         this.updatedAt = medicineReminder.getUpdatedAt();
         this.deleted = medicineReminder.isDeleted();
+        this.indexTimes = indexTimes;
     }
 }

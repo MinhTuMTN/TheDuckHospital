@@ -33,18 +33,21 @@ public class MedicineReminderController {
                         authorization,
                         medicineReminderRequest
                 ))
+                .statusCode(200)
                 .build()
         );
     }
 
     @GetMapping
     public ResponseEntity<?> getMedicineReminders(
-            @RequestHeader("Authorization") String authorization
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
+                .statusCode(200)
                 .message("Get medicine reminders successfully")
-                .data(medicineReminderServices.patientGetMedicineReminders(authorization))
+                .data(medicineReminderServices.patientGetMedicineReminders(authorization, date))
                 .build()
         );
     }
@@ -53,7 +56,7 @@ public class MedicineReminderController {
     @PreAuthorize("permitAll()")
     public ResponseEntity<?> confirmReceivedMedicineReminder(
             @RequestParam(name = "reminderId") UUID reminderId,
-            @RequestParam(name = "confirmId")UUID confirmId
+            @RequestParam(name = "confirmId") UUID confirmId
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
@@ -66,8 +69,8 @@ public class MedicineReminderController {
     @GetMapping("/prescription")
     public ResponseEntity<?> searchPrescription(
             @RequestParam(name = "patientProfileId") UUID patientProfileId,
-            @RequestParam(name = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
-            @RequestParam(name = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate,
+            @RequestParam(name = "startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(name = "endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
             @RequestHeader(name = "Authorization") String authorization
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
@@ -96,6 +99,42 @@ public class MedicineReminderController {
                         authorization,
                         prescriptionId,
                         patientProfileId
+                ))
+                .build()
+        );
+    }
+
+    @DeleteMapping("/{reminderId}/{reminderDetailId}")
+    public ResponseEntity<?> deleteMedicineReminder(
+            @PathVariable(name = "reminderId") UUID reminderId,
+            @PathVariable(name = "reminderDetailId") UUID reminderDetailId,
+            @RequestParam(name = "type") String type,
+            @RequestHeader(name = "Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Mark medicine as used successfully")
+                .data(medicineReminderServices.deleteMedicineReminderDetails(
+                        authorization,
+                        reminderId,
+                        reminderDetailId,
+                        type
+                ))
+                .build()
+        );
+    }
+
+    @DeleteMapping("/{reminderId}")
+    public ResponseEntity<?> deleteMedicineReminder(
+            @PathVariable(name = "reminderId") UUID reminderId,
+            @RequestHeader(name = "Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Delete medicine reminder successfully")
+                .data(medicineReminderServices.deleteMedicineReminder(
+                        authorization,
+                        reminderId
                 ))
                 .build()
         );

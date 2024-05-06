@@ -31,6 +31,7 @@ public class MedicineReminderDetail {
 
     private float amount;
     private boolean used;
+    private boolean ignore;
 
     private Date createdAt;
     private Date updatedAt;
@@ -47,6 +48,7 @@ public class MedicineReminderDetail {
         this.medicineReminderDetailId = UUID.randomUUID();
         this.confirmationId = UUID.randomUUID();
         this.used = false;
+        this.ignore = false;
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.deleted = false;

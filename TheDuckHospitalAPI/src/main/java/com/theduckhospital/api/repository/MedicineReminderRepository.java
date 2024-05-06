@@ -1,9 +1,6 @@
 package com.theduckhospital.api.repository;
 
-import com.theduckhospital.api.entity.MedicineReminder;
-import com.theduckhospital.api.entity.Patient;
-import com.theduckhospital.api.entity.PatientProfile;
-import com.theduckhospital.api.entity.PrescriptionItem;
+import com.theduckhospital.api.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -31,4 +28,12 @@ public interface MedicineReminderRepository extends JpaRepository<MedicineRemind
             PatientProfile patientProfile,
             PrescriptionItem prescriptionItem
     );
+
+    @Query("SELECT mr " +
+            "FROM MedicineReminder mr " +
+            "WHERE mr.patientProfile.account = :account " +
+            "AND mr.deleted = false " +
+            "AND mr.medicineReminderId = :medicineReminderId"
+    )
+    Optional<MedicineReminder> findByAccountAndId(Account account, UUID medicineReminderId);
 }
