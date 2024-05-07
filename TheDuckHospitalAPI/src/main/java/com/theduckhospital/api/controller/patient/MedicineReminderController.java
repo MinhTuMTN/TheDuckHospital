@@ -86,6 +86,24 @@ public class MedicineReminderController {
         );
     }
 
+    @GetMapping("/prescription-by-code")
+    public ResponseEntity<?> searchPrescriptionById(
+            @RequestParam(name = "patientProfileId") UUID patientProfileId,
+            @RequestParam(name = "prescriptionCode") String prescriptionCode,
+            @RequestHeader(name = "Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Search prescription successfully")
+                .data(medicineReminderServices.searchPrescriptionByCode(
+                        authorization,
+                        patientProfileId,
+                        prescriptionCode
+                ))
+                .build()
+        );
+    }
+
     @GetMapping("/prescription/{prescriptionId}")
     public ResponseEntity<?> getPrescription(
             @PathVariable(name = "prescriptionId") UUID prescriptionId,
