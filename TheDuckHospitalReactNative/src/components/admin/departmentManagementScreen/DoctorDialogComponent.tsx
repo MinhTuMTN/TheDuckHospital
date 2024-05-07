@@ -41,15 +41,19 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [doctor, setDoctor] = useState({staffId: '', fullName: 'Chọn bác sĩ'});
+  const [isFirstClick, setIsFirstClick] = useState(true);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
+      setIsFirstClick(true);
       setDoctor({staffId: '', fullName: 'Chọn bác sĩ'});
     }
   };
 
   const handleAddDoctorToDepartment = async () => {
+    if (isFirstClick) setIsFirstClick(false);
+    if (doctor === null || doctor.staffId === '') return;
     setLoading(true);
     const response = await addDoctorToDepartment(departmentId, doctor.staffId);
     setLoading(false);
@@ -128,7 +132,6 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                 borderWidth: 1,
                 borderRadius: 10,
                 width: '100%',
-                marginBottom: 25,
               }}
               buttonTextStyle={{
                 textAlign: 'left',
@@ -148,6 +151,19 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                 );
               }}
             />
+            {doctor && doctor.staffId === '' && !isFirstClick && (
+              <TextComponent
+                color={appColors.error}
+                fontSize={12}
+                style={[
+                  {
+                    paddingLeft: 5,
+                    marginTop: 10,
+                  },
+                ]}>
+                Cần chọn bác sĩ
+              </TextComponent>
+            )}
           </ScrollView>
           <ButtonGroup
             space="lg"
@@ -164,6 +180,7 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              enabled={!(doctor?.staffId === '')}
               isLoading={loading}
               onPress={handleAddDoctorToDepartment}
               containerStyles={[styles.button, {marginRight: 15}]}>

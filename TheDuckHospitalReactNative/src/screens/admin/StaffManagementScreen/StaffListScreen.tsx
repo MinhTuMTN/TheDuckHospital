@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
@@ -17,7 +18,6 @@ import {
 import {appColors} from '../../../constants/appColors';
 import Icon from 'react-native-vector-icons/AntDesign';
 import StaffItemComponent from '../../../components/admin/staffManagementScreen/StaffItemComponent';
-import {ScrollView} from '@gluestack-ui/themed';
 import Popover from 'react-native-popover-view';
 import {Filter} from 'lucide-react-native';
 import ButtonComponent from '../../../components/ButtonComponent';
@@ -28,7 +28,8 @@ import CreateStaffSuccessDialogComponent from '../../../components/admin/staffMa
 
 function StaffListScreen() {
   const [showPopover, setShowPopover] = useState(false);
-  const [selected, setSelected] = useState('all');
+  const [selected, setSelected] = useState('ALL');
+  const [isEditing, setIsEditing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
   const [staffs, setStaffs] = useState<any>([]);
@@ -46,33 +47,47 @@ function StaffListScreen() {
     email: '',
     password: '',
   });
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, staffs, paginationParams.page]);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
-  const handleGetMedicines = async () => {
+  const handleGetStaffs = async () => {
     if (
       paginationParams.page + 1 > paginationParams.totalPages &&
       paginationParams.totalPages !== 0
     )
       return;
+
+    let staffRole: string[] = [];
+    if (selected === 'ALL') {
+      staffRole = [
+        'DOCTOR',
+        'NURSE',
+        'PHARMACIST',
+        'CASHIER',
+        'LABORATORY_TECHNICIAN',
+      ];
+    } else {
+      staffRole = [selected];
+    }
+
     setIsLoadingAPI(true);
     const response = await getPaginationStaffs(
       debouncedSearchText.trim(),
       paginationParams.limit,
       paginationParams.page,
-      [],
+      staffRole,
       [],
     );
     setIsLoadingAPI(false);
@@ -102,38 +117,71 @@ function StaffListScreen() {
     }));
   };
 
-  React.useEffect(() => {
+  const handleResetList = () => {
+    setSearchText('');
     setPaginationParams((prevState: any) => ({
       ...prevState,
       page: 0,
     }));
+  };
+  
+  React.useEffect(() => {
+    handleResetList();
   }, [refreshList]);
 
   React.useEffect(() => {
-    handleGetMedicines();
-  }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
+
+    handleGetStaffs();
+  }, [
+    debouncedSearchText,
+    paginationParams.page,
+    paginationParams.limit,
+    selected,
+  ]);
+
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
-          Danh sách nhân viên
-        </TextComponent>
-        <ButtonComponent
-          containerStyles={styles.addButtonContainer}
-          onPress={toggleModal}>
-          <View style={styles.buttonContent}>
-            <TextComponent
-              bold
-              fontSize={18}
-              color={appColors.textPrimary}
-              style={styles.addButtonText}>
-              Thêm
-            </TextComponent>
-            <Icon name="plus" size={20} color={appColors.textPrimary} />
-          </View>
-        </ButtonComponent>
-      </ContainerComponent>
+      {(!isKeyboardVisible || isEditing) && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={28} style={styles.listLabel}>
+            Danh sách nhân viên
+          </TextComponent>
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={toggleModal}>
+            <View style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={18}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <Icon name="plus" size={20} color={appColors.textPrimary} />
+            </View>
+          </ButtonComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -175,15 +223,16 @@ function StaffListScreen() {
             <FlexComponent style={styles.filterContainer}>
               <ButtonComponent
                 containerStyles={
-                  selected === 'all' ? styles.selectedButton : styles.button
+                  selected === 'ALL' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('all');
+                  setSelected('ALL');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'all'
+                    selected === 'ALL'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -193,15 +242,16 @@ function StaffListScreen() {
 
               <ButtonComponent
                 containerStyles={
-                  selected === 'doctor' ? styles.selectedButton : styles.button
+                  selected === 'DOCTOR' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('doctor');
+                  setSelected('DOCTOR');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'doctor'
+                    selected === 'DOCTOR'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -211,15 +261,18 @@ function StaffListScreen() {
 
               <ButtonComponent
                 containerStyles={
-                  selected === 'test' ? styles.selectedButton : styles.button
+                  selected === 'LABORATORY_TECHNICIAN'
+                    ? styles.selectedButton
+                    : styles.button
                 }
                 onPress={() => {
-                  setSelected('test');
+                  setSelected('LABORATORY_TECHNICIAN');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'test'
+                    selected === 'LABORATORY_TECHNICIAN'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -229,15 +282,16 @@ function StaffListScreen() {
 
               <ButtonComponent
                 containerStyles={
-                  selected === 'nurse' ? styles.selectedButton : styles.button
+                  selected === 'NURSE' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('nurse');
+                  setSelected('NURSE');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'nurse'
+                    selected === 'NURSE'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -262,40 +316,44 @@ function StaffListScreen() {
         <StaffItemComponent />
       </ScrollView> */}
 
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={staffs}
-          keyExtractor={(item: any, index: number) =>
-            `staff-${item.id}-${index}`
-          }
-          extraData={staffs}
-          refreshing={true}
-          renderItem={({item}) => (
-            <StaffItemComponent
-              refreshList={refreshList}
-              setRefreshList={setRefreshList}
-              staff={item}
-            />
-          )}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {(!isKeyboardVisible || isEditing) && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={staffs}
+            keyExtractor={(item: any, index: number) =>
+              `staff-${item.staffId}-${index}`
             }
-          }}
-          onEndReachedThreshold={0.7}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            extraData={staffs}
+            refreshing={true}
+            renderItem={({item}) => (
+              <StaffItemComponent
+                setIsEditing={setIsEditing}
+                refreshList={refreshList}
+                setRefreshList={setRefreshList}
+                staff={item}
+              />
+            )}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={0.7}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
 
       <StaffDialogComponent
+        setIsEditing={setIsEditing}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}

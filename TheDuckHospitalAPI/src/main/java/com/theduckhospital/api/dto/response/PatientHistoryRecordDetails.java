@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class PatientHistoryRecordDetails {
     private PatientProfileItemResponse patientProfile;
+    private String bookingCode;
     private Date date;
     private String doctorName;
     private String departmentName;
@@ -18,6 +19,7 @@ public class PatientHistoryRecordDetails {
     private List<PrescriptionItem> prescriptionItems;
     private Date reExaminationDate;
     public PatientHistoryRecordDetails(MedicalExaminationRecord medicalExaminationRecord) {
+        this.bookingCode = medicalExaminationRecord.getBooking().getBookingCode();
         this.patientProfile = new PatientProfileItemResponse(
                 medicalExaminationRecord.getPatientProfile()
         );

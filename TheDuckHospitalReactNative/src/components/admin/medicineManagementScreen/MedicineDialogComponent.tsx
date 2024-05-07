@@ -58,6 +58,7 @@ interface MedicineDialogComponentProps {
   refreshList: boolean;
   medicine?: any;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing?: (isEditing: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
@@ -66,24 +67,24 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
     modalVisible,
     refreshList,
     medicine,
+    setIsEditing,
     setRefreshList,
     setModalVisible,
     edit = false,
   } = props;
   const [name, setName] = useState(edit ? medicine.medicineName : '');
-  const [quantity, setQuantity] = useState(edit ? medicine.quantity + '' : '0');
+  const [quantity, setQuantity] = useState(edit ? medicine.quantity + '' : '1');
   const [unit, setUnit] = useState(
     edit ? units.find(unit => unit.value === medicine.unit) : units[0],
   );
-  const [price, setPrice] = useState(edit ? medicine.price + '' : '0');
+  const [price, setPrice] = useState(edit ? medicine.price + '' : '1');
   const [error, setError] = React.useState(false);
-  const [firstClick, setFirstClick] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
-      console.log(medicine);
+      if (setIsEditing) setIsEditing(false);
 
       if (edit) {
         setName(medicine.medicineName);
@@ -92,15 +93,14 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
         setPrice(medicine.price + '');
       } else {
         setName('');
-        setQuantity('0');
+        setQuantity('1');
         setUnit(units[0]);
-        setPrice('0');
+        setPrice('1');
       }
     }
   };
 
   const handleCreateOrUpdateMedicine = async () => {
-    if (!firstClick) setFirstClick(true);
     if (error) {
       return;
     }
@@ -172,6 +172,8 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
                 labelStyle={styles.labelInput}
                 placeholder="Tên thuốc*"
                 value={name}
+                error={name.trim() === '' || name.length <= 0}
+                errorMessage="Tên thuốc không được để trống"
                 onChangeText={newValue => setName(newValue)}
                 startIcon={
                   <MaterialCommunityIcons
@@ -202,10 +204,53 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
                 labelStyle={styles.labelInput}
                 placeholder="Số lượng*"
                 value={quantity}
+                error={
+                  quantity.trim() === '' ||
+                  quantity.length <= 0 ||
+                  price.trim() === '0'
+                }
+                errorMessage="Số lượng không được để trống"
                 onChangeText={newValue => setQuantity(newValue)}
                 startIcon={
                   <OcticonsIcon
                     name="number"
+                    size={24}
+                    color={appColors.black}
+                  />
+                }
+                keyboardType="numeric"
+                inputContainerStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+                inputContainerFocusStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.primary,
+                  borderRadius: 10,
+                  marginBottom: 5,
+                  width: '100%',
+                }}
+              />
+
+              <InputComponent
+                size="md"
+                label="Giá*"
+                labelStyle={styles.labelInput}
+                placeholder="Giá*"
+                value={price}
+                error={
+                  price.trim() === '' ||
+                  price.length <= 0 ||
+                  price.trim() === '0'
+                }
+                errorMessage="Giá không được để trống"
+                onChangeText={newValue => setPrice(newValue)}
+                startIcon={
+                  <FoundationIcon
+                    name="dollar-bill"
                     size={24}
                     color={appColors.black}
                   />
@@ -255,7 +300,7 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
                   borderRadius: 10,
                   height: '12%',
                   width: '100%',
-                  marginBottom: 15,
+                  marginBottom: 18,
                 }}
                 buttonTextStyle={{
                   textAlign: 'left',
@@ -293,37 +338,6 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
                   <ChevronDownIcon color={appColors.black} size={20} />
                 }
               /> */}
-
-              <InputComponent
-                size="md"
-                label="Giá*"
-                labelStyle={styles.labelInput}
-                placeholder="Giá*"
-                value={price}
-                onChangeText={newValue => setPrice(newValue)}
-                startIcon={
-                  <FoundationIcon
-                    name="dollar-bill"
-                    size={24}
-                    color={appColors.black}
-                  />
-                }
-                keyboardType="numeric"
-                inputContainerStyle={{
-                  backgroundColor: appColors.white,
-                  borderColor: appColors.black,
-                  borderRadius: 10,
-                  marginBottom: 15,
-                  width: '100%',
-                }}
-                inputContainerFocusStyle={{
-                  backgroundColor: appColors.white,
-                  borderColor: appColors.primary,
-                  borderRadius: 10,
-                  marginBottom: 15,
-                  width: '100%',
-                }}
-              />
             </FormControlComponent>
           </ScrollView>
           <ButtonGroup
@@ -341,6 +355,7 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              enabled={!error}
               isLoading={isLoading}
               onPress={handleCreateOrUpdateMedicine}
               containerStyles={[styles.button, {marginRight: 15}]}>

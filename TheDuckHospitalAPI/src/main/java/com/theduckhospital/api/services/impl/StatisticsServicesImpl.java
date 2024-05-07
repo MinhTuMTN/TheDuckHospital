@@ -112,8 +112,15 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                 ));
 
 
-        List<String> labels = new ArrayList<>(totalAmountByDate.keySet());
-        List<Double> values = new ArrayList<>(totalAmountByDate.values());
+        List<String> labels = new ArrayList<>();
+        for (String date : totalAmountByDate.keySet()) {
+            labels.add(date.length() > 5 ? date.substring(0, 5) : date);
+        }
+        List<Double> values = totalAmountByDate.values()
+                .stream()
+                .map(amount -> Math.round(amount / 1000))
+                .map(Long::doubleValue)
+                .collect(Collectors.toList());
 
         return new RevenueStatisticsResponse(values, labels);
     }
@@ -141,7 +148,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime());
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
 
         List<Long> values = bookings.stream()
                 .map(entry -> (Long) entry[1])

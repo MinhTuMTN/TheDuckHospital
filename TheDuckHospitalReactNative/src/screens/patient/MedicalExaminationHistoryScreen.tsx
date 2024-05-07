@@ -20,10 +20,12 @@ import HorizontalLineComponent from '../../components/HorizontalLineComponent';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {getMedicalRecordDetail} from '../../services/medicalRecordServices';
 import PrescriptionItemComponent from '../../components/patient/medicalExaminationHistoryScreen/PrescriptionItemComponent';
+import {formatDate} from '../../utils/dateUtils';
+import {View} from 'react-native';
 
 const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
   const [medicalRecord, setMedicalRecord] = React.useState<any>();
-  const {medicalRecordId} = route.params || 1;
+  const {medicalRecordId} = route.params;
 
   React.useEffect(() => {
     const handleGetMedicalRecordDetail = async () => {
@@ -31,6 +33,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
       if (response.success) {
         setMedicalRecord(response.data?.data);
+        console.log(response.data?.data);
       }
     };
 
@@ -52,7 +55,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
         <ContainerComponent style={styles.detailContainer}>
           <LineInfoComponent
             label="Ngày khám:"
-            value={medicalRecord?.date || '21/02/2024'}
+            value={formatDate(medicalRecord?.date)}
             labelColor={appColors.textDescription}
             valueColor={'#4F4F4F'}
             flexLabel={1}
@@ -74,14 +77,18 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               />
             }
           />
-          <FlexComponent direction="row">
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
             <LineInfoComponent
               label="Mã phiếu khám:"
-              value={medicalRecordId || 'F5F470FC8737'}
+              value={medicalRecord?.bookingCode}
               labelColor={appColors.textDescription}
               valueColor={'#4F4F4F'}
-              flexLabel={1}
-              flexValue={1}
+              flexLabel={9}
+              flexValue={7}
               containerFlex={1}
               valueStyles={{
                 fontWeight: '700',
@@ -100,13 +107,23 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
                 />
               }
               endIcon={
-                <TouchableOpacity
-                  onPress={() => Clipboard.setString('F5F470FC8737')}>
-                  <Copy size={19} color={appColors.black} />
-                </TouchableOpacity>
+                <View style={{flex: 2}}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      Clipboard.setString(medicalRecord.bookingCode)
+                    }>
+                    <Copy size={19} color={appColors.black} />
+                  </TouchableOpacity>
+                </View>
               }
             />
-          </FlexComponent>
+            {/* <View style={{flex: 2}}>
+              <TouchableOpacity
+                onPress={() => Clipboard.setString(medicalRecord.bookingCode)}>
+                <Copy size={19} color={appColors.black} />
+              </TouchableOpacity>
+            </View> */}
+          </View>
         </ContainerComponent>
 
         <HorizontalLineComponent
@@ -130,10 +147,10 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
             }>
             <LineInfoComponent
               label="Họ tên:"
-              value={medicalRecord?.patientProfile.fullName || 'Nguyễn Văn A'}
+              value={medicalRecord?.patientProfile.fullName}
               valueColor={appColors.textPrimary}
               flexLabel={1}
-              flexValue={1}
+              flexValue={2}
               valueStyles={styles.lineInfo}
               labelStyles={styles.lineInfo}
               containerStyles={{paddingTop: 10}}
@@ -141,10 +158,13 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Ngày sinh:"
-              value={medicalRecord?.patientProfile.dateOfBirth || '01/01/1999'}
+              value={
+                formatDate(medicalRecord?.patientProfile.dateOfBirth) ||
+                '01/01/1999'
+              }
               valueColor={appColors.textGray}
               flexLabel={1}
-              flexValue={1}
+              flexValue={2}
               valueStyles={styles.lineInfo}
               labelStyles={styles.lineInfo}
               containerStyles={{paddingTop: 10}}
@@ -153,12 +173,11 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
             <LineInfoComponent
               label="Giới tính:"
               value={
-                (medicalRecord?.patientProfile.gender === "MALE" ? 'Nam' : 'Nữ') ||
-                'Nam'
+                medicalRecord?.patientProfile.gender === 'MALE' ? 'Nam' : 'Nữ'
               }
               valueColor={appColors.textGray}
               flexLabel={1}
-              flexValue={1}
+              flexValue={2}
               valueStyles={styles.lineInfo}
               labelStyles={styles.lineInfo}
               containerStyles={{paddingTop: 10}}
@@ -166,14 +185,10 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Địa chỉ:"
-              value={
-                medicalRecord
-                  ? `${medicalRecord?.patientProfile.streetName}, ${medicalRecord?.patientProfile.ward?.wardName}, ${medicalRecord?.patientProfile.district?.districtName}, ${medicalRecord?.patientProfile.province?.provinceName}`
-                  : '01 Võ Văn Ngân, Linh Chiểu, TP Thủ Đức, Tp. HCM'
-              }
+              value={`${medicalRecord?.patientProfile.streetName}, ${medicalRecord?.patientProfile.ward?.wardName}, ${medicalRecord?.patientProfile.district?.districtName}, ${medicalRecord?.patientProfile.province?.provinceName}`}
               valueColor={appColors.textGray}
               flexLabel={1}
-              flexValue={1}
+              flexValue={2}
               valueStyles={styles.lineInfo}
               labelStyles={styles.lineInfo}
               containerStyles={{paddingTop: 10}}
@@ -181,10 +196,10 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Mã bệnh nhân:"
-              value={medicalRecord?.patientProfile.patientCode || 'BN12345678'}
+              value={medicalRecord?.patientProfile.patientCode}
               valueColor={appColors.textGray}
               flexLabel={1}
-              flexValue={1}
+              flexValue={2}
               valueStyles={styles.lineInfo}
               labelStyles={styles.lineInfo}
               containerStyles={{paddingTop: 10}}
@@ -213,7 +228,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
             }>
             <LineInfoComponent
               label="Bác sĩ điều trị:"
-              value={medicalRecord?.doctorName || 'Nguyễn Văn D'}
+              value={medicalRecord?.doctorName}
               valueColor={appColors.textPrimary}
               flexLabel={1}
               flexValue={1}
@@ -224,7 +239,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Chuyên khoa:"
-              value={medicalRecord?.departmentName || 'Răng - hàm - mặt'}
+              value={medicalRecord?.departmentName}
               valueColor={appColors.textGray}
               flexLabel={1}
               flexValue={1}
@@ -235,7 +250,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Triệu chứng:"
-              value={medicalRecord?.symptom || 'Đau răng, sưng nướu'}
+              value={medicalRecord?.symptom}
               valueColor={appColors.textGray}
               flexLabel={1}
               flexValue={1}
@@ -246,7 +261,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
 
             <LineInfoComponent
               label="Chuẩn đoán:"
-              value={medicalRecord?.diagnosis || 'Sâu răng'}
+              value={medicalRecord?.diagnosis}
               valueColor={appColors.textGray}
               flexLabel={1}
               flexValue={1}
@@ -255,16 +270,18 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               containerStyles={{paddingTop: 10}}
             />
 
-            <LineInfoComponent
-              label="Tái khám:"
-              value={medicalRecord?.reExaminationDate || '31/03/2024'}
-              valueColor={appColors.textGray}
-              flexLabel={1}
-              flexValue={1}
-              valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
-              containerStyles={{paddingTop: 10}}
-            />
+            {medicalRecord?.reExaminationDate && (
+              <LineInfoComponent
+                label="Tái khám:"
+                value={medicalRecord?.reExaminationDate}
+                valueColor={appColors.textGray}
+                flexLabel={1}
+                flexValue={1}
+                valueStyles={styles.lineInfo}
+                labelStyles={styles.lineInfo}
+                containerStyles={{paddingTop: 10}}
+              />
+            )}
           </SectionComponent>
         </ContainerComponent>
 
@@ -276,18 +293,19 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
           marginRight={30}
         />
 
-        <ContainerComponent style={styles.detailContainer}>
-          <SectionComponent
-            title="Toa thuốc"
-            paddingTop={20}
-            startIcon={
-              <Pill
-                size={24}
-                color={appColors.black}
-                style={{marginBottom: 10, marginRight: 5}}
-              />
-            }>
-            {/* <FlexComponent style={styles.prescriptionItemContainer}>
+        {medicalRecord?.prescriptionItems && (
+          <ContainerComponent style={styles.detailContainer}>
+            <SectionComponent
+              title="Toa thuốc"
+              paddingTop={20}
+              startIcon={
+                <Pill
+                  size={24}
+                  color={appColors.black}
+                  style={{marginBottom: 10, marginRight: 5}}
+                />
+              }>
+              {/* <FlexComponent style={styles.prescriptionItemContainer}>
               <FlexComponent>
                 <TextComponent fontWeight="600" fontSize={18}>
                   {prescriptionItem?.medicine.medicineName || "Clinozpam"}
@@ -330,16 +348,25 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               </TextComponent>
             </FlexComponent> */}
 
-            <FlatList
+              {medicalRecord?.prescriptionItems?.map(
+                (item: any, index: number) => (
+                  <PrescriptionItemComponent
+                    key={index}
+                    prescriptionItem={item}
+                  />
+                ),
+              )}
+              {/* <FlatList
               showsVerticalScrollIndicator={false}
               data={medicalRecord?.prescriptionItems}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({item}) => (
                 <PrescriptionItemComponent prescriptionItem={item} />
               )}
-            />
-          </SectionComponent>
-        </ContainerComponent>
+            /> */}
+            </SectionComponent>
+          </ContainerComponent>
+        )}
       </ScrollView>
     </ContainerComponent>
   );

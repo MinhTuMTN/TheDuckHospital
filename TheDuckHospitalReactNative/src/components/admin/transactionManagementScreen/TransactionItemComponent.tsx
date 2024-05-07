@@ -6,13 +6,11 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import {globalStyles} from '../../../styles/globalStyles';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
-import { formatDate } from '../../../utils/dateUtils';
-import { formatCurrency } from '../../../utils/currencyUtils';
+import {formatDate} from '../../../utils/dateUtils';
+import {formatCurrency} from '../../../utils/currencyUtils';
 
 interface TransactionItemComponentProps {
   transaction: any;
-  refreshList: boolean;
-  setRefreshList: (refreshList: boolean) => void;
 }
 
 function TransactionItemComponent(props: TransactionItemComponentProps) {
@@ -29,7 +27,9 @@ function TransactionItemComponent(props: TransactionItemComponentProps) {
           <TextComponent bold fontSize={21}>
             {transaction.userName}
           </TextComponent>
-          <TextComponent fontSize={16}>{formatDate(transaction.createdAt)}</TextComponent>
+          <TextComponent fontSize={16}>
+            {formatDate(transaction.createdAt)}
+          </TextComponent>
         </FlexComponent>
 
         <FlexComponent

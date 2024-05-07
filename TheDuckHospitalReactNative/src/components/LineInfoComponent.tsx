@@ -82,27 +82,30 @@ const LineInfoComponent = (props: Props) => {
         {label}
       </TextComponent>
       {value && (
-        <View
-          style={{
-            flexDirection: 'row',
-            flex: flexValue,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-          }}>
-          <TextComponent
-            color={valueColor}
-            style={[
-              valueStyles,
-              {
-                textAlign: valueTextAlign,
-              },
-            ]}
-            flex={endIcon ? 0.85 : 1}
-            uppercase={valueUppercase}>
-            {value}
-          </TextComponent>
+        <>
+          <View
+            style={{
+              flexDirection: 'row',
+              flex: flexValue,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}>
+            <TextComponent
+              color={valueColor}
+              style={[
+                valueStyles,
+                {
+                  textAlign: valueTextAlign,
+                },
+              ]}
+              flex={1}
+              uppercase={valueUppercase}>
+              {value}
+            </TextComponent>
+          </View>
+
           {endIcon && endIcon}
-        </View>
+        </>
       )}
     </View>
   );

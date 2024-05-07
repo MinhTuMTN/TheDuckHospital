@@ -15,12 +15,14 @@ import {changePasswordWithOldPassword} from '../../services/authServices';
 import {changePasswordWithOldPasswordDataProps} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import LoginRequireComponent from '../../components/LoginRequireComponent';
+import FormControlComponent from '../../components/FormControlComponent';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
   const [showOldPassword, setShowOldPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [error, setError] = React.useState(false);
 
   const [password, setPassword] =
     React.useState<changePasswordWithOldPasswordDataProps>({
@@ -35,6 +37,7 @@ const ChangePasswordScreen = () => {
   }, []);
 
   const handleChangePassword = async () => {
+    if (error) return;
     const respone = await changePasswordWithOldPassword(password);
     if (respone.success) {
       navigation.goBack();
@@ -77,131 +80,135 @@ const ChangePasswordScreen = () => {
               Vui lòng nhập chính xác các thông tin bên dưới để đặt mật khẩu mới{' '}
             </TextComponent>
 
-            <InputComponent
-              label="Mật khẩu cũ"
-              labelStyle={{
-                color: appColors.textDescription,
-                fontSize: 14,
-                fontWeight: '500',
-              }}
-              value={password.oldPassword}
-              onChangeText={text =>
-                setPassword({...password, oldPassword: text})
-              }
-              error={password.oldPassword === ''}
-              errorMessage="Mật khẩu cũ không được để trống"
-              variant="underlined"
-              startIcon={
-                <SimpleLineIcons
-                  size={25}
-                  style={{
-                    marginLeft: -12,
-                  }}
-                  name="lock"
-                  color={appColors.primaryDark}
-                />
-              }
-              endIcon={
-                showOldPassword ? (
-                  <HideEye width={30} height={30} />
-                ) : (
-                  <Eye width={30} height={30} />
-                )
-              }
-              type={showOldPassword ? 'text' : 'password'}
-              placeholder="Mật khẩu cũ"
-              onEndIconPress={() => {
-                setShowOldPassword(!showOldPassword);
-              }}
-            />
-            <InputComponent
-              label="Mật khẩu mới"
-              labelStyle={{
-                color: appColors.textDescription,
-                fontSize: 14,
-                fontWeight: '500',
-              }}
-              value={password.newPassword}
-              onChangeText={text =>
-                setPassword({...password, newPassword: text})
-              }
-              error={
-                password.newPassword === '' ||
-                !validatePassword(password.newPassword)
-              }
-              errorMessage={
-                password.newPassword === ''
-                  ? 'Mật khẩu mới không được để trống'
-                  : 'Mật khẩu mới phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
-              }
-              variant="underlined"
-              startIcon={
-                <SimpleLineIcons
-                  size={25}
-                  style={{
-                    marginLeft: -12,
-                  }}
-                  name="lock"
-                  color={appColors.primaryDark}
-                />
-              }
-              endIcon={
-                showNewPassword ? (
-                  <HideEye width={30} height={30} />
-                ) : (
-                  <Eye width={30} height={30} />
-                )
-              }
-              type={showNewPassword ? 'text' : 'password'}
-              placeholder="Mật khẩu mới"
-              onEndIconPress={() => {
-                setShowNewPassword(!showNewPassword);
-              }}
-            />
-            <InputComponent
-              label="Xác nhận lại mật khẩu"
-              labelStyle={{
-                color: appColors.textDescription,
-                fontSize: 14,
-                fontWeight: '500',
-              }}
-              value={password.confirmNewPassword}
-              onChangeText={text =>
-                setPassword({...password, confirmNewPassword: text})
-              }
-              error={
-                password.confirmNewPassword === '' ||
-                password.newPassword !== password.confirmNewPassword
-              }
-              errorMessage={
-                password.confirmNewPassword === ''
-                  ? 'Mật khẩu mới không được để trống'
-                  : 'Mật khẩu mới không trùng khớp với mật khẩu mới'
-              }
-              variant="underlined"
-              startIcon={
-                <RectangleEllipsis
-                  size={25}
-                  style={{
-                    marginLeft: -12,
-                  }}
-                  color={appColors.primaryDark}
-                />
-              }
-              endIcon={
-                showConfirmPassword ? (
-                  <HideEye width={30} height={30} />
-                ) : (
-                  <Eye width={30} height={30} />
-                )
-              }
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Xác nhận lại mật khẩu"
-              onEndIconPress={() => {
-                setShowConfirmPassword(!showConfirmPassword);
-              }}
-            />
-
+            <FormControlComponent onErrors={error => setError(error)}>
+              <InputComponent
+                label="Mật khẩu cũ"
+                labelStyle={{
+                  color: appColors.textDescription,
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+                value={password.oldPassword}
+                onChangeText={text =>
+                  setPassword({...password, oldPassword: text})
+                }
+                error={password.oldPassword === ''}
+                errorMessage="Mật khẩu cũ không được để trống"
+                variant="underlined"
+                startIcon={
+                  <SimpleLineIcons
+                    size={25}
+                    style={{
+                      marginLeft: -12,
+                    }}
+                    name="lock"
+                    color={appColors.primaryDark}
+                  />
+                }
+                endIcon={
+                  showOldPassword ? (
+                    <HideEye width={30} height={30} />
+                  ) : (
+                    <Eye width={30} height={30} />
+                  )
+                }
+                containerStyle={{width: '100%'}}
+                type={showOldPassword ? 'text' : 'password'}
+                placeholder="Mật khẩu cũ"
+                onEndIconPress={() => {
+                  setShowOldPassword(!showOldPassword);
+                }}
+              />
+              <InputComponent
+                label="Mật khẩu mới"
+                labelStyle={{
+                  color: appColors.textDescription,
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+                value={password.newPassword}
+                onChangeText={text =>
+                  setPassword({...password, newPassword: text})
+                }
+                error={
+                  password.newPassword === '' ||
+                  !validatePassword(password.newPassword)
+                }
+                errorMessage={
+                  password.newPassword === ''
+                    ? 'Mật khẩu mới không được để trống'
+                    : 'Mật khẩu mới phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
+                }
+                variant="underlined"
+                startIcon={
+                  <SimpleLineIcons
+                    size={25}
+                    style={{
+                      marginLeft: -12,
+                    }}
+                    name="lock"
+                    color={appColors.primaryDark}
+                  />
+                }
+                endIcon={
+                  showNewPassword ? (
+                    <HideEye width={30} height={30} />
+                  ) : (
+                    <Eye width={30} height={30} />
+                  )
+                }
+                containerStyle={{width: '100%'}}
+                type={showNewPassword ? 'text' : 'password'}
+                placeholder="Mật khẩu mới"
+                onEndIconPress={() => {
+                  setShowNewPassword(!showNewPassword);
+                }}
+              />
+              <InputComponent
+                label="Xác nhận lại mật khẩu"
+                labelStyle={{
+                  color: appColors.textDescription,
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+                value={password.confirmNewPassword}
+                onChangeText={text =>
+                  setPassword({...password, confirmNewPassword: text})
+                }
+                error={
+                  password.confirmNewPassword === '' ||
+                  password.newPassword !== password.confirmNewPassword
+                }
+                errorMessage={
+                  password.confirmNewPassword === ''
+                    ? 'Mật khẩu mới không được để trống'
+                    : 'Mật khẩu mới không trùng khớp với mật khẩu mới'
+                }
+                variant="underlined"
+                startIcon={
+                  <RectangleEllipsis
+                    size={25}
+                    style={{
+                      marginLeft: -12,
+                    }}
+                    color={appColors.primaryDark}
+                  />
+                }
+                endIcon={
+                  showConfirmPassword ? (
+                    <HideEye width={30} height={30} />
+                  ) : (
+                    <Eye width={30} height={30} />
+                  )
+                }
+                containerStyle={{width: '100%'}}
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Xác nhận lại mật khẩu"
+                onEndIconPress={() => {
+                  setShowConfirmPassword(!showConfirmPassword);
+                }}
+              />
+            </FormControlComponent>
             <View
               style={{
                 paddingHorizontal: 12,

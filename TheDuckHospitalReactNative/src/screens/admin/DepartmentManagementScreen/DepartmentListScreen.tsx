@@ -1,5 +1,11 @@
 import React, {useMemo, useState} from 'react';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Keyboard,
+} from 'react-native';
 import {
   ContainerComponent,
   InputComponent,
@@ -19,6 +25,7 @@ import {RootState} from '../../../types';
 function DepartmentListScreen() {
   const [departments, setDepartments] = React.useState<any>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [paginationParams, setPaginationParams] = React.useState({
     page: 0,
     limit: 5,
@@ -28,6 +35,7 @@ function DepartmentListScreen() {
   const [searchText, setSearchText] = React.useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
   const [refreshList, setRefreshList] = React.useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const refreshListDetailChanged = useSelector(
     (state: RootState) => state.refreshList.refreshList,
@@ -35,16 +43,15 @@ function DepartmentListScreen() {
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, departments, paginationParams.page]);
 
   const handleGetDepartments = async () => {
@@ -92,6 +99,7 @@ function DepartmentListScreen() {
   };
 
   React.useEffect(() => {
+    setSearchText('');
     setPaginationParams((prevState: any) => ({
       ...prevState,
       page: 0,
@@ -100,8 +108,6 @@ function DepartmentListScreen() {
 
   React.useEffect(() => {
     try {
-      console.log(refreshListDetailChanged);
-      
       handleGetDepartments();
     } catch (error) {
       console.log(error);
@@ -113,27 +119,49 @@ function DepartmentListScreen() {
     refreshListDetailChanged,
   ]);
 
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={32} style={styles.listLabel}>
-          Danh sách khoa
-        </TextComponent>
-        <ButtonComponent
-          containerStyles={styles.addButtonContainer}
-          onPress={toggleModal}>
-          <View style={styles.buttonContent}>
-            <TextComponent
-              bold
-              fontSize={18}
-              color={appColors.textPrimary}
-              style={styles.addButtonText}>
-              Thêm
-            </TextComponent>
-            <Icon name="plus" size={20} color={appColors.textPrimary} />
-          </View>
-        </ButtonComponent>
-      </ContainerComponent>
+      {(!isKeyboardVisible || isEditing) && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={32} style={styles.listLabel}>
+            Danh sách khoa
+          </TextComponent>
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={toggleModal}>
+            <View style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={18}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <Icon name="plus" size={20} color={appColors.textPrimary} />
+            </View>
+          </ButtonComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -159,45 +187,49 @@ function DepartmentListScreen() {
         />
       </ContainerComponent>
 
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={departments}
-          keyExtractor={(item: any, index: number) =>
-            `department-${item.id}-${index}`
-          }
-          extraData={departments}
-          refreshing={true}
-          renderItem={({item}) => (
-            <DepartmentItemComponent
-              refreshList={refreshList}
-              setRefreshList={setRefreshList}
-              department={item}
-            />
-          )}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            console.log(paginationParams.page);
-            console.log(paginationParams.totalPages);
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              // console.log(paginationParams.page);
-              // console.log(paginationParams.totalPages);
-
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {(!isKeyboardVisible || isEditing) && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={departments}
+            keyExtractor={(item: any, index: number) =>
+              `department-${item.departmentId}-${index}`
             }
-          }}
-          onEndReachedThreshold={1}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            extraData={departments}
+            refreshing={true}
+            renderItem={({item}) => (
+              <DepartmentItemComponent
+                setIsEditing={setIsEditing}
+                refreshList={refreshList}
+                setRefreshList={setRefreshList}
+                department={item}
+              />
+            )}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              console.log(paginationParams.page);
+              console.log(paginationParams.totalPages);
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                // console.log(paginationParams.page);
+                // console.log(paginationParams.totalPages);
+
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={1}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
 
       <DepartmentDialogComponent
+        setIsEditing={setIsEditing}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}

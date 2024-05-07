@@ -6,6 +6,7 @@ import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredStaffsResponse;
 import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.Staff;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;

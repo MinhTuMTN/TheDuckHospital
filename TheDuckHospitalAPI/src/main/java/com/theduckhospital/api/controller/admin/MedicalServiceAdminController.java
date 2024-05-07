@@ -1,5 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.constant.ServiceType;
 import com.theduckhospital.api.dto.request.admin.CreateServicesRequest;
 import com.theduckhospital.api.dto.request.admin.UpdateServiceRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
@@ -8,6 +10,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/services")
@@ -34,13 +38,14 @@ public class MedicalServiceAdminController {
     public ResponseEntity<?> getPaginationServices(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(defaultValue = "MedicalExamination, MedicalTest") List<ServiceType> serviceTypes
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get filtered services pagination successfully")
-                        .data(serviceServices.getPaginationFilteredServices(search, page, limit))
+                        .data(serviceServices.getPaginationFilteredServices(search, page, limit, serviceTypes))
                         .build()
         );
     }

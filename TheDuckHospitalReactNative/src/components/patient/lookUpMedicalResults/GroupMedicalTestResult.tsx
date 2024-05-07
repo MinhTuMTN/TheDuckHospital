@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useCallback} from 'react';
 import TextComponent from '../../TextComponent';
@@ -11,6 +12,8 @@ import {appColors} from '../../../constants/appColors';
 import MedicalTestResultItem from './MedicalTestResultItem';
 import Space from '../../Space';
 import dayjs from 'dayjs';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
 
 interface GroupMedicalTestResultProps {
   medicalTests: any;
@@ -21,13 +24,18 @@ interface GroupMedicalTestResultProps {
 
 const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   const {medicalTests, fromDate, toDate, loading} = props;
+  const navigate = useNavigation<navigationProps>();
 
   const _keyExtractor = useCallback(
     (item: any, index: number) => `${item.medicalTestId}-${index}`,
     [],
   );
   const _renderItem = useCallback(
-    ({item}: any) => <MedicalTestResultItem medicalTest={item} />,
+    ({item}: any) => (
+      <TouchableOpacity onPress={item => handleMedicalTestPress(item)}>
+        <MedicalTestResultItem medicalTest={item} />
+      </TouchableOpacity>
+    ),
     [],
   );
   const _footerComponent = useCallback(() => {
@@ -45,6 +53,11 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
     }
     return null;
   }, [loading]);
+
+  const handleMedicalTestPress = (medicalTest: any) => {
+    navigate.navigate('MedicalTestDetailResultScreen', {result: medicalTest});
+  };
+
   return (
     <View style={styles.container}>
       <TextComponent bold color={appColors.textDarker} fontSize={18}>

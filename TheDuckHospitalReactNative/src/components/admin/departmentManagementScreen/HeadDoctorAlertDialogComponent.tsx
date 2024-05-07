@@ -32,7 +32,6 @@ const HeadDoctorAlertDialogComponent = (
   };
 
   const onAccept = async () => {
-    console.log(staffId);
 
     setIsLoading(true);
     const response = await deleteHeadDoctor(staffId);
@@ -45,10 +44,8 @@ const HeadDoctorAlertDialogComponent = (
         headDoctorId: null,
         headDoctorName: null,
       }));
-      console.log(refreshList);
       
       dispatch(setRefreshList(!refreshList));
-      console.log(refreshList);
       onClose();
     } else {
       console.log(response);

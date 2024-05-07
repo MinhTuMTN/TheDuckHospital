@@ -293,8 +293,7 @@ function StatisticsScreen() {
                 }}
                 width={appInfo.size.width * 0.9}
                 height={220}
-                yAxisLabel="$"
-                yAxisSuffix="k"
+                yAxisSuffix="k đ"
                 chartConfig={{
                   decimalPlaces: 0,
                   backgroundColor: 'transparent',

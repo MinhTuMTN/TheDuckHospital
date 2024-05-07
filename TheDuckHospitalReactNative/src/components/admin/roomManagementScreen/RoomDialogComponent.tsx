@@ -41,6 +41,7 @@ interface RoomDialogComponentProps {
   room?: any;
   setRefreshList: (refreshList: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
+  setIsEditing?: (isEditing: boolean) => void;
 }
 
 const RoomDialogComponent = (props: RoomDialogComponentProps) => {
@@ -48,6 +49,7 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
     modalVisible,
     refreshList,
     room,
+    setIsEditing,
     setRefreshList,
     setModalVisible,
     edit = false,
@@ -59,12 +61,14 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
     edit ? room.department : {departmentId: null, departmentName: ''},
   );
   const [error, setError] = React.useState(false);
-  const [firstClick, setFirstClick] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
+      if (setIsEditing) setIsEditing(false);
+      if (!firstClick) setFirstClick(true);
       if (edit) {
         setName(room.roomName);
         setDescription(room.description);
@@ -78,7 +82,7 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
   };
 
   const handleCreateOrUpdateRoom = async () => {
-    if (!firstClick) setFirstClick(true);
+    if (firstClick) setFirstClick(false);
     if (error) {
       return;
     }
@@ -160,10 +164,13 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                 labelStyle={styles.labelInput}
                 placeholder="Tên phòng*"
                 value={name}
+                error={name.trim() === '' || name.length <= 0}
+                errorMessage="Tên phòng không được để trống"
                 onChangeText={newValue => setName(newValue)}
                 startIcon={
                   <FontistoIcon name="room" size={24} color={appColors.black} />
                 }
+                labelContainerStyle={{marginTop: 5}}
                 inputContainerStyle={{
                   backgroundColor: appColors.white,
                   borderColor: appColors.black,
@@ -238,7 +245,8 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                   borderRadius: 10,
                   height: '18%',
                   width: '100%',
-                  marginBottom: 25,
+                  marginBottom:
+                    !firstClick && department.departmentId === null ? 0 : 25,
                 }}
                 buttonTextStyle={{
                   textAlign: 'left',
@@ -260,6 +268,21 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                   );
                 }}
               />
+              {department.departmentName === '' && !firstClick && (
+                <TextComponent
+                  color={appColors.error}
+                  fontSize={12}
+                  style={[
+                    {
+                      paddingLeft: 5,
+                      marginTop: 10,
+                      marginBottom: 25,
+                      width: '100%',
+                    },
+                  ]}>
+                  Cần chọn khoa
+                </TextComponent>
+              )}
 
               {/* <SelectComponent
                 options={departments}
@@ -295,6 +318,7 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              enabled={!error && !(department.departmentName === '')}
               isLoading={isLoading}
               onPress={handleCreateOrUpdateRoom}
               containerStyles={[styles.button, {marginRight: 15}]}>
@@ -316,7 +340,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalView: {
-    margin: 20,
     width: '90%',
     height: '65%',
     backgroundColor: appColors.white,

@@ -24,7 +24,7 @@ public class TransactionAdminController {
     public ResponseEntity<?> getAllTransactionsPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "VNPay, Cash") List<String> transactionPayment,
+            @RequestParam(defaultValue = "VNPay, Cash, Momo") List<String> transactionPayment,
             @RequestParam(defaultValue = "PENDING, SUCCESS, FAILED") List<TransactionStatus> transactionStatus
     ) {
         return ResponseEntity.ok(

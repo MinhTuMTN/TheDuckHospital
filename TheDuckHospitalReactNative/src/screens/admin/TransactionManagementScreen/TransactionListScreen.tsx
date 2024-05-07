@@ -2,6 +2,7 @@ import React, {useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
@@ -25,26 +26,26 @@ import {getPaginationTransactions} from '../../../services/transactionServices';
 
 function TransactionListScreen() {
   const [showPopover, setShowPopover] = useState(false);
-  const [selected, setSelected] = useState('all');
+  const [selected, setSelected] = useState('ALL');
+  const [init, setInit] = useState(true);
+  const [refreshList, setRefreshList] = useState(false);
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
-  const [refreshList, setRefreshList] = useState(false);
   const [transactions, setTransactions] = useState<any>([]);
   const [paginationParams, setPaginationParams] = useState({
     page: 0,
     limit: 5,
     totalPages: 0,
   });
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, transactions, paginationParams.page]);
 
   const handleChangedText = (text: string) => {
@@ -61,13 +62,21 @@ function TransactionListScreen() {
       paginationParams.totalPages !== 0
     )
       return;
+
+    let transactionStatus: string[] = [];
+    if (selected === 'ALL') {
+      transactionStatus = ['PENDING', 'SUCCESS', 'FAILED'];
+    } else {
+      transactionStatus = [selected];
+    }
+
     setIsLoadingAPI(true);
     const response = await getPaginationTransactions(
       debouncedSearchText.trim(),
       paginationParams.limit,
       paginationParams.page,
       [],
-      [],
+      transactionStatus,
     );
     setIsLoadingAPI(false);
 
@@ -91,24 +100,56 @@ function TransactionListScreen() {
     }
   };
 
-  React.useEffect(() => {
+  const handleResetList = () => {
+    setSearchText('');
     setPaginationParams((prevState: any) => ({
       ...prevState,
       page: 0,
     }));
+  };
+
+  React.useEffect(() => {
+    handleResetList();
   }, [refreshList]);
 
   React.useEffect(() => {
     handleGetTransactions();
-  }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
+  }, [
+    debouncedSearchText,
+    paginationParams.page,
+    paginationParams.limit,
+    selected,
+  ]);
+
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={32} style={styles.listLabel}>
-          Danh sách thanh toán
-        </TextComponent>
-      </ContainerComponent>
+      {!isKeyboardVisible && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={32} style={styles.listLabel}>
+            Danh sách thanh toán
+          </TextComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -131,6 +172,8 @@ function TransactionListScreen() {
             borderColor: appColors.primary,
           }}
           variant="rounded"
+          value={searchText}
+          onChangeText={handleChangedText}
         />
 
         <ContainerComponent style={styles.filterIcon}>
@@ -148,15 +191,16 @@ function TransactionListScreen() {
             <FlexComponent style={styles.filterContainer}>
               <ButtonComponent
                 containerStyles={
-                  selected === 'all' ? styles.selectedButton : styles.button
+                  selected === 'ALL' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('all');
+                  setSelected('ALL');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'all'
+                    selected === 'ALL'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -165,17 +209,16 @@ function TransactionListScreen() {
               </ButtonComponent>
               <ButtonComponent
                 containerStyles={
-                  selected === 'successful'
-                    ? styles.selectedButton
-                    : styles.button
+                  selected === 'SUCCESS' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('successful');
+                  setSelected('SUCCESS');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'successful'
+                    selected === 'SUCCESS'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -184,15 +227,16 @@ function TransactionListScreen() {
               </ButtonComponent>
               <ButtonComponent
                 containerStyles={
-                  selected === 'failed' ? styles.selectedButton : styles.button
+                  selected === 'FAILED' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('failed');
+                  setSelected('FAILED');
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'failed'
+                    selected === 'FAILED'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -217,38 +261,36 @@ function TransactionListScreen() {
         <TransactionItemComponent />
       </ScrollView> */}
 
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={transactions}
-          keyExtractor={(item: any, index: number) =>
-            `transaction-${item.id}-${index}`
-          }
-          extraData={transactions}
-          refreshing={true}
-          renderItem={({item}) => (
-            <TransactionItemComponent
-              refreshList={refreshList}
-              setRefreshList={setRefreshList}
-              transaction={item}
-            />
-          )}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {!isKeyboardVisible && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={transactions}
+            keyExtractor={(item: any, index: number) =>
+              `transaction-${item.transactionId}-${index}`
             }
-          }}
-          onEndReachedThreshold={0.7}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            extraData={transactions}
+            refreshing={true}
+            renderItem={({item}) => (
+              <TransactionItemComponent transaction={item} />
+            )}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={0.7}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
     </ContainerComponent>
   );
 }

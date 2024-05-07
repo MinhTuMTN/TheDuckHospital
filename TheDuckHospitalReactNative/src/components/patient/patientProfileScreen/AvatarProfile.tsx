@@ -42,17 +42,18 @@ const AvatarProfile = (props: AvatarProfileProps) => {
   const navigation = useNavigation();
 
   const handleUpdatePatientProfile = async () => {
-    if (!firstClick) setFirstClick(true);
+    if (firstClick) setFirstClick(false);
+    console.log(0);
 
     if (
-      editProfile.fullPhoneNumber.length != 10 ||
+      editProfile.fullPhoneNumber.length !== 10 ||
       !editProfile.fullPhoneNumber.startsWith('0')
     )
       return;
 
     if (
-      (editProfile.email.length > 0 || editProfile.email.trim() !== '') &&
-      !editProfile.email.includes('@')
+      editProfile.email.length > 0 &&
+      !editProfile.email.includes('@theduckhospital.onmicrosoft.com')
     )
       return;
 
@@ -61,6 +62,8 @@ const AvatarProfile = (props: AvatarProfileProps) => {
     if (selectedWard.wardName.length <= 0) return;
     if (editProfile.streetName.length <= 0) return;
 
+    console.log(1);
+    return;
     let wardId: number = +selectedWard?.wardId;
     const data = {
       fullName: editProfile.fullName,
@@ -79,6 +82,7 @@ const AvatarProfile = (props: AvatarProfileProps) => {
     );
 
     if (response.success) {
+      if (!firstClick) setFirstClick(true);
       navigation.navigate('ProfileScreen' as never);
     }
   };
@@ -111,9 +115,38 @@ const AvatarProfile = (props: AvatarProfileProps) => {
           <Icon name="home" size={30} color={appColors.primary} />
         </Pressable>
         <TouchableOpacity
+          disabled={
+            editProfile.fullPhoneNumber.length !== 10 ||
+            (editProfile.email.length > 0 &&
+              !editProfile.email.includes(
+                '@theduckhospital.onmicrosoft.com',
+              )) ||
+            !editProfile.fullPhoneNumber.startsWith('0') ||
+            selectedProvince.provinceName.trim() === '' ||
+            selectedDistrict.districtName.trim() === '' ||
+            selectedWard.wardName.trim() === '' ||
+            editProfile.streetName.trim() === ''
+          }
           style={styles.iconButton}
           onPress={handleUpdatePatientProfile}>
-          <Icon name="mode-edit-outline" size={30} color={appColors.primary} />
+          <Icon
+            name="mode-edit-outline"
+            size={30}
+            color={
+              editProfile.fullPhoneNumber.length !== 10 ||
+              (editProfile.email.length > 0 &&
+                !editProfile.email.includes(
+                  '@theduckhospital.onmicrosoft.com',
+                )) ||
+              !editProfile.fullPhoneNumber.startsWith('0') ||
+              selectedProvince.provinceName.trim() === '' ||
+              selectedDistrict.districtName.trim() === '' ||
+              selectedWard.wardName.trim() === '' ||
+              editProfile.streetName.trim() === ''
+                ? appColors.darkGray
+                : appColors.primary
+            }
+          />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton} onPress={toggleAlert}>
           <Icon name="delete-outline" size={30} color={appColors.primary} />

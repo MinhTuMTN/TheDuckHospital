@@ -100,13 +100,13 @@ const AccountScreen = () => {
           )}
         </View>
 
-        <SectionComponent
+        {/* <SectionComponent
           title={t('account.myWallet')}
           tilteStyle={styles.titleSection}>
           <View style={styles.flexGap}>
             <TheDuckWallet />
           </View>
-        </SectionComponent>
+        </SectionComponent> */}
 
         <SectionComponent
           title={t('account.generalSettings')}
@@ -152,6 +152,24 @@ const AccountScreen = () => {
                 title={t('account.shareApp')}
                 icon={<Share2 size={20} color={appColors.black} />}
                 onPress={() => navigation.navigate('SuccessScreen')}
+              />
+            </View>
+          </SectionComponent>
+        )}
+
+        {userInfo.role === 'Admin' && (
+          <SectionComponent title={'Quản lý'} tilteStyle={styles.titleSection}>
+            <View style={styles.flexGap}>
+              <AccountScreenRowComponent
+                title={'Giao diện quản lý'}
+                icon={<FolderKanban size={20} color={appColors.black} />}
+                onPress={() =>
+                  reset({
+                    index: 1,
+                    // routes: [{name: 'PatientBottom'}],
+                    routes: [{name: 'AdminLeftSideDrawer'}],
+                  })
+                }
               />
             </View>
           </SectionComponent>

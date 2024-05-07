@@ -2,16 +2,15 @@ package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.theduckhospital.api.constant.Degree;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringExclude;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -21,6 +20,7 @@ import java.util.List;
 public class Doctor extends Staff{
     @Nullable
     private Degree degree;
+    private double rating = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
@@ -28,6 +28,11 @@ public class Doctor extends Staff{
     private Department department;
 
     private boolean headOfDepartment = false;
+
+    @OneToMany(mappedBy = "doctor")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Rating> ratings;
 
     @OneToMany(mappedBy = "doctor")
     @ToStringExclude

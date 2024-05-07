@@ -68,7 +68,7 @@ function PatientDetailScreen() {
             Giới tính:
           </TextComponent>
           <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {patient.gender === 0 ? 'Nam' : 'Nữ'}
+            {patient.gender === 'MALE' ? 'Nam' : 'Nữ'}
           </TextComponent>
         </FlexComponent>
 
@@ -126,12 +126,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailContainer: {
-    flex: 2,
+    flex: 3,
     paddingTop: 0,
     paddingLeft: 40,
   },
   scrollViewContainer: {
-    flex: 1,
+    flex: 3,
     paddingHorizontal: 20,
   },
   listLabel: {
