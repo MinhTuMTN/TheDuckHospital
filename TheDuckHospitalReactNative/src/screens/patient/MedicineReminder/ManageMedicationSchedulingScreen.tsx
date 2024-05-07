@@ -12,6 +12,8 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
   const [tabNotSet, setTabNotSet] = React.useState(true);
   const [medicineHaveNotSet, setMedicineHaveNotSet] = React.useState([]);
   const [medicineHaveSet, setMedicineHaveSet] = React.useState([]);
+  const [prescription, setPrescription] = React.useState<any>({});
+
   useEffect(() => {
     const medicineHaveNotSetDetail = async () => {
       const result = await getPrescriptionDetail(
@@ -20,6 +22,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
       );
 
       if (result.success) {
+        setPrescription(result.data.data.prescription);
         setMedicineHaveNotSet(result.data.data.notRemindedPrescriptionItems);
         setMedicineHaveSet(result.data.data.remindedPrescriptionItems);
       }
@@ -46,7 +49,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
           <View style={styles.header}>
             <LineInfoComponent
               label="Toa thuốc:"
-              value={prescriptionInfo.departmentName}
+              value={prescriptionInfo.departmentName || ''}
               valueColor={appColors.darkRed}
               valueUppercase
               valueTextAlign="left"
@@ -57,7 +60,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
             />
             <LineInfoComponent
               label="Mã toa thuốc:"
-              value="TTK-001220833-0987"
+              value={prescription.prescriptionCode || ''}
               valueColor={appColors.black}
               valueUppercase
               valueTextAlign="left"
@@ -74,7 +77,9 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
             }}>
             <FlatList
               data={tabNotSet ? medicineHaveNotSet : medicineHaveSet}
-              keyExtractor={(item: any) => item.prescriptionItemId}
+              keyExtractor={(item: any) =>
+                item.prescriptionItem.prescriptionItemId
+              }
               renderItem={({item}) => (
                 <View>
                   <MedicationInfoReminder

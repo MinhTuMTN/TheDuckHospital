@@ -8,6 +8,7 @@ import {appInfo} from '../../../constants/appInfo';
 import {useToast} from '../../../hooks/ToastProvider';
 import {getMessages, sendMessage} from '../../../services/chatServices';
 import {AppNotification} from '../../../utils/appNotification';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const ChatScreen = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -133,37 +134,39 @@ const ChatScreen = () => {
   }, []);
 
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title="Hỗ trợ"
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-      />
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          backgroundColor: '#ffffff',
-        }}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          initialNumToRender={15}
-          onEndReachedThreshold={0.1}
-          keyExtractor={_keyExtractor}
-          renderItem={_renderItem}
-          inverted
-          onEndReached={loadMore}
-          ListFooterComponent={_footerComponent}
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title="Hỗ trợ"
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
         />
-      </View>
-      <InputChatComponent
-        onSend={(message: string) => {
-          handleSendMessage(message);
-        }}
-      />
-    </ContainerComponent>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            backgroundColor: '#ffffff',
+          }}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            initialNumToRender={15}
+            onEndReachedThreshold={0.1}
+            keyExtractor={_keyExtractor}
+            renderItem={_renderItem}
+            inverted
+            onEndReached={loadMore}
+            ListFooterComponent={_footerComponent}
+          />
+        </View>
+        <InputChatComponent
+          onSend={(message: string) => {
+            handleSendMessage(message);
+          }}
+        />
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

@@ -12,6 +12,16 @@ export const searchPrescription = async (
   });
 };
 
+export const searchPrescriptionByCode = async (
+  patientProfileId: string,
+  prescriptionCode: string,
+) => {
+  return get(`/medicine-reminders/prescription-by-code`, {
+    patientProfileId,
+    prescriptionCode,
+  });
+};
+
 export const getPrescriptionDetail = async (
   prescripatientProfileId: string,
   prescriptionId: string,

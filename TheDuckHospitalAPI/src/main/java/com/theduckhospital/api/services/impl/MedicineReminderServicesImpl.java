@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.MedicineReminderDetailsRequest;
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
 import com.theduckhospital.api.dto.response.*;
@@ -41,6 +42,22 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
     @Override
     public MedicineReminder patientCreateMedicineReminder(String token, MedicineReminderRequest request) {
         Account account = accountServices.findAccountByToken(token);
+        Calendar startOfToday = Calendar.getInstance();
+        startOfToday.add(Calendar.DATE, -1);
+        startOfToday.set(Calendar.HOUR_OF_DAY, 23);
+        startOfToday.set(Calendar.MINUTE, 59);
+        startOfToday.set(Calendar.SECOND, 59);
+
+        Calendar dateRequest = Calendar.getInstance();
+        dateRequest.setTime(request.getStartDate());
+        dateRequest.set(Calendar.HOUR_OF_DAY, 0);
+        dateRequest.set(Calendar.MINUTE, 0);
+        dateRequest.set(Calendar.SECOND, 0);
+
+        if (dateRequest.before(startOfToday)) {
+            throw new BadRequestException("Start date must be greater than or equal to today", 10029);
+        }
+
         PatientProfile patientProfile = patientProfileServices.getPatientProfileById(
                 token,
                 request.getPatientProfileId()
@@ -59,6 +76,18 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 )
         ) {
             throw new BadRequestException("Prescription item not found", 10024);
+        }
+
+        // Check already exist medicine reminder
+        Optional<MedicineReminder> existMedicineReminder = medicineReminderRepository
+                .findExistMedicineReminder(
+                        request.getStartDate(),
+                        prescriptionItem,
+                        patientProfile
+                );
+
+        if (existMedicineReminder.isPresent()) {
+            throw new BadRequestException("Medicine reminder already exist", 10030);
         }
 
         MedicineReminder medicineReminder = new MedicineReminder();
@@ -206,6 +235,9 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
     @Override
     public List<PrescriptionResponse> searchPrescription(String token, UUID patientProfileId, Date fromDate, Date toDate) {
         PatientProfile patientProfile = patientProfileServices.getPatientProfileById(token, patientProfileId);
+        fromDate = DateCommon.getStarOfDay(fromDate);
+        toDate = DateCommon.getEndOfDay(toDate);
+        
         List<Prescription> prescriptions = prescriptionRepository
                 .findByPatientProfileAndDateBetween(
                         patientProfile,
@@ -347,5 +379,20 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 medicineReminder.getListMedicineReminderDetail()
         );
         return true;
+    }
+
+    @Override
+    public List<PrescriptionResponse> searchPrescriptionByCode(String token, UUID patientProfileId, String prescriptionCode) {
+        PatientProfile patientProfile = patientProfileServices.getPatientProfileById(token, patientProfileId);
+        Optional<Prescription> optional = prescriptionRepository
+                .findByPatientProfileAndPrescriptionCode(
+                        patientProfile,
+                        prescriptionCode
+                );
+
+        if (optional.isEmpty())
+            throw new BadRequestException("Prescription not found", 10026);
+
+        return List.of(new PrescriptionResponse(optional.get()));
     }
 }

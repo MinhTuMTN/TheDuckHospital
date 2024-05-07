@@ -48,4 +48,19 @@ public class DateCommon {
 
         return calendar;
     }
+
+    public static Date getStarOfDay(Date date) {
+        Calendar calendar = getCalendar(date);
+        return calendar.getTime();
+    }
+
+    public static Date getEndOfDay(Date date) {
+        Calendar calendar = getCalendar(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+
+        return calendar.getTime();
+    }
 }

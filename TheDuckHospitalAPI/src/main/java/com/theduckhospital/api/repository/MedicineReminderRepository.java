@@ -12,9 +12,17 @@ import java.util.UUID;
 
 @Repository
 public interface MedicineReminderRepository extends JpaRepository<MedicineReminder, UUID> {
-    List<MedicineReminder> findByPatientProfileAndEndDateGreaterThanEqual(
-            PatientProfile patientProfile,
-            Date endDate
+    @Query("SELECT mr " +
+            "FROM MedicineReminder mr " +
+            "WHERE mr.patientProfile = :patientProfile " +
+            "AND mr.deleted = false " +
+            "AND mr.endDate >= :endDate " +
+            "AND mr.prescriptionItem = :prescriptionItem"
+    )
+    Optional<MedicineReminder> findExistMedicineReminder(
+            Date endDate,
+            PrescriptionItem prescriptionItem,
+            PatientProfile patientProfile
     );
 
     @Query("SELECT mr " +

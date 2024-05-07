@@ -22,6 +22,8 @@ import {appColors} from '../../../constants/appColors';
 import {remindersDetail} from '../../../services/reminderServices';
 import LoadingComponent from '../../../components/LoadingComponent';
 import {globalStyles} from '../../../styles/globalStyles';
+import {LoginManager} from 'react-native-fbsdk-next';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const data = [];
 
@@ -96,190 +98,192 @@ const MedicineReminderScreen = () => {
       <ActivityIndicator size={'large'} color={appColors.primary} />
     </View>
   ) : (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title="Nhắc nhở uống thuốc"
-        uppercase={false}
-        titleSize={22}
-        noBackground
-        backIcon={
-          <View
-            style={{
-              backgroundColor: 'rgba(230, 230, 230, 0.26)',
-              width: 27,
-              height: 27,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 8,
-            }}>
-            <ArrowLeft size={25} color={appColors.white} />
-          </View>
-        }
-        backgroundColor={appColors.darkBlue}
-      />
-      <MedicineReminderChooseDate
-        selectedDate={selectedDate}
-        onChangeSelectedDate={date => setSelectedDate(date)}
-      />
-
-      <View style={styles.main}>
-        {isLoading ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <ActivityIndicator size={'large'} color={appColors.primary} />
-          </View>
-        ) : listReminder.length === 0 ? (
-          <View style={styles.noMedicationReminder}>
-            <Image
-              source={require('../../../assets/images/noMedicationReminder.jpg')}
-              style={{width: '80%', height: 200, marginBottom: 10}}
-            />
-            <TextComponent
-              fontWeight="700"
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title="Nhắc nhở uống thuốc"
+          uppercase={false}
+          titleSize={22}
+          noBackground
+          backIcon={
+            <View
               style={{
-                marginBottom: 8,
+                backgroundColor: 'rgba(230, 230, 230, 0.26)',
+                width: 27,
+                height: 27,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 8,
               }}>
-              Bạn chưa có lịch hẹn uống thuốc nào
-            </TextComponent>
+              <ArrowLeft size={25} color={appColors.white} />
+            </View>
+          }
+          backgroundColor={appColors.darkBlue}
+        />
+        <MedicineReminderChooseDate
+          selectedDate={selectedDate}
+          onChangeSelectedDate={date => setSelectedDate(date)}
+        />
 
-            <TextComponent
-              textAlign="center"
-              style={{letterSpacing: 0.5, lineHeight: 22}}>
-              Hãy thêm toa thuốc của bác sĩ {'\n'}
-              để đặt nhắc nhở uống thuốc nhé
-            </TextComponent>
-            <ButtonComponent
-              onPress={() =>
-                navigation.navigate(
-                  'ChooseProfileForMedicineReminderScreen' as never,
-                )
-              }
-              borderRadius={20}
-              backgroundColor={appColors.darkBlue}
-              containerStyles={{
-                marginTop: 20,
-                paddingHorizontal: 30,
-                paddingVertical: 12,
-              }}
-              textStyles={{
-                fontWeight: '500',
-                fontSize: 16,
-              }}
-              startIcon={
-                <MaterialCommunityIcons
-                  name="pill"
-                  size={20}
-                  color={appColors.white}
-                />
-              }>
-              Quản lý toa thuốc
-            </ButtonComponent>
-          </View>
-        ) : (
-          <ScrollView style={styles.medicationReminder}>
-            {morningMeds.length > 0 && (
-              <>
-                <View style={styles.timeOfDay}>
-                  <Image
-                    source={require('../../../assets/images/sun.png')}
-                    style={{width: 35, height: 35, marginRight: 10}}
-                  />
-                  <TextComponent
-                    fontWeight="700"
-                    fontSize={20}
-                    color={appColors.grayText}>
-                    Buổi sáng
-                  </TextComponent>
-                </View>
-                {morningMeds.map((medicine: any) => (
-                  <MedicineReminderOptinesComponent
-                    onRefresh={getListReminder}
-                    key={medicine.medicineReminderDetailId}
-                    medicineReminder={medicine}
-                  />
-                ))}
-              </>
-            )}
+        <View style={styles.main}>
+          {isLoading ? (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator size={'large'} color={appColors.primary} />
+            </View>
+          ) : listReminder.length === 0 ? (
+            <View style={styles.noMedicationReminder}>
+              <Image
+                source={require('../../../assets/images/noMedicationReminder.jpg')}
+                style={{width: '80%', height: 200, marginBottom: 10}}
+              />
+              <TextComponent
+                fontWeight="700"
+                style={{
+                  marginBottom: 8,
+                }}>
+                Bạn chưa có lịch hẹn uống thuốc nào
+              </TextComponent>
 
-            {noonMeds.length > 0 && (
-              <>
-                <View style={styles.timeOfDay}>
-                  <Image
-                    source={require('../../../assets/images/noon.png')}
-                    style={{width: 35, height: 35, marginRight: 10}}
+              <TextComponent
+                textAlign="center"
+                style={{letterSpacing: 0.5, lineHeight: 22}}>
+                Hãy thêm toa thuốc của bác sĩ {'\n'}
+                để đặt nhắc nhở uống thuốc nhé
+              </TextComponent>
+              <ButtonComponent
+                onPress={() =>
+                  navigation.navigate(
+                    'ChooseProfileForMedicineReminderScreen' as never,
+                  )
+                }
+                borderRadius={20}
+                backgroundColor={appColors.darkBlue}
+                containerStyles={{
+                  marginTop: 20,
+                  paddingHorizontal: 30,
+                  paddingVertical: 12,
+                }}
+                textStyles={{
+                  fontWeight: '500',
+                  fontSize: 16,
+                }}
+                startIcon={
+                  <MaterialCommunityIcons
+                    name="pill"
+                    size={20}
+                    color={appColors.white}
                   />
-                  <TextComponent
-                    fontWeight="700"
-                    fontSize={20}
-                    color={appColors.grayText}>
-                    Buổi trưa
-                  </TextComponent>
-                </View>
-                {noonMeds.map((medicine: any) => (
-                  <MedicineReminderOptinesComponent
-                    onRefresh={getListReminder}
-                    key={medicine.medicineReminderDetailId}
-                    medicineReminder={medicine}
-                  />
-                ))}
-              </>
-            )}
+                }>
+                Quản lý toa thuốc
+              </ButtonComponent>
+            </View>
+          ) : (
+            <ScrollView style={styles.medicationReminder}>
+              {morningMeds.length > 0 && (
+                <>
+                  <View style={styles.timeOfDay}>
+                    <Image
+                      source={require('../../../assets/images/sun.png')}
+                      style={{width: 35, height: 35, marginRight: 10}}
+                    />
+                    <TextComponent
+                      fontWeight="700"
+                      fontSize={20}
+                      color={appColors.grayText}>
+                      Buổi sáng
+                    </TextComponent>
+                  </View>
+                  {morningMeds.map((medicine: any) => (
+                    <MedicineReminderOptinesComponent
+                      onRefresh={getListReminder}
+                      key={medicine.medicineReminderDetailId}
+                      medicineReminder={medicine}
+                    />
+                  ))}
+                </>
+              )}
 
-            {afternoonMeds.length > 0 && (
-              <>
-                <View style={styles.timeOfDay}>
-                  <Image
-                    source={require('../../../assets/images/sunsets.png')}
-                    style={{width: 35, height: 35, marginRight: 10}}
-                  />
-                  <TextComponent
-                    fontWeight="700"
-                    fontSize={20}
-                    color={appColors.grayText}>
-                    Buổi chiều
-                  </TextComponent>
-                </View>
-                {afternoonMeds.map((medicine: any) => (
-                  <MedicineReminderOptinesComponent
-                    onRefresh={getListReminder}
-                    key={medicine.medicineReminderDetailId}
-                    medicineReminder={medicine}
-                  />
-                ))}
-              </>
-            )}
+              {noonMeds.length > 0 && (
+                <>
+                  <View style={styles.timeOfDay}>
+                    <Image
+                      source={require('../../../assets/images/noon.png')}
+                      style={{width: 35, height: 35, marginRight: 10}}
+                    />
+                    <TextComponent
+                      fontWeight="700"
+                      fontSize={20}
+                      color={appColors.grayText}>
+                      Buổi trưa
+                    </TextComponent>
+                  </View>
+                  {noonMeds.map((medicine: any) => (
+                    <MedicineReminderOptinesComponent
+                      onRefresh={getListReminder}
+                      key={medicine.medicineReminderDetailId}
+                      medicineReminder={medicine}
+                    />
+                  ))}
+                </>
+              )}
 
-            {eveningMeds.length > 0 && (
-              <>
-                <View style={styles.timeOfDay}>
-                  <Image
-                    source={require('../../../assets/images/night.png')}
-                    style={{width: 35, height: 35, marginRight: 10}}
-                  />
-                  <TextComponent
-                    fontWeight="700"
-                    fontSize={20}
-                    color={appColors.grayText}>
-                    Buổi tối
-                  </TextComponent>
-                </View>
-                {eveningMeds.map((medicine: any) => (
-                  <MedicineReminderOptinesComponent
-                    onRefresh={getListReminder}
-                    key={medicine.medicineReminderDetailId}
-                    medicineReminder={medicine}
-                  />
-                ))}
-              </>
-            )}
-          </ScrollView>
-        )}
-      </View>
-    </ContainerComponent>
+              {afternoonMeds.length > 0 && (
+                <>
+                  <View style={styles.timeOfDay}>
+                    <Image
+                      source={require('../../../assets/images/sunsets.png')}
+                      style={{width: 35, height: 35, marginRight: 10}}
+                    />
+                    <TextComponent
+                      fontWeight="700"
+                      fontSize={20}
+                      color={appColors.grayText}>
+                      Buổi chiều
+                    </TextComponent>
+                  </View>
+                  {afternoonMeds.map((medicine: any) => (
+                    <MedicineReminderOptinesComponent
+                      onRefresh={getListReminder}
+                      key={medicine.medicineReminderDetailId}
+                      medicineReminder={medicine}
+                    />
+                  ))}
+                </>
+              )}
+
+              {eveningMeds.length > 0 && (
+                <>
+                  <View style={styles.timeOfDay}>
+                    <Image
+                      source={require('../../../assets/images/night.png')}
+                      style={{width: 35, height: 35, marginRight: 10}}
+                    />
+                    <TextComponent
+                      fontWeight="700"
+                      fontSize={20}
+                      color={appColors.grayText}>
+                      Buổi tối
+                    </TextComponent>
+                  </View>
+                  {eveningMeds.map((medicine: any) => (
+                    <MedicineReminderOptinesComponent
+                      onRefresh={getListReminder}
+                      key={medicine.medicineReminderDetailId}
+                      medicineReminder={medicine}
+                    />
+                  ))}
+                </>
+              )}
+            </ScrollView>
+          )}
+        </View>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

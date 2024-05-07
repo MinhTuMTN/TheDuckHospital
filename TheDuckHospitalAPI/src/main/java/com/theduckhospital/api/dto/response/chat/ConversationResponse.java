@@ -12,6 +12,7 @@ public class ConversationResponse {
     private UUID conversationId;
     private UUID userId;
     private String userName;
+    private String avatar;
     private boolean lastMessageIsMine;
     private String lastMessage;
     private Date lastMessageDate;

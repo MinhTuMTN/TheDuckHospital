@@ -13,6 +13,7 @@ import ToastProvider from './src/hooks/ToastProvider';
 import linking from './src/linking';
 import './src/localization/i18n';
 import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
+import MedicineRemiderNavigator from './src/navigator/MedicineRemiderNavigator';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
 import {User} from './src/realm/User';
 import NotFoundScreen from './src/screens/NotFoundScreen';
@@ -31,6 +32,7 @@ import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
+import ChangeAccountInfoScreen from './src/screens/patient/ChangeAccountInfoScreen';
 import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
@@ -47,6 +49,10 @@ import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProces
 import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
+import ChooseProfileForMedicineReminderScreen from './src/screens/patient/MedicineReminder/ChooseProfileForMedicineReminderScreen';
+import ManageMedicationSchedulingScreen from './src/screens/patient/MedicineReminder/ManageMedicationSchedulingScreen';
+import ScheduleMedicationRemindersScreen from './src/screens/patient/MedicineReminder/ScheduleMedicationRemindersScreen';
+import YourPrescriptionScreen from './src/screens/patient/MedicineReminder/YourPrescriptionScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
@@ -55,11 +61,6 @@ import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
 import TransactionStatisticScreen from './src/screens/patient/Wallet/TransactionStatisticScreen';
 import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import store from './src/store/store';
-import MedicineRemiderNavigator from './src/navigator/MedicineRemiderNavigator';
-import ChooseProfileForMedicineReminderScreen from './src/screens/patient/MedicineReminder/ChooseProfileForMedicineReminderScreen';
-import YourPrescriptionScreen from './src/screens/patient/MedicineReminder/YourPrescriptionScreen';
-import ManageMedicationSchedulingScreen from './src/screens/patient/MedicineReminder/ManageMedicationSchedulingScreen';
-import ScheduleMedicationRemindersScreen from './src/screens/patient/MedicineReminder/ScheduleMedicationRemindersScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -68,9 +69,9 @@ const App = () => {
     if (type === EventType.PRESS) {
       Linking.openURL('theduck://app/notifications');
     } else if (type === EventType.DISMISSED) {
-      console.log('Foreground user dismissed notification');
+      // console.log('Foreground user dismissed notification');
     } else if (type === EventType.DELIVERED) {
-      console.log('Foreground notification delivered');
+      // console.log('Foreground notification delivered');
     }
   });
 
@@ -241,7 +242,6 @@ const App = () => {
                     name="MedicineRemiderNavigator"
                     component={MedicineRemiderNavigator}
                   />
-
                   <Stack.Screen
                     name="ChooseProfileForMedicineReminderScreen"
                     component={ChooseProfileForMedicineReminderScreen}
@@ -257,6 +257,11 @@ const App = () => {
                   <Stack.Screen
                     name="ScheduleMedicationRemindersScreen"
                     component={ScheduleMedicationRemindersScreen}
+                  />
+
+                  <Stack.Screen
+                    name="ChangeAccountInfoScreen"
+                    component={ChangeAccountInfoScreen}
                   />
                 </Stack.Navigator>
               </NavigationContainer>

@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import React from "react";
 import { getMedicineUnit } from "../../services/doctor/MedicineServices";
 import FormatCurrency from "../General/FormatCurrency";
+import QRCode from "react-qr-code";
 
 function ContactItem(props) {
   const { title, content, titleMinWidth = 0 } = props;
@@ -35,7 +36,13 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function PrescriptionInvoice(props, ref) {
-  const { patientInfo, doctorName, prescriptionItems, diagnostic } = props;
+  const {
+    patientInfo,
+    doctorName,
+    prescriptionItems,
+    diagnostic,
+    prescriptionCode,
+  } = props;
   const contacts = [
     {
       title: "Email",
@@ -130,7 +137,11 @@ function PrescriptionInvoice(props, ref) {
         >
           Thông tin hóa đơn
         </Typography>
-
+        <ContactItem
+          title="Mã toa thuốc"
+          content={prescriptionCode}
+          titleMinWidth={"110px"}
+        />
         <ContactItem
           title="Ngày tạo"
           content={dayjs().format("DD/MM/YYYY HH:mm")}
@@ -196,6 +207,26 @@ function PrescriptionInvoice(props, ref) {
       </Grid>
 
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
+      <Grid
+        item
+        xs={12}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: "8px",
+          marginTop: "16px",
+        }}
+      >
+        <QRCode value={prescriptionCode || ""} size={64} style={{}} />
+        <Typography
+          variant="body1"
+          sx={{ fontWeight: "500", textAlign: "center" }}
+        >
+          {prescriptionCode}
+        </Typography>
+      </Grid>
     </Grid>
   );
 }

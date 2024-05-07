@@ -30,6 +30,8 @@ public class Account {
     @JsonBackReference
     private String password;
     private String phoneNumber;
+    private String avatar;
+    private Integer numberOfProfile;
     private boolean deleted;
 
     @JsonBackReference
@@ -54,6 +56,7 @@ public class Account {
     private void onCreate() {
         this.createdAt = new Date();
         this.lastModifiedAt = new Date();
+        this.numberOfProfile = 0;
         this.balance = null;
         this.walletLocked = true;
         this.walletPinCount = 0;
