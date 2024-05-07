@@ -74,7 +74,7 @@ public class PatientServicesImpl implements IPatientServices {
             int limit
     ) {
         List<Patient> patients = patientRepository.
-                findByFullNameContainingOrPhoneNumberContainingOrIdentityNumberContaining(search, search, search);
+                findFullTextSearchByFullNameOrPhoneNumberContainingOrIdentityNumberContaining(search, search, search);
 
         Pageable pageable = PageRequest.of(page, limit);
 

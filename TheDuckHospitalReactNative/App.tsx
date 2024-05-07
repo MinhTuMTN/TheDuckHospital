@@ -63,6 +63,7 @@ import RatingScreen from './src/screens/patient/RatingScreen';
 import TransactionStatisticScreen from './src/screens/patient/Wallet/TransactionStatisticScreen';
 import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import store from './src/store/store';
+import DoctorInformationScreen from './src/screens/patient/DoctorInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -268,10 +269,13 @@ const App = () => {
                     name="ScheduleMedicationRemindersScreen"
                     component={ScheduleMedicationRemindersScreen}
                   />
-
                   <Stack.Screen
                     name="ChangeAccountInfoScreen"
                     component={ChangeAccountInfoScreen}
+                  />
+                  <Stack.Screen
+                    name="DoctorInformationScreen"
+                    component={DoctorInformationScreen}
                   />
                 </Stack.Navigator>
               </NavigationContainer>

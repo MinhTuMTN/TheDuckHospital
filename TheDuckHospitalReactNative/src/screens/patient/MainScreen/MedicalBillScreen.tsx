@@ -45,7 +45,7 @@ const MedicalBillScreen = () => {
   };
   const _keyExtractor = (item: any, index: number) => item.bookingId;
   const _footerComponent = () => {
-    if (bookingToDisplay.length === 0) {
+    if (bookingToDisplay === undefined || bookingToDisplay.length === 0) {
       return (
         <View
           style={{

@@ -16,7 +16,7 @@ public interface StaffRepository extends JpaRepository<Staff, UUID> {
     Page<Staff> findPaginationByOrderByDeleted(Pageable pageable);
     List<Staff> findByFullNameContainingAndDeletedIn(String fullName, List<Boolean> deleted);
 
-    @Query(value = "SELECT * FROM Staff WHERE CONTAINS(fullName, :fullName) AND deleted IN :deleted", nativeQuery = true)
+    @Query(value = "SELECT * FROM staff WHERE FREETEXT(fullName, :fullName) AND deleted IN :deleted", nativeQuery = true)
     List<Staff> findFullTextSearchByFullNameAndDeletedIn(
             @Param("fullName") String fullName,
             @Param("deleted") List<Boolean> deleted);

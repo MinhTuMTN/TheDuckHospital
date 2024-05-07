@@ -68,7 +68,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         onPress={async () => {
           await AsyncStorage.removeItem('token');
           auth.logout();
-          // navigation.navigate('LoginScreen' as never);
+          navigation.navigate('LoginScreen' as never);
         }}>
         Đăng xuất
       </ButtonComponent>

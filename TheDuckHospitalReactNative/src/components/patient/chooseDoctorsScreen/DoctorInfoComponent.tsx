@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React, {memo, useEffect} from 'react';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextComponent} from '../..';
 import {Calendar, CashInHand, Gender, Stethoscope} from '../../../assets/svgs';
 import {appColors} from '../../../constants/appColors';
@@ -9,6 +10,7 @@ import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
 import {useTranslation} from 'react-i18next';
+import {Star} from 'lucide-react-native';
 
 interface DoctorInfoComponentProps {
   item: any;
@@ -17,6 +19,7 @@ interface DoctorInfoComponentProps {
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
   const {item} = props;
+  
   const {t} = useTranslation();
   const [dayOfWeek, setDayOfWeek] = React.useState('');
   const navigation = useNavigation<navigationProps>();
@@ -59,7 +62,9 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
         <Image
           // source={require('../../../assets/images/avatarDoctor.jpg')}
           source={{
-            uri: 'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/1/1299808/Parkshinhye.jpeg',
+            uri: item.avatar
+              ? item.avatar
+              : 'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/1/1299808/Parkshinhye.jpeg',
           }}
           alt="Logo"
           style={{
@@ -120,6 +125,21 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
           />
           <LineInfoComponent
             startIcon={
+              <Star
+                size={20}
+                color={appColors.black}
+                style={{marginRight: 8}}
+              />
+            }
+            label={t('chooseDoctorForBooking.rating')}
+            labelColor={'#8F8F8F'}
+            value={`${item.rating}/5 (${item.totalRating})`}
+            valueColor={'#4F4F4F'}
+            flexLabel={2}
+            flexValue={3}
+          />
+          <LineInfoComponent
+            startIcon={
               <CashInHand width={20} height={20} style={{marginRight: 8}} />
             }
             label={t('chooseDoctorForBooking.fee')}
@@ -134,6 +154,32 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
 
         <View style={styles.nextPage}>
           <Icon name="navigate-next" color={appColors.primary} size={20} />
+        </View>
+        <View style={styles.info}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('DoctorInformationScreen', {
+                doctor: item,
+                dayOfWeek,
+              });
+            }}>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                borderColor: appColors.primary,
+                borderWidth: 1,
+                borderRadius: 15,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <MaterialCommunityIcons
+                name="information-variant"
+                color={appColors.primary}
+                size={20}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     </View>
@@ -168,6 +214,18 @@ const styles = StyleSheet.create({
     borderColor: appColors.primary,
     borderWidth: 1,
     bottom: 16,
+    right: 20,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  info: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderColor: appColors.primary,
+    borderWidth: 1,
+    top: 16,
     right: 20,
     borderRadius: 15,
     justifyContent: 'center',
