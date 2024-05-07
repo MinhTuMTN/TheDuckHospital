@@ -18,6 +18,7 @@ import java.util.UUID;
 public class PrescriptionItem {
     @Id
     private UUID prescriptionItemId;
+    private String prescriptionCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
