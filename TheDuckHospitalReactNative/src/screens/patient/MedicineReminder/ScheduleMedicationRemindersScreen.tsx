@@ -31,10 +31,16 @@ import TimeReminder from '../../../components/patient/medicineReminderScreen/Tim
 import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
 import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
+import {creatReminder} from '../../../services/medicineReminderServices';
+import {navigationProps} from '../../../types';
+import {useNavigation} from '@react-navigation/native';
+import {set} from '@gluestack-style/react';
 
 const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
-  const {isEdit, medicationInfo} = route.params;
+  const {isEdit, medicationInfo, patientProfileId} = route.params;
   const toast = useToast();
+  const navigation = useNavigation<navigationProps>();
+  const [isLoading, setIsLoading] = useState(false);
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs());
@@ -87,6 +93,26 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
 
     setTimes(newTimes);
   }, []);
+
+  const handleCreateReminder = async () => {
+    setIsLoading(true);
+    const result = await creatReminder({
+      patientProfileId: patientProfileId,
+      startDate: startDate.toString(),
+      prescriptionItemId: medicationInfo.prescriptionItem.prescriptionItemId,
+      amount: amountOfMedicine,
+      details: times.map(time => ({
+        hour: time.hour,
+        minute: time.minute,
+        amount: time.quantity,
+      })),
+    });
+    setIsLoading(false);
+    if (result) {
+      toast.showToast('Tạo lịch nhắc thuốc thành công');
+      navigation.navigate('MedicineReminderScreen');
+    }
+  };
 
   return (
     <LoadingComponent
@@ -186,7 +212,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
               style={{
                 flex: 1,
               }}>
-              Sertralin (Cleadline 50mg)
+              {medicationInfo.prescriptionItem.medicine.medicineName}
             </TextComponent>
           </View>
           <View style={styles.mainLayout}>
@@ -405,7 +431,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                             onChangeText={text => setAmountOfMedicine(+text)}
                             keyboardType="numeric"
                             containerStyle={{
-                              width: 60,
+                              width: 120,
                               marginLeft: 10,
                             }}
                             inputStyle={{
@@ -450,7 +476,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                   paddingBottom: 4,
                 },
               ]}>
-              Cài đặt thời gian và liều lượng uống:
+              Cài đặt thời gian và liều lượng sử dụng:
             </TextComponent>
             <View
               style={{
@@ -484,7 +510,8 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
           </View>
         </View>
         <ButtonComponent
-          isLoading={false}
+          isLoading={isLoading}
+          onPress={handleCreateReminder}
           containerStyles={{
             backgroundColor: appColors.darkerBlue,
             marginHorizontal: 16,

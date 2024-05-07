@@ -13,6 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import dayjs from 'dayjs';
 import {useMedicine} from '../../../services/reminderServices';
 import {Activity} from 'lucide-react-native';
+import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
 
 interface MedicineReminderOptinesComponentProps {
   medicineReminder: any;
@@ -67,7 +68,9 @@ const MedicineReminderOptinesComponent = (
             paddingTop: 6,
             letterSpacing: 0.3,
           }}>
-          Uống {medicineReminder.amount.toString()} viên lúc{' '}
+          {howToUse(medicineReminder.medicineUnit)}{' '}
+          {medicineReminder.amount.toString()}{' '}
+          {getMedicineUnit(medicineReminder.medicineUnit)} lúc{' '}
           {dayjs(medicineReminder.reminderTime).format('HH:mm')}
         </TextComponent>
         <TextComponent
@@ -78,7 +81,8 @@ const MedicineReminderOptinesComponent = (
             paddingTop: 4,
             letterSpacing: 0.3,
           }}>
-          {medicineReminder.remainingAmount} viên còn lại
+          {medicineReminder.remainingAmount.toString()} {''}
+          {getMedicineUnit(medicineReminder.medicineUnit)} còn lại
         </TextComponent>
 
         <View style={styles.patientInfo}>

@@ -158,3 +158,15 @@ export type medicalTestResultDataProps = {
   sort: string;
   serviceId: number;
 };
+
+export type creatReminderDataProps = {
+  patientProfileId: string;
+  startDate: string;
+  prescriptionItemId: string;
+  amount: number;
+  details: {
+    hour: number;
+    minute: number;
+    amount: number;
+  }[];
+};

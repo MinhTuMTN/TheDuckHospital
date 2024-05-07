@@ -29,11 +29,12 @@ const buoiUong = [
   },
 ];
 interface MedicationInfoReminderProps {
+  patientProfileId: string;
   medicationInfo: any;
   isSet?: boolean;
 }
 const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
-  const {medicationInfo, isSet} = props;
+  const {medicationInfo, isSet, patientProfileId} = props;
   const navigation = useNavigation<navigationProps>();
   const quantityPerTime =
     medicationInfo.prescriptionItem.quantityPerTime.toString() === '0'
@@ -191,6 +192,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               startIcon={<AlarmClockOff size={18} color={'#fd7b02'} />}
               onPress={() =>
                 navigation.navigate('ScheduleMedicationRemindersScreen', {
+                  patientProfileId: patientProfileId,
                   isEdit: false,
                   medicationInfo,
                 })
