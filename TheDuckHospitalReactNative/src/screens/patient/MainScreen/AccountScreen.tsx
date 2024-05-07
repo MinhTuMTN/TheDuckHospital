@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import {
   Bell,
   Camera,
+  FolderKanban,
   Headset,
   KeyRound,
   LogOut,
@@ -36,6 +37,7 @@ const AccountScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
+  const {reset} = useNavigation<navigationProps>();
   const auth = useAuth();
   const tokenRedux = useSelector((state: RootState) => state.auth.token);
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -111,13 +113,13 @@ const AccountScreen = () => {
           )}
         </View>
 
-        {/* <SectionComponent
+        <SectionComponent
           title={t('account.myWallet')}
           tilteStyle={styles.titleSection}>
           <View style={styles.flexGap}>
             <TheDuckWallet />
           </View>
-        </SectionComponent> */}
+        </SectionComponent>
 
         <SectionComponent
           title={t('account.generalSettings')}
