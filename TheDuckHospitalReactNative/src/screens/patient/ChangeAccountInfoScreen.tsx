@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // '#00000080
     padding: 4,
     borderRadius: 20,
+    zIndex: 1,
   },
 });
 export default ChangeAccountInfoScreen;

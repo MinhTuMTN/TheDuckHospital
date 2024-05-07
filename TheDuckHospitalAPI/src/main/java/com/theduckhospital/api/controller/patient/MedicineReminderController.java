@@ -38,6 +38,25 @@ public class MedicineReminderController {
         );
     }
 
+    @PutMapping("/{reminderId}")
+    public ResponseEntity<?> updateMedicineReminder(
+            @PathVariable(name = "reminderId") UUID reminderId,
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody MedicineReminderRequest medicineReminderRequest
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Update medicine reminder successfully")
+                .data(medicineReminderServices.patientUpdateMedicineReminder(
+                        authorization,
+                        reminderId,
+                        medicineReminderRequest
+                ))
+                .statusCode(200)
+                .build()
+        );
+    }
+
     @GetMapping
     public ResponseEntity<?> getMedicineReminders(
             @RequestHeader("Authorization") String authorization,
@@ -153,6 +172,20 @@ public class MedicineReminderController {
                 .data(medicineReminderServices.deleteMedicineReminder(
                         authorization,
                         reminderId
+                ))
+                .build()
+        );
+    }
+
+    @GetMapping("/medicine-reminder-history")
+    public ResponseEntity<?> getMedicineReminderHistory(
+            @RequestHeader(name = "Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get medicine reminder history successfully")
+                .data(medicineReminderServices.getMedicineReminderHistory(
+                        authorization
                 ))
                 .build()
         );

@@ -32,6 +32,7 @@ public class MedicineReminder {
 
     @OneToMany(mappedBy = "medicineReminder")
     @ToStringExclude
+    @JsonBackReference
     private List<MedicineReminderDetail> listMedicineReminderDetail;
 
     private Date createdAt;

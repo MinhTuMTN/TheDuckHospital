@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallbackText, AvatarImage } from '@gluestack-ui/themed';
+import {Avatar, AvatarFallbackText, AvatarImage} from '@gluestack-ui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {
   Bell,
   Camera,
@@ -9,12 +9,12 @@ import {
   LogOut,
   MonitorSmartphone,
   Share2,
-  Star
+  Star,
 } from 'lucide-react-native';
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
-import { useSelector } from 'react-redux';
+import React, {useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
+import {Linking, Pressable, StyleSheet, View} from 'react-native';
+import {useSelector} from 'react-redux';
 import {
   AccountScreenRowComponent,
   ContainerComponent,
@@ -27,9 +27,9 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
 import TheDuckWallet from '../../../components/patient/accountScreen/TheDuckWallet';
-import { appColors } from '../../../constants/appColors';
-import { useAuth } from '../../../hooks/AuthHooks';
-import { RootState, navigationProps } from '../../../types';
+import {appColors} from '../../../constants/appColors';
+import {useAuth} from '../../../hooks/AuthHooks';
+import {RootState, navigationProps} from '../../../types';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // '#00000080
     padding: 4,
     borderRadius: 20,
+    zIndex: 1,
   },
 });
 

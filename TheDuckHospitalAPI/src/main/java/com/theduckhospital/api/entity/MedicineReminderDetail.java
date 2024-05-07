@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.MedicineUnit;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -26,6 +27,7 @@ public class MedicineReminderDetail {
 
     @Nationalized
     private String medicineName;
+    private MedicineUnit medicineUnit;
     @Nationalized
     private String fullName;
 
@@ -47,7 +49,6 @@ public class MedicineReminderDetail {
     public void prePersist() {
         this.medicineReminderDetailId = UUID.randomUUID();
         this.confirmationId = UUID.randomUUID();
-        this.used = false;
         this.ignore = false;
         this.createdAt = new Date();
         this.updatedAt = new Date();

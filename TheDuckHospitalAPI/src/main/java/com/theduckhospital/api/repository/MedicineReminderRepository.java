@@ -44,4 +44,13 @@ public interface MedicineReminderRepository extends JpaRepository<MedicineRemind
             "AND mr.medicineReminderId = :medicineReminderId"
     )
     Optional<MedicineReminder> findByAccountAndId(Account account, UUID medicineReminderId);
+
+    List<MedicineReminder> findByPatientProfileAndEndDateLessThanOrDeletedIsTrue(
+            PatientProfile patientProfile,
+            Date endDate
+    );
+    List<MedicineReminder> findByPatientProfileAndDeletedIsFalseAndEndDateGreaterThanEqual(
+            PatientProfile patientProfile,
+            Date endDate
+    );
 }
