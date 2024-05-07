@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.MedicineReminderDetailsRequest;
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
 import com.theduckhospital.api.dto.response.*;
@@ -234,6 +235,9 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
     @Override
     public List<PrescriptionResponse> searchPrescription(String token, UUID patientProfileId, Date fromDate, Date toDate) {
         PatientProfile patientProfile = patientProfileServices.getPatientProfileById(token, patientProfileId);
+        fromDate = DateCommon.getStarOfDay(fromDate);
+        toDate = DateCommon.getEndOfDay(toDate);
+        
         List<Prescription> prescriptions = prescriptionRepository
                 .findByPatientProfileAndDateBetween(
                         patientProfile,
@@ -375,5 +379,20 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 medicineReminder.getListMedicineReminderDetail()
         );
         return true;
+    }
+
+    @Override
+    public List<PrescriptionResponse> searchPrescriptionByCode(String token, UUID patientProfileId, String prescriptionCode) {
+        PatientProfile patientProfile = patientProfileServices.getPatientProfileById(token, patientProfileId);
+        Optional<Prescription> optional = prescriptionRepository
+                .findByPatientProfileAndPrescriptionCode(
+                        patientProfile,
+                        prescriptionCode
+                );
+
+        if (optional.isEmpty())
+            throw new BadRequestException("Prescription not found", 10026);
+
+        return List.of(new PrescriptionResponse(optional.get()));
     }
 }

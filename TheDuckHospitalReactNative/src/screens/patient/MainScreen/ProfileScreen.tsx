@@ -27,6 +27,7 @@ import {appColors} from '../../../constants/appColors';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
 import {RootState, navigationProps} from '../../../types';
 import {useSelector} from 'react-redux';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const ProfileScreen = () => {
   const {t} = useTranslation();
@@ -37,9 +38,13 @@ const ProfileScreen = () => {
   const navigation = useNavigation<navigationProps>();
   const isFocused = useIsFocused();
   const token = useSelector((state: RootState) => state.auth.token);
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  const toast = useToast();
 
   const handleEndIconHeaderPress = () => {
-    setModalVisible(true);
+    if (userInfo.numberOfProfile && userInfo.numberOfProfile >= 10)
+      toast.showToast('Số lượng hồ sơ tối đa là 10 hồ sơ');
+    else setModalVisible(true);
   };
   const handleAddProfileClick = () => {
     setModalVisible(false);
@@ -52,6 +57,10 @@ const ProfileScreen = () => {
   const handleEnterProfileCode = () => {
     setModalVisible(false);
     navigation.navigate('EnterProfileCode');
+  };
+  const handleFindProfileCodeScreen = () => {
+    setModalVisible(false);
+    navigation.navigate('FindProfileCodeScreen');
   };
 
   useEffect(() => {
@@ -147,7 +156,7 @@ const ProfileScreen = () => {
                   fontSize: 16,
                   fontWeight: '500',
                 }}
-                onPress={handleEnterProfileCode}>
+                onPress={handleFindProfileCodeScreen}>
                 Tôi quên mã bệnh nhân của mình
               </ButtonComponent>
             </View>

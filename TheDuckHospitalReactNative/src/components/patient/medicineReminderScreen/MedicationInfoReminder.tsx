@@ -53,7 +53,9 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               letterSpacing: 0.7,
               color: appColors.grayLight,
             }}
-            value={howToUse(medicationInfo.prescriptionItem.medicine.unit)}
+            value={
+              howToUse(medicationInfo.prescriptionItem.medicine.unit) || ''
+            }
             valueStyles={{
               fontWeight: '700',
               letterSpacing: 0.7,
@@ -73,7 +75,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               letterSpacing: 0.7,
               color: appColors.grayLight,
             }}
-            value={medicationInfo.prescriptionItem.timesPerDay}
+            value={medicationInfo.prescriptionItem.timesPerDay || ''}
             valueStyles={{
               fontWeight: '700',
               letterSpacing: 0.7,
@@ -93,7 +95,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               letterSpacing: 0.7,
               color: appColors.grayLight,
             }}
-            value={quantityPerTime}
+            value={quantityPerTime || ''}
             valueStyles={{
               fontWeight: '700',
               letterSpacing: 0.7,

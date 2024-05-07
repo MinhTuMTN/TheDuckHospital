@@ -33,4 +33,9 @@ public interface IMedicineReminderServices {
             String type
     );
     boolean deleteMedicineReminder(String token, UUID medicineReminderId);
+    List<PrescriptionResponse> searchPrescriptionByCode(
+            String token,
+            UUID patientProfileId,
+            String prescriptionCode
+    );
 }

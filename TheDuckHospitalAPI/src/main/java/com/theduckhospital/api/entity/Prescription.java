@@ -18,6 +18,7 @@ import java.util.UUID;
 public class Prescription {
     @Id
     private UUID prescriptionId;
+    private String prescriptionCode;
 
     private double totalCost;
 
@@ -42,7 +43,12 @@ public class Prescription {
     private boolean deleted;
     @PrePersist
     public void prePersist() {
-        this.prescriptionId = UUID.randomUUID();
+        UUID uuid = UUID.randomUUID();
+        this.prescriptionId = uuid;
+        this.prescriptionCode = uuid.toString()
+                .substring(0, 13)
+                .toUpperCase()
+                .replace("-", "");
         this.createdAt = new Date();
         this.lastModifiedAt = new Date();
         this.deleted = false;

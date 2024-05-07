@@ -23,7 +23,22 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, UUID
     @Query("SELECT p " +
             "FROM Prescription p " +
             "WHERE p.medicalExaminationRecord.patientProfile = :patientProfile " +
-            "AND p.createdAt BETWEEN :fromDate AND :toDate"
+            "AND p.createdAt BETWEEN :fromDate AND :toDate " +
+            "AND p.deleted = false"
     )
-    List<Prescription> findByPatientProfileAndDateBetween(PatientProfile patientProfile, Date fromDate, Date toDate);
+    List<Prescription> findByPatientProfileAndDateBetween(
+            PatientProfile patientProfile,
+            Date fromDate,
+            Date toDate
+    );
+    @Query("SELECT p " +
+            "FROM Prescription p " +
+            "WHERE p.medicalExaminationRecord.patientProfile = :patientProfile " +
+            "AND p.prescriptionCode = :prescriptionCode " +
+            "AND p.deleted = false"
+    )
+    Optional<Prescription> findByPatientProfileAndPrescriptionCode(
+            PatientProfile patientProfile,
+            String prescriptionCode
+    );
 }
