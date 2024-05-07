@@ -15,6 +15,7 @@ import ButtonComponent from '../../ButtonComponent';
 import LineInfoComponent from '../../LineInfoComponent';
 import TextComponent from '../../TextComponent';
 import {howToUse} from '../../../utils/medicineUtils';
+import InputComponent from '../../InputComponent';
 
 interface TimeReminderProps {
   unit: string;
@@ -224,17 +225,29 @@ const TimeReminder = (props: TimeReminderProps) => {
                         if (quantity > 0) setQuantity(quantity - 0.5);
                       }}
                     />
-                    <TextComponent
-                      fontSize={30}
-                      fontWeight="600"
-                      color={appColors.black}
-                      style={{
-                        width: 70,
-                        paddingHorizontal: 10,
+                    <InputComponent
+                      value={quantity.toString()}
+                      onChangeText={(text: string) => {
+                        const newValue = parseFloat(text);
+                        if (newValue >= 0) {
+                          setQuantity(newValue);
+                        } else {
+                          setQuantity(0);
+                        }
+                      }}
+                      keyboardType="numeric"
+                      _inputStyle={{
                         textAlign: 'center',
-                      }}>
-                      {quantity}
-                    </TextComponent>
+                        fontSize: 20,
+                        fontWeight: '600',
+                        paddingVertical: 0,
+                      }}
+                      containerStyle={{
+                        width: 90,
+                        marginHorizontal: 10,
+                      }}
+                    />
+
                     <AntDesign
                       name="pluscircleo"
                       size={22}

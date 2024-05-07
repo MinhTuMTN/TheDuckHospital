@@ -1,4 +1,5 @@
-import {get, getNonAuth} from './AxiosInstance';
+import {creatReminderDataProps} from '../types';
+import {get, getNonAuth, post} from './AxiosInstance';
 
 export const getMedicineReminder = async () => {
   return get('/medicine-reminders');
@@ -12,4 +13,8 @@ export const confirmReceivedReminder = async (
     reminderId,
     confirmId,
   });
+};
+
+export const creatReminder = async (data: creatReminderDataProps) => {
+  return post('/medicine-reminders', data);
 };
