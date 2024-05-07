@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {CalendarDays} from 'lucide-react-native';
 import React, {useState} from 'react';
-import {FlatList, Pressable, ScrollView, StyleSheet, View} from 'react-native';
+import {FlatList, Image, Pressable, StyleSheet, View} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,34 +12,13 @@ import {
   TextComponent,
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
-import {appColors} from '../../../constants/appColors';
-import MedicineSearchComponent from '../../../components/patient/medicineReminderScreen/MedicineSearchComponent';
 import LoadingComponent from '../../../components/LoadingComponent';
+import MedicineSearchComponent from '../../../components/patient/medicineReminderScreen/MedicineSearchComponent';
+import {appColors} from '../../../constants/appColors';
 import {searchPrescription} from '../../../services/reminderServices';
 
-const listMedicine = [
-  {
-    id: 1,
-    specialty: 'Nội tiết',
-    date: '14/12/2021',
-  },
-  {
-    id: 2,
-    specialty: 'Tâm thần kinh',
-    date: '12/11/2022',
-  },
-  {
-    id: 3,
-    specialty: 'Da liễu',
-    date: '12/12/2022',
-  },
-  {
-    id: 4,
-    specialty: 'Khoa sản và phụ khoa nữ',
-    date: '14/12/2021',
-  },
-];
 const YourPrescriptionScreen = ({route}: {route: any}) => {
+  const [loading, setLoading] = React.useState(false);
   const patientProfileId = route.params?.profile.patientProfileId;
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(
     dayjs().startOf('year'),
@@ -50,12 +29,13 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
   const [prescriptionList, setPrescriptionList] = useState([] as any[]);
 
   const handleSearchPrescription = async () => {
+    setLoading(true);
     const result = await searchPrescription(
       patientProfileId,
       startDate.format('YYYY-MM-DD'),
       endDate.format('YYYY-MM-DD'),
     );
-
+    setLoading(false);
     if (result.success) {
       setPrescriptionList(result.data.data);
       console.log(prescriptionList);
@@ -194,6 +174,7 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
             </View>
 
             <ButtonComponent
+              isLoading={loading}
               onPress={handleSearchPrescription}
               borderRadius={15}
               fontWeight="600"
@@ -207,25 +188,64 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
           </View>
 
           <View style={styles.resultWrapper}>
-            <TextComponent
-              style={{
-                letterSpacing: 0.5,
-              }}
-              fontSize={18}
-              fontWeight="600"
-              color={appColors.primaryDark}>
-              Danh sách toa thuốc ({prescriptionList.length}):
-            </TextComponent>
-            <FlatList
-              data={prescriptionList}
-              keyExtractor={item => item.prescriptionId}
-              renderItem={({item}) => (
-                <MedicineSearchComponent
-                  prescriptionInfo={item}
-                  patientId={patientProfileId}
+            {prescriptionList.length > 0 ? (
+              <>
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  fontSize={18}
+                  fontWeight="600"
+                  color={appColors.primaryDark}>
+                  Danh sách toa thuốc ({prescriptionList.length}):
+                </TextComponent>
+                <FlatList
+                  data={prescriptionList}
+                  keyExtractor={item => item.prescriptionId}
+                  renderItem={({item}) => (
+                    <MedicineSearchComponent
+                      prescriptionInfo={item}
+                      patientId={patientProfileId}
+                    />
+                  )}
                 />
-              )}
-            />
+              </>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  marginTop: 40,
+                }}>
+                <Image
+                  source={require('../../../assets/images/notFound.png')}
+                  style={{
+                    width: 150,
+                    height: 150,
+                  }}
+                />
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  fontSize={18}
+                  fontWeight="600"
+                  color={appColors.black}>
+                  Không có dữ liệu!
+                </TextComponent>
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  textAlign="center"
+                  fontSize={14}
+                  fontWeight="400"
+                  color={appColors.black}>
+                  Các toa thuốc sẽ dược hiển thị ở đây, bạn thử tìm kiếm lại
+                  ngày khác nhé.
+                </TextComponent>
+              </View>
+            )}
           </View>
         </View>
       </ContainerComponent>
@@ -273,7 +293,6 @@ const styles = StyleSheet.create({
 
   resultWrapper: {
     flexDirection: 'column',
-
     marginTop: 16,
   },
 });

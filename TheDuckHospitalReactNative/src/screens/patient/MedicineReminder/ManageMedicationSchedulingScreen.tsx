@@ -1,12 +1,10 @@
 import React, {useEffect} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {ContainerComponent, Header, TextComponent} from '../../../components';
+import {ContainerComponent, Header} from '../../../components';
+import LineInfoComponent from '../../../components/LineInfoComponent';
+import MedicationInfoReminder from '../../../components/patient/medicineReminderScreen/MedicationInfoReminder';
 import TabChooseMedicationShedulingComponent from '../../../components/patient/medicineReminderScreen/TabChooseMedicationShedulingComponent';
 import {appColors} from '../../../constants/appColors';
-import LineInfoComponent from '../../../components/LineInfoComponent';
-import SeparatorDashComponent from '../../../components/SeparatorDashComponent';
-import MedicationInfoReminder from '../../../components/patient/medicineReminderScreen/MedicationInfoReminder';
-import {use} from 'i18next';
 import {getPrescriptionDetail} from '../../../services/reminderServices';
 
 const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
@@ -72,7 +70,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
 
           <View
             style={{
-              paddingBottom: 30,
+              paddingBottom: 5,
             }}>
             <FlatList
               data={tabNotSet ? medicineHaveNotSet : medicineHaveSet}

@@ -42,7 +42,6 @@ const EnterHospitalPaymentCodeScreen = () => {
     setLoading(true);
     const response = await getMedicalTestDetails(medicalCode);
     setLoading(false);
-    console.log('Response: ', response);
 
     if (response.success) {
       navigation.navigate('HospitalFeePaymentInformationScreen', {

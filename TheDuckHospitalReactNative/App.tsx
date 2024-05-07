@@ -241,10 +241,7 @@ const App = () => {
                     name="MedicineRemiderNavigator"
                     component={MedicineRemiderNavigator}
                   />
-                  <Stack.Screen
-                    name="SuccessScreen"
-                    component={SuccessScreen}
-                  />
+
                   <Stack.Screen
                     name="ChooseProfileForMedicineReminderScreen"
                     component={ChooseProfileForMedicineReminderScreen}

@@ -16,6 +16,8 @@ import {
   View,
 } from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ContainerComponent,
   Header,
@@ -24,15 +26,13 @@ import {
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
+import LoadingComponent from '../../../components/LoadingComponent';
 import TimeReminder from '../../../components/patient/medicineReminderScreen/TimeReminder';
 import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import LoadingComponent from '../../../components/LoadingComponent';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import PopupComponent from '../../../components/PopupComponent';
 
-const ScheduleMedicationRemindersScreen = () => {
+const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
+  const {isEdit} = route.params;
   const toast = useToast();
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
@@ -54,15 +54,19 @@ const ScheduleMedicationRemindersScreen = () => {
           backgroundColor={appColors.darkerBlue}
           paddingStart={15}
           icon={
-            <MaterialCommunityIcons
-              name="delete-forever"
-              onPress={() => setDeleteModalComfirmVisible(true)}
-              size={28}
-              color={appColors.white}
-              style={{
-                zIndex: 1,
-              }}
-            />
+            isEdit ? (
+              <MaterialCommunityIcons
+                name="delete-forever"
+                onPress={() => setDeleteModalComfirmVisible(true)}
+                size={28}
+                color={appColors.white}
+                style={{
+                  zIndex: 1,
+                }}
+              />
+            ) : (
+              ''
+            )
           }
         />
         <Modal
