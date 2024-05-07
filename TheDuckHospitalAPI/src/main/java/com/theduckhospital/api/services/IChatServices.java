@@ -1,7 +1,9 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.dto.request.RefundDataRequest;
 import com.theduckhospital.api.dto.request.chat.MessagesResponse;
 import com.theduckhospital.api.dto.request.chat.SendMessageRequest;
+import com.theduckhospital.api.dto.response.CheckBookingRefundResponse;
 import com.theduckhospital.api.dto.response.chat.ConversationResponse;
 
 import java.util.List;
@@ -19,4 +21,10 @@ public interface IChatServices {
     List<ConversationResponse> getConversations(String token);
     List<ConversationResponse> getWaitingConversations();
     boolean closeConversation(String token, UUID conversationId);
+    CheckBookingRefundResponse checkRefundBooking(
+            String token,
+            UUID conversationId,
+            String bookingCode
+    );
+    boolean refundBooking(String token, UUID conversationId, RefundDataRequest request);
 }

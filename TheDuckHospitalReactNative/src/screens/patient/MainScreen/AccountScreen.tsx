@@ -1,20 +1,20 @@
-import {Avatar, AvatarFallbackText, AvatarImage} from '@gluestack-ui/themed';
+import { Avatar, AvatarFallbackText, AvatarImage } from '@gluestack-ui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import {
   Bell,
-  FolderKanban,
+  Camera,
   Headset,
   KeyRound,
   LogOut,
   MonitorSmartphone,
   Share2,
-  Star,
-  WalletMinimal,
+  Star
 } from 'lucide-react-native';
-import React, {useEffect} from 'react';
-import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import {
   AccountScreenRowComponent,
   ContainerComponent,
@@ -26,11 +26,10 @@ import {
 import ButtonComponent from '../../../components/ButtonComponent';
 import ContentComponent from '../../../components/ContentComponent';
 import ChangeLanguage from '../../../components/patient/accountScreen/ChangeLanguage';
-import {appColors} from '../../../constants/appColors';
-import {RootState, navigationProps} from '../../../types';
-import {useSelector} from 'react-redux';
-import {useAuth} from '../../../hooks/AuthHooks';
 import TheDuckWallet from '../../../components/patient/accountScreen/TheDuckWallet';
+import { appColors } from '../../../constants/appColors';
+import { useAuth } from '../../../hooks/AuthHooks';
+import { RootState, navigationProps } from '../../../types';
 
 const AccountScreen = () => {
   const [isLogged, setIsLogged] = React.useState(false);
@@ -40,10 +39,12 @@ const AccountScreen = () => {
   const auth = useAuth();
   const tokenRedux = useSelector((state: RootState) => state.auth.token);
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
-  const {reset} = useNavigation<navigationProps>();
 
   const handleBtnLoginClick = () => {
     navigation.navigate('LoginScreen');
+  };
+  const navigateToChangeAccountInfo = () => {
+    navigation.navigate('ChangeAccountInfoScreen');
   };
 
   useEffect(() => {
@@ -73,7 +74,17 @@ const AccountScreen = () => {
         <View style={styles.avatarContainer}>
           <Avatar size="lg">
             {isLogged ? (
-              <AvatarFallbackText>{userInfo.fullName}</AvatarFallbackText>
+              <Pressable
+                style={styles.avatar}
+                onPress={navigateToChangeAccountInfo}>
+                <AvatarFallbackText>{userInfo.fullName}</AvatarFallbackText>
+                <View style={styles.cameraButton}>
+                  <Camera color={appColors.white} />
+                </View>
+                {userInfo.avatar && (
+                  <AvatarImage alt="avatar" source={{uri: userInfo.avatar}} />
+                )}
+              </Pressable>
             ) : (
               <AvatarImage
                 alt="avatar"
@@ -139,7 +150,7 @@ const AccountScreen = () => {
               <AccountScreenRowComponent
                 title={t('account.hotline')}
                 icon={<Headset size={20} color={appColors.black} />}
-                onPress={() => navigation.navigate('TestScreen')}
+                onPress={() => Linking.openURL('tel:19001234')}
               />
               <AccountScreenRowComponent
                 title={t('account.ratingApp')}
@@ -220,6 +231,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  avatar: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    right: -5,
+    bottom: -10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // '#00000080
+    padding: 4,
+    borderRadius: 20,
   },
 });
 

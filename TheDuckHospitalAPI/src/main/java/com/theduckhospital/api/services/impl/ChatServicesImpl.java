@@ -1,42 +1,53 @@
 package com.theduckhospital.api.services.impl;
 
-import com.google.common.collect.Lists;
-import com.theduckhospital.api.constant.ConversationState;
+import com.theduckhospital.api.constant.*;
+import com.theduckhospital.api.dto.request.RefundDataRequest;
 import com.theduckhospital.api.dto.request.chat.MessagesResponse;
 import com.theduckhospital.api.dto.request.chat.SendMessageRequest;
+import com.theduckhospital.api.dto.response.CheckBookingRefundResponse;
 import com.theduckhospital.api.dto.response.chat.ConversationResponse;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Conversation;
-import com.theduckhospital.api.entity.Message;
-import com.theduckhospital.api.entity.SupportAgent;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
-import com.theduckhospital.api.repository.ConversationRepository;
-import com.theduckhospital.api.repository.MessageRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.IAccountServices;
+import com.theduckhospital.api.services.IBookingServices;
 import com.theduckhospital.api.services.IChatServices;
 import com.theduckhospital.api.services.IFirebaseServices;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class ChatServicesImpl implements IChatServices {
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
+    private final BookingRepository bookingRepository;
+    private final TransactionRepository transactionRepository;
+    private final NotificationRepository notificationRepository;
+
     private final IAccountServices accountServices;
     private final IFirebaseServices firebaseServices;
 
     public ChatServicesImpl(
             MessageRepository messageRepository,
             ConversationRepository conversationRepository,
+            BookingRepository bookingRepository,
+            TransactionRepository transactionRepository,
+            NotificationRepository notificationRepository,
             IAccountServices accountServices,
             IFirebaseServices firebaseServices) {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
+        this.bookingRepository = bookingRepository;
+        this.transactionRepository = transactionRepository;
+        this.notificationRepository = notificationRepository;
         this.accountServices = accountServices;
         this.firebaseServices = firebaseServices;
     }
@@ -191,18 +202,143 @@ public class ChatServicesImpl implements IChatServices {
     @Override
     public boolean closeConversation(String token, UUID conversationId) {
         Account account = accountServices.findAccountByToken(token);
-        Optional<Conversation> conversation = conversationRepository.findByConversationId(conversationId);
-        if (conversation.isEmpty())
-            throw new BadRequestException("Conversation not found", 10017);
-        if (account.getStaff() == null || !conversation.get().getSupportAgent().getStaffId().equals(account.getStaff().getStaffId()))
-            throw new BadRequestException("Conversation not found", 10017);
-        if (conversation.get().getState() == ConversationState.CLOSED)
+        Conversation conversationToClose = getConversation(conversationId, account);
+        if (conversationToClose.getState() == ConversationState.CLOSED)
             throw new BadRequestException("Conversation is already closed", 10019);
 
-        Conversation conversationToClose = conversation.get();
         conversationToClose.setState(ConversationState.CLOSED);
         conversationRepository.save(conversationToClose);
         return true;
+    }
+
+    @Override
+    public CheckBookingRefundResponse checkRefundBooking(String token, UUID conversationId, String bookingCode) {
+        Account account = accountServices.findAccountByToken(token);
+
+        Conversation conversationToCheck = getConversation(conversationId, account);
+        Booking bookingToCheck = checkBookingRefundable(bookingCode, conversationToCheck);
+
+        DoctorSchedule doctorSchedule = bookingToCheck.getTimeSlot().getDoctorSchedule();
+        Doctor doctor = doctorSchedule.getDoctor();
+        MedicalService medicalService = doctorSchedule.getMedicalService();
+        Department department = doctor.getDepartment();
+
+
+        return CheckBookingRefundResponse.builder()
+                .bookingDate(doctorSchedule.getDate())
+                .bookingCode(bookingToCheck.getBookingCode())
+                .refundAmount(medicalService.getPrice())
+                .isRefundable(true)
+                .departmentName(department.getDepartmentName())
+                .patientName(bookingToCheck.getPatientProfile().getFullName())
+                .doctorName(doctor.getFullName())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public boolean refundBooking(String token, UUID conversationId, RefundDataRequest request) {
+        try {
+            Account account = accountServices.findAccountByToken(token);
+
+            Conversation conversationToCheck = getConversation(conversationId, account);
+            Account userAccount = conversationToCheck.getAccount();
+            if (userAccount.getWalletLocked())
+                throw new BadRequestException("User wallet is locked", 10013);
+
+            Booking bookingToCheck = checkBookingRefundable(request.getBookingCode(), conversationToCheck);
+
+            // Create a refund transaction
+            Transaction refundTransaction = new Transaction();
+            refundTransaction.setAmount(bookingToCheck.getTimeSlot().getDoctorSchedule().getMedicalService().getPrice());
+            refundTransaction.setPaymentType(PaymentType.REFUND);
+            refundTransaction.setAccount(userAccount);
+            transactionRepository.save(refundTransaction);
+            refundTransaction.setStatus(TransactionStatus.SUCCESS);
+            transactionRepository.save(refundTransaction);
+
+            bookingToCheck.setRefundedTransactionId(refundTransaction.getTransactionId());
+            bookingToCheck.setRefundReason(request.getRefundReason());
+            bookingToCheck.setRefundedConversationId(conversationId);
+            bookingRepository.save(bookingToCheck);
+
+            userAccount.setBalance(userAccount.getBalance().add(BigDecimal.valueOf(refundTransaction.getAmount())));
+            accountServices.saveAccount(userAccount);
+
+            DoctorSchedule doctorSchedule = bookingToCheck.getTimeSlot().getDoctorSchedule();
+            Doctor doctor = doctorSchedule.getDoctor();
+            MedicalService medicalService = doctorSchedule.getMedicalService();
+            Department department = doctor.getDepartment();
+
+            // Format date to dd/MM/yyyy
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String formattedDate = simpleDateFormat.format(doctorSchedule.getDate());
+            String body = "Số tiền đặt khám khoa "
+                    + department.getDepartmentName()
+                    + " với bác sĩ " + doctor.getFullName()
+                    + " vào ngày " + formattedDate
+                    + " đã được hoàn lại vào tài khoản của bạn";
+            Map<String, String> data = Map.of(
+                    "title", "Hoàn tiền thành công",
+                    "body", body,
+                    "action", "refund",
+                    "value", "",
+                    "channelId", "chat"
+            );
+            UUID notificationId = UUID.randomUUID();
+            Notification notification = new Notification();
+            notification.setNotificationId(notificationId);
+            notification.setTitle("Hoàn tiền thành công");
+            notification.setContent(body);
+            notification.setData(data.toString());
+            notification.setAccount(userAccount);
+            notification.setCreatedAt(new Date());
+            notification.setLastModifiedAt(new Date());
+            notification.setDeleted(false);
+            notification.setState(NotificationState.NOT_RECEIVED);
+            notificationRepository.save(notification);
+
+            firebaseServices.sendNotificationToAccount(userAccount, data);
+        } catch (BadRequestException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), e.getErrorCode());
+        } catch (Exception ignored) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException("Refund failed", 400);
+        }
+        return false;
+    }
+
+    private Booking checkBookingRefundable(String bookingCode, Conversation conversationToCheck) {
+        Optional<Booking> booking = bookingRepository.findByBookingCodeAndDeletedIsFalse(bookingCode);
+        if (booking.isEmpty())
+            throw new BadRequestException("Booking not found", 10020);
+
+        Booking bookingToCheck = booking.get();
+        DoctorSchedule doctorSchedule = bookingToCheck.getTimeSlot().getDoctorSchedule();
+
+        if (bookingToCheck.getRefundedTransactionId() != null)
+            throw new BadRequestException("Booking is already refunded", 10021);
+        if (bookingToCheck.getPatientProfile().getAccount().getUserId() != conversationToCheck.getAccount().getUserId())
+            throw new BadRequestException("Booking does not belong to this user", 10022);
+        // Can't refund if the booking is before 7 days
+        if (doctorSchedule.getDate().getTime() + 7 * 24 * 60 * 60 * 1000 < DateCommon.getToday().getTime())
+            throw new BadRequestException("Can't refund booking after 7 days", 10023);
+
+        return bookingToCheck;
+    }
+
+    private Conversation getConversation(UUID conversationId, Account staffAccount) {
+        Optional<Conversation> conversation = conversationRepository.findByConversationId(conversationId);
+        if (conversation.isEmpty())
+            throw new BadRequestException("Conversation not found", 10017);
+        if (staffAccount.getStaff() == null ||
+                !conversation.get().getSupportAgent().getStaffId()
+                        .equals(staffAccount.getStaff().getStaffId())
+        )
+            throw new BadRequestException("Conversation not found", 10017);
+
+        return conversation.get();
     }
 
     @NotNull
@@ -220,6 +356,7 @@ public class ChatServicesImpl implements IChatServices {
             return ConversationResponse.builder()
                     .conversationId(conversation.getConversationId())
                     .userName(conversation.getAccount().getFullName())
+                    .avatar(conversation.getAccount().getAvatar())
                     .userId(conversation.getAccount().getUserId())
                     .lastMessage(lastMessage == null ? "" : lastMessage.getMessage())
                     .lastMessageDate(lastMessage == null ? null : lastMessage.getCreatedAt())

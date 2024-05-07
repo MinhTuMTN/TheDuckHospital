@@ -16,52 +16,52 @@ export const useAuth = () => {
       realm?.write(() => {
         const user = realm.objects(User)[0];
         if (user) {
-          // dispatch(
-          //   setUserInfo({
-          //     fullName: response.data.data.fullName,
-          //     role: response.data.data.role,
-          //     haveWallet: false,
-          //     balance: 0,
-          //   }),
-          // );
-
           user.role = response.data.data.role;
           user.fullName = response.data.data.fullName;
 
           if (response.data.data.balance !== null) {
-            console.log('Have wallet: ');
-
             user.balance = response.data.data.balance;
             user.haveWallet = true;
 
             dispatch(
               setUserInfo({
+                phoneNumber: response.data.data.phoneNumber,
                 fullName: response.data.data.fullName,
                 role: response.data.data.role,
                 balance: response.data.data.balance,
                 haveWallet: true,
+                createdAt: response.data.data.createdAt,
+                numberOfProfile: response.data.data.numberOfProfile,
+                avatar: response.data.data.avatar,
               }),
             );
           } else {
-            console.log('Not Have wallet: ');
             user.haveWallet = false;
             user.balance = 0;
             dispatch(
               setUserInfo({
+                phoneNumber: response.data.data.phoneNumber,
                 fullName: response.data.data.fullName,
                 role: response.data.data.role,
                 haveWallet: false,
                 balance: 0,
+                createdAt: response.data.data.createdAt,
+                numberOfProfile: response.data.data.numberOfProfile,
+                avatar: response.data.data.avatar,
               }),
             );
           }
 
           dispatch(
             setUserInfo({
+              phoneNumber: response.data.data.phoneNumber,
               fullName: response.data.data.fullName,
               role: response.data.data.role,
               balance: response.data.data.balance || 0,
               haveWallet: response.data.data.balance != null ? true : false,
+              createdAt: response.data.data.createdAt,
+              numberOfProfile: response.data.data.numberOfProfile,
+              avatar: response.data.data.avatar,
             }),
           );
         }
@@ -70,10 +70,14 @@ export const useAuth = () => {
       dispatch(setToken(null));
       dispatch(
         setUserInfo({
+          phoneNumber: '',
           fullName: null,
           role: null,
           balance: 0,
           haveWallet: false,
+          createdAt: '',
+          numberOfProfile: 0,
+          avatar: '',
         }),
       );
     }
@@ -119,10 +123,14 @@ export const useAuth = () => {
       dispatch(setToken(null));
       dispatch(
         setUserInfo({
+          phoneNumber: '',
           fullName: null,
           role: null,
           balance: 0,
           haveWallet: false,
+          createdAt: '',
+          numberOfProfile: 0,
+          avatar: '',
         }),
       );
     } catch (error) {

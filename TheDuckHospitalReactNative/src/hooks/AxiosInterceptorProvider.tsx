@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import axiosInstance from '../services/AxiosInstance';
-import {ignoreAxiosIntercepter} from '../services/ignoreAxiosIntercepter';
+import { ignoreAxiosIntercepter } from '../services/ignoreAxiosIntercepter';
 import { useAuth } from './AuthHooks';
 
 interface AxiosInterceptorProviderProps {
@@ -14,10 +14,7 @@ const AxiosInterceptorProvider = (props: AxiosInterceptorProviderProps) => {
     const interceptor = axiosInstance.interceptors.response.use(
       response => response,
       async error => {
-        // Retry if network error with max retry 3 times
         if (error.message === 'Network Error') {
-          console.log('Retry ', error.config.retry);
-
           const retry = error.config.retry || 0;
           if (retry < 3) {
             error.config.retry = retry + 1;

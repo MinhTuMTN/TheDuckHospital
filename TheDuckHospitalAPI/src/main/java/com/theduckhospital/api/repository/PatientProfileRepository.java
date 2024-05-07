@@ -6,6 +6,7 @@ import com.theduckhospital.api.entity.PatientProfile;
 import com.theduckhospital.api.entity.Province;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,17 +23,21 @@ public interface PatientProfileRepository extends JpaRepository<PatientProfile, 
             "AND (p.identityNumber LIKE %?2% OR p.phoneNumber LIKE %?2%)")
     List<PatientProfile> findPatientProfiles(String patientName, String identityNumber);
 
-    @Query("SELECT p " +
-            "FROM PatientProfile p " +
-            "WHERE p.fullName = ?1 " +
-            "AND YEAR(p.dateOfBirth) = ?2 " +
-            "AND p.ward.district.province = ?3 " +
-            "AND p.gender = ?4 " +
-            "AND p.deleted = false")
+    @Query(value = "SELECT p.* " +
+            "FROM patient_profile p " +
+            "INNER JOIN ward w ON p.ward_ward_id = w.ward_id " +
+            "INNER JOIN district d ON w.district_district_id = d.district_id " +
+            "INNER JOIN province pro ON d.province_province_id = pro.province_id " +
+            "WHERE FREETEXT(p.full_name, :fullName) " +
+            "AND YEAR(p.date_of_birth) = :dateOfBirth " +
+            "AND pro.province_id = :provinceId " +
+            "AND p.gender = :gender",
+            nativeQuery = true
+    )
     List<PatientProfile> findPatientProfilesByInfo(
-            String fullName,
-            int dateOfBirth_year,
-            Province ward_district_province,
-            Gender gender
+            @Param("fullName") String fullName,
+            @Param("dateOfBirth") int dateOfBirth,
+            @Param("provinceId") int provinceId,
+            @Param("gender") int gender
     );
 }

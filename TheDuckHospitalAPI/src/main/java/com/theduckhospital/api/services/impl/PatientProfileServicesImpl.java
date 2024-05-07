@@ -58,6 +58,12 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
             CreatePatientProfileRequest request
     ) {
         Account account = accountServices.findAccountByToken(token);
+        Integer numberOfProfile = account.getNumberOfProfile();
+        if (numberOfProfile >= 10)
+            throw new BadRequestException("Number of patient profile is limited", 10028);
+
+        account.setNumberOfProfile(numberOfProfile + 1);
+        accountServices.saveAccount(account);
 
         Nation nation = null;
         if (request.getNationId() != null) {
@@ -275,6 +281,11 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
 
     @Override
     public PatientProfileItemResponse addPatientProfile(String authorization, AddPatientProfileRequest request) {
+        Account account = accountServices.findAccountByToken(authorization);
+        Integer numberOfProfile = account.getNumberOfProfile();
+        if (numberOfProfile >= 10)
+            throw new BadRequestException("Number of patient profile is limited", 10028);
+
         PatientProfile patientProfile = patientProfileRepository.findById(
                 request.getPatientProfileId()
         ).orElseThrow(() -> new BadRequestException("Patient Profile not found", 10006));
@@ -288,7 +299,9 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
             throw new BadRequestException("OTP not valid", 10008);
         }
 
-        Account account = accountServices.findAccountByToken(authorization);
+        account.setNumberOfProfile(numberOfProfile + 1);
+        accountServices.saveAccount(account);
+
         patientProfile.setAccount(account);
         patientProfileRepository.save(patientProfile);
 
@@ -305,8 +318,8 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
                 .findPatientProfilesByInfo(
                         request.getFullName(),
                         request.getYearOfBirth(),
-                        province,
-                        request.getGender()
+                        province.getProvinceId(),
+                        request.getGender().ordinal()
                 );
 
         return patientProfiles.stream()

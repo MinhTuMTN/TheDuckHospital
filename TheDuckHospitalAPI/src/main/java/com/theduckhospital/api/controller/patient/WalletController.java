@@ -85,4 +85,19 @@ public class WalletController {
                 .build()
         );
     }
+
+    @GetMapping("/statistic")
+    public ResponseEntity<?> getWalletStatistic(
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(name = "month") int month,
+            @RequestParam(name = "year") int year
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get wallet statistic successfully")
+                .data(walletServices.getWalletStatistic(authorization, month, year))
+                .build()
+        );
+    }
 }

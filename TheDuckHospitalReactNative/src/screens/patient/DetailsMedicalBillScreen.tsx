@@ -9,9 +9,9 @@ import {
   Header,
   TextComponent,
 } from '../../components';
+import RequestRefundBookingComponent from '../../components/patient/detailsMedicalBillScreen/RequestRefundBookingComponent';
 import {appColors} from '../../constants/appColors';
 import {getDetailsMedicalBill} from '../../services/bookingServices';
-import RequestRefundBookingComponent from '../../components/patient/detailsMedicalBillScreen/RequestRefundBookingComponent';
 import ButtonComponent from '../../components/ButtonComponent';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../types';

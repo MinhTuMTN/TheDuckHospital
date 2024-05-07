@@ -58,7 +58,7 @@ const Row = (props: RowProps) => {
         </TextComponent>
       </FlexComponent>
 
-      {button && <FlexComponent flex={1}>{button}</FlexComponent>}
+      {button && <FlexComponent>{button}</FlexComponent>}
     </FlexComponent>
   );
 };

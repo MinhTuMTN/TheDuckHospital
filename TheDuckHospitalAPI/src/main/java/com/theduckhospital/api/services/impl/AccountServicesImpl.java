@@ -17,12 +17,12 @@ import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +45,7 @@ public class AccountServicesImpl implements IAccountServices {
     private final IMSGraphServices graphServices;
     private final JwtTokenProvider tokenProvider;
     private final IDeviceServices deviceServices;
+    private final ICloudinaryServices cloudinaryServices;
 
     public AccountServicesImpl(AccountRepository accountRepository,
                                DoctorScheduleRepository doctorScheduleRepository,
@@ -57,8 +58,8 @@ public class AccountServicesImpl implements IAccountServices {
                                TemporaryUserRepository temporaryUserRepository,
                                IMSGraphServices graphServices,
                                JwtTokenProvider tokenProvider,
-                               IDeviceServices deviceServices
-    ) {
+                               IDeviceServices deviceServices,
+                               ICloudinaryServices cloudinaryServices) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpServices = otpServices;
@@ -71,6 +72,7 @@ public class AccountServicesImpl implements IAccountServices {
         this.staffRepository = staffRepository;
         this.doctorRepository = doctorRepository;
         this.deviceServices = deviceServices;
+        this.cloudinaryServices = cloudinaryServices;
     }
 
     @Override
@@ -243,6 +245,10 @@ public class AccountServicesImpl implements IAccountServices {
                 .role(role)
                 .fullName(account.getFullName())
                 .balance(account.getBalance())
+                .phoneNumber(account.getPhoneNumber())
+                .createdAt(account.getCreatedAt())
+                .numberOfProfile(account.getNumberOfProfile())
+                .avatar(account.getAvatar())
                 .build();
     }
 
@@ -547,5 +553,28 @@ public class AccountServicesImpl implements IAccountServices {
     @Override
     public void saveAccount(Account account) {
         accountRepository.save(account);
+    }
+
+    @Override
+    public CheckTokenResponse updateProfile(String token, MultipartFile avatar, String fullName) {
+        Account account = findAccountByToken(token);
+        account.setFullName(fullName);
+
+        if (avatar != null) {
+            String avatarUrl = cloudinaryServices.uploadFile(avatar);
+            account.setAvatar(avatarUrl);
+        }
+        accountRepository.save(account);
+
+        return CheckTokenResponse.builder()
+                .valid(true)
+                .role(getRoleFromAccount(account))
+                .fullName(account.getFullName())
+                .balance(account.getBalance())
+                .phoneNumber(account.getPhoneNumber())
+                .createdAt(account.getCreatedAt())
+                .numberOfProfile(account.getNumberOfProfile())
+                .avatar(account.getAvatar())
+                .build();
     }
 }

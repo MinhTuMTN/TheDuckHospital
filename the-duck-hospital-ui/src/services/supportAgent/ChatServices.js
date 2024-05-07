@@ -35,3 +35,14 @@ export const sendMessage = (conversationId, message) => {
 export const closeConversation = (conversationId) => {
   return del(`/chat/${conversationId}`);
 };
+
+export const checkRefundBooking = (conversationId, bookingCode) => {
+  return get(`/chat/${conversationId}/refund/check-booking/${bookingCode}`);
+};
+
+export const refundBooking = (conversationId, bookingCode, refundReason) => {
+  return post(`/chat/${conversationId}/refund`, {
+    bookingCode,
+    refundReason,
+  });
+};

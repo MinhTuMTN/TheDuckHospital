@@ -12,7 +12,7 @@ public class WalletInfoResponse {
     private String phoneNumber;
     private String fullName;
     private Date walletCreatedAt;
-    private double balance;
-    private double totalThisMonth;
+    private Double balance;
+    private Double totalThisMonth;
     private List<TransactionInfoResponse> transactions;
 }

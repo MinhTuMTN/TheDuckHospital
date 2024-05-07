@@ -1,33 +1,38 @@
-import {config} from '@gluestack-ui/config';
-import {GluestackUIProvider} from '@gluestack-ui/themed';
-import notifee, {EventType} from '@notifee/react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { config } from '@gluestack-ui/config';
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+import notifee, { EventType } from '@notifee/react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { RealmProvider } from '@realm/react';
 import React from 'react';
-import {Linking, StatusBar} from 'react-native';
+import { Linking, StatusBar } from 'react-native';
 import 'react-native-gesture-handler';
+import { Provider } from 'react-redux';
 import AxiosInterceptorProvider from './src/hooks/AxiosInterceptorProvider';
 import ToastProvider from './src/hooks/ToastProvider';
 import linking from './src/linking';
 import './src/localization/i18n';
+import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
+import MedicineRemiderNavigator from './src/navigator/MedicineRemiderNavigator';
 import PatientBottomNavigator from './src/navigator/PatientBottomNavigator';
+import { User } from './src/realm/User';
 import NotFoundScreen from './src/screens/NotFoundScreen';
 import SlashScreen from './src/screens/SlashScreen';
 import TestScreen from './src/screens/TestScreen';
+import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
+import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
+import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
+import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
+import StatisticsScreen from './src/screens/admin/StatisticsScreen/StatisticsScreen';
+import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 import ChangePasswordScreen from './src/screens/auth/ChangePasswordScreen';
 import ForgetAndChangePasswordScreen from './src/screens/auth/ForgetAndChangePasswordScreen';
 import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
-import AdminLeftSideDrawer from './src/navigator/AdminLeftSideDrawer';
-import DepartmentDetailScreen from './src/screens/admin/DepartmentManagementScreen/DepartmentDetailScreen';
-import StatisticsScreen from './src/screens/admin/StatisticsScreen/StatisticsScreen';
-import StaffDetailScreen from './src/screens/admin/StaffManagementScreen/StaffDetailScreen';
-import PatientDetailScreen from './src/screens/admin/PatientManagementScreen/PatientDetailScreen';
-import PatientProfileDetailScreen from './src/screens/admin/PatientManagementScreen/PatientProfileDetailScreen';
-import TransactionDetailScreen from './src/screens/admin/TransactionManagementScreen/TransactionDetailScreen';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
+import ChangeAccountInfoScreen from './src/screens/patient/ChangeAccountInfoScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import DeviceManagementScreen from './src/screens/patient/DeviceManagementScreen';
@@ -35,6 +40,7 @@ import AllPatientProfilesScreen from './src/screens/patient/LookUpMedicalResults
 import AuthenticatePatientAccountViaOTPScreen from './src/screens/patient/LookUpMedicalResults/AuthenticatePatientAccountViaOTPScreen';
 import EnterProfileCode from './src/screens/patient/LookUpMedicalResults/EnterProfileCode';
 import FindProfileCodeScreen from './src/screens/patient/LookUpMedicalResults/FindProfileCodeScreen';
+import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
 import MedicalExaminationHistoryScreen from './src/screens/patient/MedicalExaminationHistoryScreen';
 import BillingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/BillingInformationScreen';
 import ChooseDateScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseDateScreen';
@@ -42,21 +48,21 @@ import ChooseDoctorsScreen from './src/screens/patient/MedicalRegistrationProces
 import ChooseProfileScreen from './src/screens/patient/MedicalRegistrationProcess/ChooseProfileScreen';
 import ConfirmBookingInformationScreen from './src/screens/patient/MedicalRegistrationProcess/ConfirmBookingInformationScreen';
 import PaymentResultScreen from './src/screens/patient/MedicalRegistrationProcess/PaymentResultScreen';
-import MedicineReminderScreen from './src/screens/patient/MedicineReminder/MedicineReminderScreen';
+import ChooseProfileForMedicineReminderScreen from './src/screens/patient/MedicineReminder/ChooseProfileForMedicineReminderScreen';
+import ManageMedicationSchedulingScreen from './src/screens/patient/MedicineReminder/ManageMedicationSchedulingScreen';
+import ScheduleMedicationRemindersScreen from './src/screens/patient/MedicineReminder/ScheduleMedicationRemindersScreen';
+import YourPrescriptionScreen from './src/screens/patient/MedicineReminder/YourPrescriptionScreen';
 import EnterHospitalPaymentCodeScreen from './src/screens/patient/Payment/EnterHospitalPaymentCodeScreen';
 import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/HospitalFeePaymentInformationScreen';
-import {Provider} from 'react-redux';
-import store from './src/store/store';
-import {RealmProvider} from '@realm/react';
-import {User} from './src/realm/User';
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
-import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
-import MedicalTestResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestResultScreen';
 import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
 import MedicalTestDetailResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestDetailResultScreen';
 import RatingScreen from './src/screens/patient/RatingScreen';
+import TransactionStatisticScreen from './src/screens/patient/Wallet/TransactionStatisticScreen';
+import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
+import store from './src/store/store';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,9 +71,9 @@ const App = () => {
     if (type === EventType.PRESS) {
       Linking.openURL('theduck://app/notifications');
     } else if (type === EventType.DISMISSED) {
-      console.log('Foreground user dismissed notification');
+      // console.log('Foreground user dismissed notification');
     } else if (type === EventType.DELIVERED) {
-      console.log('Foreground notification delivered');
+      // console.log('Foreground notification delivered');
     }
   });
 
@@ -168,10 +174,6 @@ const App = () => {
                     component={ChooseDateScreen}
                   />
                   <Stack.Screen
-                    name="MedicineReminderScreen"
-                    component={MedicineReminderScreen}
-                  />
-                  <Stack.Screen
                     name="ConfirmBookingInformationScreen"
                     component={ConfirmBookingInformationScreen}
                   />
@@ -241,6 +243,35 @@ const App = () => {
                   <Stack.Screen
                     name="RatingScreen"
                     component={RatingScreen}
+                    />
+                    <Stack.Screen
+                    name="TransactionStatisticScreen"
+                    component={TransactionStatisticScreen}
+                  />
+                  <Stack.Screen
+                    name="MedicineRemiderNavigator"
+                    component={MedicineRemiderNavigator}
+                  />
+                  <Stack.Screen
+                    name="ChooseProfileForMedicineReminderScreen"
+                    component={ChooseProfileForMedicineReminderScreen}
+                  />
+                  <Stack.Screen
+                    name="YourPrescriptionScreen"
+                    component={YourPrescriptionScreen}
+                  />
+                  <Stack.Screen
+                    name="ManageMedicationSchedulingScreen"
+                    component={ManageMedicationSchedulingScreen}
+                  />
+                  <Stack.Screen
+                    name="ScheduleMedicationRemindersScreen"
+                    component={ScheduleMedicationRemindersScreen}
+                  />
+
+                  <Stack.Screen
+                    name="ChangeAccountInfoScreen"
+                    component={ChangeAccountInfoScreen}
                   />
                 </Stack.Navigator>
               </NavigationContainer>

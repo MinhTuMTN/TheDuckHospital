@@ -7,7 +7,6 @@ import {useTranslation} from 'react-i18next';
 import {
   FlatList,
   Image,
-  Linking,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +14,7 @@ import {
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {useSelector} from 'react-redux';
 import {Headset, Search, Typing} from '../../../assets/svgs';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
@@ -23,14 +23,12 @@ import {appInfo} from '../../../constants/appInfo';
 import {useToast} from '../../../hooks/ToastProvider';
 import {updateDeviceInformation} from '../../../services/authServices';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
-import {AppNotification} from '../../../utils/appNotification';
 import {
   NotificationState,
   updateNotificationState,
 } from '../../../services/notificationServices';
-import {useSelector} from 'react-redux';
-import { RootState } from '../../../types';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
+import {AppNotification} from '../../../utils/appNotification';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -81,7 +79,7 @@ const HomeScreen = () => {
     navigation.navigate('EnterHospitalPaymentCodeScreen');
   };
   const handleNavigateMidicineReminderScreen = () => {
-    navigation.navigate('MedicineReminderScreen');
+    navigation.navigate('MedicineRemiderNavigator');
   };
   const handleNavigateMedicalExaminationHistoryScreen = () => {
     navigation.navigate('AllPatientProfilesScreen');
@@ -149,7 +147,7 @@ const HomeScreen = () => {
       AppNotification.displayNotification(remoteMessage);
       const notificationId: string | undefined =
         (remoteMessage.data?.notificationId as string) || undefined;
-      if (notificationId) {
+      if (notificationId && remoteMessage.data?.channelId !== 'reminder') {
         const response = await updateNotificationState(
           notificationId,
           NotificationState.RECEIVED,
@@ -163,8 +161,6 @@ const HomeScreen = () => {
 
   useEffect(() => {
     notifee.getInitialNotification().then(notification => {
-      console.log('Initial notification', notification);
-
       if (notification) {
         navigation.navigate('NotificationScreen');
       }
@@ -181,7 +177,11 @@ const HomeScreen = () => {
           <View className="pt-12 flex-row items-center justify-between">
             <View className="flex-row items-center flex-auto w-72">
               <Image
-                source={require('../../../assets/images/avatar-meo.jpg')}
+                source={
+                  token && userInfo.avatar
+                    ? {uri: userInfo.avatar}
+                    : require('../../../assets/images/avatar-meo.jpg')
+                }
                 className="w-14 h-14 rounded-full"
               />
               <View className="pl-2">
@@ -364,6 +364,9 @@ const HomeScreen = () => {
         />
       </ScrollView>
       <Fab
+        onPress={() => {
+          navigation.navigate('ChatScreen');
+        }}
         size="md"
         placement="bottom right"
         style={{

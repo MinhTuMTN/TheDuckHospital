@@ -27,6 +27,7 @@ import Bookmark from './Bookmark.svg';
 import TimeMachine from './TimeMachine.svg';
 import Up from './Up.svg';
 import Down from './Down.svg';
+import PieChart from './PieChart.svg';
 
 export {
   English,
@@ -58,4 +59,5 @@ export {
   TimeMachine,
   Up,
   Down,
+  PieChart,
 };

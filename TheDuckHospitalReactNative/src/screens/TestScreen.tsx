@@ -1,38 +1,42 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import QRCodeScanner from 'react-native-qrcode-scanner';
-import {TextComponent} from '../components';
+import {StyleSheet, View} from 'react-native';
+import ButtonComponent from '../components/ButtonComponent';
 import {useToast} from '../hooks/ToastProvider';
 import {globalStyles} from '../styles/globalStyles';
+import notifee, {TriggerType} from '@notifee/react-native';
+import dayjs from 'dayjs';
+import DatePicker from 'react-native-date-picker';
 
 const TestScreen = () => {
-  const toast = useToast();
-  const handleShowToast = () => {
-    toast.showToast('This is a toast message');
-  };
+  const [datePickerVisible, setDatePickerVisible] = React.useState(false);
+
   return (
     <View style={globalStyles.center}>
-      <QRCodeScanner
-        reactivate
-        reactivateTimeout={1500}
-        onRead={e => {
-          toast.showToast(e.data);
+      <ButtonComponent
+        onPress={() => {
+          setDatePickerVisible(true);
+        }}>
+        Show Notification
+      </ButtonComponent>
+
+      <DatePicker
+        date={new Date()}
+        onConfirm={(date: Date) => {
+          // Reset the time to 00:00:00
+          date.setHours(0);
+          date.setMinutes(0);
+          date.setSeconds(0);
+          date.setMilliseconds(0);
+
+          console.log('date', date);
+          setDatePickerVisible(false);
         }}
-        // flashMode={RNCamera.Constants.FlashMode.torch}
-        topContent={
-          <TextComponent style={styles.centerText}>
-            Go to{' '}
-            <TextComponent style={styles.textBold}>
-              wikipedia.org/wiki/QR_code
-            </TextComponent>{' '}
-            on your computer and scan the QR code.
-          </TextComponent>
-        }
-        bottomContent={
-          <TouchableOpacity style={styles.buttonTouchable}>
-            <TextComponent style={styles.buttonText}>OK. Got it!</TextComponent>
-          </TouchableOpacity>
-        }
+        mode="date"
+        modal
+        onCancel={() => {
+          setDatePickerVisible(false);
+        }}
+        open={datePickerVisible}
       />
     </View>
   );

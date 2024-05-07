@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller;
 
+import com.theduckhospital.api.dto.request.RefundDataRequest;
 import com.theduckhospital.api.dto.request.chat.AcceptConversationRequest;
 import com.theduckhospital.api.dto.request.chat.SendMessageRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
@@ -116,6 +117,40 @@ public class ChatController {
                         .success(true)
                         .message("Conversations retrieved")
                         .data(chatServices.closeConversation(token, conversationId))
+                        .statusCode(200)
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPPORT_AGENT')")
+    @GetMapping("/{conversationId}/refund/check-booking/{bookingCode}")
+    public ResponseEntity<?> getWaitingConversations(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable UUID conversationId,
+            @PathVariable String bookingCode
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Conversations retrieved")
+                        .data(chatServices.checkRefundBooking(token, conversationId, bookingCode))
+                        .statusCode(200)
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPPORT_AGENT')")
+    @PostMapping("/{conversationId}/refund")
+    public ResponseEntity<?> refundBooking(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable UUID conversationId,
+            @RequestBody RefundDataRequest request
+            ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Conversations retrieved")
+                        .data(chatServices.refundBooking(token, conversationId, request))
                         .statusCode(200)
                         .build()
         );
