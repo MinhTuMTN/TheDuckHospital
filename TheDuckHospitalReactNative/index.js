@@ -1,13 +1,13 @@
-import {AppRegistry, Linking} from 'react-native';
-import App from './App';
-import {name as appName} from './app.json';
+import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import {AppNotification} from './src/utils/appNotification';
-import notifee, {EventType} from '@notifee/react-native';
+import { AppRegistry } from 'react-native';
+import App from './App';
+import { name as appName } from './app.json';
 import {
   NotificationState,
   updateNotificationState,
 } from './src/services/notificationServices';
+import { AppNotification } from './src/utils/appNotification';
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   AppNotification.displayNotification(remoteMessage);
@@ -22,13 +22,13 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
 });
 
 notifee.onBackgroundEvent(async ({type, detail}) => {
-  console.log('Background event received');
-  if (type === EventType.PRESS) {
-    console.log('Background user pressed on notification');
-  } else if (type === EventType.DISMISSED) {
-    console.log('Background user dismissed notification');
-  } else if (type === EventType.DELIVERED) {
-    console.log('Background notification delivered');
-  }
+  // console.log('Background event received');
+  // if (type === EventType.PRESS) {
+  //   console.log('Background user pressed on notification');
+  // } else if (type === EventType.DISMISSED) {t
+  //   console.log('Background user dismissed notificaion');
+  // } else if (type === EventType.DELIVERED) {
+  //   console.log('Background notification delivered');
+  // }
 });
 AppRegistry.registerComponent(appName, () => App);

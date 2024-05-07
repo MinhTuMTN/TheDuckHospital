@@ -1,4 +1,10 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useCallback, useState} from 'react';
 import TextComponent from '../../TextComponent';
 import {appColors} from '../../../constants/appColors';
@@ -6,6 +12,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import dayjs from 'dayjs';
 import {useMedicine} from '../../../services/reminderServices';
+import {Activity} from 'lucide-react-native';
 
 interface MedicineReminderOptinesComponentProps {
   medicineReminder: any;
@@ -15,19 +22,26 @@ const MedicineReminderOptinesComponent = (
   props: MedicineReminderOptinesComponentProps,
 ) => {
   const {medicineReminder} = props;
+  const [isUsedLoading, setIsUsedLoading] = useState(false);
+  const [isIgnoreLoading, setIsIgnoreLoading] = useState(false);
 
   const handleUseMedicine = useCallback(
     async (type: 'used' | 'ignore') => {
+      if (type === 'used') {
+        setIsUsedLoading(true);
+      } else {
+        setIsIgnoreLoading(true);
+      }
       const response = await useMedicine(
         medicineReminder.medicineReminderId,
         medicineReminder.medicineReminderDetailId,
         type,
       );
-      console.log(response);
-
       if (response.success && props.onRefresh) {
         props.onRefresh(false);
       }
+      setIsUsedLoading(false);
+      setIsIgnoreLoading(false);
     },
     [medicineReminder, props.onRefresh],
   );
@@ -90,7 +104,11 @@ const MedicineReminderOptinesComponent = (
                     marginBottom: 4,
                   },
                 ]}>
-                <AntDesign name="close" size={18} color={appColors.darkRed} />
+                {isIgnoreLoading ? (
+                  <ActivityIndicator size={'large'} color={appColors.darkRed} />
+                ) : (
+                  <AntDesign name="close" size={18} color={appColors.darkRed} />
+                )}
               </View>
               <TextComponent
                 fontSize={14}
@@ -115,11 +133,18 @@ const MedicineReminderOptinesComponent = (
                     marginBottom: 4,
                   },
                 ]}>
-                <Ionicons
-                  name="checkmark-sharp"
-                  size={18}
-                  color={appColors.darkerBlue}
-                />
+                {isUsedLoading ? (
+                  <ActivityIndicator
+                    size={'large'}
+                    color={appColors.darkerBlue}
+                  />
+                ) : (
+                  <Ionicons
+                    name="checkmark-sharp"
+                    size={18}
+                    color={appColors.darkerBlue}
+                  />
+                )}
               </View>
               <TextComponent
                 fontSize={14}
@@ -148,7 +173,11 @@ const MedicineReminderOptinesComponent = (
                   marginBottom: 4,
                 },
               ]}>
-              <AntDesign name="close" size={18} color={appColors.white} />
+              {isIgnoreLoading ? (
+                <ActivityIndicator size={'large'} color={appColors.white} />
+              ) : (
+                <AntDesign name="close" size={18} color={appColors.white} />
+              )}
             </View>
             <TextComponent
               fontSize={14}
@@ -176,11 +205,15 @@ const MedicineReminderOptinesComponent = (
                   marginBottom: 4,
                 },
               ]}>
-              <Ionicons
-                name="checkmark-sharp"
-                size={18}
-                color={appColors.white}
-              />
+              {isUsedLoading ? (
+                <ActivityIndicator size={'large'} color={appColors.white} />
+              ) : (
+                <Ionicons
+                  name="checkmark-sharp"
+                  size={18}
+                  color={appColors.white}
+                />
+              )}
             </View>
             <TextComponent
               fontSize={14}

@@ -11,6 +11,8 @@ import com.theduckhospital.api.dto.response.DeviceResponse;
 import com.theduckhospital.api.dto.response.admin.AccountResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredAccountsResponse;
 import com.theduckhospital.api.entity.Account;
+import org.hibernate.annotations.Check;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,4 +48,5 @@ public interface IAccountServices {
     boolean remoteLogout(String logoutTokenId, String token);
     boolean remoteLogoutAll(String token);
     void saveAccount(Account account);
+    CheckTokenResponse updateProfile(String token, MultipartFile avatar, String fullName);
 }

@@ -189,13 +189,25 @@ function HeaderChat(props) {
         justifyContent={"space-between"}
       >
         <Stack direction={"row"} alignItems={"center"}>
-          <Avatar
-            sx={{
-              backgroundColor: "#0184c6",
-            }}
-          >
-            {avatarName}
-          </Avatar>
+          {conversation.avatar ? (
+            <Avatar
+              src={conversation.avatar}
+              alt={conversation.userName}
+              sx={{
+                width: (theme) => theme.spacing(5),
+                height: (theme) => theme.spacing(5),
+              }}
+            />
+          ) : (
+            <Avatar
+              sx={{
+                width: (theme) => theme.spacing(5),
+                height: (theme) => theme.spacing(5),
+              }}
+            >
+              {avatarName}
+            </Avatar>
+          )}
           <Typography marginLeft={2} fontWeight={500} fontSize={"18px"}>
             {conversation.userName}
           </Typography>

@@ -30,6 +30,7 @@ import {getAllDepartment} from '../../../services/bookingServices';
 import {searchDoctor} from '../../../services/dotorSevices';
 import {navigationProps} from '../../../types';
 import {useTranslation} from 'react-i18next';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const degreeData = [
   {
@@ -234,123 +235,125 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
     setDoctors(prevDoctors);
   }, [timeSlots]);
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.mainHeader}>
-          <Icon
-            name="chevron-back"
-            size={30}
-            color={appColors.black}
-            onPress={() => navigation.goBack()}
-          />
-          <TextComponent
-            fontSize={18}
-            fontWeight="700"
-            color={appColors.black}
-            textAlign="center"
-            uppercase>
-            {t('chooseDoctorForBooking.title')}
-          </TextComponent>
-          <Filter width={30} height={30} onPress={handleFilterClick} />
-        </View>
-        <Animated.View style={[styles.bodyHeard, animatedStyles]}>
-          <InputComponent
-            variant="rounded"
-            placeholder={t('chooseDoctorForBooking.placeHolderSearch')}
-            placeholderTextColor={'#A0A0A0'}
-            startIcon={<Icon name="search" size={20} color={'#A0A0A0'} />}
-            _inputContainerStyle={{
-              backgroundColor: 'rgba(211,211,211,0.31)',
-              borderWidth: 0,
-              borderRadius: 16,
-            }}
-            value={searchText}
-            onChangeText={handleChangedText}
-          />
-
-          <View style={styles.filter}>
-            <View style={styles.box}>
-              <Filter width={18} height={18} />
-              <Text style={{fontSize: 14, color: appColors.black}}>
-                {t('chooseDoctorForBooking.filter')}
-              </Text>
-            </View>
-            <SelectComponent
-              options={degreeData}
-              keyTitle="degree"
-              value={selectedDegree}
-              size="md"
-              onChange={selectedDegree => {
-                setSelectedDegree(selectedDegree);
-                setPagination((prevState: any) => ({
-                  ...prevState,
-                  page: 1,
-                }));
-              }}
-              selectInputStyle={{
-                backgroundColor: appColors.primary,
-                paddingHorizontal: 8,
-              }}
-              marginRight={8}
-              selectIconColor={appColors.white}
-              selectTextColor={appColors.white}
-              title={t('chooseDoctorForBooking.academicRanks')}
-              placeholder={t('chooseDoctorForBooking.academicRanks')}
-              placeholderColor={appColors.white}
-              selectTextSize={14}
+    <LoginRequireComponent>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.mainHeader}>
+            <Icon
+              name="chevron-back"
+              size={30}
+              color={appColors.black}
+              onPress={() => navigation.goBack()}
             />
-            <SelectComponent
-              options={departments}
-              keyTitle="departmentName"
-              value={selectedDepartment}
-              size="md"
-              onChange={selectedDepartment => {
-                setSelectedDepartment(selectedDepartment);
-                setPagination((prevState: any) => ({
-                  ...prevState,
-                  page: 1,
-                }));
-              }}
-              selectInputStyle={{
-                backgroundColor: appColors.primary,
-                paddingHorizontal: 8,
-              }}
-              padding={0}
-              width={150}
-              flex={undefined}
-              selectIconColor={appColors.white}
-              selectTextColor={appColors.white}
-              title={t('chooseDoctorForBooking.departmentInFilter')}
-              placeholder={t('chooseDoctorForBooking.departmentInFilter')}
-              placeholderSearch={t(
-                'chooseDoctorForBooking.placeHolderSearchDepartment',
-              )}
-              enableSearch
-              placeholderColor={appColors.white}
-              selectTextSize={14}
-            />
+            <TextComponent
+              fontSize={18}
+              fontWeight="700"
+              color={appColors.black}
+              textAlign="center"
+              uppercase>
+              {t('chooseDoctorForBooking.title')}
+            </TextComponent>
+            <Filter width={30} height={30} onPress={handleFilterClick} />
           </View>
-        </Animated.View>
-      </View>
+          <Animated.View style={[styles.bodyHeard, animatedStyles]}>
+            <InputComponent
+              variant="rounded"
+              placeholder={t('chooseDoctorForBooking.placeHolderSearch')}
+              placeholderTextColor={'#A0A0A0'}
+              startIcon={<Icon name="search" size={20} color={'#A0A0A0'} />}
+              _inputContainerStyle={{
+                backgroundColor: 'rgba(211,211,211,0.31)',
+                borderWidth: 0,
+                borderRadius: 16,
+              }}
+              value={searchText}
+              onChangeText={handleChangedText}
+            />
 
-      <FlatList
-        data={doctors}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        style={{width: '100%'}}
-        initialNumToRender={5}
-        onEndReached={e => {
-          if (pagination.page < pagination.totalPages && !isLoadingAPI) {
-            setPagination((prevState: any) => ({
-              ...prevState,
-              page: prevState.page + 1,
-            }));
-          }
-        }}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={listFooterComponent}
-      />
-    </View>
+            <View style={styles.filter}>
+              <View style={styles.box}>
+                <Filter width={18} height={18} />
+                <Text style={{fontSize: 14, color: appColors.black}}>
+                  {t('chooseDoctorForBooking.filter')}
+                </Text>
+              </View>
+              <SelectComponent
+                options={degreeData}
+                keyTitle="degree"
+                value={selectedDegree}
+                size="md"
+                onChange={selectedDegree => {
+                  setSelectedDegree(selectedDegree);
+                  setPagination((prevState: any) => ({
+                    ...prevState,
+                    page: 1,
+                  }));
+                }}
+                selectInputStyle={{
+                  backgroundColor: appColors.primary,
+                  paddingHorizontal: 8,
+                }}
+                marginRight={8}
+                selectIconColor={appColors.white}
+                selectTextColor={appColors.white}
+                title={t('chooseDoctorForBooking.academicRanks')}
+                placeholder={t('chooseDoctorForBooking.academicRanks')}
+                placeholderColor={appColors.white}
+                selectTextSize={14}
+              />
+              <SelectComponent
+                options={departments}
+                keyTitle="departmentName"
+                value={selectedDepartment}
+                size="md"
+                onChange={selectedDepartment => {
+                  setSelectedDepartment(selectedDepartment);
+                  setPagination((prevState: any) => ({
+                    ...prevState,
+                    page: 1,
+                  }));
+                }}
+                selectInputStyle={{
+                  backgroundColor: appColors.primary,
+                  paddingHorizontal: 8,
+                }}
+                padding={0}
+                width={150}
+                flex={undefined}
+                selectIconColor={appColors.white}
+                selectTextColor={appColors.white}
+                title={t('chooseDoctorForBooking.departmentInFilter')}
+                placeholder={t('chooseDoctorForBooking.departmentInFilter')}
+                placeholderSearch={t(
+                  'chooseDoctorForBooking.placeHolderSearchDepartment',
+                )}
+                enableSearch
+                placeholderColor={appColors.white}
+                selectTextSize={14}
+              />
+            </View>
+          </Animated.View>
+        </View>
+
+        <FlatList
+          data={doctors}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          style={{width: '100%'}}
+          initialNumToRender={5}
+          onEndReached={e => {
+            if (pagination.page < pagination.totalPages && !isLoadingAPI) {
+              setPagination((prevState: any) => ({
+                ...prevState,
+                page: prevState.page + 1,
+              }));
+            }
+          }}
+          onEndReachedThreshold={0.7}
+          ListFooterComponent={listFooterComponent}
+        />
+      </View>
+    </LoginRequireComponent>
   );
 };
 

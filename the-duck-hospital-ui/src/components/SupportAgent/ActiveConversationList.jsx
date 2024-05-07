@@ -99,12 +99,26 @@ function ActiveConversationList() {
             }}
           >
             <ListItemIcon>
-              <PersonIcon
-                sx={{
-                  fontSize: "30px",
-                  color: "#0184c6",
-                }}
-              />
+              {conversation.avatar ? (
+                <img
+                  src={conversation.avatar}
+                  alt="avatar"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                  }}
+                />
+              ) : (
+                <PersonIcon
+                  sx={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    color: theme.palette.primary.main,
+                  }}
+                />
+              )}
             </ListItemIcon>
             <Stack>
               <Typography

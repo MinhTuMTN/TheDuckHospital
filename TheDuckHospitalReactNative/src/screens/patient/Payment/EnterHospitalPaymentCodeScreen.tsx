@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import {Keyboard, Zap} from 'lucide-react-native';
 import React, {useEffect} from 'react';
 import {Image, Modal, Pressable, StyleSheet, View} from 'react-native';
@@ -20,11 +21,11 @@ import {
   TextComponent,
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 import {appColors} from '../../../constants/appColors';
 import {appInfo} from '../../../constants/appInfo';
-import {globalStyles} from '../../../styles/globalStyles';
 import {getMedicalTestDetails} from '../../../services/payment';
-import {useNavigation} from '@react-navigation/native';
+import {globalStyles} from '../../../styles/globalStyles';
 import {navigationProps} from '../../../types';
 
 const EnterHospitalPaymentCodeScreen = () => {
@@ -58,185 +59,190 @@ const EnterHospitalPaymentCodeScreen = () => {
     top.value = withRepeat(withTiming(200, {duration: 1000}), -1, true);
   }, []);
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title={`Nhập mã hồ sơ`}
-        titleSize={20}
-        paddingTop={35}
-        paddingBottom={20}
-      />
-      <View style={styles.container}>
-        <View style={styles.noteContainer}>
-          <Image
-            source={require('../../../assets/images/information.png')}
-            style={{width: 45, height: 45}}
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={`Nhập mã hồ sơ`}
+          titleSize={20}
+          paddingTop={35}
+          paddingBottom={20}
+        />
+        <View style={styles.container}>
+          <View style={styles.noteContainer}>
+            <Image
+              source={require('../../../assets/images/information.png')}
+              style={{width: 45, height: 45}}
+            />
+            <View style={styles.noteText}>
+              <TextComponent
+                color={appColors.darkRed}
+                fontSize={13}
+                textAlign="justify"
+                fontWeight="500">
+                Vui lòng kiểm tra kỹ mã thanh toán trước khi {'\n'}thực hiện
+                thanh toán
+              </TextComponent>
+            </View>
+          </View>
+
+          <InputComponent
+            inputContainerStyle={{
+              borderColor: appColors.grayLight,
+              borderRadius: 20,
+            }}
+            inputContainerFocusStyle={{
+              borderColor: appColors.primaryDark,
+              borderRadius: 20,
+            }}
+            value={medicalCode}
+            onChangeText={text => setMedicalCode(text)}
+            startIcon={
+              <Fontisto
+                name="search"
+                color={appColors.grayLight}
+                style={{
+                  color: appColors.primaryDark,
+                  fontSize: 18,
+                }}
+              />
+            }
+            placeholder="Nhập mã số hoá đơn"
+            placeholderTextColor={appColors.grayLight}
+            endIcon={
+              <MaterialCommunityIcons
+                name="qrcode-scan"
+                color={appColors.grayLight}
+                style={{
+                  fontSize: 20,
+                  paddingEnd: 2,
+                }}
+              />
+            }
+            onEndIconPress={() => {
+              setModalVisible(true);
+            }}
           />
-          <View style={styles.noteText}>
+          <View style={styles.howToGetCode}>
             <TextComponent
-              color={appColors.darkRed}
-              fontSize={13}
-              textAlign="justify"
-              fontWeight="500">
-              Vui lòng kiểm tra kỹ mã thanh toán trước khi {'\n'}thực hiện thanh
-              toán
+              fontSize={16}
+              fontWeight="600"
+              textAlign="center"
+              uppercase
+              style={{
+                letterSpacing: 0.5,
+              }}>
+              Gợi ý tìm mã vạch thanh toán
             </TextComponent>
+
+            <Image
+              source={require('../../../assets/images/ma-thanh-toan.png')}
+              style={{width: 360, height: 180, marginTop: 20}}
+            />
+            <ButtonComponent
+              isLoading={loading}
+              onPress={handleSearch}
+              backgroundColor={appColors.primaryDark}
+              borderRadius={25}
+              containerStyles={{
+                paddingVertical: 12,
+                width: '100%',
+                marginTop: 30,
+              }}
+              fontWeight="500"
+              fontSize={16}
+              textStyles={{
+                textTransform: 'uppercase',
+              }}>
+              thanh toán
+            </ButtonComponent>
           </View>
         </View>
-
-        <InputComponent
-          inputContainerStyle={{
-            borderColor: appColors.grayLight,
-            borderRadius: 20,
+        <Modal
+          onRequestClose={() => {
+            setModalVisible(false);
           }}
-          inputContainerFocusStyle={{
-            borderColor: appColors.primaryDark,
-            borderRadius: 20,
-          }}
-          value={medicalCode}
-          onChangeText={text => setMedicalCode(text)}
-          startIcon={
-            <Fontisto
-              name="search"
-              color={appColors.grayLight}
-              style={{
-                color: appColors.primaryDark,
-                fontSize: 18,
-              }}
-            />
-          }
-          placeholder="Nhập mã số hoá đơn"
-          placeholderTextColor={appColors.grayLight}
-          endIcon={
-            <MaterialCommunityIcons
-              name="qrcode-scan"
-              color={appColors.grayLight}
-              style={{
-                fontSize: 20,
-                paddingEnd: 2,
-              }}
-            />
-          }
-          onEndIconPress={() => {
-            setModalVisible(true);
-          }}
-        />
-        <View style={styles.howToGetCode}>
-          <TextComponent
-            fontSize={16}
-            fontWeight="600"
-            textAlign="center"
-            uppercase
-            style={{
-              letterSpacing: 0.5,
-            }}>
-            Gợi ý tìm mã vạch thanh toán
-          </TextComponent>
-
-          <Image
-            source={require('../../../assets/images/ma-thanh-toan.png')}
-            style={{width: 360, height: 180, marginTop: 20}}
-          />
-          <ButtonComponent
-            isLoading={loading}
-            onPress={handleSearch}
-            backgroundColor={appColors.primaryDark}
-            borderRadius={25}
-            containerStyles={{
-              paddingVertical: 12,
-              width: '100%',
-              marginTop: 30,
-            }}
-            fontWeight="500"
-            fontSize={16}
-            textStyles={{
-              textTransform: 'uppercase',
-            }}>
-            thanh toán
-          </ButtonComponent>
-        </View>
-      </View>
-      <Modal
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-        statusBarTranslucent
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}>
-        <View
-          style={[
-            globalStyles.containerModal,
-            {paddingHorizontal: 0, paddingVertical: 0},
-          ]}>
-          <View style={styles.modalView}>
-            <Pressable
-              style={styles.closeModalButton}
-              onPress={() => {
-                setModalVisible(false);
-              }}
-            />
-            <View style={styles.content}>
-              <QRCodeScanner
-                containerStyle={styles.content}
-                cameraStyle={{
-                  width: '100%',
-                  borderRadius: 20,
-                }}
-                onRead={e => {
-                  setMedicalCode(e.data);
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}>
+          <View
+            style={[
+              globalStyles.containerModal,
+              {paddingHorizontal: 0, paddingVertical: 0},
+            ]}>
+            <View style={styles.modalView}>
+              <Pressable
+                style={styles.closeModalButton}
+                onPress={() => {
                   setModalVisible(false);
                 }}
-                topContent={
-                  <View style={styles.topContent}>
-                    <TextComponent bold fontSize={20}>
-                      Quét mã QR
-                    </TextComponent>
-                    <Space paddingTop={4} />
-                    <TextComponent
-                      fontSize={15}
-                      textAlign="center"
-                      fontWeight="500"
-                      color={appColors.textDescription}>
-                      Đưa camera vào mã QR để quét. Vui lòng giữ camera ổn định
-                      để có kết quả tốt nhất
-                    </TextComponent>
-                    <Space paddingTop={4} />
-                  </View>
-                }
-                bottomContent={
-                  <View style={styles.bottomContent}>
-                    <TextComponent
-                      color={appColors.textDescription}
-                      fontWeight="600">
-                      Đang quét mã...
-                    </TextComponent>
-                    <Space paddingTop={4} />
-                    <FlexComponent
-                      direction="row"
-                      justifyContent="center"
-                      columnGap={12}>
-                      <Pressable
-                        onPress={() => {
-                          setModalVisible(false);
-                        }}>
-                        <Keyboard size={28} color={appColors.textDescription} />
-                      </Pressable>
-                      <Pressable>
-                        <Zap size={28} color={appColors.textDescription} />
-                      </Pressable>
-                    </FlexComponent>
-                  </View>
-                }
               />
-              <View style={styles.scanFrame}>
-                <QRScan width={200} height={200} />
-                <Animated.View style={[styles.indicator, animatedStyles]} />
+              <View style={styles.content}>
+                <QRCodeScanner
+                  containerStyle={styles.content}
+                  cameraStyle={{
+                    width: '100%',
+                    borderRadius: 20,
+                  }}
+                  onRead={e => {
+                    setMedicalCode(e.data);
+                    setModalVisible(false);
+                  }}
+                  topContent={
+                    <View style={styles.topContent}>
+                      <TextComponent bold fontSize={20}>
+                        Quét mã QR
+                      </TextComponent>
+                      <Space paddingTop={4} />
+                      <TextComponent
+                        fontSize={15}
+                        textAlign="center"
+                        fontWeight="500"
+                        color={appColors.textDescription}>
+                        Đưa camera vào mã QR để quét. Vui lòng giữ camera ổn
+                        định để có kết quả tốt nhất
+                      </TextComponent>
+                      <Space paddingTop={4} />
+                    </View>
+                  }
+                  bottomContent={
+                    <View style={styles.bottomContent}>
+                      <TextComponent
+                        color={appColors.textDescription}
+                        fontWeight="600">
+                        Đang quét mã...
+                      </TextComponent>
+                      <Space paddingTop={4} />
+                      <FlexComponent
+                        direction="row"
+                        justifyContent="center"
+                        columnGap={12}>
+                        <Pressable
+                          onPress={() => {
+                            setModalVisible(false);
+                          }}>
+                          <Keyboard
+                            size={28}
+                            color={appColors.textDescription}
+                          />
+                        </Pressable>
+                        <Pressable>
+                          <Zap size={28} color={appColors.textDescription} />
+                        </Pressable>
+                      </FlexComponent>
+                    </View>
+                  }
+                />
+                <View style={styles.scanFrame}>
+                  <QRScan width={200} height={200} />
+                  <Animated.View style={[styles.indicator, animatedStyles]} />
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    </ContainerComponent>
+        </Modal>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

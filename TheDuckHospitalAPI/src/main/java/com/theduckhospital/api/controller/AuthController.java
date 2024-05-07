@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -270,6 +271,21 @@ public class AuthController {
                 .success(true)
                 .message("Remote logout all success")
                 .data(accountServices.remoteLogoutAll(token))
+                .statusCode(200)
+                .build()
+        );
+    }
+
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam(name = "avatar", required = false) MultipartFile avatar,
+            @RequestParam(name = "fullName") String name
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Update profile success")
+                .data(accountServices.updateProfile(token, avatar, name))
                 .statusCode(200)
                 .build()
         );

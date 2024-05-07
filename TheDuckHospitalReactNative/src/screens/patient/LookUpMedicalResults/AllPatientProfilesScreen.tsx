@@ -17,6 +17,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
 import {getAllPatientProfile} from '../../../services/patientProfileServices';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const AllPatientProfilesScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -79,91 +80,93 @@ const AllPatientProfilesScreen = () => {
     handleGetAllPatientProfile();
   }, []);
   return (
-    <ContainerComponent paddingTop={4}>
-      <Header
-        title={`Tra cứu kết quả\nkhám bệnh`}
-        titleSize={20}
-        paddingTop={32}
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-      />
-      <View style={styles.container}>
-        <FlatList
-          data={profiles}
-          keyExtractor={_keyExtractor}
-          renderItem={_renderItem}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={_footerComponent}
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={4}>
+        <Header
+          title={`Tra cứu kết quả\nkhám bệnh`}
+          titleSize={20}
+          paddingTop={32}
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
         />
-      </View>
-
-      <View style={styles.buttonAddProfile}>
-        <ButtonComponent
-          onPress={handleOpenPopup}
-          backgroundColor={appColors.darkerBlue}
-          borderRadius={15}
-          containerStyles={{paddingVertical: 12}}
-          textStyles={{
-            textTransform: 'uppercase',
-            fontWeight: '700',
-            fontSize: 16,
-          }}>
-          Thêm hồ sơ bệnh nhân mới
-        </ButtonComponent>
-      </View>
-
-      <Modal
-        statusBarTranslucent
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => Alert.alert('Close modal')}>
-        <View style={styles.containerModal}>
-          <View style={styles.modalView}>
-            <Pressable
-              style={{
-                position: 'absolute',
-                right: 25,
-                top: 20,
-              }}
-              onPress={() => setModalVisible(false)}>
-              <AntDesign
-                name="closecircle"
-                size={24}
-                color={appColors.grayLight}
-              />
-            </Pressable>
-            <TextComponent textAlign="center" fontWeight="600" fontSize={16}>
-              Thêm hồ sơ để tra cứu kết quả
-              {'\n'}khám bệnh cận lâm sàng
-            </TextComponent>
-            <ButtonComponent
-              containerStyles={styles.buttonOption}
-              backgroundColor="white"
-              onPress={handleEnterProfileCode}>
-              <TextComponent
-                fontWeight="500"
-                fontSize={16}
-                color={appColors.primaryDark}>
-                Đã từng khám, nhập mã hồ sơ
-              </TextComponent>
-            </ButtonComponent>
-            <ButtonComponent
-              containerStyles={styles.buttonOption}
-              backgroundColor="white"
-              onPress={handleFindProfileCodeScreen}>
-              <TextComponent
-                fontWeight="500"
-                fontSize={16}
-                color={appColors.primaryDark}>
-                Tôi quên mã bệnh nhân của mình
-              </TextComponent>
-            </ButtonComponent>
-          </View>
+        <View style={styles.container}>
+          <FlatList
+            data={profiles}
+            keyExtractor={_keyExtractor}
+            renderItem={_renderItem}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={_footerComponent}
+          />
         </View>
-      </Modal>
-    </ContainerComponent>
+
+        <View style={styles.buttonAddProfile}>
+          <ButtonComponent
+            onPress={handleOpenPopup}
+            backgroundColor={appColors.darkerBlue}
+            borderRadius={15}
+            containerStyles={{paddingVertical: 12}}
+            textStyles={{
+              textTransform: 'uppercase',
+              fontWeight: '700',
+              fontSize: 16,
+            }}>
+            Thêm hồ sơ bệnh nhân mới
+          </ButtonComponent>
+        </View>
+
+        <Modal
+          statusBarTranslucent
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => Alert.alert('Close modal')}>
+          <View style={styles.containerModal}>
+            <View style={styles.modalView}>
+              <Pressable
+                style={{
+                  position: 'absolute',
+                  right: 25,
+                  top: 20,
+                }}
+                onPress={() => setModalVisible(false)}>
+                <AntDesign
+                  name="closecircle"
+                  size={24}
+                  color={appColors.grayLight}
+                />
+              </Pressable>
+              <TextComponent textAlign="center" fontWeight="600" fontSize={16}>
+                Thêm hồ sơ để tra cứu kết quả
+                {'\n'}khám bệnh cận lâm sàng
+              </TextComponent>
+              <ButtonComponent
+                containerStyles={styles.buttonOption}
+                backgroundColor="white"
+                onPress={handleEnterProfileCode}>
+                <TextComponent
+                  fontWeight="500"
+                  fontSize={16}
+                  color={appColors.primaryDark}>
+                  Đã từng khám, nhập mã hồ sơ
+                </TextComponent>
+              </ButtonComponent>
+              <ButtonComponent
+                containerStyles={styles.buttonOption}
+                backgroundColor="white"
+                onPress={handleFindProfileCodeScreen}>
+                <TextComponent
+                  fontWeight="500"
+                  fontSize={16}
+                  color={appColors.primaryDark}>
+                  Tôi quên mã bệnh nhân của mình
+                </TextComponent>
+              </ButtonComponent>
+            </View>
+          </View>
+        </Modal>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

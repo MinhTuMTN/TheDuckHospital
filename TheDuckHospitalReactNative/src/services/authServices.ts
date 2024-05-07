@@ -73,3 +73,14 @@ export const remoteLogout = async (data: remoteLogoutDataProps) => {
 export const remoteLogoutAll = async () => {
   return get('/auth/remote-logout-all');
 };
+
+export const updateProfile = async (data: FormData) => {
+  return post(
+    '/auth/update-profile',
+    data,
+    {
+      'Content-Type': 'multipart/form-data',
+    },
+    10000,
+  );
+};

@@ -20,6 +20,7 @@ import {
   updateNotificationState,
 } from '../../../services/notificationServices';
 import {useIsFocused} from '@react-navigation/native';
+import LoginRequireComponent from '../../../components/LoginRequireComponent';
 
 const NotificationScreen = () => {
   const [numberNotification, setNumberNotification] = useState(1);
@@ -178,54 +179,56 @@ const NotificationScreen = () => {
     }
   }, [filter, notifications]);
   return (
-    <ContainerComponent paddingTop={0}>
-      <Header
-        title={t('notification.title')}
-        titleSize={19}
-        showBackButton={true}
-        paddingTop={35}
-        noBackground
-        titleColor={appColors.textDarker}
-        backButtonColor={appColors.textDarker}
-        backgroundColor={appColors.backgroundGray}
-        icon={<MoreHorizontal size={30} color={appColors.textDarker} />}
-      />
-      <GestureHandlerRootView
-        style={{flex: 1, backgroundColor: appColors.backgroundGray}}>
-        <FilterComponent
-          items={['Tất cả', 'Chưa đọc', 'Đã đọc']}
-          value={filter}
-          onChange={value => setFilter(value)}
+    <LoginRequireComponent>
+      <ContainerComponent paddingTop={0}>
+        <Header
+          title={t('notification.title')}
+          titleSize={19}
+          showBackButton={true}
+          paddingTop={35}
+          noBackground
+          titleColor={appColors.textDarker}
+          backButtonColor={appColors.textDarker}
+          backgroundColor={appColors.backgroundGray}
+          icon={<MoreHorizontal size={30} color={appColors.textDarker} />}
         />
+        <GestureHandlerRootView
+          style={{flex: 1, backgroundColor: appColors.backgroundGray}}>
+          <FilterComponent
+            items={['Tất cả', 'Chưa đọc', 'Đã đọc']}
+            value={filter}
+            onChange={value => setFilter(value)}
+          />
 
-        {numberNotification === 0 ? (
-          <NotFoundComponent
-            imageSrc={require('../../../assets/images/no-notifications.png')}
-            imgStyle={{width: 300, height: 300, marginBottom: 20}}
-            desc="Bạn chưa có thông báo nào"
-            descStyle={{fontSize: 18}}
-          />
-        ) : (
-          <FlatList
-            data={notificationsToShow}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            style={{width: '100%'}}
-            initialNumToRender={5}
-            onEndReached={e => {
-              if (pagination.page < pagination.totalPages && !isLoadingAPI) {
-                setPagination((prevState: any) => ({
-                  ...prevState,
-                  page: prevState.page + 1,
-                }));
-              }
-            }}
-            onEndReachedThreshold={0.7}
-            ListFooterComponent={listFooterComponent}
-          />
-        )}
-      </GestureHandlerRootView>
-    </ContainerComponent>
+          {numberNotification === 0 ? (
+            <NotFoundComponent
+              imageSrc={require('../../../assets/images/no-notifications.png')}
+              imgStyle={{width: 300, height: 300, marginBottom: 20}}
+              desc="Bạn chưa có thông báo nào"
+              descStyle={{fontSize: 18}}
+            />
+          ) : (
+            <FlatList
+              data={notificationsToShow}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              style={{width: '100%'}}
+              initialNumToRender={5}
+              onEndReached={e => {
+                if (pagination.page < pagination.totalPages && !isLoadingAPI) {
+                  setPagination((prevState: any) => ({
+                    ...prevState,
+                    page: prevState.page + 1,
+                  }));
+                }
+              }}
+              onEndReachedThreshold={0.7}
+              ListFooterComponent={listFooterComponent}
+            />
+          )}
+        </GestureHandlerRootView>
+      </ContainerComponent>
+    </LoginRequireComponent>
   );
 };
 

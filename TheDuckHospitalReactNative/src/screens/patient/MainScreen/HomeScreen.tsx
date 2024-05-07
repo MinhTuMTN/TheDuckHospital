@@ -1,5 +1,5 @@
 import {Fab} from '@gluestack-ui/themed';
-import notifee, {TriggerType} from '@notifee/react-native';
+import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
@@ -7,7 +7,6 @@ import {useTranslation} from 'react-i18next';
 import {
   FlatList,
   Image,
-  Linking,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +14,7 @@ import {
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {useSelector} from 'react-redux';
 import {Headset, Search, Typing} from '../../../assets/svgs';
 import {MoreMenuComponent, TextComponent} from '../../../components';
 import TopDoctorComponent from '../../../components/patient/homeScreen/TopDoctorComponent';
@@ -23,16 +23,12 @@ import {appInfo} from '../../../constants/appInfo';
 import {useToast} from '../../../hooks/ToastProvider';
 import {updateDeviceInformation} from '../../../services/authServices';
 import {getAllHeadDoctor} from '../../../services/dotorSevices';
-import {AppNotification} from '../../../utils/appNotification';
 import {
   NotificationState,
   updateNotificationState,
 } from '../../../services/notificationServices';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../types';
-import {navigationProps} from '../../../types';
-import {getMedicineReminder} from '../../../services/medicineReminderServices';
-import dayjs from 'dayjs';
+import {RootState, navigationProps} from '../../../types';
+import {AppNotification} from '../../../utils/appNotification';
 
 const HomeScreen = () => {
   const [index, setIndex] = useState(0);
@@ -181,7 +177,11 @@ const HomeScreen = () => {
           <View className="pt-12 flex-row items-center justify-between">
             <View className="flex-row items-center flex-auto w-72">
               <Image
-                source={require('../../../assets/images/avatar-meo.jpg')}
+                source={
+                  token && userInfo.avatar
+                    ? {uri: userInfo.avatar}
+                    : require('../../../assets/images/avatar-meo.jpg')
+                }
                 className="w-14 h-14 rounded-full"
               />
               <View className="pl-2">
@@ -365,7 +365,7 @@ const HomeScreen = () => {
       </ScrollView>
       <Fab
         onPress={() => {
-          navigation.navigate('TestScreen');
+          navigation.navigate('ChatScreen');
         }}
         size="md"
         placement="bottom right"

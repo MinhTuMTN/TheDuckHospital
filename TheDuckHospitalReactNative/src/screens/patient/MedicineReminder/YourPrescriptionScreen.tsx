@@ -17,28 +17,6 @@ import MedicineSearchComponent from '../../../components/patient/medicineReminde
 import LoadingComponent from '../../../components/LoadingComponent';
 import {searchPrescription} from '../../../services/reminderServices';
 
-const listMedicine = [
-  {
-    id: 1,
-    specialty: 'Nội tiết',
-    date: '14/12/2021',
-  },
-  {
-    id: 2,
-    specialty: 'Tâm thần kinh',
-    date: '12/11/2022',
-  },
-  {
-    id: 3,
-    specialty: 'Da liễu',
-    date: '12/12/2022',
-  },
-  {
-    id: 4,
-    specialty: 'Khoa sản và phụ khoa nữ',
-    date: '14/12/2021',
-  },
-];
 const YourPrescriptionScreen = ({route}: {route: any}) => {
   const patientProfileId = route.params?.profile.patientProfileId;
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(

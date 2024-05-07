@@ -356,6 +356,7 @@ public class ChatServicesImpl implements IChatServices {
             return ConversationResponse.builder()
                     .conversationId(conversation.getConversationId())
                     .userName(conversation.getAccount().getFullName())
+                    .avatar(conversation.getAccount().getAvatar())
                     .userId(conversation.getAccount().getUserId())
                     .lastMessage(lastMessage == null ? "" : lastMessage.getMessage())
                     .lastMessageDate(lastMessage == null ? null : lastMessage.getCreatedAt())

@@ -76,7 +76,9 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
             }}>
             <FlatList
               data={tabNotSet ? medicineHaveNotSet : medicineHaveSet}
-              keyExtractor={(item: any) => item.prescriptionItemId}
+              keyExtractor={(item: any) =>
+                item.prescriptionItem.prescriptionItemId
+              }
               renderItem={({item}) => (
                 <View>
                   <MedicationInfoReminder
