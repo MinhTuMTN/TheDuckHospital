@@ -40,8 +40,14 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
       ? medicationInfo.prescriptionItem.dosageInstruction
       : medicationInfo.prescriptionItem.quantityPerTime.toString();
   const buoiUongValue = useMemo(() => {
-    console.log(medicationInfo);
     let buoiUongValue = '';
+    buoiUong.forEach(item => {
+      if (medicationInfo.prescriptionItem[item.key]) {
+        buoiUongValue += `${item.value}, `;
+      }
+    });
+    buoiUongValue = buoiUongValue.slice(0, -2);
+
     return buoiUongValue;
   }, [medicationInfo]);
 
@@ -140,7 +146,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               letterSpacing: 0.7,
               color: appColors.grayLight,
             }}
-            value=""
+            value={buoiUongValue || ''}
             valueStyles={{
               fontWeight: '700',
               letterSpacing: 0.7,
@@ -186,6 +192,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               onPress={() =>
                 navigation.navigate('ScheduleMedicationRemindersScreen', {
                   isEdit: false,
+                  medicationInfo,
                 })
               }>
               Đặt lịch uống thuốc

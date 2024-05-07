@@ -6,7 +6,7 @@ import {
   ChevronsLeftRight,
   Pill,
 } from 'lucide-react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -30,17 +30,63 @@ import LoadingComponent from '../../../components/LoadingComponent';
 import TimeReminder from '../../../components/patient/medicineReminderScreen/TimeReminder';
 import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
+import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
 
 const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
-  const {isEdit} = route.params;
+  const {isEdit, medicationInfo} = route.params;
   const toast = useToast();
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs());
   const [dateStartVisible, setDateStartVisible] = useState(false);
-  const [amountOfMedicine, setAmountOfMedicine] = useState(12);
+  const [amountOfMedicine, setAmountOfMedicine] = useState(
+    medicationInfo.prescriptionItem.quantity,
+  );
   const [amountOfMedicineModalVisible, setAmountOfMedicineModalVisible] =
     useState(false);
+  const [times, setTimes] = useState<any[]>([]);
+
+  const defaultTime: {
+    [key: string]: {hour: string; minute: string; quantity: number};
+  } = {
+    morning: {
+      hour: '7',
+      minute: '0',
+      quantity: 1,
+    },
+    noon: {
+      hour: '12',
+      minute: '0',
+      quantity: 1,
+    },
+    afternoon: {
+      hour: '16',
+      minute: '0',
+      quantity: 1,
+    },
+    evening: {
+      hour: '20',
+      minute: '0',
+      quantity: 1,
+    },
+  };
+
+  useEffect(() => {
+    const newTimes: any[] = [];
+    let index = 0;
+    ['morning', 'noon', 'afternoon', 'evening'].forEach(time => {
+      if (medicationInfo.prescriptionItem[time]) {
+        newTimes.push({
+          index: index++,
+          hour: defaultTime[time].hour,
+          minute: defaultTime[time].minute,
+          quantity: medicationInfo.prescriptionItem.quantityPerTime || 1,
+        });
+      }
+    });
+
+    setTimes(newTimes);
+  }, []);
 
   return (
     <LoadingComponent
@@ -207,55 +253,14 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                   }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  toast.showToast('Không thể thay đổi ngày kết thúc nhắc')
-                }>
-                <LineInfoComponent
-                  label="Ngày kết thúc:"
-                  value="24/05/2024"
-                  containerStyles={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    borderBottomColor: appColors.grayLight,
-                    borderBottomWidth: 1,
-                  }}
-                  startIcon={
-                    <CalendarCheck2
-                      size={22}
-                      color={appColors.black}
-                      style={{
-                        marginRight: 8,
-                        marginLeft: 5,
-                      }}
-                    />
-                  }
-                  endIcon={
-                    <ChevronRight
-                      size={23}
-                      color={appColors.black}
-                      style={{
-                        marginLeft: 5,
-                      }}
-                    />
-                  }
-                  flexLabel={1}
-                  flexValue={1}
-                  valueTextAlign="right"
-                  valueStyles={{
-                    fontWeight: '500',
-                    color: appColors.darkerBlue,
-                  }}
-                  labelStyles={{
-                    color: appColors.black,
-                  }}
-                />
-              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={() => toast.showToast('Không thể thay đổi đơn vị')}>
                 <LineInfoComponent
                   label="Đơn vị:"
-                  value="viên"
+                  value={getMedicineUnit(
+                    medicationInfo.prescriptionItem.medicine.unit,
+                  )}
                   containerStyles={{
                     paddingHorizontal: 16,
                     paddingVertical: 12,
@@ -297,7 +302,14 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                 onPress={() => setAmountOfMedicineModalVisible(true)}>
                 <LineInfoComponent
                   label="Số lượng:"
-                  value={'Còn ' + amountOfMedicine.toString() + ' viên'}
+                  value={
+                    'Còn ' +
+                    amountOfMedicine +
+                    ' ' +
+                    getMedicineUnit(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )
+                  }
                   containerStyles={{
                     paddingHorizontal: 16,
                     paddingVertical: 12,
@@ -411,6 +423,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                           style={{
                             width: '100%',
                             paddingHorizontal: 20,
+                            height: 60,
                           }}>
                           <ButtonComponent
                             onPress={() =>
@@ -443,9 +456,30 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
               style={{
                 width: '100%',
               }}>
-              <TimeReminder />
-              <TimeReminder />
-              <TimeReminder />
+              {times.map((time, index) => (
+                <TimeReminder
+                  key={index}
+                  hour={time.hour}
+                  minute={time.minute}
+                  quantity={time.quantity}
+                  index={index}
+                  onChange={(index, hour, minute, quantity) => {
+                    const newTimes = [...times];
+                    newTimes[index] = {
+                      hour,
+                      minute,
+                      quantity,
+                    };
+                    setTimes(newTimes);
+                  }}
+                  unit={getMedicineUnit(
+                    medicationInfo.prescriptionItem.medicine.unit,
+                  )}
+                  howToUse={howToUse(
+                    medicationInfo.prescriptionItem.medicine.unit,
+                  )}
+                />
+              ))}
             </View>
           </View>
         </View>
