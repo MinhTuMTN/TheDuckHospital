@@ -82,15 +82,11 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
 
         // Check already exist medicine reminder
         Optional<MedicineReminder> existMedicineReminder = medicineReminderRepository
-                .findExistMedicineReminder(
-                        request.getStartDate(),
-                        prescriptionItem,
-                        patientProfile
+                .findByPatientProfileAndPrescriptionItem(
+                        patientProfile,
+                        prescriptionItem
                 );
-
-        if (existMedicineReminder.isPresent()) {
-            throw new BadRequestException("Medicine reminder already exist", 10030);
-        }
+        existMedicineReminder.ifPresent(medicineReminderRepository::delete);
 
         MedicineReminder medicineReminder = new MedicineReminder();
         medicineReminder.setPatientProfile(patientProfile);
@@ -189,6 +185,23 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
 
             medicineReminderDetailRepository.saveAll(medicineReminderDetails);
         } else {
+            // Check start date must be greater than or equal to today
+            Calendar startOfToday = Calendar.getInstance();
+            startOfToday.add(Calendar.DATE, -1);
+            startOfToday.set(Calendar.HOUR_OF_DAY, 23);
+            startOfToday.set(Calendar.MINUTE, 59);
+            startOfToday.set(Calendar.SECOND, 59);
+
+            Calendar dateRequest = Calendar.getInstance();
+            dateRequest.setTime(request.getStartDate());
+            dateRequest.set(Calendar.HOUR_OF_DAY, 0);
+            dateRequest.set(Calendar.MINUTE, 0);
+            dateRequest.set(Calendar.SECOND, 0);
+
+            if (dateRequest.before(startOfToday)) {
+                throw new BadRequestException("Start date must be greater than or equal to today", 10029);
+            }
+
             medicineReminderDetailRepository.deleteAll(
                     medicineReminder.getListMedicineReminderDetail()
             );
@@ -208,6 +221,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
             medicineReminder.setAmount(amountRequest);
             medicineReminder.setRemainingAmount(amountRequest);
             medicineReminder.setPrescriptionItem(prescriptionItem);
+            medicineReminder.setListMedicineReminderDetail(new ArrayList<>());
             medicineReminderRepository.save(medicineReminder);
 
             while (amountRequest > 0) {
@@ -385,7 +399,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 continue;
 
             Optional<MedicineReminder> medicineReminder = medicineReminderRepository
-                    .findByPatientProfileAndPrescriptionItem(
+                    .findByPatientProfileAndPrescriptionItemAndNotDeleted(
                             patientProfile,
                             prescriptionItem
                     );
@@ -407,6 +421,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                             MedicineDetailsIndexTime.builder()
                                     .reminderIndex((int) objects[0])
                                     .reminderTime(objects[1].toString())
+                                    .amount((float) objects[2])
                                     .build()
                     );
                 }
@@ -536,16 +551,16 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
             List<PrescriptionItemForReminderResponse> usedPrescriptionItems = new ArrayList<>();
 
             for (MedicineReminder medicineReminder: alreadyReminded) {
-                for (PrescriptionItem prescriptionItem: medicineReminder.getPrescriptionItem().getPrescription().getPrescriptionItems()) {
-                    if (prescriptionItem.isDeleted())
-                        continue;
+                PrescriptionItem prescriptionItem = medicineReminder.getPrescriptionItem();
+                if (prescriptionItem.isDeleted())
+                    continue;
 
-                    usedPrescriptionItems.add(
-                            PrescriptionItemForReminderResponse.builder()
-                                    .prescriptionItem(prescriptionItem)
-                                    .build()
-                    );
-                }
+                usedPrescriptionItems.add(
+                        PrescriptionItemForReminderResponse.builder()
+                                .prescriptionItem(prescriptionItem)
+                                .build()
+                );
+
             }
 
             for (MedicineReminder medicineReminder: workingReminded) {
@@ -561,6 +576,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                             MedicineDetailsIndexTime.builder()
                                     .reminderIndex((int) objects[0])
                                     .reminderTime(objects[1].toString())
+                                    .amount((float) objects[2])
                                     .build()
                     );
                 }

@@ -8,4 +8,5 @@ import lombok.Data;
 public class MedicineDetailsIndexTime {
     private int reminderIndex;
     private String reminderTime;
+    private float amount;
 }

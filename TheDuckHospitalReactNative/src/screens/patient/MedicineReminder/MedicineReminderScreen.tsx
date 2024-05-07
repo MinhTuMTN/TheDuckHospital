@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import dayjs from 'dayjs';
 import {ArrowLeft} from 'lucide-react-native';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
@@ -59,6 +59,7 @@ const MedicineReminderScreen = () => {
   const [firstRender, setFirstRender] = useState(true);
   const navigation = useNavigation();
   const [listReminder, setListReminder] = useState([]);
+  const isFocused = useIsFocused();
 
   const {morningMeds, noonMeds, afternoonMeds, eveningMeds} = useMemo(() => {
     const {morningMeds, noonMeds, afternoonMeds, eveningMeds} =
@@ -81,8 +82,8 @@ const MedicineReminderScreen = () => {
   );
 
   useEffect(() => {
-    getListReminder(true);
-  }, [getListReminder]);
+    if (isFocused) getListReminder(true);
+  }, [getListReminder, isFocused]);
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
