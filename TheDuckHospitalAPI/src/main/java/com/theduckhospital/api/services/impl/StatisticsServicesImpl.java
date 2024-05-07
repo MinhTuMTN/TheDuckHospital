@@ -79,7 +79,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
         // Statistics payment method
         List<PieChartItemResponse> pieChartData = new ArrayList<>();
-        pieChartData.add(getPaymentMethodCount(1, "VNPay"));
+        pieChartData.add(getPaymentMethodCount(1, "VNPAY"));
         pieChartData.add(getPaymentMethodCount(2, "CASH"));
         pieChartData.add(getPaymentMethodCount(3, "MOMO"));
 

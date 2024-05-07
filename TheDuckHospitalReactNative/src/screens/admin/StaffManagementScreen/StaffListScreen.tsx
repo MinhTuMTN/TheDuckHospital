@@ -81,7 +81,7 @@ function StaffListScreen() {
     } else {
       staffRole = [selected];
     }
-
+    
     setIsLoadingAPI(true);
     const response = await getPaginationStaffs(
       debouncedSearchText.trim(),

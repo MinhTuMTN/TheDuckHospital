@@ -17,11 +17,7 @@ import java.util.UUID;
 public interface PatientRepository extends JpaRepository<Patient, UUID> {
     Optional<Patient> findByIdentityNumberAndDeletedIsFalse(String identityNumber);
     Page<Patient> findPaginationByOrderByDeleted(Pageable pageable);
-    List<Patient> findByFullNameContainingOrPhoneNumberContainingOrIdentityNumberContaining(
-            String fullName,
-            String phoneNumber,
-            String identityNumber
-    );
+    List<Patient> findAll();
 
     @Query(value = "SELECT * FROM patient WHERE FREETEXT(full_name, :fullName) " +
             "OR phone_number = :phoneNumber " +
