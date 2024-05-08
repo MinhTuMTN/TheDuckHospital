@@ -72,13 +72,12 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
     }
   };
 
+  useEffect(() => {
+    handleSearchPrescription();
+  }, []);
+
   const handleSearchPrescriptionByPrescriptionCode = useCallback(async () => {
-    console.log('prescriptionCode', prescriptionCode);
-
     if (prescriptionCode.length !== 12) return;
-
-    console.log('will search');
-
     const result = await searchPrescriptionByCode(
       patientProfileId,
       prescriptionCode,
@@ -172,8 +171,6 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
                     date={startDate.toDate()}
                     onConfirm={date => {
                       setStartDate(dayjs(date));
-                      console.log('date', date);
-
                       setDateStartVisible(false);
                     }}
                     onCancel={() => {
@@ -219,8 +216,6 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
                     date={endDate.toDate()}
                     onConfirm={date => {
                       setEndDate(dayjs(date));
-                      console.log('date', date);
-
                       setDateEndVisible(false);
                     }}
                     onCancel={() => {

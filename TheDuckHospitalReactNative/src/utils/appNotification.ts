@@ -73,8 +73,6 @@ export class AppNotification {
       const notificationId: string = remoteMessage.data
         ?.notificationId as string;
       const comfirmId: string = remoteMessage.data?.confirmId as string;
-      console.log('notificationId', notificationId);
-      console.log('comfirmId', comfirmId);
 
       if (notificationId && comfirmId) {
         await confirmReceivedReminder(notificationId, comfirmId);

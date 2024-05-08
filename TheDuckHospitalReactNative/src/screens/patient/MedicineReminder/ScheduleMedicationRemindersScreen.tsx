@@ -40,14 +40,15 @@ import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
 
 const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
   const {isEdit, medicationInfo, patientProfileId} = route.params;
-
   const toast = useToast();
   const navigation = useNavigation<navigationProps>();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
-  const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs());
+  const [startDate, setStartDate] = useState<dayjs.Dayjs>(
+    isEdit ? dayjs(medicationInfo.medicineReminder.startDate) : dayjs(),
+  );
   const [dateStartVisible, setDateStartVisible] = useState(false);
   const [amountOfMedicine, setAmountOfMedicine] = useState(
     isEdit
@@ -101,6 +102,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
       medicationInfo.medicineReminder.indexTimes.forEach(
         (indexTime: any, index: number) => {
           const time = dayjs(`1990-01-01 ${indexTime.reminderTime}`);
+
           newTimes.push({
             index: indexTime.reminderIndex,
             hour: time.get('hour').toString(),
@@ -154,18 +156,13 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
     const reminderIdToUpdate =
       medicationInfo.medicineReminder.medicineReminderId;
 
-    console.log('reminderIdToUpdate', reminderIdToUpdate);
-    times.forEach(time => {
-      console.log('time', time.hour);
-      console.log('minute', time.minute);
-    });
-
     const result = await updateReminder(reminderIdToUpdate, {
       patientProfileId: patientProfileId,
       startDate: startDate.toString(),
       prescriptionItemId: medicationInfo.prescriptionItem.prescriptionItemId,
       amount: amountOfMedicine,
       details: times.map(time => ({
+        index: time.index,
         hour: time.hour,
         minute: time.minute,
         amount: time.quantity,
@@ -174,11 +171,8 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
 
     setIsLoading(false);
 
-    console.log('result', result);
-
     if (result.success) {
       toast.showToast('Cập nhật lịch nhắc thuốc thành công');
-      //navigation.navigate('MedicineReminderScreen');
     }
   };
   return (
@@ -340,8 +334,6 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                   date={startDate.toDate()}
                   onConfirm={date => {
                     setStartDate(dayjs(date));
-                    console.log('date', date);
-
                     setDateStartVisible(false);
                   }}
                   onCancel={() => {
@@ -552,30 +544,33 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
               style={{
                 width: '100%',
               }}>
-              {times.map((time, index) => (
-                <TimeReminder
-                  key={index}
-                  hour={time.hour}
-                  minute={time.minute}
-                  quantity={time.quantity}
-                  index={index}
-                  onChange={(index, hour, minute, quantity) => {
-                    const newTimes = [...times];
-                    newTimes[index] = {
-                      hour,
-                      minute,
-                      quantity,
-                    };
-                    setTimes(newTimes);
-                  }}
-                  unit={getMedicineUnit(
-                    medicationInfo.prescriptionItem.medicine.unit,
-                  )}
-                  howToUse={howToUse(
-                    medicationInfo.prescriptionItem.medicine.unit,
-                  )}
-                />
-              ))}
+              {times.map((time, index) => {
+                return (
+                  <TimeReminder
+                    key={index}
+                    hour={time.hour}
+                    minute={time.minute}
+                    quantity={time.quantity}
+                    index={time.index}
+                    onChange={(index, hour, minute, quantity) => {
+                      const newTimes = [...times];
+                      newTimes[index] = {
+                        hour,
+                        minute,
+                        quantity,
+                        index,
+                      };
+                      setTimes(newTimes);
+                    }}
+                    unit={getMedicineUnit(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )}
+                    howToUse={howToUse(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )}
+                  />
+                );
+              })}
             </View>
           </View>
         </View>

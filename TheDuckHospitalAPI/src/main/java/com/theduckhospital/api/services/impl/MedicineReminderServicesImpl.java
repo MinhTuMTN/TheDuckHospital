@@ -138,7 +138,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
         }
 
         startDate = new Date(startDate.getTime() - 86400000);
-        medicineReminder.setEndDate(startDate);
+        medicineReminder.setEndDate(DateCommon.getEndOfDay(startDate));
         medicineReminderRepository.save(medicineReminder);
 
         return medicineReminder;

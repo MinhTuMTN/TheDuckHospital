@@ -6,16 +6,18 @@ import TextComponent from '../../TextComponent';
 import {useNavigation} from '@react-navigation/native';
 import {Pencil, RotateCcw} from 'lucide-react-native';
 import {navigationProps} from '../../../types';
+import {getMedicineUnit} from '../../../utils/medicineUtils';
+import dayjs from 'dayjs';
 
 interface MedicineInfoInMyMedicineBoxComponentProps {
   isUse: boolean;
   item: any;
+  patientProfileId: string;
 }
 const MedicineInfoInMyMedicineBoxComponent = (
   props: MedicineInfoInMyMedicineBoxComponentProps,
 ) => {
-  const {isUse, item} = props;
-  console.log(item);
+  const {isUse, item, patientProfileId} = props;
 
   const navigation = useNavigation<navigationProps>();
   return (
@@ -32,7 +34,7 @@ const MedicineInfoInMyMedicineBoxComponent = (
             letterSpacing: 0.5,
             textAlign: 'left',
           }}>
-          Amlodipine + Atorvastatin
+          {item.prescriptionItem.medicine.medicineName || 'Tên thuốc'}
         </TextComponent>
         <TextComponent
           color={'#6d6d6d'}
@@ -42,7 +44,8 @@ const MedicineInfoInMyMedicineBoxComponent = (
             paddingTop: 6,
             letterSpacing: 0.3,
           }}>
-          Số viên còn lại: 20 viên
+          Số viên còn lại: {`${item.medicineReminder?.remainingAmount || 0} `}
+          {getMedicineUnit(item.prescriptionItem.medicine.unit || 'viên')}
         </TextComponent>
 
         <View style={styles.patientInfo}>
@@ -50,7 +53,9 @@ const MedicineInfoInMyMedicineBoxComponent = (
             color={appColors.darkGray}
             fontSize={10}
             fontWeight="500">
-            Tim mạch
+            Dự kiến kết thúc ngày:{' '}
+            {dayjs(item.medicineReminder?.endDate).format('DD/MM/YYYY') ||
+              'Chưa có'}
           </TextComponent>
         </View>
       </View>
@@ -59,7 +64,9 @@ const MedicineInfoInMyMedicineBoxComponent = (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('ScheduleMedicationRemindersScreen', {
-                isEdit: true,
+                isEdit: isUse,
+                medicationInfo: item,
+                patientProfileId,
               })
             }
             style={styles.optionsWrapper}>
@@ -77,7 +84,9 @@ const MedicineInfoInMyMedicineBoxComponent = (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('ScheduleMedicationRemindersScreen', {
-                isEdit: true,
+                isEdit: isUse,
+                medicationInfo: item,
+                patientProfileId,
               })
             }
             style={styles.optionsWrapper}>

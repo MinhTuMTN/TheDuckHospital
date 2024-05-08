@@ -1,4 +1,4 @@
-import {creatReminderDataProps} from '../types';
+import {createReminderDataProps, updateReminderDataProps} from '../types';
 import {get, getNonAuth, post, put} from './AxiosInstance';
 
 export const getMedicineReminder = async () => {
@@ -15,13 +15,13 @@ export const confirmReceivedReminder = async (
   });
 };
 
-export const creatReminder = async (data: creatReminderDataProps) => {
+export const creatReminder = async (data: createReminderDataProps) => {
   return post('/medicine-reminders', data);
 };
 
 export const updateReminder = async (
   medicineReminderId: string,
-  data: creatReminderDataProps,
+  data: updateReminderDataProps,
 ) => {
   return put(`/medicine-reminders/${medicineReminderId}`, data);
 };
