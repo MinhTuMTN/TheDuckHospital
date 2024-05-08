@@ -101,10 +101,6 @@ function PatientProfileDetailScreen() {
 
         <ContainerComponent style={styles.listExamination}>
           <Accordion type="single" width={'100%'} shadowColor="transparent">
-            {/* <ExaminationItemComponent value="a" />
-            <ExaminationItemComponent value="b" />
-            <ExaminationItemComponent value="c" /> */}
-
             {profile.medicalRecords.map((item: any, index: number) => (
               <ExaminationItemComponent
                 patient

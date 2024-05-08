@@ -24,6 +24,7 @@ import {
 } from '../../../services/statisticsServices';
 import DepartmentStatisticsItemComponent from '../../../components/admin/statisticsScreen/DepartmentStatisticsItemComponent';
 import LegendComponent from '../../../components/admin/statisticsScreen/LegendComponent';
+import StatisticsItemComponent from '../../../components/admin/statisticsScreen/StatisticsItemComponent';
 
 function StatisticsScreen() {
   const [showDatePicker1, setShowDatePicker1] = React.useState(false);
@@ -110,7 +111,7 @@ function StatisticsScreen() {
       );
 
       console.log(response);
-      
+
       if (response.success) {
         setRevenueStatistics(response.data?.data);
       }
@@ -137,7 +138,32 @@ function StatisticsScreen() {
   return (
     <ScrollView>
       <FlexComponent direction="row" justifyContent="space-evenly">
-        <ContainerComponent style={styles.cardStatistics}>
+        <StatisticsItemComponent
+          marginLeft={10}
+          icon={
+            <FontistoIcon
+              name="bed-patient"
+              size={65}
+              color={appColors.primary}
+            />
+          }
+          label={`Số bệnh nhân mới`}
+          value={statistics.totalPatients}
+        />
+
+        <StatisticsItemComponent
+          marginLeft={10}
+          icon={
+            <MaterialCommunityIcon
+              name="google-classroom"
+              size={65}
+              color={appColors.primary}
+            />
+          }
+          label={`Số chuyên khoa`}
+          value={statistics.totalDepartments}
+        />
+        {/* <ContainerComponent style={[styles.cardStatistics, {marginLeft: 10}]}>
           <FlexComponent alignItems="center" justifyContent="center">
             <FontistoIcon
               name="bed-patient"
@@ -159,9 +185,9 @@ function StatisticsScreen() {
               {statistics.totalPatients}
             </TextComponent>
           </FlexComponent>
-        </ContainerComponent>
+        </ContainerComponent> */}
 
-        <ContainerComponent style={[styles.cardStatistics, {marginLeft: 0}]}>
+        {/* <ContainerComponent style={[styles.cardStatistics, {marginLeft: 0}]}>
           <FlexComponent alignItems="center" justifyContent="center">
             <MaterialCommunityIcon
               name="google-classroom"
@@ -183,7 +209,7 @@ function StatisticsScreen() {
               {statistics.totalDepartments}
             </TextComponent>
           </FlexComponent>
-        </ContainerComponent>
+        </ContainerComponent> */}
       </FlexComponent>
 
       <ContainerComponent style={styles.cardStatistics}>
@@ -531,19 +557,6 @@ function StatisticsScreen() {
             index={index}
           />
         ))}
-        {/* <FlatList
-          data={statistics.topDepartments}
-          keyExtractor={(item: any, index: number) =>
-            `department-${item.id}-${index}`
-          }
-          renderItem={({item, index}) => (
-            <DepartmentStatisticsItemComponent
-              departmentItem={item}
-              index={index}
-            />
-          )}
-          style={{width: '100%'}}
-        /> */}
       </ContainerComponent>
     </ScrollView>
   );
@@ -583,7 +596,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 15,
     marginTop: 20,
-    marginHorizontal: 10,
+    marginRight: 10,
     shadowColor: appColors.black,
     shadowOffset: {
       width: 0,

@@ -320,24 +320,6 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
                   );
                 }}
               />
-
-              {/* <SelectComponent
-                options={units}
-                keyTitle="label"
-                value={unit.label}
-                selectInputStyle={{paddingHorizontal: 10}}
-                placeholderColor={appColors.darkGray}
-                title="Chọn đơn vị"
-                error={unit.label === '' && firstClick}
-                errorMessage="Đơn vị không được để trống"
-                onChange={value => setUnit(value)}
-                selectTextColor={'black'}
-                placeholder="Đơn vị"
-                marginRight={8}
-                selectInputIcon={
-                  <ChevronDownIcon color={appColors.black} size={20} />
-                }
-              /> */}
             </FormControlComponent>
           </ScrollView>
           <ButtonGroup

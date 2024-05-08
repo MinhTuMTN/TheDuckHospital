@@ -92,8 +92,6 @@ function StaffListScreen() {
     );
     setIsLoadingAPI(false);
 
-    console.log(response);
-
     if (response.success) {
       if (paginationParams.page === 0) {
         setStaffs(response.data?.data.staffs);
@@ -130,7 +128,6 @@ function StaffListScreen() {
   }, [refreshList]);
 
   React.useEffect(() => {
-
     handleGetStaffs();
   }, [
     debouncedSearchText,
@@ -302,19 +299,6 @@ function StaffListScreen() {
           </Popover>
         </ContainerComponent>
       </ContainerComponent>
-
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-        <StaffItemComponent />
-      </ScrollView> */}
 
       {(!isKeyboardVisible || isEditing) && (
         <SafeAreaView style={styles.flatListContainer}>

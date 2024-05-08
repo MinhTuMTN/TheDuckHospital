@@ -88,12 +88,6 @@ function PatientDetailScreen() {
           Hồ sơ bệnh nhân
         </TextComponent>
       </ContainerComponent>
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <PatientProfileItemComponent />
-        <PatientProfileItemComponent />
-        <PatientProfileItemComponent />
-        <PatientProfileItemComponent />
-      </ScrollView> */}
 
       <SafeAreaView style={styles.scrollViewContainer}>
         <FlatList

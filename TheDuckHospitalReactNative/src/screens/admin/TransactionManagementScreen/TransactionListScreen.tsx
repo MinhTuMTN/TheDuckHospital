@@ -27,8 +27,6 @@ import {getPaginationTransactions} from '../../../services/transactionServices';
 function TransactionListScreen() {
   const [showPopover, setShowPopover] = useState(false);
   const [selected, setSelected] = useState('ALL');
-  const [init, setInit] = useState(true);
-  const [refreshList, setRefreshList] = useState(false);
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
@@ -80,8 +78,6 @@ function TransactionListScreen() {
     );
     setIsLoadingAPI(false);
 
-    console.log(response);
-
     if (response.success) {
       if (paginationParams.page === 0) {
         setTransactions(response.data?.data.transactions);
@@ -107,10 +103,6 @@ function TransactionListScreen() {
       page: 0,
     }));
   };
-
-  React.useEffect(() => {
-    handleResetList();
-  }, [refreshList]);
 
   React.useEffect(() => {
     handleGetTransactions();
@@ -247,19 +239,6 @@ function TransactionListScreen() {
           </Popover>
         </ContainerComponent>
       </ContainerComponent>
-
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-        <TransactionItemComponent />
-      </ScrollView> */}
 
       {!isKeyboardVisible && (
         <SafeAreaView style={styles.flatListContainer}>

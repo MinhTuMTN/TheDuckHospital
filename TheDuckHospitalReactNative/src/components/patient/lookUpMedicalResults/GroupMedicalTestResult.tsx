@@ -14,6 +14,7 @@ import Space from '../../Space';
 import dayjs from 'dayjs';
 import {useNavigation} from '@react-navigation/native';
 import {navigationProps} from '../../../types';
+import {useToast} from '../../../hooks/ToastProvider';
 
 interface GroupMedicalTestResultProps {
   medicalTests: any;
@@ -25,6 +26,8 @@ interface GroupMedicalTestResultProps {
 const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   const {medicalTests, fromDate, toDate, loading} = props;
   const navigate = useNavigation<navigationProps>();
+
+  const toast = useToast();
 
   const _keyExtractor = useCallback(
     (item: any, index: number) => `${item.medicalTestId}-${index}`,
@@ -55,13 +58,22 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   }, [loading]);
 
   const handleMedicalTestPress = (medicalTest: any) => {
-    navigate.navigate('MedicalTestDetailResultScreen', {result: medicalTest});
+    if (
+      medicalTest.resultFileUrl === null ||
+      medicalTest.resultFileUrl === undefined ||
+      medicalTest.resultFileUrl === ''
+    ) {
+      toast.showToast('Chưa có kết quả xét nghiệm');
+    } else {
+      navigate.navigate('MedicalTestDetailResultScreen', {
+        result: medicalTest.resultFileUrl,
+      });
+    }
   };
 
   return (
     <View style={styles.container}>
       <TextComponent bold color={appColors.textDarker} fontSize={18}>
-        {/* Kết quả ngày 20/04/2024 */}
         {fromDate.format('DD/MM/YYYY') === toDate.format('DD/MM/YYYY')
           ? `Kết quả ngày ${fromDate.format('DD/MM/YYYY')}`
           : `Kết quả từ ngày ${fromDate.format(
@@ -69,9 +81,6 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
             )} đến ngày ${toDate.format('DD/MM/YYYY')}`}
       </TextComponent>
       <Space paddingTop={8} />
-      {/* <View style={styles.resultContainer}> */}
-      {/* <MedicalTestResultItem />
-        <MedicalTestResultItem /> */}
       <FlatList
         data={medicalTests}
         keyExtractor={_keyExtractor}
@@ -81,7 +90,6 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
         ItemSeparatorComponent={() => <View style={{height: 8}} />}
         contentContainerStyle={{paddingVertical: 10, paddingHorizontal: 5}}
       />
-      {/* </View> */}
     </View>
   );
 };

@@ -85,8 +85,6 @@ function DepartmentListScreen() {
           response.data.data.total / paginationParams.limit,
         ),
       });
-      // console.log(paginationParams.totalPages);
-      // console.log(paginationParams.page);
     }
   };
 
@@ -213,9 +211,6 @@ function DepartmentListScreen() {
                 paginationParams.page < paginationParams.totalPages - 1 &&
                 !isLoadingAPI
               ) {
-                // console.log(paginationParams.page);
-                // console.log(paginationParams.totalPages);
-
                 setPaginationParams((prevState: any) => ({
                   ...prevState,
                   page: prevState.page + 1,

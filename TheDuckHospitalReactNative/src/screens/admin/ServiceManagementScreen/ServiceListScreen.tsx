@@ -77,8 +77,6 @@ function ServiceListScreen() {
       serviceTypes = [selected];
     }
 
-    console.log(serviceTypes);
-
     setIsLoadingAPI(true);
     const response = await getPaginationMedMedicalServices(
       debouncedSearchText.trim(),
@@ -87,8 +85,6 @@ function ServiceListScreen() {
       serviceTypes,
     );
     setIsLoadingAPI(false);
-
-    console.log(response);
 
     if (response.success) {
       if (paginationParams.page === 0) {
@@ -121,8 +117,6 @@ function ServiceListScreen() {
   }, [refreshList]);
 
   React.useEffect(() => {
-    console.log(selected);
-
     handleGetServices();
   }, [
     debouncedSearchText,

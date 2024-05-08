@@ -136,17 +136,6 @@ function StaffDetailScreen() {
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>
-
-        {/* <ContainerComponent style={styles.container}>
-        <Calendar size={32} color={appColors.black} />
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
-          Lịch trực
-        </TextComponent>
-      </ContainerComponent>
-      <ScrollView style={styles.scrollViewContainer}>
-        <ScheduleItemComponent morning />
-        <ScheduleItemComponent />
-      </ScrollView> */}
       </ScrollView>
     </ContainerComponent>
   );

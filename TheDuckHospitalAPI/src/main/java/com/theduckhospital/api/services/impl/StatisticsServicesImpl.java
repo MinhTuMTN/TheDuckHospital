@@ -41,7 +41,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public TotalStatisticsResponse getStatistics() {
-        // Top 5 department with the most patient
+
         List<Department> departments = departmentRepository.findAll();
 
         List<Booking> bookings = bookingRepository.findAll();

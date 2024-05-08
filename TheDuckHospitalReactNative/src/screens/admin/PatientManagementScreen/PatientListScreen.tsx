@@ -135,19 +135,6 @@ function PatientListScreen() {
         />
       </ContainerComponent>
 
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-      </ScrollView> */}
-
       {!isKeyboardVisible && (
         <SafeAreaView style={styles.flatListContainer}>
           <FlatList

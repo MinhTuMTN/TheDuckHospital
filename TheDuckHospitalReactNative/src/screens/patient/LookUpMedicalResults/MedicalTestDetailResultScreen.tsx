@@ -27,126 +27,14 @@ const MedicalTestDetailResultScreen = ({route}: {route: any}) => {
   const source = {
     uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf'
   };
-  // const source = {
-  //   uri: result.medicalTest.resultFileUrl,
-  //   cache: true,
-  // };
 
   return (
     <ContainerComponent paddingTop={0}>
       <Header title={`Chi tiết kết quả xét nghiệm`} />
       <ContentComponent>
-        {/* <FlexComponent
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          style={{
-            paddingHorizontal: 15,
-            paddingTop: 10,
-          }}>
-          <TextComponent uppercase>{`Kết quả ${
-            result.medicalService.serviceName
-          }\n(${formatDate(result.medicalTest.date)})`}</TextComponent>
-        </FlexComponent>
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Bác sĩ điều trị"
-          value={result.doctor.fullName}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Chuyên khoa"
-          value={result.doctor.department.departmentName}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Bác sĩ xét nghiệm"
-          value={result.laboratoryTechnician.fullName}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Yêu cầu thực hiện"
-          value={result.medicalTest.note}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Chuẩn đoán"
-          value={result.medicalTest.note}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Space paddingTop={4} />
-        <LineInfoComponent
-          label="Hình ảnh đính kèm"
-          value={''}
-          labelStyles={{
-            fontSize: 15,
-            color: appColors.darkGray,
-            fontWeight: '500',
-          }}
-          valueStyles={{
-            fontSize: 15,
-            color: appColors.black,
-          }}
-        />
-        <Image
-          source={{
-            uri: 'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/1/1299808/Parkshinhye.jpeg',
-          }}
-          alt="medical-test-result-image"
-          style={{
-            width: 90,
-            height: 90,
-            borderRadius: 50,
-          }}
-        /> */}
-
         <View style={styles.container}>
           <Pdf
-            source={source}
+            source={result}
             onLoadComplete={(numberOfPages, filePath) => {
               console.log(`Number of pages: ${numberOfPages}`);
             }}
