@@ -308,14 +308,16 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
                 Toa không thuốc
               </TextComponent>
             ) : (
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={medicalRecord?.prescriptionItems}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({item}) => (
-                  <PrescriptionItemComponent prescriptionItem={item} />
-                )}
-              />
+              medicalRecord?.prescriptionItems?.map(
+                (item: any, index: number) => {
+                  return (
+                    <PrescriptionItemComponent
+                      key={`item-${index}`}
+                      prescriptionItem={item}
+                    />
+                  );
+                },
+              )
             )}
           </SectionComponent>
         </ContainerComponent>
