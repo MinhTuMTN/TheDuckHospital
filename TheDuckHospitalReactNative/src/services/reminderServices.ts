@@ -48,3 +48,7 @@ export const useMedicine = async (
 export const deleteReminder = async (reminderId: string) => {
   return del(`/medicine-reminders/${reminderId}`);
 };
+
+export const getReminderHistory = async () => {
+  return get(`/medicine-reminders/medicine-reminder-history`);
+};

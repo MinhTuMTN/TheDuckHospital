@@ -9,11 +9,14 @@ import {navigationProps} from '../../../types';
 
 interface MedicineInfoInMyMedicineBoxComponentProps {
   isUse: boolean;
+  item: any;
 }
 const MedicineInfoInMyMedicineBoxComponent = (
   props: MedicineInfoInMyMedicineBoxComponentProps,
 ) => {
-  const {isUse} = props;
+  const {isUse, item} = props;
+  console.log(item);
+
   const navigation = useNavigation<navigationProps>();
   return (
     <View style={styles.container}>
