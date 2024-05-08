@@ -152,7 +152,7 @@ function StatisticsScreen() {
         />
 
         <StatisticsItemComponent
-          marginLeft={10}
+          marginLeft={0}
           icon={
             <MaterialCommunityIcon
               name="google-classroom"
