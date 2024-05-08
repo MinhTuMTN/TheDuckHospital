@@ -156,5 +156,18 @@
     "total": "Total",
     "confirmNote": "I agree to the Convenience Fee TheDuck Hospital provides to book examinations and pay hospital fees, this is not a mandatory service by the medical facility.",
     "payment": "Payment confirmation"
+  },
+  "wallet": {
+    "accountOwner": "Account owner",
+    "availableBalance": "Available balance",
+    "phoneNumber": "Phone number",
+    "createDate": "Create date",
+    "myWallet": "My Wallet",
+    "transactionInThisMonth": "Transaction in this month",
+    "statistic": "Statistic",
+    "topUp": "Top up",
+    "qrScan": "QR Scan",
+    "recentTransaction": "Recent transaction",
+    "viewAll": "View all"
   }
 }

@@ -34,6 +34,7 @@ import NotFoundTransaction from '../../../components/patient/walletScreen/NotFou
 import TransactionInfoComponent from '../../../components/patient/walletScreen/TransactionInfoComponent';
 import {TimeMachine} from '../../../assets/svgs';
 import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
 
 const WalletScreen = () => {
   const [showBalance, setShowBalance] = React.useState(false);
@@ -49,6 +50,7 @@ const WalletScreen = () => {
   const [pinCodeVisible, setPinCodeVisible] = React.useState(true);
   const navigation = useNavigation<navigationProps>();
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  const {t, i18n} = useTranslation();
 
   const handleNavigateToTransactionStatisticScreen = () => {
     navigation.navigate('TransactionStatisticScreen');
@@ -101,7 +103,7 @@ const WalletScreen = () => {
                         <TextComponent
                           style={styles.title}
                           color={appColors.textDescription}>
-                          Chủ tài khoản
+                          {t('wallet.accountOwner')}
                         </TextComponent>
                         <TextComponent
                           color={appColors.black}
@@ -115,7 +117,7 @@ const WalletScreen = () => {
                       <TextComponent
                         uppercase
                         color={appColors.textDescription}>
-                        Số dư khả dụng
+                        {t('wallet.availableBalance')}
                       </TextComponent>
                       {showBalance ? (
                         <EyeOff
@@ -152,7 +154,7 @@ const WalletScreen = () => {
                           color={appColors.darkGray}
                           fontWeight="500"
                           style={{letterSpacing: 1}}>
-                          Số điện thoại
+                          {t('wallet.phoneNumber')}
                         </TextComponent>
                         <TextComponent
                           fontWeight="700"
@@ -168,7 +170,7 @@ const WalletScreen = () => {
                           color={appColors.darkGray}
                           fontWeight="500"
                           style={{letterSpacing: 1}}>
-                          Ngày tạo
+                          {t('wallet.createDate')}
                         </TextComponent>
                         <TextComponent
                           fontWeight="700"
@@ -200,7 +202,7 @@ const WalletScreen = () => {
                     fontSize={22}
                     fontWeight="500"
                     color={appColors.black}>
-                    Ví của tôi
+                    {t('wallet.myWallet')}
                   </TextComponent>
                 </View>
 
@@ -216,7 +218,7 @@ const WalletScreen = () => {
                       fontSize={14}
                       fontWeight="400"
                       color={appColors.textDescription}>
-                      Giao dịch trong tháng này
+                      {t('wallet.transactionInThisMonth')}
                     </TextComponent>
                   </View>
 
@@ -243,7 +245,7 @@ const WalletScreen = () => {
                         }}
                       />
                     }>
-                    Thống kê
+                    {t('wallet.statistic')}
                   </ButtonComponent>
                 </View>
 
@@ -259,7 +261,9 @@ const WalletScreen = () => {
                         marginRight: 8,
                       }}
                     />
-                    <TextComponent fontWeight="500">Nạp tiền</TextComponent>
+                    <TextComponent fontWeight="500">
+                      {t('wallet.topUp')}
+                    </TextComponent>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleNavigateToPayment}
@@ -272,7 +276,9 @@ const WalletScreen = () => {
                         marginRight: 8,
                       }}
                     />
-                    <TextComponent fontWeight="500">Quét QR</TextComponent>
+                    <TextComponent fontWeight="500">
+                      {t('wallet.qrScan')}
+                    </TextComponent>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -291,7 +297,7 @@ const WalletScreen = () => {
                       fontSize={22}
                       fontWeight="500"
                       color={appColors.black}>
-                      Giao dịch gần đây
+                      {t('wallet.recentTransaction')}
                     </TextComponent>
                   </FlexComponent>
                   <Pressable
@@ -300,7 +306,7 @@ const WalletScreen = () => {
                       fontSize={18}
                       fontWeight="600"
                       color={appColors.textDarker}>
-                      Xem tất cả
+                      {t('wallet.viewAll')}
                     </TextComponent>
                   </Pressable>
                 </FlexComponent>

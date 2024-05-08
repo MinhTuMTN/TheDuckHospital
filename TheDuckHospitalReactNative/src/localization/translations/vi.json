@@ -162,5 +162,18 @@
     "total": "Tổng tiền",
     "confirmNote": "Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám, thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ sở ý tế.",
     "payment": "Thanh toán"
+  },
+  "wallet": {
+    "accountOwner": "Chủ tài khoản",
+    "availableBalance": "Số dư khả dụng",
+    "phoneNumber": "Số điện thoại",
+    "createDate": "Ngày tạo",
+    "myWallet": "Ví của tôi",
+    "transactionInThisMonth": "Giao dịch trong tháng này",
+    "statistic": "Thống kê",
+    "topUp": "Nạp tiền",
+    "qrScan": "Quét QR",
+    "recentTransaction": "Giao dịch gần đây",
+    "viewAll": "Xem tất cả"
   }
 }

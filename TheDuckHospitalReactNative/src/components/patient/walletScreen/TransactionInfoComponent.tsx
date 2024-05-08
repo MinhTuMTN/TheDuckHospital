@@ -8,6 +8,7 @@ import {
   getTransactionType,
 } from '../../../utils/transactionUtils';
 import TextComponent from '../../TextComponent';
+import {useTranslation} from 'react-i18next';
 
 interface TransactionInfoComponentProps {
   transaction: any;
@@ -16,6 +17,7 @@ interface TransactionInfoComponentProps {
 
 const TransactionInfoComponent = (props: TransactionInfoComponentProps) => {
   const {transaction, variant = 'normal'} = props;
+  const {i18n} = useTranslation();
   return (
     <View style={variant === 'normal' ? styles.container : styles.container2}>
       <View style={styles.left}>
@@ -36,7 +38,10 @@ const TransactionInfoComponent = (props: TransactionInfoComponentProps) => {
             color={appColors.textDarker}
             fontWeight="600"
             fontSize={18}>
-            {getTransactionType(transaction?.paymentType)}
+            {getTransactionType(
+              transaction?.paymentType,
+              i18n.language as 'vi' | 'en',
+            )}
           </TextComponent>
           <TextComponent color={appColors.grayText}>
             {dayjs(transaction?.createdAt).format('HH:mm')}
