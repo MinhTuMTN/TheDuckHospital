@@ -1,6 +1,6 @@
+import {useNavigation} from '@react-navigation/native';
 import dayjs from 'dayjs';
 import {
-  CalendarCheck2,
   CalendarPlus,
   ChevronRight,
   ChevronsLeftRight,
@@ -30,23 +30,29 @@ import LoadingComponent from '../../../components/LoadingComponent';
 import TimeReminder from '../../../components/patient/medicineReminderScreen/TimeReminder';
 import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
-import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
-import {creatReminder} from '../../../services/medicineReminderServices';
+import {
+  creatReminder,
+  updateReminder,
+} from '../../../services/medicineReminderServices';
+import {deleteReminder} from '../../../services/reminderServices';
 import {navigationProps} from '../../../types';
-import {useNavigation} from '@react-navigation/native';
-import {set} from '@gluestack-style/react';
+import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
 
 const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
   const {isEdit, medicationInfo, patientProfileId} = route.params;
+
   const toast = useToast();
   const navigation = useNavigation<navigationProps>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs());
   const [dateStartVisible, setDateStartVisible] = useState(false);
   const [amountOfMedicine, setAmountOfMedicine] = useState(
-    medicationInfo.prescriptionItem.quantity,
+    isEdit
+      ? medicationInfo.medicineReminder.amount
+      : medicationInfo.prescriptionItem.quantity,
   );
   const [amountOfMedicineModalVisible, setAmountOfMedicineModalVisible] =
     useState(false);
@@ -79,17 +85,31 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
 
   useEffect(() => {
     const newTimes: any[] = [];
-    let index = 0;
-    ['morning', 'noon', 'afternoon', 'evening'].forEach(time => {
-      if (medicationInfo.prescriptionItem[time]) {
-        newTimes.push({
-          index: index++,
-          hour: defaultTime[time].hour,
-          minute: defaultTime[time].minute,
-          quantity: medicationInfo.prescriptionItem.quantityPerTime || 1,
-        });
-      }
-    });
+    if (!isEdit) {
+      let index = 0;
+      ['morning', 'noon', 'afternoon', 'evening'].forEach(time => {
+        if (medicationInfo.prescriptionItem[time]) {
+          newTimes.push({
+            index: index++,
+            hour: defaultTime[time].hour,
+            minute: defaultTime[time].minute,
+            quantity: medicationInfo.prescriptionItem.quantityPerTime || 1,
+          });
+        }
+      });
+    } else {
+      medicationInfo.medicineReminder.indexTimes.forEach(
+        (indexTime: any, index: number) => {
+          const time = dayjs(`1990-01-01 ${indexTime.reminderTime}`);
+          newTimes.push({
+            index: indexTime.reminderIndex,
+            hour: time.get('hour').toString(),
+            minute: time.get('minute').toString(),
+            quantity: indexTime.amount,
+          });
+        },
+      );
+    }
 
     setTimes(newTimes);
   }, []);
@@ -114,6 +134,53 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
     }
   };
 
+  const handleDeleteReminder = async () => {
+    setIsLoadingDelete(true);
+
+    const result = await deleteReminder(
+      medicationInfo.medicineReminder.medicineReminderId,
+    );
+
+    setIsLoadingDelete(false);
+    if (result.success) {
+      toast.showToast('Xóa lịch nhắc thuốc thành công');
+      navigation.navigate('MedicineReminderScreen');
+    }
+  };
+
+  const handleUpdateReminder = async () => {
+    setIsLoading(true);
+
+    const reminderIdToUpdate =
+      medicationInfo.medicineReminder.medicineReminderId;
+
+    console.log('reminderIdToUpdate', reminderIdToUpdate);
+    times.forEach(time => {
+      console.log('time', time.hour);
+      console.log('minute', time.minute);
+    });
+
+    const result = await updateReminder(reminderIdToUpdate, {
+      patientProfileId: patientProfileId,
+      startDate: startDate.toString(),
+      prescriptionItemId: medicationInfo.prescriptionItem.prescriptionItemId,
+      amount: amountOfMedicine,
+      details: times.map(time => ({
+        hour: time.hour,
+        minute: time.minute,
+        amount: time.quantity,
+      })),
+    });
+
+    setIsLoading(false);
+
+    console.log('result', result);
+
+    if (result.success) {
+      toast.showToast('Cập nhật lịch nhắc thuốc thành công');
+      //navigation.navigate('MedicineReminderScreen');
+    }
+  };
   return (
     <LoadingComponent
       styles={{
@@ -172,7 +239,10 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
                     paddingHorizontal: 20,
                   }}>
                   <ButtonComponent
-                    onPress={() => setDeleteModalComfirmVisible(false)}
+                    onPress={() => {
+                      setDeleteModalComfirmVisible(false);
+                      handleDeleteReminder();
+                    }}
                     containerStyles={styles.buttonOption}
                     textStyles={{
                       color: appColors.white,
@@ -509,22 +579,41 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
             </View>
           </View>
         </View>
-        <ButtonComponent
-          isLoading={isLoading}
-          onPress={handleCreateReminder}
-          containerStyles={{
-            backgroundColor: appColors.darkerBlue,
-            marginHorizontal: 16,
-            marginBottom: 16,
-            borderRadius: 10,
-          }}
-          textStyles={{
-            textTransform: 'uppercase',
-            fontWeight: '700',
-            fontSize: 16,
-          }}>
-          Lưu
-        </ButtonComponent>
+        {isEdit ? (
+          <ButtonComponent
+            isLoading={isLoading}
+            onPress={handleUpdateReminder}
+            containerStyles={{
+              backgroundColor: appColors.darkerBlue,
+              marginHorizontal: 16,
+              marginBottom: 16,
+              borderRadius: 10,
+            }}
+            textStyles={{
+              textTransform: 'uppercase',
+              fontWeight: '700',
+              fontSize: 16,
+            }}>
+            Cập nhật
+          </ButtonComponent>
+        ) : (
+          <ButtonComponent
+            isLoading={isLoading}
+            onPress={handleCreateReminder}
+            containerStyles={{
+              backgroundColor: appColors.darkerBlue,
+              marginHorizontal: 16,
+              marginBottom: 16,
+              borderRadius: 10,
+            }}
+            textStyles={{
+              textTransform: 'uppercase',
+              fontWeight: '700',
+              fontSize: 16,
+            }}>
+            Lưu
+          </ButtonComponent>
+        )}
       </ContainerComponent>
     </LoadingComponent>
   );
