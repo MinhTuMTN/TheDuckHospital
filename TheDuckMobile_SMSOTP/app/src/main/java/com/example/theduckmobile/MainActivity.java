@@ -3,6 +3,9 @@ package com.example.theduckmobile;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +32,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         btnStart = findViewById(R.id.btnStart);
+        btnStart.setOnClickListener(v -> {
+            final SharedPreferenceManager sharedPreferenceManager = new SharedPreferenceManager(this);
+            String token = sharedPreferenceManager.getStringValue(
+                    SharedPreferenceManager.USER_PROFILE_FCM_TOKEN_KEY
+            );
+            Toast.makeText(this, token, Toast.LENGTH_SHORT).show();
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("fcmToken", token);
+            clipboard.setPrimaryClip(clip);
+        });
 
         getAndUpdateFCMToken();
         checkSMSPermission();

@@ -24,7 +24,6 @@ public class DoctorItemResponse {
     private double rating;
     private int totalRating;
     private List<RatingItemResponse> ratings;
-    private String avatar;
 
     public DoctorItemResponse(Doctor doctor) {
         this.doctorId = doctor.getStaffId();
