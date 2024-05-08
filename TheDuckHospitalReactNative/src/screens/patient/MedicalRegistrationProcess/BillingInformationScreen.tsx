@@ -27,10 +27,12 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
 import {appColors} from '../../../constants/appColors';
 import {createBooking} from '../../../services/bookingServices';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 import {useTranslation} from 'react-i18next';
+import {useToast} from '../../../hooks/ToastProvider';
+import {useSelector} from 'react-redux';
 
 const BillingInformationScreen = ({route}: {route: any}) => {
   const {timeSlots, profile} = route.params;
@@ -39,15 +41,24 @@ const BillingInformationScreen = ({route}: {route: any}) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const {t} = useTranslation();
   const [paymentMethod, setPaymentMethod] = React.useState<
-    'MOMO' | 'VNPAY' | ''
+    'MOMO' | 'VNPAY' | 'WALLET' | ''
   >('MOMO');
   const navigation = useNavigation<navigationProps>();
+  const toast = useToast();
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+
   const totalAmount = React.useMemo(() => {
     return timeSlots?.reduce((total: number, item: any) => {
       return total + item.price;
     }, 0);
   }, [timeSlots]);
   const handleBookingPayment = async () => {
+    if (paymentMethod === 'WALLET') {
+      if (userInfo.balance && userInfo?.balance < totalAmount) {
+        toast?.showToast(t('billingInformation.notEnoughMoney'));
+        return;
+      }
+    }
     setPaymentLoading(true);
     const response = await createBooking(
       profile?.patientProfileId,
@@ -57,9 +68,20 @@ const BillingInformationScreen = ({route}: {route: any}) => {
     );
     setPaymentLoading(false);
 
-    console.log(response);
+    console.log(response.data.data);
 
     if (response.success) {
+      if (paymentMethod === 'WALLET') {
+        const walletSuccess = response.data?.data?.walletSuccess;
+        if (walletSuccess) {
+          toast?.showToast(t('billingInformation.success'));
+          navigation.navigate('HomeScreen');
+          return;
+        } else {
+          toast?.showToast(t('billingInformation.fail'));
+          return;
+        }
+      }
       if (response.data?.data?.deepLink) {
         Linking.openURL(response.data.data.deepLink);
       } else if (response.data?.data?.paymentUrl) {
@@ -67,7 +89,7 @@ const BillingInformationScreen = ({route}: {route: any}) => {
         Linking.openURL(response.data.data.paymentUrl);
       }
     } else {
-      console.log('Payment failed');
+      toast?.showToast(t('billingInformation.fail'));
     }
   };
   return (
@@ -303,6 +325,20 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                     {t('billingInformation.momoE-wallet')}
                   </TextComponent>
                 </View>
+              ) : paymentMethod === 'WALLET' ? (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/logo-text-small.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    The Duck Wallet
+                  </TextComponent>
+                </View>
               ) : (
                 <View style={styles.isChoose}>
                   <Image
@@ -347,7 +383,11 @@ const BillingInformationScreen = ({route}: {route: any}) => {
               <LineInfoComponent
                 label={t('billingInformation.otherFee')}
                 valueTextAlign="right"
-                value={formatCurrency('15000') + 'đ'}
+                value={
+                  paymentMethod === 'WALLET'
+                    ? '0đ'
+                    : formatCurrency('15000') + 'đ'
+                }
                 labelStyles={{
                   fontSize: 15,
                   fontWeight: '400',
@@ -367,8 +407,12 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                 label={t('billingInformation.total')}
                 valueTextAlign="right"
                 value={
-                  formatCurrency((parseFloat(totalAmount) + 15000).toString()) +
-                  'đ'
+                  formatCurrency(
+                    (
+                      parseFloat(totalAmount) +
+                      (paymentMethod === 'WALLET' ? 0 : 15000)
+                    ).toString(),
+                  ) + 'đ'
                 }
                 labelStyles={{
                   fontSize: 16,
@@ -442,6 +486,32 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                   />
                 </Pressable>
               </View>
+              {userInfo.balance && (
+                <Pressable
+                  style={[
+                    styles.option,
+                    {
+                      borderBottomColor: appColors.grayLine,
+                      borderBottomWidth: 1,
+                    },
+                  ]}
+                  onPress={() => {
+                    setPaymentMethod('WALLET');
+                    setModalVisible(false);
+                  }}>
+                  <Image
+                    source={require('../../../assets/images/logo-text-small.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="400"
+                    fontSize={16}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    The Duck Wallet
+                  </TextComponent>
+                </Pressable>
+              )}
               <Pressable
                 style={[
                   styles.option,

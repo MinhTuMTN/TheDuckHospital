@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -119,12 +121,17 @@ public class BookingServicesImpl implements IBookingServices {
                 throw new BadRequestException("No doctor schedule available");
 
             Transaction transaction = new Transaction();
-            transaction.setAmount(totalAmount + MomoConfig.fee);
+            transaction.setAmount(totalAmount + (
+                    request.getPaymentMethod() == PaymentMethod.WALLET
+                            ? 0
+                            :  MomoConfig.fee
+            ));
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);
             transaction.setAccount(patientProfile.getAccount());
             transactionRepository.save(transaction);
 
+            List<Booking> bookings = new ArrayList<>();
             for (TimeSlot timeSlot : timeSlots) {
                 Booking booking = new Booking();
                 booking.setPatientProfile(patientProfile);
@@ -135,8 +142,11 @@ public class BookingServicesImpl implements IBookingServices {
 
                 booking.setDeleted(true);
                 bookingRepository.save(booking);
+
+                bookings.add(booking);
             }
 
+            transaction.setBookings(bookings);
             return switch (request.getPaymentMethod()) {
                 case VNPAY -> paymentServices.vnPayCreatePaymentUrl(
                         totalAmount + VNPayConfig.fee,
@@ -147,12 +157,38 @@ public class BookingServicesImpl implements IBookingServices {
                         transaction.getTransactionId(),
                         request.isMobile()
                 );
+                case WALLET -> paymentWithWallet(transaction) ? PaymentResponse
+                        .builder().walletSuccess(true).build() : PaymentResponse
+                        .builder().walletSuccess(false).build();
                 default -> throw new BadRequestException("Invalid payment method");
             };
+        } catch (BadRequestException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), e.getErrorCode());
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), 400);
         }
-        return null;
+    }
+
+    private boolean paymentWithWallet(Transaction transaction) {
+        Account account = transaction.getAccount();
+        if (account.getBalance().compareTo(BigDecimal.valueOf(transaction.getAmount())) < 0
+                || account.getWalletLocked()
+        )
+            return false;
+
+        account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
+
+        Transaction transactionResult = updateTransactionAndBooking(
+                transaction.getTransactionId(),
+                "WALLET",
+                "WALLET",
+                TransactionStatus.SUCCESS
+        );
+        accountServices.saveAccount(account);
+
+        return transactionResult != null;
     }
 
     @Override

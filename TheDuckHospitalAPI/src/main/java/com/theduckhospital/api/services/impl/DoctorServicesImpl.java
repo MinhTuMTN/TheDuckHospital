@@ -139,19 +139,7 @@ public class DoctorServicesImpl implements IDoctorServices {
         }
 
         Page<Doctor> doctors;
-//        if (degree == null)
-//            doctors = doctorRepository
-//                    .findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
-//                    fullName, department == null ? "" : department.getDepartmentName(),
-//                    pageable
-//            );
-//        else
-//            doctors = doctorRepository
-//                    .findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
-//                    fullName, degree,
-//                    department == null ? "" : department.getDepartmentName(),
-//                    pageable
-//            );
+
         if (degree == null)
             doctors = doctorRepository
                     .findDoctorsWithoutDegree(

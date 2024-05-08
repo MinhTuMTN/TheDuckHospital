@@ -162,7 +162,10 @@
     "otherFee": "Phí tiện ích + TGTT",
     "total": "Tổng tiền",
     "confirmNote": "Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám, thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ sở ý tế.",
-    "payment": "Thanh toán"
+    "payment": "Thanh toán",
+    "notEnoughMoney": "Số dư không đủ để thanh toán. Vui lòng nạp tiền vào ví để tiếp tục thanh toán",
+    "success": "Thanh toán thành công",
+    "fail": "Thanh toán thất bại"
   },
   "wallet": {
     "accountOwner": "Chủ tài khoản",

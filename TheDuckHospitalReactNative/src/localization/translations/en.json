@@ -156,7 +156,10 @@
     "otherFee": "Utility fee + PTF",
     "total": "Total",
     "confirmNote": "I agree to the Convenience Fee TheDuck Hospital provides to book examinations and pay hospital fees, this is not a mandatory service by the medical facility.",
-    "payment": "Payment confirmation"
+    "payment": "Payment confirmation",
+    "notEnoughMoney": "Balance is not enough to pay. Please add money to your wallet to continue paying",
+    "success": "Payment success",
+    "fail": "Payment fail"
   },
   "wallet": {
     "accountOwner": "Account owner",
