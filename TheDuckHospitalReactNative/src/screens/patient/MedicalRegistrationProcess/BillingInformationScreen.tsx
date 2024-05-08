@@ -33,16 +33,19 @@ import {getTimeSlotById} from '../../../utils/timeSlotUtils';
 import {useTranslation} from 'react-i18next';
 import {useToast} from '../../../hooks/ToastProvider';
 import {useSelector} from 'react-redux';
+import RequestPinCodeComponent from '../../../components/patient/walletScreen/RequestPinCodeComponent';
 
 const BillingInformationScreen = ({route}: {route: any}) => {
   const {timeSlots, profile} = route.params;
 
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const {t} = useTranslation();
+  const [pinCodeVisible, setPinCodeVisible] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState<
     'MOMO' | 'VNPAY' | 'WALLET' | ''
   >('MOMO');
+
+  const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
   const toast = useToast();
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -52,23 +55,27 @@ const BillingInformationScreen = ({route}: {route: any}) => {
       return total + item.price;
     }, 0);
   }, [timeSlots]);
-  const handleBookingPayment = async () => {
-    if (paymentMethod === 'WALLET') {
-      if (userInfo.balance && userInfo?.balance < totalAmount) {
-        toast?.showToast(t('billingInformation.notEnoughMoney'));
-        return;
-      }
+
+  const handlePaymentWithWallet = async () => {
+    if (userInfo.balance && userInfo?.balance < totalAmount) {
+      toast?.showToast(t('billingInformation.notEnoughMoney'));
+      return;
     }
+    setPinCodeVisible(true);
+  };
+
+  const handleBookingPayment = async (pinCode: string = '') => {
     setPaymentLoading(true);
     const response = await createBooking(
       profile?.patientProfileId,
       timeSlots.map((item: any) => item?.timeSlot?.timeSlotId),
       paymentMethod,
       true,
+      pinCode,
     );
     setPaymentLoading(false);
 
-    console.log(response.data.data);
+    console.log(response.data);
 
     if (response.success) {
       if (paymentMethod === 'WALLET') {
@@ -89,7 +96,10 @@ const BillingInformationScreen = ({route}: {route: any}) => {
         Linking.openURL(response.data.data.paymentUrl);
       }
     } else {
-      toast?.showToast(t('billingInformation.fail'));
+      const errorCode = response.statusCode;
+      if (errorCode === 10030)
+        toast?.showToast(t('billingInformation.notEnoughMoney'));
+      else toast?.showToast(t('billingInformation.fail'));
     }
   };
   return (
@@ -440,7 +450,11 @@ const BillingInformationScreen = ({route}: {route: any}) => {
                 </TextComponent>
               </View>
               <ButtonComponent
-                onPress={handleBookingPayment}
+                onPress={
+                  paymentMethod === 'WALLET'
+                    ? handlePaymentWithWallet
+                    : handleBookingPayment
+                }
                 borderRadius={40}
                 isLoading={paymentLoading}
                 textStyles={{
@@ -557,6 +571,16 @@ const BillingInformationScreen = ({route}: {route: any}) => {
             </View>
           </View>
         </Modal>
+        <RequestPinCodeComponent
+          visible={pinCodeVisible}
+          onClosed={() => {
+            setPinCodeVisible(false);
+          }}
+          onSucess={async (pinCode: string) => {
+            setPinCodeVisible(false);
+            handleBookingPayment(pinCode);
+          }}
+        />
       </ContainerComponent>
     </GestureHandlerRootView>
   );

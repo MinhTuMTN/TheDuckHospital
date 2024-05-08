@@ -17,12 +17,11 @@ import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.TimeSlotRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +40,7 @@ public class BookingServicesImpl implements IBookingServices {
     private final IPaymentServices paymentServices;
     private final IAccountServices accountServices;
     private final ITimeSlotServices timeSlotServices;
+    private final PasswordEncoder passwordEncoder;
 
     public BookingServicesImpl(
             BookingRepository bookingRepository,
@@ -52,8 +52,8 @@ public class BookingServicesImpl implements IBookingServices {
             IScheduleDoctorServices doctorScheduleServices,
             IPaymentServices paymentServices,
             IAccountServices accountServices,
-            ITimeSlotServices timeSlotServices
-    ) {
+            ITimeSlotServices timeSlotServices,
+            PasswordEncoder passwordEncoder) {
         this.bookingRepository = bookingRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.transactionRepository = transactionRepository;
@@ -64,6 +64,7 @@ public class BookingServicesImpl implements IBookingServices {
         this.paymentServices = paymentServices;
         this.accountServices = accountServices;
         this.timeSlotServices = timeSlotServices;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -157,7 +158,7 @@ public class BookingServicesImpl implements IBookingServices {
                         transaction.getTransactionId(),
                         request.isMobile()
                 );
-                case WALLET -> paymentWithWallet(transaction) ? PaymentResponse
+                case WALLET -> paymentWithWallet(transaction, request.getPinCode()) ? PaymentResponse
                         .builder().walletSuccess(true).build() : PaymentResponse
                         .builder().walletSuccess(false).build();
                 default -> throw new BadRequestException("Invalid payment method");
@@ -171,12 +172,18 @@ public class BookingServicesImpl implements IBookingServices {
         }
     }
 
-    private boolean paymentWithWallet(Transaction transaction) {
+    @Override
+    public boolean paymentWithWallet(Transaction transaction, String pinCode) {
+        if (pinCode == null || pinCode.isEmpty())
+            throw new BadRequestException("Pin code is required", 10031);
+        
         Account account = transaction.getAccount();
+        if (!passwordEncoder.matches(pinCode, account.getWalletPin()))
+            throw new BadRequestException("Invalid pin code", 10014);
         if (account.getBalance().compareTo(BigDecimal.valueOf(transaction.getAmount())) < 0
                 || account.getWalletLocked()
         )
-            return false;
+            throw new BadRequestException("Not enough balance", 10030);
 
         account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
 

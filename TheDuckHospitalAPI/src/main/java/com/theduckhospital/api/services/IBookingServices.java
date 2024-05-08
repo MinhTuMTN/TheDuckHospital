@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
 import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.Booking;
+import com.theduckhospital.api.entity.Transaction;
 
 import java.text.ParseException;
 import java.util.List;
@@ -26,4 +27,5 @@ public interface IBookingServices {
     Booking bookingIsValid(String bookingCode, int roomId) throws ParseException;
     Map<String, String> checkPatientCode(String identityNumber);
     Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException;
+    boolean paymentWithWallet(Transaction transaction, String pinCode);
 }

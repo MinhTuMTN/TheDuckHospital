@@ -21,11 +21,13 @@ export const createBooking = async (
   timeSlotIds: string[],
   paymentMethod: 'MOMO' | 'VNPAY' | 'WALLET' | '',
   mobile: boolean = true,
+  pinCode: string = '',
 ) => {
   return post('/booking', {
     patientProfileId,
     timeSlotIds,
     paymentMethod,
     mobile,
+    pinCode,
   });
 };
