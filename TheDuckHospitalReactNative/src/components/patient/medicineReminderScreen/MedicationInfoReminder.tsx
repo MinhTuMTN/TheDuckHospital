@@ -171,7 +171,14 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
                 borderWidth: 1,
                 paddingHorizontal: 16,
               }}
-              startIcon={<AlarmClockCheck size={18} color={'#279818'} />}>
+              startIcon={<AlarmClockCheck size={18} color={'#279818'} />}
+              onPress={() =>
+                navigation.navigate('ScheduleMedicationRemindersScreen', {
+                  patientProfileId: patientProfileId,
+                  isEdit: true,
+                  medicationInfo,
+                })
+              }>
               Đã đặt lịch uống thuốc
             </ButtonComponent>
           ) : (
