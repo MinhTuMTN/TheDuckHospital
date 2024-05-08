@@ -8,18 +8,50 @@ import ButtonComponent from '../../ButtonComponent';
 import {AlarmClockCheck, AlarmClockOff} from 'lucide-react-native';
 import {useNavigation} from '@react-navigation/native';
 import {howToUse} from '../../../utils/medicineUtils';
+import {navigationProps} from '../../../types';
 
+const buoiUong = [
+  {
+    key: 'morning',
+    value: 'Sáng',
+  },
+  {
+    key: 'noon',
+    value: 'Trưa',
+  },
+  {
+    key: 'afternoon',
+    value: 'Chiều',
+  },
+  {
+    key: 'evening',
+    value: 'Tối',
+  },
+];
 interface MedicationInfoReminderProps {
+  patientProfileId: string;
   medicationInfo: any;
   isSet?: boolean;
 }
 const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
-  const {medicationInfo, isSet} = props;
-  const navigation = useNavigation();
+  const {medicationInfo, isSet, patientProfileId} = props;
+  const navigation = useNavigation<navigationProps>();
   const quantityPerTime =
     medicationInfo.prescriptionItem.quantityPerTime.toString() === '0'
       ? medicationInfo.prescriptionItem.dosageInstruction
       : medicationInfo.prescriptionItem.quantityPerTime.toString();
+  const buoiUongValue = useMemo(() => {
+    let buoiUongValue = '';
+    buoiUong.forEach(item => {
+      if (medicationInfo.prescriptionItem[item.key]) {
+        buoiUongValue += `${item.value}, `;
+      }
+    });
+    buoiUongValue = buoiUongValue.slice(0, -2);
+
+    return buoiUongValue;
+  }, [medicationInfo]);
+
   return (
     <View>
       <SeparatorDashComponent marginTop={10} />
@@ -115,7 +147,7 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               letterSpacing: 0.7,
               color: appColors.grayLight,
             }}
-            value="Sáng - Tối"
+            value={buoiUongValue || ''}
             valueStyles={{
               fontWeight: '700',
               letterSpacing: 0.7,
@@ -139,7 +171,14 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
                 borderWidth: 1,
                 paddingHorizontal: 16,
               }}
-              startIcon={<AlarmClockCheck size={18} color={'#279818'} />}>
+              startIcon={<AlarmClockCheck size={18} color={'#279818'} />}
+              onPress={() =>
+                navigation.navigate('ScheduleMedicationRemindersScreen', {
+                  patientProfileId: patientProfileId,
+                  isEdit: true,
+                  medicationInfo,
+                })
+              }>
               Đã đặt lịch uống thuốc
             </ButtonComponent>
           ) : (
@@ -159,9 +198,11 @@ const MedicationInfoReminder = (props: MedicationInfoReminderProps) => {
               }}
               startIcon={<AlarmClockOff size={18} color={'#fd7b02'} />}
               onPress={() =>
-                navigation.navigate(
-                  'ScheduleMedicationRemindersScreen' as never,
-                )
+                navigation.navigate('ScheduleMedicationRemindersScreen', {
+                  patientProfileId: patientProfileId,
+                  isEdit: false,
+                  medicationInfo,
+                })
               }>
               Đặt lịch uống thuốc
             </ButtonComponent>

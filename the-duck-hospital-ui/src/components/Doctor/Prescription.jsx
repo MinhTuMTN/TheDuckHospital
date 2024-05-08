@@ -61,6 +61,7 @@ function Prescription(props) {
   const [medicines, setMedicines] = React.useState([]);
   const [prescriptionItems, setPrescriptionItems] = React.useState([]);
   const [selectedMedicineId, setSelectedMedicineId] = React.useState(null);
+  const [prescriptionCode, setPrescriptionCode] = React.useState("");
 
   const handleDeleteRow = async (id) => {
     const response = await deleteMedicine(medicalRecordId, id);
@@ -104,7 +105,9 @@ function Prescription(props) {
   useEffect(() => {
     const handleGetMedicine = async () => {
       const response = await searchMedicine(query);
-      if (response.success) setMedicines(response.data.data);
+      if (response.success) {
+        setMedicines(response.data.data);
+      }
     };
     handleGetMedicine();
   }, [query]);
@@ -171,7 +174,10 @@ function Prescription(props) {
   useEffect(() => {
     const handleGetPrescription = async () => {
       const response = await getMedicineItems(medicalRecordId);
-      if (response.success) setPrescriptionItems(response.data.data);
+      if (response.success) {
+        setPrescriptionItems(response.data.data);
+        setPrescriptionCode(response.data.data[0].prescriptionCode);
+      }
     };
     handleGetPrescription();
   }, [medicalRecordId]);
@@ -221,6 +227,7 @@ function Prescription(props) {
                   ref={componentRef}
                   patientInfo={patientInfo}
                   prescriptionItems={prescriptionItems}
+                  prescriptionCode={prescriptionCode}
                   doctorName={fullName}
                   diagnostic={diagnostic}
                 />

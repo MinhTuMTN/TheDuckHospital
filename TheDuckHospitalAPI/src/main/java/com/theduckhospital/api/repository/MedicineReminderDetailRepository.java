@@ -19,10 +19,10 @@ public interface MedicineReminderDetailRepository extends JpaRepository<Medicine
     List<MedicineReminderDetail> findByReminderTimeAfterAndReminderTimeBeforeAndReceivedIsFalseAndUsedIsFalse(
             Date after, Date before
     );
-    @Query(value = "SELECT mrd.reminder_index, CAST(mrd.reminder_time AS TIME) " +
+    @Query(value = "SELECT mrd.reminder_index, CAST(mrd.reminder_time AS TIME), mrd.amount " +
             "FROM medicine_reminder_detail mrd " +
             "WHERE mrd.medicine_reminder_medicine_reminder_id = :medicineReminderId " +
-            "GROUP BY mrd.reminder_index, CAST(mrd.reminder_time AS TIME)",
+            "GROUP BY mrd.reminder_index, CAST(mrd.reminder_time AS TIME), mrd.amount",
             nativeQuery = true
     )
     List<Object[]> findGroupedByReminderIndexAndTime(@Param("medicineReminderId") UUID medicineReminderId);

@@ -1,23 +1,46 @@
 import dayjs from 'dayjs';
-import {CalendarDays} from 'lucide-react-native';
-import React, {useState} from 'react';
-import {FlatList, Pressable, ScrollView, StyleSheet, View} from 'react-native';
+import {CalendarDays, Keyboard, Zap} from 'lucide-react-native';
+import {default as React, useCallback, useEffect, useState} from 'react';
+import {
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {QRScan} from '../../../assets/svgs';
 import {
   ContainerComponent,
+  FlexComponent,
   Header,
   InputComponent,
+  Space,
   TextComponent,
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
-import {appColors} from '../../../constants/appColors';
-import MedicineSearchComponent from '../../../components/patient/medicineReminderScreen/MedicineSearchComponent';
 import LoadingComponent from '../../../components/LoadingComponent';
-import {searchPrescription} from '../../../services/reminderServices';
+import MedicineSearchComponent from '../../../components/patient/medicineReminderScreen/MedicineSearchComponent';
+import {appColors} from '../../../constants/appColors';
+import {appInfo} from '../../../constants/appInfo';
+import {
+  searchPrescription,
+  searchPrescriptionByCode,
+} from '../../../services/reminderServices';
+import {globalStyles} from '../../../styles/globalStyles';
 
 const YourPrescriptionScreen = ({route}: {route: any}) => {
+  const [loading, setLoading] = React.useState(false);
   const patientProfileId = route.params?.profile.patientProfileId;
   const [startDate, setStartDate] = useState<dayjs.Dayjs>(
     dayjs().startOf('year'),
@@ -26,19 +49,51 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
   const [dateStartVisible, setDateStartVisible] = useState(false);
   const [dateEndVisible, setDateEndVisible] = useState(false);
   const [prescriptionList, setPrescriptionList] = useState([] as any[]);
+  const [prescriptionCode, setPrescriptionCode] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const top = useSharedValue(0);
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: top.value}],
+    };
+  });
 
   const handleSearchPrescription = async () => {
+    setLoading(true);
     const result = await searchPrescription(
       patientProfileId,
       startDate.format('YYYY-MM-DD'),
       endDate.format('YYYY-MM-DD'),
     );
+    setLoading(false);
+    if (result.success) {
+      setPrescriptionList(result.data.data);
+    }
+  };
+
+  useEffect(() => {
+    handleSearchPrescription();
+  }, []);
+
+  const handleSearchPrescriptionByPrescriptionCode = useCallback(async () => {
+    if (prescriptionCode.length !== 12) return;
+    const result = await searchPrescriptionByCode(
+      patientProfileId,
+      prescriptionCode,
+    );
 
     if (result.success) {
       setPrescriptionList(result.data.data);
-      console.log(prescriptionList);
     }
-  };
+  }, [prescriptionCode]);
+
+  useEffect(() => {
+    handleSearchPrescriptionByPrescriptionCode();
+  }, [handleSearchPrescriptionByPrescriptionCode]);
+  useEffect(() => {
+    top.value = withRepeat(withTiming(200, {duration: 1000}), -1, true);
+  }, []);
   return (
     <LoadingComponent
       styles={{
@@ -61,9 +116,13 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
                   name="qrcode-scan"
                   size={20}
                   color={appColors.grayLight}
-                  onPress={() => console.log('Scan QR code')}
+                  onPress={() => {
+                    setModalVisible(true);
+                  }}
                 />
               }
+              value={prescriptionCode}
+              onChangeText={setPrescriptionCode}
               containerStyle={{
                 marginBottom: 10,
                 borderRadius: 12,
@@ -112,8 +171,6 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
                     date={startDate.toDate()}
                     onConfirm={date => {
                       setStartDate(dayjs(date));
-                      console.log('date', date);
-
                       setDateStartVisible(false);
                     }}
                     onCancel={() => {
@@ -159,8 +216,6 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
                     date={endDate.toDate()}
                     onConfirm={date => {
                       setEndDate(dayjs(date));
-                      console.log('date', date);
-
                       setDateEndVisible(false);
                     }}
                     onCancel={() => {
@@ -172,6 +227,7 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
             </View>
 
             <ButtonComponent
+              isLoading={loading}
               onPress={handleSearchPrescription}
               borderRadius={15}
               fontWeight="600"
@@ -185,28 +241,148 @@ const YourPrescriptionScreen = ({route}: {route: any}) => {
           </View>
 
           <View style={styles.resultWrapper}>
-            <TextComponent
-              style={{
-                letterSpacing: 0.5,
-              }}
-              fontSize={18}
-              fontWeight="600"
-              color={appColors.primaryDark}>
-              Danh sách toa thuốc ({prescriptionList.length}):
-            </TextComponent>
-            <FlatList
-              data={prescriptionList}
-              keyExtractor={item => item.prescriptionId}
-              renderItem={({item}) => (
-                <MedicineSearchComponent
-                  prescriptionInfo={item}
-                  patientId={patientProfileId}
+            {prescriptionList.length > 0 ? (
+              <>
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  fontSize={18}
+                  fontWeight="600"
+                  color={appColors.primaryDark}>
+                  Danh sách toa thuốc ({prescriptionList.length}):
+                </TextComponent>
+                <FlatList
+                  data={prescriptionList}
+                  keyExtractor={item => item.prescriptionId}
+                  renderItem={({item}) => (
+                    <MedicineSearchComponent
+                      prescriptionInfo={item}
+                      patientId={patientProfileId}
+                    />
+                  )}
                 />
-              )}
-            />
+              </>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  marginTop: 40,
+                }}>
+                <Image
+                  source={require('../../../assets/images/notFound.png')}
+                  style={{
+                    width: 150,
+                    height: 150,
+                  }}
+                />
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  fontSize={18}
+                  fontWeight="600"
+                  color={appColors.black}>
+                  Không có dữ liệu!
+                </TextComponent>
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  textAlign="center"
+                  fontSize={14}
+                  fontWeight="400"
+                  color={appColors.black}>
+                  Các toa thuốc sẽ dược hiển thị ở đây, bạn thử tìm kiếm lại
+                  ngày khác nhé.
+                </TextComponent>
+              </View>
+            )}
           </View>
         </View>
       </ContainerComponent>
+      <Modal
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+        statusBarTranslucent
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}>
+        <View
+          style={[
+            globalStyles.containerModal,
+            {paddingHorizontal: 0, paddingVertical: 0},
+          ]}>
+          <View style={styles.modalView}>
+            <Pressable
+              style={styles.closeModalButton}
+              onPress={() => {
+                setModalVisible(false);
+              }}
+            />
+            <View style={styles.content}>
+              <QRCodeScanner
+                containerStyle={styles.content}
+                cameraStyle={{
+                  width: '100%',
+                  borderRadius: 20,
+                }}
+                onRead={e => {
+                  setPrescriptionCode(e.data);
+                  setModalVisible(false);
+                }}
+                topContent={
+                  <View style={styles.topContent}>
+                    <TextComponent bold fontSize={20}>
+                      Quét mã QR
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                    <TextComponent
+                      fontSize={15}
+                      textAlign="center"
+                      fontWeight="500"
+                      color={appColors.textDescription}>
+                      Đưa camera vào mã QR để quét. Vui lòng giữ camera ổn định
+                      để có kết quả tốt nhất
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                  </View>
+                }
+                bottomContent={
+                  <View style={styles.bottomContent}>
+                    <TextComponent
+                      color={appColors.textDescription}
+                      fontWeight="600">
+                      Đang quét mã...
+                    </TextComponent>
+                    <Space paddingTop={4} />
+                    <FlexComponent
+                      direction="row"
+                      justifyContent="center"
+                      columnGap={12}>
+                      <Pressable
+                        onPress={() => {
+                          setModalVisible(false);
+                        }}>
+                        <Keyboard size={28} color={appColors.textDescription} />
+                      </Pressable>
+                      <Pressable>
+                        <Zap size={28} color={appColors.textDescription} />
+                      </Pressable>
+                    </FlexComponent>
+                  </View>
+                }
+              />
+              <View style={styles.scanFrame}>
+                <QRScan width={200} height={200} />
+                <Animated.View style={[styles.indicator, animatedStyles]} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </LoadingComponent>
   );
 };
@@ -251,7 +427,75 @@ const styles = StyleSheet.create({
 
   resultWrapper: {
     flexDirection: 'column',
-
     marginTop: 16,
+  },
+
+  noteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  noteText: {
+    marginLeft: 10,
+    flex: 1,
+    flexDirection: 'column',
+  },
+
+  howToGetCode: {
+    flex: 1,
+    paddingTop: 30,
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  modalView: {
+    backgroundColor: appColors.white,
+    height: '90%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 16,
+    paddingHorizontal: 8,
+  },
+  closeModalButton: {
+    width: 60,
+    height: 4,
+    backgroundColor: appColors.grayLight,
+    alignSelf: 'center',
+    borderRadius: 10,
+  },
+  content: {
+    flex: 1,
+  },
+  topContent: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: appInfo.size.width - 16,
+    marginLeft: -16,
+    marginTop: -32,
+  },
+  bottomContent: {
+    marginTop: 32,
+  },
+  scanFrame: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    top: '50%',
+    left: '50%',
+    marginLeft: -100,
+    marginTop: -100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  indicator: {
+    width: 200,
+    height: 3,
+    backgroundColor: appColors.primary,
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -100,
+    marginTop: -1,
+    top: 0,
   },
 });

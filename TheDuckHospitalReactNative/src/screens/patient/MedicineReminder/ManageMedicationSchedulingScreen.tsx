@@ -1,27 +1,32 @@
 import React, {useEffect} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
 import {ContainerComponent, Header, TextComponent} from '../../../components';
+import LineInfoComponent from '../../../components/LineInfoComponent';
+import MedicationInfoReminder from '../../../components/patient/medicineReminderScreen/MedicationInfoReminder';
 import TabChooseMedicationShedulingComponent from '../../../components/patient/medicineReminderScreen/TabChooseMedicationShedulingComponent';
 import {appColors} from '../../../constants/appColors';
-import LineInfoComponent from '../../../components/LineInfoComponent';
-import SeparatorDashComponent from '../../../components/SeparatorDashComponent';
-import MedicationInfoReminder from '../../../components/patient/medicineReminderScreen/MedicationInfoReminder';
-import {use} from 'i18next';
 import {getPrescriptionDetail} from '../../../services/reminderServices';
+import SeparatorDashComponent from '../../../components/SeparatorDashComponent';
+import LoadingComponent from '../../../components/LoadingComponent';
 
 const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
   const {prescriptionInfo, prescripatientProfileId} = route.params;
   const [tabNotSet, setTabNotSet] = React.useState(true);
   const [medicineHaveNotSet, setMedicineHaveNotSet] = React.useState([]);
   const [medicineHaveSet, setMedicineHaveSet] = React.useState([]);
+  const [prescription, setPrescription] = React.useState<any>({});
+  const [loading, setLoading] = React.useState(false);
+
   useEffect(() => {
+    setLoading(true);
     const medicineHaveNotSetDetail = async () => {
       const result = await getPrescriptionDetail(
         prescripatientProfileId,
         prescriptionInfo.prescriptionId,
       );
-
+      setLoading(false);
       if (result.success) {
+        setPrescription(result.data.data.prescription);
         setMedicineHaveNotSet(result.data.data.notRemindedPrescriptionItems);
         setMedicineHaveSet(result.data.data.remindedPrescriptionItems);
       }
@@ -48,7 +53,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
           <View style={styles.header}>
             <LineInfoComponent
               label="Toa thuốc:"
-              value={prescriptionInfo.departmentName}
+              value={prescriptionInfo.departmentName || ''}
               valueColor={appColors.darkRed}
               valueUppercase
               valueTextAlign="left"
@@ -59,7 +64,7 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
             />
             <LineInfoComponent
               label="Mã toa thuốc:"
-              value="TTK-001220833-0987"
+              value={prescription.prescriptionCode || ''}
               valueColor={appColors.black}
               valueUppercase
               valueTextAlign="left"
@@ -69,25 +74,80 @@ const ManageMedicationSchedulingScreen = ({route}: {route: any}) => {
               flexValue={3.25}
             />
           </View>
-
-          <View
-            style={{
-              paddingBottom: 30,
-            }}>
-            <FlatList
-              data={tabNotSet ? medicineHaveNotSet : medicineHaveSet}
-              keyExtractor={(item: any) =>
-                item.prescriptionItem.prescriptionItemId
-              }
-              renderItem={({item}) => (
+          <View>
+            {medicineHaveNotSet.length === 0 &&
+              tabNotSet &&
+              medicineHaveSet.length > 0 && (
                 <View>
-                  <MedicationInfoReminder
-                    medicationInfo={item}
-                    isSet={!tabNotSet}
-                  />
+                  <SeparatorDashComponent marginTop={10} />
+                  <TextComponent
+                    color={appColors.darkBlue}
+                    fontWeight="600"
+                    style={{
+                      marginTop: 10,
+                      fontStyle: 'italic',
+                    }}>
+                    Thuốc của bạn đã được đặt lịch nhắc nhở
+                  </TextComponent>
                 </View>
               )}
-            />
+            {medicineHaveNotSet.length > 0 &&
+              !tabNotSet &&
+              medicineHaveSet.length === 0 && (
+                <View>
+                  <SeparatorDashComponent marginTop={10} />
+                  <TextComponent
+                    color={appColors.darkBlue}
+                    fontWeight="600"
+                    style={{
+                      marginTop: 10,
+                      fontStyle: 'italic',
+                    }}>
+                    Chưa có thuốc nào được đặt lịch nhắc nhở
+                  </TextComponent>
+                </View>
+              )}
+            {medicineHaveNotSet.length === 0 &&
+              (tabNotSet || !tabNotSet) &&
+              medicineHaveSet.length === 0 && (
+                <View>
+                  <SeparatorDashComponent marginTop={10} />
+                  <TextComponent
+                    color={appColors.darkBlue}
+                    fontWeight="600"
+                    style={{
+                      marginTop: 10,
+                      fontStyle: 'italic',
+                    }}>
+                    Toa không thuốc
+                  </TextComponent>
+                </View>
+              )}
+
+            <View
+              style={{
+                paddingBottom:
+                  (medicineHaveNotSet.length === 0 && tabNotSet) ||
+                  (medicineHaveSet.length === 0 && !tabNotSet)
+                    ? 0
+                    : 30,
+              }}>
+              <FlatList
+                data={tabNotSet ? medicineHaveNotSet : medicineHaveSet}
+                keyExtractor={(item: any) =>
+                  item.prescriptionItem.prescriptionItemId
+                }
+                renderItem={({item}) => (
+                  <View>
+                    <MedicationInfoReminder
+                      patientProfileId={prescripatientProfileId}
+                      medicationInfo={item}
+                      isSet={!tabNotSet}
+                    />
+                  </View>
+                )}
+              />
+            </View>
           </View>
         </View>
       </View>

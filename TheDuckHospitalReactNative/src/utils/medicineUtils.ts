@@ -10,3 +10,16 @@ export const howToUse = (value: string) => {
       return 'Uống';
   }
 };
+
+export const getMedicineUnit = (value: string) => {
+  switch (value) {
+    case 'TUBE':
+      return 'ml';
+    case 'BOTTLE':
+      return 'ml';
+    case 'SYRINGE':
+      return 'ống';
+    default:
+      return 'viên';
+  }
+};

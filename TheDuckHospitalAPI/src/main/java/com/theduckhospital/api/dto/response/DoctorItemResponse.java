@@ -15,6 +15,7 @@ import java.util.UUID;
 public class DoctorItemResponse {
     private UUID doctorId;
     private String doctorName;
+    private String avatar;
     private Gender gender;
     private Degree degree;
     private Department department;
@@ -36,6 +37,7 @@ public class DoctorItemResponse {
         }
         this.ratings = ratingList;
         doctorName = doctor.getFullName();
+        avatar = doctor.getAvatar();
         degree = doctor.getDegree();
         gender = doctor.getGender();
         department = doctor.getDepartment();

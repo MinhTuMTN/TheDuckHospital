@@ -14,9 +14,9 @@ const TopDoctorComponent = (props: TopDoctorComponentProps) => {
       <View style={styles.avatar}>
         <Image
           source={{
-            uri: doctorInfo.doctor.avatar
-              ? doctorInfo.doctor.avatar
-              : 'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
+            uri:
+              doctorInfo.doctor?.avatar ||
+              'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
           }}
           height={85}
           width={85}

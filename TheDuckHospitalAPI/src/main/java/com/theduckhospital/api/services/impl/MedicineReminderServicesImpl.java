@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
+import com.theduckhospital.api.constant.MedicineUnit;
 import com.theduckhospital.api.dto.request.MedicineReminderDetailsRequest;
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
 import com.theduckhospital.api.dto.response.*;
@@ -42,6 +43,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
     @Override
     public MedicineReminder patientCreateMedicineReminder(String token, MedicineReminderRequest request) {
         Account account = accountServices.findAccountByToken(token);
+
         Calendar startOfToday = Calendar.getInstance();
         startOfToday.add(Calendar.DATE, -1);
         startOfToday.set(Calendar.HOUR_OF_DAY, 23);
@@ -80,27 +82,25 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
 
         // Check already exist medicine reminder
         Optional<MedicineReminder> existMedicineReminder = medicineReminderRepository
-                .findExistMedicineReminder(
-                        request.getStartDate(),
-                        prescriptionItem,
-                        patientProfile
+                .findByPatientProfileAndPrescriptionItem(
+                        patientProfile,
+                        prescriptionItem
                 );
-
-        if (existMedicineReminder.isPresent()) {
-            throw new BadRequestException("Medicine reminder already exist", 10030);
-        }
+        existMedicineReminder.ifPresent(medicineReminderRepository::delete);
 
         MedicineReminder medicineReminder = new MedicineReminder();
         medicineReminder.setPatientProfile(patientProfile);
-        medicineReminder.setStartDate(request.getStartDate());
+        medicineReminder.setStartDate(dateRequest.getTime());
         medicineReminder.setAmount(request.getAmount());
         medicineReminder.setRemainingAmount(request.getAmount());
         medicineReminder.setPrescriptionItem(prescriptionItem);
         medicineReminderRepository.save(medicineReminder);
 
-        Date startDate = request.getStartDate();
+        Date startDate = dateRequest.getTime();
         float amount = request.getAmount();
-        String medicineName = prescriptionItem.getMedicine().getMedicineName();
+        Medicine medicine = prescriptionItem.getMedicine();
+        String medicineName = medicine.getMedicineName();
+        MedicineUnit medicineUnit = medicine.getUnit();
         String fullName = patientProfile.getFullName();
 
         while (amount > 0) {
@@ -121,6 +121,8 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 medicineReminderDetail.setAmount(detail.getAmount());
                 medicineReminderDetail.setReminderIndex(index++);
                 medicineReminderDetail.setMedicineName(medicineName);
+                medicineReminderDetail.setUsed(false);
+                medicineReminderDetail.setMedicineUnit(medicineUnit);
                 medicineReminderDetail.setFullName(fullName);
                 medicineReminderDetail.setAccount(account);
 
@@ -136,8 +138,136 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
         }
 
         startDate = new Date(startDate.getTime() - 86400000);
-        medicineReminder.setEndDate(startDate);
+        medicineReminder.setEndDate(DateCommon.getEndOfDay(startDate));
         medicineReminderRepository.save(medicineReminder);
+
+        return medicineReminder;
+    }
+
+    @Override
+    public MedicineReminder patientUpdateMedicineReminder(String token, UUID reminderId, MedicineReminderRequest request) {
+        Account account = accountServices.findAccountByToken(token);
+        MedicineReminder medicineReminder = medicineReminderRepository
+                .findByAccountAndId(
+                        account,
+                        reminderId
+                ).orElseThrow(() -> new BadRequestException("Medicine reminder not found", 10027));
+
+        // If medicine reminder is deleted or end date is less than today
+        // then throw exception
+        if (medicineReminder.isDeleted() || medicineReminder.getEndDate().before(new Date())) {
+            throw new BadRequestException("Medicine reminder not found", 10027);
+        }
+
+        // If not update start date and amount
+        // update details only
+        Date startDate = medicineReminder.getStartDate();
+        float amount = medicineReminder.getAmount();
+        Date startDateRequest = DateCommon.getStarOfDay(request.getStartDate());
+        float amountRequest = request.getAmount();
+        if (startDate.getTime() == startDateRequest.getTime() && amount == amountRequest) {
+            List<MedicineReminderDetail> medicineReminderDetails = medicineReminder
+                    .getListMedicineReminderDetail();
+
+            for (MedicineReminderDetail medicineReminderDetail: medicineReminderDetails) {
+                Calendar reminderTime = Calendar.getInstance();
+                reminderTime.setTime(medicineReminderDetail.getReminderTime());
+
+                for (MedicineReminderDetailsRequest detail: request.getDetails()) {
+                    if (medicineReminderDetail.getReminderIndex() == detail.getIndex()) {
+                        reminderTime.set(Calendar.HOUR_OF_DAY, detail.getHour());
+                        reminderTime.set(Calendar.MINUTE, detail.getMinute());
+                        reminderTime.set(Calendar.SECOND, 0);
+                        medicineReminderDetail.setReminderTime(reminderTime.getTime());
+                    }
+                }
+            }
+
+            medicineReminderDetailRepository.saveAll(medicineReminderDetails);
+        } else {
+            // Check start date must be greater than or equal to today
+            Calendar startOfToday = Calendar.getInstance();
+            startOfToday.add(Calendar.DATE, -1);
+            startOfToday.set(Calendar.HOUR_OF_DAY, 23);
+            startOfToday.set(Calendar.MINUTE, 59);
+            startOfToday.set(Calendar.SECOND, 59);
+
+            Calendar dateRequest = Calendar.getInstance();
+            dateRequest.setTime(request.getStartDate());
+            dateRequest.set(Calendar.HOUR_OF_DAY, 0);
+            dateRequest.set(Calendar.MINUTE, 0);
+            dateRequest.set(Calendar.SECOND, 0);
+
+            if (dateRequest.before(startOfToday)) {
+                throw new BadRequestException("Start date must be greater than or equal to today", 10029);
+            }
+
+            medicineReminderDetailRepository.deleteAll(
+                    medicineReminder.getListMedicineReminderDetail()
+            );
+
+            PatientProfile patientProfile = patientProfileServices.getPatientProfileById(
+                    token,
+                    request.getPatientProfileId()
+            );
+
+            PrescriptionItem prescriptionItem = medicineReminder.getPrescriptionItem();
+            Medicine medicine = prescriptionItem.getMedicine();
+            String medicineName = medicine.getMedicineName();
+            MedicineUnit medicineUnit = medicine.getUnit();
+            String fullName = patientProfile.getFullName();
+
+            medicineReminder.setStartDate(startDateRequest);
+            medicineReminder.setAmount(amountRequest);
+            medicineReminder.setRemainingAmount(amountRequest);
+            medicineReminder.setPrescriptionItem(prescriptionItem);
+            medicineReminder.setListMedicineReminderDetail(new ArrayList<>());
+            medicineReminderRepository.save(medicineReminder);
+
+            while (amountRequest > 0) {
+                int index = 0;
+                for (MedicineReminderDetailsRequest detail : request.getDetails()) {
+                    if (amountRequest <= 0)
+                        break;
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(startDateRequest);
+                    calendar.set(Calendar.HOUR_OF_DAY, detail.getHour());
+                    calendar.set(Calendar.MINUTE, detail.getMinute());
+                    calendar.set(Calendar.SECOND, 0);
+
+                    MedicineReminderDetail medicineReminderDetail = new MedicineReminderDetail();
+                    medicineReminderDetail.setMedicineReminder(medicineReminder);
+                    medicineReminderDetail.setReminderTime(calendar.getTime());
+                    medicineReminderDetail.setAmount(detail.getAmount());
+
+                    medicineReminderDetail.setUsed(medicineReminderDetail
+                            .getReminderTime()
+                            .before(new Date())
+                    );
+                    medicineReminderDetail.setReminderIndex(index++);
+                    medicineReminderDetail.setMedicineName(medicineName);
+                    medicineReminderDetail.setMedicineUnit(medicineUnit);
+                    medicineReminderDetail.setFullName(fullName);
+                    medicineReminderDetail.setAccount(account);
+
+                    medicineReminderDetailRepository.save(medicineReminderDetail);
+
+
+
+                    amountRequest -= detail.getAmount();
+                }
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(startDateRequest);
+                calendar.add(Calendar.DATE, 1);
+                startDateRequest = calendar.getTime();
+            }
+
+            startDateRequest = new Date(startDateRequest.getTime() - 86400000);
+            medicineReminder.setEndDate(startDateRequest);
+            medicineReminderRepository.save(medicineReminder);
+        }
 
         return medicineReminder;
     }
@@ -269,7 +399,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                 continue;
 
             Optional<MedicineReminder> medicineReminder = medicineReminderRepository
-                    .findByPatientProfileAndPrescriptionItem(
+                    .findByPatientProfileAndPrescriptionItemAndNotDeleted(
                             patientProfile,
                             prescriptionItem
                     );
@@ -291,6 +421,7 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
                             MedicineDetailsIndexTime.builder()
                                     .reminderIndex((int) objects[0])
                                     .reminderTime(objects[1].toString())
+                                    .amount((float) objects[2])
                                     .build()
                     );
                 }
@@ -394,5 +525,83 @@ public class MedicineReminderServicesImpl implements IMedicineReminderServices {
             throw new BadRequestException("Prescription not found", 10026);
 
         return List.of(new PrescriptionResponse(optional.get()));
+    }
+
+    @Override
+    public List<MedicineReminderHistoryResponse> getMedicineReminderHistory(String token) {
+        Account account = accountServices.findAccountByToken(token);
+        List<MedicineReminderHistoryResponse> result = new ArrayList<>();
+
+        for (PatientProfile patientProfile: account.getPatientProfile()) {
+            List<MedicineReminder> alreadyReminded = medicineReminderRepository
+                    .findByPatientProfileAndEndDateLessThanOrDeletedIsTrue(
+                            patientProfile,
+                            DateCommon.getStarOfDay(new Date())
+                    );
+            List<MedicineReminder> workingReminded = medicineReminderRepository
+                    .findByPatientProfileAndDeletedIsFalseAndEndDateGreaterThanEqual(
+                            patientProfile,
+                            DateCommon.getStarOfDay(new Date())
+                    );
+
+            if (alreadyReminded.isEmpty() && workingReminded.isEmpty())
+                continue;
+
+            List<PrescriptionItemForReminderResponse> usingPrescriptionItems = new ArrayList<>();
+            List<PrescriptionItemForReminderResponse> usedPrescriptionItems = new ArrayList<>();
+
+            for (MedicineReminder medicineReminder: alreadyReminded) {
+                PrescriptionItem prescriptionItem = medicineReminder.getPrescriptionItem();
+                if (prescriptionItem.isDeleted())
+                    continue;
+
+                usedPrescriptionItems.add(
+                        PrescriptionItemForReminderResponse.builder()
+                                .prescriptionItem(prescriptionItem)
+                                .build()
+                );
+
+            }
+
+            for (MedicineReminder medicineReminder: workingReminded) {
+                PrescriptionItem prescriptionItem = medicineReminder.getPrescriptionItem();
+
+                List<Object[]> medicineReminderDetails = medicineReminderDetailRepository
+                        .findGroupedByReminderIndexAndTime(
+                                medicineReminder.getMedicineReminderId()
+                        );
+                List<MedicineDetailsIndexTime> indexTimes = new ArrayList<>();
+                for (Object[] objects : medicineReminderDetails) {
+                    indexTimes.add(
+                            MedicineDetailsIndexTime.builder()
+                                    .reminderIndex((int) objects[0])
+                                    .reminderTime(objects[1].toString())
+                                    .amount((float) objects[2])
+                                    .build()
+                    );
+                }
+                usingPrescriptionItems.add(
+                        PrescriptionItemForReminderResponse.builder()
+                                .prescriptionItem(prescriptionItem)
+                                .medicineReminder(new MedicineReminderDetailsResponse(
+                                        medicineReminder,
+                                        indexTimes
+                                ))
+                                .build()
+                );
+
+            }
+
+            result.add(
+                    MedicineReminderHistoryResponse.builder()
+                            .patientProfileId(patientProfile.getPatientProfileId().toString())
+                            .fullName(patientProfile.getFullName())
+                            .usingPrescriptionItems(usingPrescriptionItems)
+                            .usedPrescriptionItems(usedPrescriptionItems)
+                            .build()
+            );
+        }
+
+        return result;
     }
 }

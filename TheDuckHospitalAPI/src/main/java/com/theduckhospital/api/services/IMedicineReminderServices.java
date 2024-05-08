@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.MedicineReminderRequest;
+import com.theduckhospital.api.dto.response.MedicineReminderHistoryResponse;
 import com.theduckhospital.api.dto.response.MedicineReminderResponse;
 import com.theduckhospital.api.dto.response.PrescriptionDetailForReminderResponse;
 import com.theduckhospital.api.dto.response.PrescriptionResponse;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 public interface IMedicineReminderServices {
     MedicineReminder patientCreateMedicineReminder(String token, MedicineReminderRequest request);
+    MedicineReminder patientUpdateMedicineReminder(String token, UUID reminderId, MedicineReminderRequest request);
     List<MedicineReminderResponse> patientGetMedicineReminders(String token, Date date);
     void checkAndSendMedicineReminder();
     boolean confirmReceivedMedicineReminder(UUID reminderId, UUID confirmId);
@@ -37,5 +39,8 @@ public interface IMedicineReminderServices {
             String token,
             UUID patientProfileId,
             String prescriptionCode
+    );
+    List<MedicineReminderHistoryResponse> getMedicineReminderHistory(
+            String token
     );
 }

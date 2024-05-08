@@ -531,6 +531,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
 
         PrescriptionItem prescriptionItem = new PrescriptionItem();
         prescriptionItem.setPrescription(prescription);
+        prescriptionItem.setPrescriptionCode(prescription.getPrescriptionCode());
         prescriptionItem.setMedicine(medicine);
         prescriptionItem.setPrice(medicine.getPrice());
         prescriptionItem.setQuantity(request.getQuantity());

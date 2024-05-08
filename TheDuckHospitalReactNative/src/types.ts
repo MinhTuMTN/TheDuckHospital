@@ -165,4 +165,29 @@ export type addRatingProps = {
   review: string;
   bookingId: string;
   patientCode: string;
+}
+
+export type createReminderDataProps = {
+  patientProfileId: string;
+  startDate: string;
+  prescriptionItemId: string;
+  amount: number;
+  details: {
+    hour: number;
+    minute: number;
+    amount: number;
+  }[];
+};
+
+export type updateReminderDataProps = {
+  patientProfileId: string;
+  startDate: string;
+  prescriptionItemId: string;
+  amount: number;
+  details: {
+    hour: number;
+    minute: number;
+    amount: number;
+    index: number;
+  }[];
 };

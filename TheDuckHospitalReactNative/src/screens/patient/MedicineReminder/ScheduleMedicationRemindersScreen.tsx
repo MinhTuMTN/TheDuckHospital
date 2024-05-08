@@ -1,12 +1,12 @@
+import {useNavigation} from '@react-navigation/native';
 import dayjs from 'dayjs';
 import {
-  CalendarCheck2,
   CalendarPlus,
   ChevronRight,
   ChevronsLeftRight,
   Pill,
 } from 'lucide-react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -16,6 +16,8 @@ import {
   View,
 } from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ContainerComponent,
   Header,
@@ -24,24 +26,155 @@ import {
 } from '../../../components';
 import ButtonComponent from '../../../components/ButtonComponent';
 import LineInfoComponent from '../../../components/LineInfoComponent';
+import LoadingComponent from '../../../components/LoadingComponent';
 import TimeReminder from '../../../components/patient/medicineReminderScreen/TimeReminder';
 import {appColors} from '../../../constants/appColors';
 import {useToast} from '../../../hooks/ToastProvider';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import LoadingComponent from '../../../components/LoadingComponent';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import PopupComponent from '../../../components/PopupComponent';
+import {
+  creatReminder,
+  updateReminder,
+} from '../../../services/medicineReminderServices';
+import {deleteReminder} from '../../../services/reminderServices';
+import {navigationProps} from '../../../types';
+import {getMedicineUnit, howToUse} from '../../../utils/medicineUtils';
 
-const ScheduleMedicationRemindersScreen = () => {
+const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
+  const {isEdit, medicationInfo, patientProfileId} = route.params;
   const toast = useToast();
+  const navigation = useNavigation<navigationProps>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [deleteModalComfirmVisible, setDeleteModalComfirmVisible] =
     useState(false);
-  const [startDate, setStartDate] = useState<dayjs.Dayjs>(dayjs());
+  const [startDate, setStartDate] = useState<dayjs.Dayjs>(
+    isEdit ? dayjs(medicationInfo.medicineReminder.startDate) : dayjs(),
+  );
   const [dateStartVisible, setDateStartVisible] = useState(false);
-  const [amountOfMedicine, setAmountOfMedicine] = useState(12);
+  const [amountOfMedicine, setAmountOfMedicine] = useState(
+    isEdit
+      ? medicationInfo.medicineReminder.amount
+      : medicationInfo.prescriptionItem.quantity,
+  );
   const [amountOfMedicineModalVisible, setAmountOfMedicineModalVisible] =
     useState(false);
+  const [times, setTimes] = useState<any[]>([]);
 
+  const defaultTime: {
+    [key: string]: {hour: string; minute: string; quantity: number};
+  } = {
+    morning: {
+      hour: '7',
+      minute: '0',
+      quantity: 1,
+    },
+    noon: {
+      hour: '12',
+      minute: '0',
+      quantity: 1,
+    },
+    afternoon: {
+      hour: '16',
+      minute: '0',
+      quantity: 1,
+    },
+    evening: {
+      hour: '20',
+      minute: '0',
+      quantity: 1,
+    },
+  };
+
+  useEffect(() => {
+    const newTimes: any[] = [];
+    if (!isEdit) {
+      let index = 0;
+      ['morning', 'noon', 'afternoon', 'evening'].forEach(time => {
+        if (medicationInfo.prescriptionItem[time]) {
+          newTimes.push({
+            index: index++,
+            hour: defaultTime[time].hour,
+            minute: defaultTime[time].minute,
+            quantity: medicationInfo.prescriptionItem.quantityPerTime || 1,
+          });
+        }
+      });
+    } else {
+      medicationInfo.medicineReminder.indexTimes.forEach(
+        (indexTime: any, index: number) => {
+          const time = dayjs(`1990-01-01 ${indexTime.reminderTime}`);
+
+          newTimes.push({
+            index: indexTime.reminderIndex,
+            hour: time.get('hour').toString(),
+            minute: time.get('minute').toString(),
+            quantity: indexTime.amount,
+          });
+        },
+      );
+    }
+
+    setTimes(newTimes);
+  }, []);
+
+  const handleCreateReminder = async () => {
+    setIsLoading(true);
+    const result = await creatReminder({
+      patientProfileId: patientProfileId,
+      startDate: startDate.toString(),
+      prescriptionItemId: medicationInfo.prescriptionItem.prescriptionItemId,
+      amount: amountOfMedicine,
+      details: times.map(time => ({
+        hour: time.hour,
+        minute: time.minute,
+        amount: time.quantity,
+      })),
+    });
+    setIsLoading(false);
+    if (result) {
+      toast.showToast('Tạo lịch nhắc thuốc thành công');
+      navigation.navigate('MedicineReminderScreen');
+    }
+  };
+
+  const handleDeleteReminder = async () => {
+    setIsLoadingDelete(true);
+
+    const result = await deleteReminder(
+      medicationInfo.medicineReminder.medicineReminderId,
+    );
+
+    setIsLoadingDelete(false);
+    if (result.success) {
+      toast.showToast('Xóa lịch nhắc thuốc thành công');
+      navigation.navigate('MedicineReminderScreen');
+    }
+  };
+
+  const handleUpdateReminder = async () => {
+    setIsLoading(true);
+
+    const reminderIdToUpdate =
+      medicationInfo.medicineReminder.medicineReminderId;
+
+    const result = await updateReminder(reminderIdToUpdate, {
+      patientProfileId: patientProfileId,
+      startDate: startDate.toString(),
+      prescriptionItemId: medicationInfo.prescriptionItem.prescriptionItemId,
+      amount: amountOfMedicine,
+      details: times.map(time => ({
+        index: time.index,
+        hour: time.hour,
+        minute: time.minute,
+        amount: time.quantity,
+      })),
+    });
+
+    setIsLoading(false);
+
+    if (result.success) {
+      toast.showToast('Cập nhật lịch nhắc thuốc thành công');
+    }
+  };
   return (
     <LoadingComponent
       styles={{
@@ -54,15 +187,19 @@ const ScheduleMedicationRemindersScreen = () => {
           backgroundColor={appColors.darkerBlue}
           paddingStart={15}
           icon={
-            <MaterialCommunityIcons
-              name="delete-forever"
-              onPress={() => setDeleteModalComfirmVisible(true)}
-              size={28}
-              color={appColors.white}
-              style={{
-                zIndex: 1,
-              }}
-            />
+            isEdit ? (
+              <MaterialCommunityIcons
+                name="delete-forever"
+                onPress={() => setDeleteModalComfirmVisible(true)}
+                size={28}
+                color={appColors.white}
+                style={{
+                  zIndex: 1,
+                }}
+              />
+            ) : (
+              ''
+            )
           }
         />
         <Modal
@@ -96,7 +233,10 @@ const ScheduleMedicationRemindersScreen = () => {
                     paddingHorizontal: 20,
                   }}>
                   <ButtonComponent
-                    onPress={() => setDeleteModalComfirmVisible(false)}
+                    onPress={() => {
+                      setDeleteModalComfirmVisible(false);
+                      handleDeleteReminder();
+                    }}
                     containerStyles={styles.buttonOption}
                     textStyles={{
                       color: appColors.white,
@@ -136,7 +276,7 @@ const ScheduleMedicationRemindersScreen = () => {
               style={{
                 flex: 1,
               }}>
-              Sertralin (Cleadline 50mg)
+              {medicationInfo.prescriptionItem.medicine.medicineName}
             </TextComponent>
           </View>
           <View style={styles.mainLayout}>
@@ -194,8 +334,6 @@ const ScheduleMedicationRemindersScreen = () => {
                   date={startDate.toDate()}
                   onConfirm={date => {
                     setStartDate(dayjs(date));
-                    console.log('date', date);
-
                     setDateStartVisible(false);
                   }}
                   onCancel={() => {
@@ -203,55 +341,14 @@ const ScheduleMedicationRemindersScreen = () => {
                   }}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  toast.showToast('Không thể thay đổi ngày kết thúc nhắc')
-                }>
-                <LineInfoComponent
-                  label="Ngày kết thúc:"
-                  value="24/05/2024"
-                  containerStyles={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    borderBottomColor: appColors.grayLight,
-                    borderBottomWidth: 1,
-                  }}
-                  startIcon={
-                    <CalendarCheck2
-                      size={22}
-                      color={appColors.black}
-                      style={{
-                        marginRight: 8,
-                        marginLeft: 5,
-                      }}
-                    />
-                  }
-                  endIcon={
-                    <ChevronRight
-                      size={23}
-                      color={appColors.black}
-                      style={{
-                        marginLeft: 5,
-                      }}
-                    />
-                  }
-                  flexLabel={1}
-                  flexValue={1}
-                  valueTextAlign="right"
-                  valueStyles={{
-                    fontWeight: '500',
-                    color: appColors.darkerBlue,
-                  }}
-                  labelStyles={{
-                    color: appColors.black,
-                  }}
-                />
-              </TouchableOpacity>
+
               <TouchableOpacity
                 onPress={() => toast.showToast('Không thể thay đổi đơn vị')}>
                 <LineInfoComponent
                   label="Đơn vị:"
-                  value="viên"
+                  value={getMedicineUnit(
+                    medicationInfo.prescriptionItem.medicine.unit,
+                  )}
                   containerStyles={{
                     paddingHorizontal: 16,
                     paddingVertical: 12,
@@ -293,7 +390,14 @@ const ScheduleMedicationRemindersScreen = () => {
                 onPress={() => setAmountOfMedicineModalVisible(true)}>
                 <LineInfoComponent
                   label="Số lượng:"
-                  value={'Còn ' + amountOfMedicine.toString() + ' viên'}
+                  value={
+                    'Còn ' +
+                    amountOfMedicine +
+                    ' ' +
+                    getMedicineUnit(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )
+                  }
                   containerStyles={{
                     paddingHorizontal: 16,
                     paddingVertical: 12,
@@ -389,7 +493,7 @@ const ScheduleMedicationRemindersScreen = () => {
                             onChangeText={text => setAmountOfMedicine(+text)}
                             keyboardType="numeric"
                             containerStyle={{
-                              width: 60,
+                              width: 120,
                               marginLeft: 10,
                             }}
                             inputStyle={{
@@ -407,6 +511,7 @@ const ScheduleMedicationRemindersScreen = () => {
                           style={{
                             width: '100%',
                             paddingHorizontal: 20,
+                            height: 60,
                           }}>
                           <ButtonComponent
                             onPress={() =>
@@ -433,33 +538,77 @@ const ScheduleMedicationRemindersScreen = () => {
                   paddingBottom: 4,
                 },
               ]}>
-              Cài đặt thời gian và liều lượng uống:
+              Cài đặt thời gian và liều lượng sử dụng:
             </TextComponent>
             <View
               style={{
                 width: '100%',
               }}>
-              <TimeReminder />
-              <TimeReminder />
-              <TimeReminder />
+              {times.map((time, index) => {
+                return (
+                  <TimeReminder
+                    key={index}
+                    hour={time.hour}
+                    minute={time.minute}
+                    quantity={time.quantity}
+                    index={time.index}
+                    onChange={(index, hour, minute, quantity) => {
+                      const newTimes = [...times];
+                      newTimes[index] = {
+                        hour,
+                        minute,
+                        quantity,
+                        index,
+                      };
+                      setTimes(newTimes);
+                    }}
+                    unit={getMedicineUnit(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )}
+                    howToUse={howToUse(
+                      medicationInfo.prescriptionItem.medicine.unit,
+                    )}
+                  />
+                );
+              })}
             </View>
           </View>
         </View>
-        <ButtonComponent
-          isLoading={false}
-          containerStyles={{
-            backgroundColor: appColors.darkerBlue,
-            marginHorizontal: 16,
-            marginBottom: 16,
-            borderRadius: 10,
-          }}
-          textStyles={{
-            textTransform: 'uppercase',
-            fontWeight: '700',
-            fontSize: 16,
-          }}>
-          Lưu
-        </ButtonComponent>
+        {isEdit ? (
+          <ButtonComponent
+            isLoading={isLoading}
+            onPress={handleUpdateReminder}
+            containerStyles={{
+              backgroundColor: appColors.darkerBlue,
+              marginHorizontal: 16,
+              marginBottom: 16,
+              borderRadius: 10,
+            }}
+            textStyles={{
+              textTransform: 'uppercase',
+              fontWeight: '700',
+              fontSize: 16,
+            }}>
+            Cập nhật
+          </ButtonComponent>
+        ) : (
+          <ButtonComponent
+            isLoading={isLoading}
+            onPress={handleCreateReminder}
+            containerStyles={{
+              backgroundColor: appColors.darkerBlue,
+              marginHorizontal: 16,
+              marginBottom: 16,
+              borderRadius: 10,
+            }}
+            textStyles={{
+              textTransform: 'uppercase',
+              fontWeight: '700',
+              fontSize: 16,
+            }}>
+            Lưu
+          </ButtonComponent>
+        )}
       </ContainerComponent>
     </LoadingComponent>
   );

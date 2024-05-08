@@ -14,17 +14,39 @@ import {appColors} from '../../../constants/appColors';
 import ButtonComponent from '../../ButtonComponent';
 import LineInfoComponent from '../../LineInfoComponent';
 import TextComponent from '../../TextComponent';
+import {howToUse} from '../../../utils/medicineUtils';
+import InputComponent from '../../InputComponent';
 
-const TimeReminder = () => {
-  const [timeReminderModalVisible, setTimeReminderModalVisible] =
-    useState(false);
-  const [hour, setHour] = useState('7');
-  const [minute, setMinute] = useState('');
-  const [quantity, setQuantity] = useState(0);
+interface TimeReminderProps {
+  unit: string;
+  howToUse: string;
+  index: number;
+  hour: string;
+  minute: string;
+  quantity: number;
+  onChange: (
+    index: number,
+    hour: string,
+    minute: string,
+    quantity: number,
+  ) => void;
+}
+const TimeReminder = (props: TimeReminderProps) => {
+  const {index, hour, minute, quantity, onChange, unit, howToUse} = props;
+  const [timeReminderVisible, setTimeReminderVisible] = useState(false);
+  const setHour = (hour: string) => {
+    onChange(index, hour, minute, quantity);
+  };
+  const setMinute = (minute: string) => {
+    onChange(index, hour, minute, quantity);
+  };
+  const setQuantity = (quantity: number) => {
+    onChange(index, hour, minute, quantity);
+  };
   return (
     <Pressable
       onPress={() => {
-        setTimeReminderModalVisible(true);
+        setTimeReminderVisible(true);
       }}
       style={styles.container}>
       <View style={styles.timeLayout}>
@@ -45,7 +67,7 @@ const TimeReminder = () => {
       <View style={styles.infoLayOut}>
         <LineInfoComponent
           label="Liều lượng:"
-          value={quantity + ' viên'}
+          value={quantity + ' ' + unit}
           containerStyles={{
             paddingHorizontal: 16,
           }}
@@ -75,8 +97,8 @@ const TimeReminder = () => {
         statusBarTranslucent
         animationType="slide"
         transparent={true}
-        visible={timeReminderModalVisible}
-        onRequestClose={() => setTimeReminderModalVisible(false)}>
+        visible={timeReminderVisible}
+        onRequestClose={() => setTimeReminderVisible(false)}>
         <KeyboardAvoidingView
           behavior="padding"
           style={{
@@ -93,7 +115,7 @@ const TimeReminder = () => {
                   width: '100%',
                 }}>
                 <TouchableOpacity
-                  onPress={() => setTimeReminderModalVisible(false)}
+                  onPress={() => setTimeReminderVisible(false)}
                   style={{
                     position: 'absolute',
                     padding: 10,
@@ -119,7 +141,6 @@ const TimeReminder = () => {
                   flexDirection: 'column',
                   paddingHorizontal: 22,
                   paddingTop: 14,
-                  //backgroundColor: appColors.grayLight,
                   width: '100%',
                 }}>
                 <View
@@ -190,7 +211,7 @@ const TimeReminder = () => {
                     fontSize={14}
                     fontWeight="500"
                     color={appColors.grayLight}>
-                    Uống
+                    {howToUse}
                   </TextComponent>
                   <View style={styles.numberInputWrapper}>
                     <AntDesign
@@ -204,17 +225,29 @@ const TimeReminder = () => {
                         if (quantity > 0) setQuantity(quantity - 0.5);
                       }}
                     />
-                    <TextComponent
-                      fontSize={30}
-                      fontWeight="600"
-                      color={appColors.black}
-                      style={{
-                        width: 70,
-                        paddingHorizontal: 10,
+                    <InputComponent
+                      value={quantity.toString()}
+                      onChangeText={(text: string) => {
+                        const newValue = parseFloat(text);
+                        if (newValue >= 0) {
+                          setQuantity(newValue);
+                        } else {
+                          setQuantity(0);
+                        }
+                      }}
+                      keyboardType="numeric"
+                      _inputStyle={{
                         textAlign: 'center',
-                      }}>
-                      {quantity}
-                    </TextComponent>
+                        fontSize: 20,
+                        fontWeight: '600',
+                        paddingVertical: 0,
+                      }}
+                      containerStyle={{
+                        width: 90,
+                        marginHorizontal: 10,
+                      }}
+                    />
+
                     <AntDesign
                       name="pluscircleo"
                       size={22}
@@ -229,7 +262,7 @@ const TimeReminder = () => {
                     fontSize={14}
                     fontWeight="500"
                     color={appColors.grayLight}>
-                    Viên
+                    {unit}
                   </TextComponent>
                 </View>
               </View>
@@ -240,7 +273,7 @@ const TimeReminder = () => {
                   paddingHorizontal: 20,
                 }}>
                 <ButtonComponent
-                  onPress={() => setTimeReminderModalVisible(false)}
+                  onPress={() => setTimeReminderVisible(false)}
                   containerStyles={styles.buttonOption}
                   textStyles={{
                     color: appColors.white,

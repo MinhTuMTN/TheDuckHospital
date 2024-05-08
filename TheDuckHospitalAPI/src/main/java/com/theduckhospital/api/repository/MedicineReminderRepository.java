@@ -25,6 +25,11 @@ public interface MedicineReminderRepository extends JpaRepository<MedicineRemind
             PatientProfile patientProfile
     );
 
+    Optional<MedicineReminder> findByPatientProfileAndPrescriptionItem(
+            PatientProfile patientProfile,
+            PrescriptionItem prescriptionItem
+    );
+
     @Query("SELECT mr " +
             "FROM MedicineReminder mr " +
             "WHERE mr.patientProfile = :patientProfile " +
@@ -32,7 +37,7 @@ public interface MedicineReminderRepository extends JpaRepository<MedicineRemind
             "AND mr.deleted = false " +
             "ORDER BY mr.createdAt DESC "
     )
-    Optional<MedicineReminder> findByPatientProfileAndPrescriptionItem(
+    Optional<MedicineReminder> findByPatientProfileAndPrescriptionItemAndNotDeleted(
             PatientProfile patientProfile,
             PrescriptionItem prescriptionItem
     );
@@ -44,4 +49,18 @@ public interface MedicineReminderRepository extends JpaRepository<MedicineRemind
             "AND mr.medicineReminderId = :medicineReminderId"
     )
     Optional<MedicineReminder> findByAccountAndId(Account account, UUID medicineReminderId);
+
+    @Query("SELECT mr " +
+            "FROM MedicineReminder mr " +
+            "WHERE mr.patientProfile = :patientProfile " +
+            "AND (mr.deleted = true OR mr.endDate < :endDate) "
+    )
+    List<MedicineReminder> findByPatientProfileAndEndDateLessThanOrDeletedIsTrue(
+            PatientProfile patientProfile,
+            Date endDate
+    );
+    List<MedicineReminder> findByPatientProfileAndDeletedIsFalseAndEndDateGreaterThanEqual(
+            PatientProfile patientProfile,
+            Date endDate
+    );
 }

@@ -62,9 +62,9 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
         <Image
           // source={require('../../../assets/images/avatarDoctor.jpg')}
           source={{
-            uri: item.avatar
-              ? item.avatar
-              : 'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/1/1299808/Parkshinhye.jpeg',
+            uri:
+              item.avatar ||
+              'https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/1/1299808/Parkshinhye.jpeg',
           }}
           alt="Logo"
           style={{
