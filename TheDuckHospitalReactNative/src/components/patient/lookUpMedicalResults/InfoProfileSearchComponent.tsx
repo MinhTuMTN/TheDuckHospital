@@ -21,6 +21,8 @@ import {FlexComponent, InputComponent, TextComponent} from '../..';
 import {confirmPatientProfileViaOTP} from '../../../services/patientProfileServices';
 import {addPatientProfileProps, navigationProps} from '../../../types';
 import ButtonComponent from '../../ButtonComponent';
+import {useToast} from '../../../hooks/ToastProvider';
+import {set} from '@gluestack-style/react';
 
 interface InfoProfileSearchComponentProps {
   info: any;
@@ -28,6 +30,7 @@ interface InfoProfileSearchComponentProps {
 const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
   const {info} = props;
   const [isShow, setIsShow] = React.useState(false);
+  const [isWrong, setIsWrong] = React.useState(false);
 
   const [confirm, setConfirm] = React.useState<addPatientProfileProps>({
     patientProfileId: info.patientProfileId,
@@ -46,6 +49,7 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
         patientProfileId: confirm.patientProfileId,
       });
     } else {
+      setIsWrong(true);
       console.log(respone.error);
     }
   };
@@ -85,7 +89,6 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
             color: appColors.grayLight,
             letterSpacing: 0,
           }}
-          containerFlex={1}
         />
       </FlexComponent>
       <FlexComponent direction="row" style={{marginTop: 10}}>
@@ -188,6 +191,18 @@ const InfoProfileSearchComponent = (props: InfoProfileSearchComponentProps) => {
                   />
                 }
               />
+              {isWrong && (
+                <TextComponent
+                  textAlign="justify"
+                  fontSize={14}
+                  color={appColors.error}
+                  style={{
+                    marginTop: 5,
+                    lineHeight: 20,
+                  }}>
+                  * Số điện thoại chính xác
+                </TextComponent>
+              )}
               <View style={styles.options}>
                 <ButtonComponent
                   containerStyles={{

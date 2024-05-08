@@ -5,7 +5,6 @@ import {
   ContainerComponent,
   DetailsInfomation,
 } from '../../components';
-import {useNavigation} from '@react-navigation/native';
 
 const DetailsProfileScreen = ({route}: {route: any}) => {
   const [firstClick, setFirstClick] = React.useState(false);

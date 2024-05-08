@@ -185,7 +185,7 @@ const AddProfileScreen = () => {
                       patientProfile.fullName.length <= 0 ||
                       patientProfile.fullName.trim() === ''
                     }
-                    errorMessage={'Họ tên không hợp lệ'}
+                    errorMessage={'Họ và tên không được để trống'}
                     value={patientProfile.fullName}
                     onChangeText={text =>
                       setPatientProfile({
@@ -218,7 +218,8 @@ const AddProfileScreen = () => {
                       })
                     }
                     error={
-                      patientProfile.phoneNumber.length != 10 ||
+                      (patientProfile.phoneNumber.length != 10 &&
+                        patientProfile.phoneNumber.length != 0) ||
                       !patientProfile.phoneNumber.startsWith('0')
                     }
                     errorMessage={'Số điện thoại không hợp lệ'}
