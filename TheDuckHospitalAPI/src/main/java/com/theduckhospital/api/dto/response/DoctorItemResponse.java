@@ -24,13 +24,11 @@ public class DoctorItemResponse {
     private double rating;
     private int totalRating;
     private List<RatingItemResponse> ratings;
-    private String avatar;
 
     public DoctorItemResponse(Doctor doctor) {
         this.doctorId = doctor.getStaffId();
         this.rating = doctor.getRating();
         this.totalRating = doctor.getRatings().size();
-        this.avatar = doctor.getAvatar();
         List<RatingItemResponse> ratingList= new ArrayList<>();
         for (Rating rating: doctor.getRatings()) {
             ratingList.add(new RatingItemResponse(rating));
