@@ -24,7 +24,7 @@ import {useNavigation} from '@react-navigation/native';
 import {loginDataProps, navigationProps} from '../../types';
 import FormControlComponent from '../../components/FormControlComponent';
 import {loginWithPassword} from '../../services/authServices';
-import { useAuth } from '../../hooks/AuthHooks';
+import {useAuth} from '../../hooks/AuthHooks';
 
 const LoginScreen = () => {
   const [rememberMe, setRememberMe] = React.useState(['rememberMe']);
@@ -49,6 +49,7 @@ const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
+    if (error) return;
     setIsLoadingAPI(true);
     const response = await loginWithPassword(info);
     setIsLoadingAPI(false);
@@ -57,12 +58,13 @@ const LoginScreen = () => {
       const token = response.data.data;
 
       await auth.login(token, true);
+
       // navigation.navigate('HomeScreen');
       reset({
-            index: 0,
-            routes: [{name: 'PatientBottom'}],
-            // routes: [{name: 'AdminLeftSideDrawer'}],
-          });
+        index: 0,
+        routes: [{name: 'PatientBottom'}],
+        // routes: [{name: 'AdminLeftSideDrawer'}],
+      });
     } else {
       setIsLoadingAPI(false);
       console.log('Error', response);

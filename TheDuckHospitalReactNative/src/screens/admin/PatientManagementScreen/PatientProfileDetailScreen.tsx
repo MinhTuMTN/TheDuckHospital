@@ -10,8 +10,8 @@ import {appColors} from '../../../constants/appColors';
 import {Accordion, ScrollView} from '@gluestack-ui/themed';
 import {FileSpreadsheet, Info} from 'lucide-react-native';
 import ExaminationItemComponent from '../../../components/admin/patientManagementScreen/ExaminationItemComponent';
-import { useRoute } from '@react-navigation/native';
-import { formatDate } from '../../../utils/dateUtils';
+import {useRoute} from '@react-navigation/native';
+import {formatDate} from '../../../utils/dateUtils';
 
 function PatientProfileDetailScreen() {
   const route = useRoute();
@@ -60,7 +60,7 @@ function PatientProfileDetailScreen() {
               Giới tính:
             </TextComponent>
             <TextComponent fontSize={20} style={{flex: 0.6}}>
-              {profile.gender === "FEMALE" ?  "Nữ" : "Name"}
+              {profile.gender === 'FEMALE' ? 'Nữ' : 'Nam'}
             </TextComponent>
           </FlexComponent>
 
@@ -101,9 +101,14 @@ function PatientProfileDetailScreen() {
 
         <ContainerComponent style={styles.listExamination}>
           <Accordion type="single" width={'100%'} shadowColor="transparent">
-            {/* <ExaminationItemComponent value="a" />
-            <ExaminationItemComponent value="b" />
-            <ExaminationItemComponent value="c" /> */}
+            {profile.medicalRecords.map((item: any, index: number) => (
+              <ExaminationItemComponent
+                patient
+                key={index}
+                value={`medicalExamRecord - ${index}`}
+                item={item}
+              />
+            ))}
           </Accordion>
         </ContainerComponent>
       </ScrollView>

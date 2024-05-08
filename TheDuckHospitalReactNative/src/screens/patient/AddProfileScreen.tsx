@@ -76,7 +76,7 @@ const AddProfileScreen = () => {
     wardName: '',
   });
   const [error, setError] = React.useState(false);
-  const [firstClick, setFirstClick] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(true);
 
   const navigation = useNavigation();
 
@@ -132,7 +132,7 @@ const AddProfileScreen = () => {
   }, [selectedDistrict]);
 
   const handleCreatePatientProfile = async () => {
-    if (!firstClick) setFirstClick(true);
+    if (firstClick) setFirstClick(false);
     if (error) {
       return;
     }
@@ -274,9 +274,8 @@ const AddProfileScreen = () => {
                       })
                     }
                     error={
-                      patientProfile.identity.length != 0 &&
-                      patientProfile.identity.length != 9 &&
-                      patientProfile.identity.length != 12
+                      patientProfile.identity.length !== 9 &&
+                      patientProfile.identity.length !== 12
                     }
                     errorMessage={'CMND/CCCD không hợp lệ'}
                     inputContainerStyle={styles.inputContainer}
@@ -345,7 +344,7 @@ const AddProfileScreen = () => {
                         selectInputStyle={{paddingHorizontal: 10}}
                         placeholderColor={appColors.darkGray}
                         title="Chọn giới tính"
-                        error={selectedGender.genderId === '' && firstClick}
+                        error={selectedGender.genderId === '' && !firstClick}
                         errorMessage="Giới tính không được để trống"
                         onChange={value => setSelectedGender(value)}
                         selectTextColor={'black'}
@@ -370,7 +369,7 @@ const AddProfileScreen = () => {
                         placeholderColor={appColors.darkGray}
                         enableSearch={true}
                         width={'100%'}
-                        error={selectedNation.nationId === '' && firstClick}
+                        error={selectedNation.nationId === '' && !firstClick}
                         errorMessage="Dân tộc không được để trống"
                         onChange={value => setSelectedNation(value)}
                         placeholder="Dân tộc..."
@@ -392,7 +391,7 @@ const AddProfileScreen = () => {
                       value={selectedProvince.provinceName}
                       onChange={value => setSelectedProvince(value)}
                       error={
-                        selectedProvince.provinceId.length <= 0 && firstClick
+                        selectedProvince.provinceId.length <= 0 && !firstClick
                       }
                       errorMessage="Tỉnh thành không được để trống"
                       title="Chọn tỉnh thành"
@@ -425,7 +424,7 @@ const AddProfileScreen = () => {
                         onChange={value => setSelectedDistrict(value)}
                         isDisabled={selectedProvince.provinceId === ''}
                         error={
-                          selectedDistrict.districtId.length <= 0 && firstClick
+                          selectedDistrict.districtId.length <= 0 && !firstClick
                         }
                         errorMessage="Quận huyện không được để trống"
                         enableSearch={true}
@@ -452,7 +451,7 @@ const AddProfileScreen = () => {
                         value={selectedWard.wardName}
                         onChange={value => setSelectedWard(value)}
                         isDisabled={selectedDistrict.districtId === ''}
-                        error={selectedWard.wardId.length <= 0 && firstClick}
+                        error={selectedWard.wardId.length <= 0 && !firstClick}
                         errorMessage="Phường xã không được để trống"
                         title="Chọn phường xã"
                         enableSearch={true}

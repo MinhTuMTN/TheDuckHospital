@@ -112,7 +112,8 @@
     "department": "Chuyên khoa:",
     "date": "Ngày khám:",
     "gender": "Giới tính:",
-    "fee": "Phí khám:"
+    "fee": "Phí khám:",
+    "rating": "Đánh giá:"
   },
 
   "chooseDate": {

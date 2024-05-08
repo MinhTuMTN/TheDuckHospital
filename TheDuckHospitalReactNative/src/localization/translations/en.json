@@ -107,7 +107,8 @@
     "placeHolderSearchDepartment": "Search for a department",
     "date": "Schedule:",
     "gender": "Gender:",
-    "fee": "Fee:"
+    "fee": "Fee:",
+    "rating": "Rating:"
   },
   "chooseDate": {
     "title": "Choose Date",

@@ -37,15 +37,17 @@ interface MedicineItemComponentProps {
   medicine: any;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 function MedicineItemComponent(props: MedicineItemComponentProps) {
-  const {medicine, refreshList, setRefreshList} = props;
+  const {medicine, refreshList, setRefreshList, setIsEditing} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const toggleAlert = () => {
@@ -125,12 +127,14 @@ function MedicineItemComponent(props: MedicineItemComponentProps) {
 
       <MedicineDialogComponent
         edit
+        setIsEditing={setIsEditing}
         medicine={medicine}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
       />
+
       <MedicineAlertDialogComponent
         setShowAlertDialog={setShowAlertDialog}
         showAlertDialog={showAlertDialog}

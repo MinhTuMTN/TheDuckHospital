@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -19,9 +20,11 @@ public class UpdateStaffRequest {
     @NotBlank(message = "Identity Number is required")
     private String identityNumber;
     @NotNull(message = "Date of birth is required")
-    private Date dateOfBirth;
+    private String dateOfBirth;
     @NotNull(message = "Gender is required")
     private Integer gender;
+    @NotNull(message = "Avatar is required")
+    private MultipartFile avatar;
 
     private Degree degree;
     private Integer departmentId;

@@ -55,7 +55,7 @@ function PatientItemComponent(props: PatientItemComponentProps) {
               style={{marginRight: 5}}
             />
             <TextComponent fontSize={16}>
-              {patient.identityNumber}
+              {patient.identityNumber ? patient.identityNumber : 'Chưa cập nhật'}
             </TextComponent>
           </FlexComponent>
           <FlexComponent style={styles.flexCenter}>

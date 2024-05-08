@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,9 @@ public class StaffAdminController {
 
     @PostMapping
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createStaff(@RequestBody @Valid CreateStaffRequest request) {
+    public ResponseEntity<?> createStaff(
+            @ModelAttribute("data") CreateStaffRequest request
+    ) {
         Map<String, Object> result = staffServices.createStaff(request);
         if (result == null) {
             return ResponseEntity.badRequest().body(
@@ -48,7 +51,10 @@ public class StaffAdminController {
 
     @PutMapping("/{staffId}")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateStaff(@PathVariable UUID staffId, @RequestBody @Valid UpdateStaffRequest request) {
+    public ResponseEntity<?> updateStaff(
+            @PathVariable UUID staffId,
+            @ModelAttribute("data") UpdateStaffRequest request
+    ) {
         Staff result = staffServices.updateStaff(staffId, request);
         if (result == null) {
             return ResponseEntity.badRequest().body(

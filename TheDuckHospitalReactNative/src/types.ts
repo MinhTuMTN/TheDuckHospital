@@ -128,6 +128,7 @@ export type updateStaffDataProps = {
   gender: number;
   degree: string;
   departmentId: number;
+  avatar: any;
 };
 
 export type createServiceDataProps = {
@@ -158,6 +159,13 @@ export type medicalTestResultDataProps = {
   sort: string;
   serviceId: number;
 };
+
+export type addRatingProps = {
+  rating: number;
+  review: string;
+  bookingId: string;
+  patientCode: string;
+}
 
 export type createReminderDataProps = {
   patientProfileId: string;

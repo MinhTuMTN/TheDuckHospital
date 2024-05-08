@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import {
   Bell,
   Camera,
+  FolderKanban,
   Headset,
   KeyRound,
   LogOut,
@@ -36,6 +37,7 @@ const AccountScreen = () => {
 
   const {t} = useTranslation();
   const navigation = useNavigation<navigationProps>();
+  const {reset} = useNavigation<navigationProps>();
   const auth = useAuth();
   const tokenRedux = useSelector((state: RootState) => state.auth.token);
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -111,13 +113,15 @@ const AccountScreen = () => {
           )}
         </View>
 
-        <SectionComponent
-          title={t('account.myWallet')}
-          tilteStyle={styles.titleSection}>
-          <View style={styles.flexGap}>
-            <TheDuckWallet />
-          </View>
-        </SectionComponent>
+        {userInfo.role !== 'Admin' && (
+          <SectionComponent
+            title={t('account.myWallet')}
+            tilteStyle={styles.titleSection}>
+            <View style={styles.flexGap}>
+              <TheDuckWallet />
+            </View>
+          </SectionComponent>
+        )}
 
         <SectionComponent
           title={t('account.generalSettings')}
@@ -163,6 +167,24 @@ const AccountScreen = () => {
                 title={t('account.shareApp')}
                 icon={<Share2 size={20} color={appColors.black} />}
                 onPress={() => navigation.navigate('SuccessScreen')}
+              />
+            </View>
+          </SectionComponent>
+        )}
+
+        {userInfo.role === 'Admin' && (
+          <SectionComponent title={'Quản lý'} tilteStyle={styles.titleSection}>
+            <View style={styles.flexGap}>
+              <AccountScreenRowComponent
+                title={'Giao diện quản lý'}
+                icon={<FolderKanban size={20} color={appColors.black} />}
+                onPress={() =>
+                  reset({
+                    index: 1,
+                    // routes: [{name: 'PatientBottom'}],
+                    routes: [{name: 'AdminLeftSideDrawer'}],
+                  })
+                }
               />
             </View>
           </SectionComponent>

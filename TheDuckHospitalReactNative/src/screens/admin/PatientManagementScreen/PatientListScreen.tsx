@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   View,
@@ -27,16 +28,23 @@ function PatientListScreen() {
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
   const [searchText, setSearchText] = React.useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
+  const [isKeyboardVisible, setKeyboardVisible] = React.useState(false);
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, patients, paginationParams.page]);
+
+  const handleChangedText = (text: string) => {
+    setSearchText(text);
+    setPaginationParams((prevState: any) => ({
+      ...prevState,
+      page: 0,
+    }));
+  };
 
   React.useEffect(() => {
     const handleGetPatients = async () => {
@@ -59,10 +67,7 @@ function PatientListScreen() {
         if (paginationParams.page === 0) {
           setPatients(response.data?.data.patients);
         } else {
-          setPatients((prev: any) => [
-            ...prev,
-            ...response.data.data.patients,
-          ]);
+          setPatients((prev: any) => [...prev, ...response.data.data.patients]);
         }
         setPaginationParams({
           ...paginationParams,
@@ -76,20 +81,35 @@ function PatientListScreen() {
     handleGetPatients();
   }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
 
-  const handleChangedText = (text: string) => {
-    setSearchText(text);
-    setPaginationParams((prevState: any) => ({
-      ...prevState,
-      page: 0,
-    }));
-  };
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={32} style={styles.listLabel}>
-          Danh sách bệnh nhân
-        </TextComponent>
-      </ContainerComponent>
+      {!isKeyboardVisible && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={32} style={styles.listLabel}>
+            Danh sách bệnh nhân
+          </TextComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -115,43 +135,32 @@ function PatientListScreen() {
         />
       </ContainerComponent>
 
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-        <PatientItemComponent />
-      </ScrollView> */}
-
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={patients}
-          keyExtractor={(item: any, index: number) =>
-            `patient-${item.id}-${index}`
-          }
-          renderItem={({item}) => <PatientItemComponent patient={item} />}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {!isKeyboardVisible && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={patients}
+            keyExtractor={(item: any, index: number) =>
+              `patient-${item.patientId}-${index}`
             }
-          }}
-          onEndReachedThreshold={0.7}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            renderItem={({item}) => <PatientItemComponent patient={item} />}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={0.7}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
     </ContainerComponent>
   );
 }

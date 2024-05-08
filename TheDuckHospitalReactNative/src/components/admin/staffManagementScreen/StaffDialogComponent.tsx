@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,35 +6,22 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Image,
+  PermissionsAndroid,
 } from 'react-native';
-import {
-  FlexComponent,
-  InputComponent,
-  SelectComponent,
-  TextComponent,
-} from '../..';
+import {FlexComponent, InputComponent, TextComponent} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ButtonGroup,
-  CircleIcon,
-  HStack,
-  Radio,
-  RadioGroup,
-  RadioIcon,
-  RadioIndicator,
-  RadioLabel,
-} from '@gluestack-ui/themed';
+import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
 import {
   AtSign,
-  Cake,
   CalendarDays,
-  ChevronDownIcon,
   Fingerprint,
+  FolderHeart,
   NotepadText,
   Phone,
   School,
@@ -46,6 +33,12 @@ import {createStaff, updateStaff} from '../../../services/staffServices';
 import {getAllDepartments} from '../../../services/departmentServices';
 import DatePicker from 'react-native-date-picker';
 import dayjs from 'dayjs';
+import {
+  ImageLibraryOptions,
+  ImagePickerResponse,
+  launchCamera,
+  launchImageLibrary,
+} from 'react-native-image-picker';
 
 const roles = [
   {value: 'DOCTOR', label: 'Bác sĩ'},
@@ -82,6 +75,7 @@ interface StaffDialogComponentProps {
   setModalVisible?: (modalVisible: boolean) => void;
   setConfirmModalVisible?: (confirmModalVisible: boolean) => void;
   setCreatedStaff?: (createdStaff: any) => void;
+  setIsEditing?: (isEditing: boolean) => void;
 }
 
 const StaffDialogComponent = (props: StaffDialogComponentProps) => {
@@ -93,13 +87,16 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
     setModalVisible,
     setConfirmModalVisible,
     setCreatedStaff,
+    setIsEditing,
     edit = false,
   } = props;
   const [name, setName] = useState(edit ? staff.fullName : '');
   const [phoneNumber, setPhoneNumber] = useState(edit ? staff.phoneNumber : '');
   const [identity, setIdentity] = useState(edit ? staff.identityNumber : '');
   const [dateOfBirth, setDateOfBirth] = useState(
-    edit ? new Date(staff.dateOfBirth) : new Date(),
+    edit
+      ? new Date(staff.dateOfBirth)
+      : new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
   );
   const [degree, setDegree] = useState(
     edit ? degrees.find(degree => degree.value === staff.degree) : degrees[0],
@@ -118,13 +115,28 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
       : genders[0],
   );
   const [error, setError] = React.useState(false);
-  const [firstClick, setFirstClick] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
   const [showDatePicker, setShowDatePicker] = React.useState(false);
+  const [selectedImage, setSelectedImage] = useState<any>(
+    edit
+      ? {
+          uri: staff?.avatar,
+          name: 'avatar.jpeg',
+          type: 'image/jpeg',
+        }
+      : {
+          uri: null,
+          name: null,
+          type: null,
+        },
+  );
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
+      if (setIsEditing) setIsEditing(false);
+      if (!firstClick) setFirstClick(true);
       if (edit) {
         setName(staff.fullName);
         setPhoneNumber(staff.phoneNumber);
@@ -139,40 +151,63 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
         );
         setRole(roles.find(role => role.label === staff.role));
         setDepartment(staff.department);
+        setSelectedImage({
+          uri: staff?.avatar,
+          name: 'avatar.jpeg',
+          type: 'image/jpeg',
+        });
       } else {
         setName('');
         setPhoneNumber('');
         setIdentity('');
-        setDateOfBirth(new Date());
+        setDateOfBirth(
+          new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+        );
         setEmail('');
         setGender(genders[0]);
         setDegree(degrees[0]);
         setRole(roles[0]);
         setDepartment({departmentId: null, departmentName: ''});
+        setSelectedImage({
+          uri: null,
+          name: null,
+          type: null,
+        });
       }
     }
   };
 
   const handleCreateOrUpdateStaff = async () => {
-    if (!firstClick) setFirstClick(true);
-    if (error) {
+    if (firstClick) setFirstClick(false);
+    if (error || selectedImage.uri === null) {
       return;
     }
     if (!edit) {
-      const data = {
-        fullName: name,
-        phoneNumber: phoneNumber,
-        identityNumber: identity,
-        dateOfBirth: dayjs(staff.dateOfBirth).toISOString(),
-        role: role ? role.value : roles[0].value,
-        gender: gender ? gender.genderId : 0,
-        email: email,
-        degree: degree ? degree.value : degrees[0].value,
-        departmentId: department.departmentId,
-      };
+      const formData = new FormData();
+      formData.append('fullName', name);
+      formData.append('phoneNumber', phoneNumber);
+      formData.append('identityNumber', identity);
+      formData.append('email', email);
+      formData.append('dateOfBirth', dayjs(dateOfBirth).format('MM/DD/YYYY'));
+      formData.append('role', role ? role.value : roles[0].value);
+      formData.append('gender', gender ? gender.genderId : 0);
+      formData.append('degree', degree ? degree.value : degrees[0].value);
+      formData.append('departmentId', department.departmentId);
+      formData.append('avatar', selectedImage);
+      // const data = {
+      //   fullName: name,
+      //   phoneNumber: phoneNumber,
+      //   identityNumber: identity,
+      //   dateOfBirth: dayjs(staff.dateOfBirth).toISOString(),
+      //   role: role ? role.value : roles[0].value,
+      //   gender: gender ? gender.genderId : 0,
+      //   email: email,
+      //   degree: degree ? degree.value : degrees[0].value,
+      //   departmentId: department.departmentId,
+      // };
 
       setIsLoading(true);
-      const responseCreateStaff = await createStaff(data);
+      const responseCreateStaff = await createStaff(formData);
       setIsLoading(false);
 
       if (responseCreateStaff.success) {
@@ -190,25 +225,104 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
         }
       }
     } else {
-      const data = {
-        fullName: name,
-        phoneNumber: phoneNumber,
-        identityNumber: identity,
-        dateOfBirth: dayjs(staff.dateOfBirth).toISOString(),
-        role: role ? role.value : roles[0].value,
-        gender: gender ? gender.genderId : 0,
-        degree: degree ? degree.value : degrees[0].value,
-        departmentId: department.departmentId,
-      };
+      const formData = new FormData();
+
+      formData.append('role', role ? role.value : roles[0].value);
+      formData.append('fullName', name);
+      formData.append('phoneNumber', phoneNumber);
+      formData.append('identityNumber', identity);
+      formData.append('dateOfBirth', dayjs(dateOfBirth).format('MM/DD/YYYY'));
+      formData.append('gender', gender ? gender.genderId : 0);
+      formData.append('avatar', selectedImage);
+      formData.append('degree', degree ? degree.value : degrees[0].value);
+      formData.append('departmentId', department.departmentId);
+      formData.append('avatar', selectedImage);
+      // const data = {
+      //   fullName: name,
+      //   phoneNumber: phoneNumber,
+      //   identityNumber: identity,
+      //   dateOfBirth: dayjs(staff.dateOfBirth).toISOString(),
+      //   role: role ? role.value : roles[0].value,
+      //   gender: gender ? gender.genderId : 0,
+      //   degree: degree ? degree.value : degrees[0].value,
+      //   departmentId: department.departmentId,
+      // };
 
       setIsLoading(true);
-      const responseUpdateStaff = await updateStaff(staff.staffId, data);
+      const responseUpdateStaff = await updateStaff(staff.staffId, formData);
       setIsLoading(false);
 
       if (responseUpdateStaff.success) {
         setRefreshList(!refreshList);
         closeModal();
       }
+    }
+  };
+
+  const openImagePicker = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
+
+    launchImageLibrary(options as ImageLibraryOptions, handleResponse);
+  };
+
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+      if (granted) return;
+
+      const permission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Yêu cầu quyền truy cập camera',
+          message:
+            'The Duck Hospital cần quyền truy cập camera của bạn để chụp ảnh.',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      // if (permission === PermissionsAndroid.RESULTS.GRANTED) {
+      //   console.log('Camera permission given');
+      // } else {
+      //   console.log('Camera permission denied');
+      // }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const openCamera = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      saveToPhotos: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
+
+    requestCameraPermission();
+    launchCamera(options as ImageLibraryOptions, handleResponse);
+  };
+
+  const handleResponse = (response: ImagePickerResponse) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.errorCode) {
+      console.log('Image picker error: ', response.errorMessage);
+    } else {
+      let image = response.assets?.[0];
+      setSelectedImage({
+        uri: image?.uri,
+        name: image?.fileName,
+        type: image?.type,
+      });
+      // console.log(selectedImage);
     }
   };
 
@@ -252,12 +366,81 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
 
           <ScrollView style={styles.modalBody}>
             <FormControlComponent onErrors={error => setError(error)}>
+              {selectedImage && selectedImage.uri !== null && (
+                <Image
+                  source={{uri: selectedImage.uri}}
+                  style={{flex: 1, width: 250, height: 250, borderRadius: 10}}
+                />
+              )}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  marginTop: 20,
+                  width: '100%',
+                }}>
+                <ButtonComponent
+                  onPress={openImagePicker}
+                  containerStyles={{
+                    borderRadius: 15,
+                    shadowColor: appColors.black,
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                    marginBottom: 10,
+                  }}
+                  textStyles={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                  }}>
+                  Chọn ảnh đại diện
+                </ButtonComponent>
+                <ButtonComponent
+                  onPress={openCamera}
+                  containerStyles={{
+                    borderRadius: 15,
+                    shadowColor: appColors.black,
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                    marginBottom: 10,
+                  }}
+                  textStyles={{
+                    fontWeight: 'bold',
+                    fontSize: 16,
+                  }}>
+                  Chụp ảnh trực tiếp
+                </ButtonComponent>
+              </View>
+              {selectedImage && selectedImage.uri === null && !firstClick && (
+                <TextComponent
+                  color={appColors.error}
+                  fontSize={12}
+                  style={[
+                    {
+                      paddingLeft: 5,
+                      marginBottom: 15,
+                    },
+                  ]}>
+                  Cần chọn ảnh đại diện
+                </TextComponent>
+              )}
               <InputComponent
                 size="md"
                 label="Họ tên*"
                 labelStyle={styles.labelInput}
                 placeholder="Họ tên*"
                 value={name}
+                error={name.trim() === '' || name.length <= 0}
+                errorMessage="Tên nhân viên không được để trống"
                 onChangeText={newValue => setName(newValue)}
                 startIcon={<User size={24} color={appColors.black} />}
                 inputContainerStyle={{
@@ -275,13 +458,10 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   width: '100%',
                 }}
               />
-
-              {!edit && (
-                <>
-                  <TextComponent bold style={styles.modalText}>
-                    Chức vụ*
-                  </TextComponent>
-                  {/* <SelectComponent
+              <TextComponent bold style={styles.modalText}>
+                Chức vụ*
+              </TextComponent>
+              {/* <SelectComponent
                     options={roles}
                     keyTitle="label"
                     value={role.label}
@@ -298,48 +478,46 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                       <ChevronDownIcon color={appColors.black} size={20} />
                     }
                   /> */}
-                  <SelectDropdown
-                    data={roles}
-                    onSelect={(selectedItem, index) => {
-                      setRole(selectedItem);
-                    }}
-                    buttonTextAfterSelection={(selectedItem, index) => {
-                      return selectedItem.label;
-                    }}
-                    rowTextForSelection={(item, index) => {
-                      return item.label;
-                    }}
-                    renderDropdownIcon={() => (
-                      <FontAwesomeIcon
-                        name="chevron-down"
-                        color={appColors.black}
-                        size={18}
-                      />
-                    )}
-                    buttonStyle={{
-                      backgroundColor: appColors.white,
-                      borderColor: appColors.black,
-                      borderWidth: 1,
-                      borderRadius: 10,
-                      width: '100%',
-                      marginBottom: 15,
-                    }}
-                    buttonTextStyle={{
-                      textAlign: 'left',
-                    }}
-                    renderCustomizedButtonChild={(selectedItem, index) => {
-                      return (
-                        <View style={styles.dropdownBtnChildStyle}>
-                          <NotepadText size={24} color={appColors.black} />
-                          <Text style={styles.dropdownBtnTxt}>
-                            {selectedItem ? selectedItem.label : role?.label}
-                          </Text>
-                        </View>
-                      );
-                    }}
+              <SelectDropdown
+                data={roles}
+                onSelect={(selectedItem, index) => {
+                  setRole(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.label;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.label;
+                }}
+                renderDropdownIcon={() => (
+                  <FontAwesomeIcon
+                    name="chevron-down"
+                    color={appColors.black}
+                    size={18}
                   />
-                </>
-              )}
+                )}
+                buttonStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  width: '100%',
+                  marginBottom: 15,
+                }}
+                buttonTextStyle={{
+                  textAlign: 'left',
+                }}
+                renderCustomizedButtonChild={(selectedItem, index) => {
+                  return (
+                    <View style={styles.dropdownBtnChildStyle}>
+                      <NotepadText size={24} color={appColors.black} />
+                      <Text style={styles.dropdownBtnTxt}>
+                        {selectedItem ? selectedItem.label : role?.label}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
 
               <InputComponent
                 size="md"
@@ -347,6 +525,11 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 labelStyle={styles.labelInput}
                 placeholder="Số điện thoại*"
                 value={phoneNumber}
+                error={
+                  phoneNumber.trim() === '' || phoneNumber.trim().length !== 10
+                }
+                maxLength={10}
+                errorMessage="Số điện thoại không hợp lệ"
                 onChangeText={newValue => setPhoneNumber(newValue)}
                 startIcon={<Phone size={24} color={appColors.black} />}
                 keyboardType="numeric"
@@ -372,6 +555,10 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 labelStyle={styles.labelInput}
                 placeholder="CCCD/CMND*"
                 value={identity}
+                error={
+                  identity.trim().length !== 9 && identity.trim().length !== 12
+                }
+                errorMessage="CCCD/CMND không hợp lệ"
                 onChangeText={newValue => setIdentity(newValue)}
                 startIcon={<Fingerprint size={24} color={appColors.black} />}
                 keyboardType="numeric"
@@ -457,7 +644,11 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 mode="date"
                 date={dateOfBirth}
                 title={'Chọn ngày sinh'}
-                maximumDate={new Date()}
+                maximumDate={
+                  new Date(
+                    new Date().setFullYear(new Date().getFullYear() - 18),
+                  )
+                }
                 onConfirm={date => {
                   setShowDatePicker(false);
                   setDateOfBirth(date);
@@ -492,15 +683,55 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
               <TextComponent bold style={styles.modalText}>
                 Giới tính *
               </TextComponent>
-              <SelectComponent
+              <SelectDropdown
+                data={genders}
+                onSelect={(selectedItem, index) => {
+                  setGender(selectedItem);
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  return selectedItem.genderName;
+                }}
+                rowTextForSelection={(item, index) => {
+                  return item.genderName;
+                }}
+                renderDropdownIcon={() => (
+                  <FontAwesomeIcon
+                    name="chevron-down"
+                    color={appColors.black}
+                    size={18}
+                  />
+                )}
+                buttonStyle={{
+                  backgroundColor: appColors.white,
+                  borderColor: appColors.black,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  width: '100%',
+                  marginBottom: 15,
+                }}
+                buttonTextStyle={{
+                  textAlign: 'left',
+                }}
+                renderCustomizedButtonChild={(selectedItem, index) => {
+                  return (
+                    <View style={styles.dropdownBtnChildStyle}>
+                      <FolderHeart size={24} color={appColors.black} />
+                      <Text style={styles.dropdownBtnTxt}>
+                        {selectedItem
+                          ? selectedItem.genderName
+                          : gender?.genderName}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+              {/* <SelectComponent
                 options={genders}
                 keyTitle="genderName"
                 value={gender?.genderName}
                 selectInputStyle={{paddingHorizontal: 10}}
                 placeholderColor={appColors.darkGray}
                 title="Chọn giới tính"
-                error={gender?.genderId === null && firstClick}
-                errorMessage="Giới tính không được để trống"
                 onChange={value => setGender(value)}
                 selectTextColor={'black'}
                 placeholder="Giới tính"
@@ -513,7 +744,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                     size={18}
                   />
                 }
-              />
+              /> */}
 
               {!edit && (
                 <InputComponent
@@ -522,6 +753,13 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   labelStyle={styles.labelInput}
                   placeholder="Email*"
                   value={email}
+                  error={
+                    email.trim() === '' ||
+                    email.trim().length <= 0 ||
+                    email.trim() === '@theduckhospital.onmicrosoft.com' ||
+                    !email.trim().includes('@theduckhospital.onmicrosoft.com')
+                  }
+                  errorMessage="Email không hợp lệ"
                   onChangeText={newValue => setEmail(newValue)}
                   startIcon={<AtSign size={24} color={appColors.black} />}
                   inputContainerStyle={{
@@ -690,6 +928,11 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              enabled={
+                !error &&
+                !(selectedImage === undefined || selectedImage.uri === null) &&
+                !(department === undefined || department.departmentName === '')
+              }
               isLoading={isLoading}
               onPress={handleCreateOrUpdateStaff}
               containerStyles={[styles.button, {marginRight: 15}]}>

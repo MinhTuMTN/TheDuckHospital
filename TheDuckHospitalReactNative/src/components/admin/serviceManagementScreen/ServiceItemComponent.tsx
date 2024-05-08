@@ -29,16 +29,17 @@ interface ServiceItemComponentProps {
   service: any;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 function ServiceItemComponent(props: ServiceItemComponentProps) {
-  const {service, refreshList, setRefreshList} = props;
+  const {service, refreshList, setRefreshList, setIsEditing} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [deleted, setDeleted] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const toggleAlert = () => {
@@ -115,6 +116,7 @@ function ServiceItemComponent(props: ServiceItemComponentProps) {
 
       <ServiceDialogComponent
         edit
+        setIsEditing={setIsEditing}
         service={service}
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}

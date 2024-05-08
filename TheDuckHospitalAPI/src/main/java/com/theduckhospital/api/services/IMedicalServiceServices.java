@@ -20,7 +20,8 @@ public interface IMedicalServiceServices {
     FilteredMedicalServicesResponse getPaginationFilteredServices(
             String search,
             int page,
-            int limit
+            int limit,
+            List<ServiceType> serviceTypes
     );
 
     MedicalService updateMedicalService(int serviceId, UpdateServiceRequest request);

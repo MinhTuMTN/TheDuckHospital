@@ -13,16 +13,17 @@ interface RoomItemComponentProps {
   room: any;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 function RoomItemComponent(props: RoomItemComponentProps) {
-  const {room, refreshList, setRefreshList} = props;
+  const {room, refreshList, setRefreshList, setIsEditing} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [deleted, setDeleted] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const toggleAlert = () => {
@@ -90,6 +91,7 @@ function RoomItemComponent(props: RoomItemComponentProps) {
       <RoomDialogComponent
         edit
         room={room}
+        setIsEditing={setIsEditing}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}

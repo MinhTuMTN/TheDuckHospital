@@ -19,6 +19,7 @@ const SlashScreen = () => {
   const auth = useAuth();
   const dispatch = useDispatch();
   const {reset} = useNavigation<navigationProps>();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const getToken = () => {
@@ -37,9 +38,9 @@ const SlashScreen = () => {
     const timeoutId = setTimeout(() => {
       reset({
         index: 0,
-        // routes: [{name: 'LoginScreen'}],
+      //   routes: [{name: 'LoginScreen'}],
         routes: [{name: 'PatientBottom'}],
-        // routes: [{name: 'AdminLeftSideDrawer'}],
+        // routes: [{name: 'DetailsMedicalBillScreen'}],
       });
       // navigation.navigate('LoginScreen' as never);
     }, 1500);

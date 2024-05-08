@@ -88,25 +88,6 @@ function TransactionDetailScreen() {
 
         <ContainerComponent style={styles.listExamination}>
           <Accordion type="single" width={'100%'} shadowColor="transparent">
-            {/* <ExaminationItemComponent value="a" />
-            <ExaminationItemComponent value="b" />
-            <ExaminationItemComponent value="c" /> */}
-
-            {/* <SafeAreaView>
-              <FlatList
-                data={transaction.bookings}
-                keyExtractor={(item: any, index: number) =>
-                  `booking-${item.id}-${index}`
-                }
-                renderItem={({item}) => (
-                  <ExaminationItemComponent
-                    value={item.booking.bookingId}
-                    
-                  />
-                )}
-                style={{width: '100%'}}
-              />
-            </SafeAreaView> */}
             {transaction.bookings.map((item: any, index: number) => (
               <ExaminationItemComponent
                 key={index}

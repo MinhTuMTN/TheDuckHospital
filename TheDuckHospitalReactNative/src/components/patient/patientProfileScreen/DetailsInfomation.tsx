@@ -32,7 +32,6 @@ interface DetailsInfomationProps {
   setSelectedDistrict: any;
   setSelectedWard: any;
   firstClick: boolean;
-  setFirstClick: any;
 }
 
 const DetailsInfomation = (props: DetailsInfomationProps) => {
@@ -197,16 +196,15 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
               label="Email"
               placeholder="Nhập email"
               value={editProfile.email}
-              onChangeText={text =>
+              onChangeText={text => {
                 setEditProfile({
                   ...editProfile,
                   email: text,
-                })
-              }
+                });
+              }}
               error={
-                (editProfile.email.length > 0 ||
-                  editProfile.email.trim() !== '') &&
-                !editProfile.email.includes('@')
+                editProfile.email.length > 0 &&
+                !editProfile.email.includes('@theduckhospital.onmicrosoft.com')
               }
               errorMessage={'Địa chỉ không hợp lệ'}
               inputContainerStyle={styles.inputContainer}
@@ -246,7 +244,7 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
                   setSelectedProvince(value);
                   setIsDefaultProvince(false);
                 }}
-                error={selectedProvince.provinceName.length <= 0 && firstClick}
+                error={selectedProvince.provinceName.length <= 0 && !firstClick}
                 errorMessage="Tỉnh thành không được để trống"
                 title="Chọn tỉnh thành"
                 selectInputStyle={{paddingHorizontal: 10}}
@@ -284,7 +282,7 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
                     setIsDefaultDistrict(false);
                   }}
                   error={
-                    selectedDistrict.districtName.length <= 0 && firstClick
+                    selectedDistrict.districtName.length <= 0 && !firstClick
                   }
                   isDisabled={selectedProvince?.provinceId === ''}
                   errorMessage="Quận huyện không được để trống"
@@ -314,8 +312,10 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
                   options={wards}
                   keyTitle="wardName"
                   value={selectedWard.wardName}
-                  onChange={value => setSelectedWard(value)}
-                  error={selectedWard.wardName.length <= 0 && firstClick}
+                  onChange={value => {
+                    setSelectedWard(value);
+                  }}
+                  error={selectedWard.wardName.length <= 0 && !firstClick}
                   errorMessage="Phường xã không được để trống"
                   title="Chọn phường xã"
                   isDisabled={selectedDistrict?.districtId === ''}
@@ -337,12 +337,12 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
               label="Địa chỉ cụ thể *"
               size="md"
               value={editProfile.streetName}
-              onChangeText={text =>
+              onChangeText={text => {
                 setEditProfile({
                   ...editProfile,
                   streetName: text,
-                })
-              }
+                });
+              }}
               placeholder="Nhập chính xác địa chỉ hiện tại..."
               error={editProfile.streetName.length <= 0}
               errorMessage="Địa chỉ không được để trống"

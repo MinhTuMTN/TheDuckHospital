@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
@@ -319,7 +318,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
                     test.getMedicalExaminationRecord().getDoctorSchedule().getDoctor(),
                     test.getLaboratoryTechnician(),
-                    test.getMedicalService());
+                    test.getMedicalService(),
+                    test);
             medicalTestResultList.add(medicalTestResultResponse);
         }
         return medicalTestResultList;

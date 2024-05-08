@@ -1,4 +1,3 @@
-import {createStaffDataProps, updateStaffDataProps} from '../types';
 import {del, get, post, put} from './AxiosInstance';
 
 export const getPaginationStaffs = async (
@@ -17,16 +16,18 @@ export const getPaginationStaffs = async (
   });
 };
 
-export const createStaff = async (data: createStaffDataProps) => {
-  return post(`/admin/staffs`, data);
+export const createStaff = async (data: FormData) => {
+  return post(`/admin/staffs`, data, {
+    'Content-Type': 'multipart/form-data',
+  });
 };
 
-export const updateStaff = async (
-  staffId: string,
-  data: updateStaffDataProps,
-) => {
-  return put(`/admin/staffs/${staffId}`, data);
+export const updateStaff = async (staffId: string, data: FormData) => {
+  return put(`/admin/staffs/${staffId}`, data, {
+    'Content-Type': 'multipart/form-data',
+  });
 };
+
 export const deleteStaff = async (staffId: string) => {
   return del(`/admin/staffs/${staffId}`);
 };

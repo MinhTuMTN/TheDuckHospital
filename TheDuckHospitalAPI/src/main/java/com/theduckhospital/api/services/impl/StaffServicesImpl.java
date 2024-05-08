@@ -6,8 +6,10 @@ import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
+import com.theduckhospital.api.services.ICloudinaryServices;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
@@ -17,7 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +42,7 @@ public class StaffServicesImpl implements IStaffServices {
     private final NurseRepository nurseRepository;
     private final PharmacistRepository pharmacistRepository;
     private final CashierRepository cashierRepository;
+    private final ICloudinaryServices cloudinaryServices;
 
     public StaffServicesImpl(
             StaffRepository staffRepository,
@@ -48,7 +55,8 @@ public class StaffServicesImpl implements IStaffServices {
             LaboratoryTechnicianRepository laboratoryTechnicianRepository,
             NurseRepository nurseRepository,
             PharmacistRepository pharmacistRepository,
-            CashierRepository cashierRepository
+            CashierRepository cashierRepository,
+            ICloudinaryServices cloudinaryServices
     ) {
         this.staffRepository = staffRepository;
         this.graphServices = graphServices;
@@ -61,6 +69,7 @@ public class StaffServicesImpl implements IStaffServices {
         this.nurseRepository = nurseRepository;
         this.pharmacistRepository = pharmacistRepository;
         this.cashierRepository = cashierRepository;
+        this.cloudinaryServices = cloudinaryServices;
     }
     @Override
     @Transactional
@@ -77,12 +86,24 @@ public class StaffServicesImpl implements IStaffServices {
                 default -> staff = new Staff();
             }
 
+            String url = cloudinaryServices.uploadFile(request.getAvatar());
+            if (url.isEmpty()) {
+                throw new BadRequestException("Đã có lỗi xảy ra");
+            }
+            staff.setAvatar(url);
             staff.setStaffId(UUID.randomUUID());
             staff.setGender(Gender.values()[request.getGender()]);
             staff.setFullName(request.getFullName());
             staff.setIdentityNumber(request.getIdentityNumber());
             staff.setPhoneNumber(request.getPhoneNumber());
-            staff.setDateOfBirth(request.getDateOfBirth());
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+            Date dateOfBirth = new Date();
+            try {
+                dateOfBirth = df.parse(request.getDateOfBirth());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            staff.setDateOfBirth(dateOfBirth);
 
             Account account = new Account();
             account.setStaff(staff);
@@ -177,8 +198,20 @@ public class StaffServicesImpl implements IStaffServices {
         staff.setFullName(request.getFullName());
         staff.setIdentityNumber(request.getIdentityNumber());
         staff.setPhoneNumber(request.getPhoneNumber());
-        staff.setDateOfBirth(request.getDateOfBirth());
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        Date dateOfBirth = new Date();
+        try {
+            dateOfBirth = df.parse(request.getDateOfBirth());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        staff.setDateOfBirth(dateOfBirth);
 
+        String url = cloudinaryServices.uploadFile(request.getAvatar());
+        if (url.isEmpty()) {
+            throw new BadRequestException("Đã có lỗi xảy ra");
+        }
+        staff.setAvatar(url);
 
         return staffRepository.save(staff);
     }
