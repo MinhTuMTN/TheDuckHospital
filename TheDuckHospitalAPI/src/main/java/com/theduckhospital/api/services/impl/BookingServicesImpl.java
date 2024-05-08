@@ -17,6 +17,7 @@ import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.TimeSlotRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -39,6 +40,7 @@ public class BookingServicesImpl implements IBookingServices {
     private final IPaymentServices paymentServices;
     private final IAccountServices accountServices;
     private final ITimeSlotServices timeSlotServices;
+    private final PasswordEncoder passwordEncoder;
 
     public BookingServicesImpl(
             BookingRepository bookingRepository,
@@ -50,8 +52,8 @@ public class BookingServicesImpl implements IBookingServices {
             IScheduleDoctorServices doctorScheduleServices,
             IPaymentServices paymentServices,
             IAccountServices accountServices,
-            ITimeSlotServices timeSlotServices
-    ) {
+            ITimeSlotServices timeSlotServices,
+            PasswordEncoder passwordEncoder) {
         this.bookingRepository = bookingRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.transactionRepository = transactionRepository;
@@ -62,6 +64,7 @@ public class BookingServicesImpl implements IBookingServices {
         this.paymentServices = paymentServices;
         this.accountServices = accountServices;
         this.timeSlotServices = timeSlotServices;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -119,12 +122,17 @@ public class BookingServicesImpl implements IBookingServices {
                 throw new BadRequestException("No doctor schedule available");
 
             Transaction transaction = new Transaction();
-            transaction.setAmount(totalAmount + MomoConfig.fee);
+            transaction.setAmount(totalAmount + (
+                    request.getPaymentMethod() == PaymentMethod.WALLET
+                            ? 0
+                            :  MomoConfig.fee
+            ));
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);
             transaction.setAccount(patientProfile.getAccount());
             transactionRepository.save(transaction);
 
+            List<Booking> bookings = new ArrayList<>();
             for (TimeSlot timeSlot : timeSlots) {
                 Booking booking = new Booking();
                 booking.setPatientProfile(patientProfile);
@@ -135,8 +143,11 @@ public class BookingServicesImpl implements IBookingServices {
 
                 booking.setDeleted(true);
                 bookingRepository.save(booking);
+
+                bookings.add(booking);
             }
 
+            transaction.setBookings(bookings);
             return switch (request.getPaymentMethod()) {
                 case VNPAY -> paymentServices.vnPayCreatePaymentUrl(
                         totalAmount + VNPayConfig.fee,
@@ -147,12 +158,44 @@ public class BookingServicesImpl implements IBookingServices {
                         transaction.getTransactionId(),
                         request.isMobile()
                 );
+                case WALLET -> paymentWithWallet(transaction, request.getPinCode()) ? PaymentResponse
+                        .builder().walletSuccess(true).build() : PaymentResponse
+                        .builder().walletSuccess(false).build();
                 default -> throw new BadRequestException("Invalid payment method");
             };
+        } catch (BadRequestException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), e.getErrorCode());
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BadRequestException(e.getMessage(), 400);
         }
-        return null;
+    }
+
+    @Override
+    public boolean paymentWithWallet(Transaction transaction, String pinCode) {
+        if (pinCode == null || pinCode.isEmpty())
+            throw new BadRequestException("Pin code is required", 10031);
+        
+        Account account = transaction.getAccount();
+        if (!passwordEncoder.matches(pinCode, account.getWalletPin()))
+            throw new BadRequestException("Invalid pin code", 10014);
+        if (account.getBalance().compareTo(BigDecimal.valueOf(transaction.getAmount())) < 0
+                || account.getWalletLocked()
+        )
+            throw new BadRequestException("Not enough balance", 10030);
+
+        account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
+
+        Transaction transactionResult = updateTransactionAndBooking(
+                transaction.getTransactionId(),
+                "WALLET",
+                "WALLET",
+                TransactionStatus.SUCCESS
+        );
+        accountServices.saveAccount(account);
+
+        return transactionResult != null;
     }
 
     @Override

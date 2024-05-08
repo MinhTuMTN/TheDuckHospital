@@ -7,6 +7,7 @@ import {appColors} from '../../../constants/appColors';
 import {checkPinCode} from '../../../services/walletServices';
 import {navigationProps} from '../../../types';
 import PopupComponent from '../../PopupComponent';
+import {useTranslation} from 'react-i18next';
 
 interface RequestPinCodeComponentProps {
   visible?: boolean;
@@ -24,9 +25,11 @@ const RequestPinCodeComponent = (props: RequestPinCodeComponentProps) => {
   const [loading, setLoading] = React.useState(false);
 
   const navigation = useNavigation<navigationProps>();
+  const {t, i18n} = useTranslation();
 
   const handleForgotPinCode = () => {
-    setMessage('Vui lòng liên hệ với bộ phận hỗ trợ để được hỗ trợ');
+    const message = t('wallet.forgotPinCodeMessage');
+    setMessage(message);
   };
   const handleOnClose = () => {
     setModalVisible(false);
@@ -76,7 +79,7 @@ const RequestPinCodeComponent = (props: RequestPinCodeComponentProps) => {
       <PopupComponent
         visible={modalVisible}
         onClose={handleOnClose}
-        title="Nhập mã PIN">
+        title={t('wallet.enterPinCode')}>
         <View style={styles.container}>
           <View style={styles.pinCodeContainer}>
             {[0, 1, 2, 3, 4, 5].map((item, index) => (
@@ -119,7 +122,7 @@ const RequestPinCodeComponent = (props: RequestPinCodeComponentProps) => {
 
           <Pressable style={styles.forgotPinCode} onPress={handleForgotPinCode}>
             <TextComponent color={appColors.textDarker} fontWeight="500">
-              Quên mã PIN?
+              {t('wallet.forgotPinCode')}
             </TextComponent>
           </Pressable>
           <View

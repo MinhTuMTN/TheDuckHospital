@@ -162,6 +162,47 @@
     "otherFee": "Phí tiện ích + TGTT",
     "total": "Tổng tiền",
     "confirmNote": "Tôi đồng ý Phí tiện ý TheDuck Hospital cung cấp để đặt khám, thanh toán viện phí, đây không phải là dịch vụ bắt buộc bởi cơ sở ý tế.",
-    "payment": "Thanh toán"
+    "payment": "Thanh toán",
+    "notEnoughMoney": "Số dư không đủ để thanh toán. Vui lòng nạp tiền vào ví để tiếp tục thanh toán",
+    "success": "Thanh toán thành công",
+    "fail": "Thanh toán thất bại"
+  },
+  "wallet": {
+    "accountOwner": "Chủ tài khoản",
+    "availableBalance": "Số dư khả dụng",
+    "phoneNumber": "Số điện thoại",
+    "createDate": "Ngày tạo",
+    "myWallet": "Ví của tôi",
+    "transactionInThisMonth": "Giao dịch trong tháng này",
+    "statistic": "Thống kê",
+    "topUp": "Nạp tiền",
+    "qrScan": "Quét QR",
+    "recentTransaction": "Giao dịch gần đây",
+    "viewAll": "Xem tất cả",
+    "enterPinCode": "Nhập mã PIN",
+    "forgotPinCode": "Quên mã PIN?",
+    "forgotPinCodeMessage": "Vui lòng liên hệ với bộ phận hỗ trợ để được hỗ trợ"
+  },
+  "forgotPassword": {
+    "password": "Mật khẩu",
+    "changePassword": "Đổi mật khẩu mới",
+    "oldPassword": "Mật khẩu cũ",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "change": "Đổi mật khẩu",
+    "enterCorrectInfo": "Vui lòng nhập chính xác các thông tin bên dưới để đặt mật khẩu mới",
+    "blankOldPassword": "Mật khẩu cũ không được để trống",
+    "blankNewPassword": "Mật khẩu mới không được để trống",
+    "blankConfirmPassword": "Xác nhận mật khẩu không được để trống",
+    "confirmPasswordNotMatch": "Mật khẩu xác nhận không khớp",
+    "passwordLengthError": "Mật khẩu mới phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt"
+  },
+  "changeAccountInfo": {
+    "title": "Thay đổi thông tin\ntài khoản",
+    "fullName": "Họ và tên",
+    "phoneNumber": "Số điện thoại",
+    "numberOfCreatedProfiles": "Số hồ sơ đã tạo (có thể tạo tối đa 10 hồ sơ)",
+    "save": "Lưu",
+    "createdAt": "Ngày tạo tài khoản"
   }
 }

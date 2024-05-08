@@ -156,6 +156,47 @@
     "otherFee": "Utility fee + PTF",
     "total": "Total",
     "confirmNote": "I agree to the Convenience Fee TheDuck Hospital provides to book examinations and pay hospital fees, this is not a mandatory service by the medical facility.",
-    "payment": "Payment confirmation"
+    "payment": "Payment confirmation",
+    "notEnoughMoney": "Balance is not enough to pay. Please add money to your wallet to continue paying",
+    "success": "Payment success",
+    "fail": "Payment fail"
+  },
+  "wallet": {
+    "accountOwner": "Account owner",
+    "availableBalance": "Available balance",
+    "phoneNumber": "Phone number",
+    "createDate": "Create date",
+    "myWallet": "My Wallet",
+    "transactionInThisMonth": "Transaction in this month",
+    "statistic": "Statistic",
+    "topUp": "Top up",
+    "qrScan": "QR Scan",
+    "recentTransaction": "Recent transaction",
+    "viewAll": "View all",
+    "enterPinCode": "Enter your PIN code",
+    "forgotPinCode": "Forgot PIN code?",
+    "forgotPinCodeMessage": "Please contact the hotline 1900-1234 for support"
+  },
+  "forgotPassword": {
+    "password": "Password",
+    "changePassword": "Change Password",
+    "oldPassword": "Old password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "change": "Change password",
+    "enterCorrectInfo": "Please enter the correct information below to change your password",
+    "blankOldPassword": "Old password cannot be blank",
+    "blankNewPassword": "New password cannot be blank",
+    "blankConfirmPassword": "Confirm password cannot be blank",
+    "confirmPasswordNotMatch": "Confirm password does not match",
+    "passwordLengthError": "The new password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character"
+  },
+  "changeAccountInfo": {
+    "title": "Change Account Information",
+    "fullName": "Full name",
+    "phoneNumber": "Phone number",
+    "numberOfCreatedProfiles": "Number of created profiles (max 10)",
+    "save": "Save",
+    "createdAt": "Created at"
   }
 }

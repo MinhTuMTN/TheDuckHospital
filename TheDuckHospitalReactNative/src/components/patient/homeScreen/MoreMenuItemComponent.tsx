@@ -1,18 +1,31 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, Pressable, StyleSheet, View} from 'react-native';
 import {TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
 import {useTranslation} from 'react-i18next';
+import {useNavigation} from '@react-navigation/native';
+import {navigationProps} from '../../../types';
+import {useToast} from '../../../hooks/ToastProvider';
 
 interface MoreMenuItemComponentProps {
   text: string;
   image: any;
+  screenNavigate?: string;
 }
 
 const MoreMenuItemComponent = (props: MoreMenuItemComponentProps) => {
   const {t} = useTranslation();
+  const navigation = useNavigation<navigationProps>();
+  const toast = useToast();
   return (
-    <View style={[styles.container]}>
+    <Pressable
+      onPress={() => {
+        if (props.screenNavigate) {
+          navigation.navigate(props.screenNavigate);
+        }
+        toast.showToast('Tính năng đang được phát triển. Hẹn sớm gặp lại bạn!');
+      }}
+      style={[styles.container]}>
       <Image
         source={props.image}
         style={{
@@ -27,7 +40,7 @@ const MoreMenuItemComponent = (props: MoreMenuItemComponentProps) => {
         }}>
         {t(props.text)}
       </TextComponent>
-    </View>
+    </Pressable>
   );
 };
 

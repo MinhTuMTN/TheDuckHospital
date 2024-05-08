@@ -26,11 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
+    private final IBookingServices bookingServices;
     private final IAccountServices accountServices;
     private final MedicalTestRepository medicalTestRepository;
     private final ILaboratoryTechnicianServices laboratoryTechnicianServices;
@@ -41,7 +43,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
-            MedicalTestRepository medicalTestRepository,
+            IBookingServices bookingServices, MedicalTestRepository medicalTestRepository,
             TransactionRepository transactionRepository,
             ILaboratoryTechnicianServices laboratoryTechnicianServices,
             ICloudinaryServices cloudinaryServices,
@@ -49,6 +51,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             IPaymentServices paymentServices,
             IPatientServices patientServices) {
         this.medicalServiceServices = medicalServiceServices;
+        this.bookingServices = bookingServices;
         this.accountServices = accountServices;
         this.medicalTestRepository = medicalTestRepository;
         this.transactionRepository = transactionRepository;
@@ -210,6 +213,13 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
 
         MedicalTest medicalTest = optional.get();
+
+        if (medicalTest.getTransaction() != null &&
+                medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
+        ) {
+            throw new BadRequestException("This medical test has been paid", 10011);
+        }
+
         return new PatientMedicalTestDetailsResponse(
                 medicalTest.getMedicalExaminationRecord().getPatientProfile(),
                 medicalTest
@@ -248,6 +258,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 transactionRepository.deleteById(oldTransactionId);
             }
 
+            transaction.setMedicalTest(medicalTest);
             return switch (request.getPaymentMethod()) {
                 case VNPAY -> {
                     try {
@@ -269,6 +280,12 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                     } catch (IOException e) {
                         throw new BadRequestException("Error when create payment url");
                     }
+                }
+                case WALLET -> {
+                    boolean result = bookingServices.paymentWithWallet(transaction, request.getPinCode());
+                    yield result ? PaymentResponse
+                            .builder().walletSuccess(true).build() : PaymentResponse
+                            .builder().walletSuccess(false).build();
                 }
                 default -> throw new BadRequestException("Invalid payment method");
             };

@@ -10,6 +10,7 @@ import {appColors} from '../../../constants/appColors';
 import dayjs from 'dayjs';
 import GroupMedicalTestResult from '../../../components/patient/lookUpMedicalResults/GroupMedicalTestResult';
 import {getMedicalTestResults} from '../../../services/medicalTestServices';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const MedicalTestResultScreen = ({route}: {route: any}) => {
   const [medicalTests, setMedicalTest] = useState([]);
@@ -24,6 +25,7 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
       splitName[splitName.length - 1]
     }`;
   }, [profile]);
+  const toast = useToast();
 
   const handleGetMedicalTestResult = async (
     sort: 'DESC' | 'ASC',
@@ -46,7 +48,7 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
     if (response.success) {
       setMedicalTest(response.data.data);
     } else {
-      console.log(response);
+      toast.showToast('Có lỗi xảy ra, vui lòng thử lại sau');
     }
   };
 
@@ -56,7 +58,6 @@ const MedicalTestResultScreen = ({route}: {route: any}) => {
     toDate: dayjs.Dayjs,
     serviceId: number,
   ) => {
-    console.log(sort, fromDate, toDate, serviceId);
     handleGetMedicalTestResult(sort, fromDate, toDate, serviceId);
   };
 

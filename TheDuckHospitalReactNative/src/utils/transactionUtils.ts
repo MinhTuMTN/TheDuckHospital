@@ -1,18 +1,18 @@
 import {formatCurrency} from './currencyUtils';
 
 // BOOKING, MEDICAL_TEST, TOP_UP, REFUND
-export const getTransactionType = (type: string) => {
+export const getTransactionType = (type: string, lang: 'en' | 'vi' = 'vi') => {
   switch (type) {
     case 'BOOKING':
-      return 'Đặt lịch';
+      return lang === 'vi' ? 'Đặt lịch' : 'Booking';
     case 'MEDICAL_TEST':
-      return 'Xét nghiệm';
+      return lang === 'vi' ? 'Xét nghiệm' : 'Medical test';
     case 'TOP_UP':
-      return 'Nạp tiền';
+      return lang === 'vi' ? 'Nạp tiền' : 'Top up';
     case 'REFUND':
-      return 'Hoàn tiền';
+      return lang === 'vi' ? 'Hoàn tiền' : 'Refund';
     default:
-      return 'Khác';
+      return lang === 'vi' ? 'Khác' : 'Other';
   }
 };
 

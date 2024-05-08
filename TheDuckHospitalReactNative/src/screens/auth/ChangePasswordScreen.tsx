@@ -16,6 +16,7 @@ import {changePasswordWithOldPasswordDataProps} from '../../types';
 import {useNavigation} from '@react-navigation/native';
 import LoginRequireComponent from '../../components/LoginRequireComponent';
 import FormControlComponent from '../../components/FormControlComponent';
+import {useTranslation} from 'react-i18next';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ const ChangePasswordScreen = () => {
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [error, setError] = React.useState(false);
+  const {t} = useTranslation();
 
   const [password, setPassword] =
     React.useState<changePasswordWithOldPasswordDataProps>({
@@ -49,7 +51,7 @@ const ChangePasswordScreen = () => {
     <LoginRequireComponent>
       <ContainerComponent paddingTop={0}>
         <Header
-          title={`Mật khẩu`}
+          title={t('forgotPassword.password')}
           titleColor={appColors.black}
           showBackButton
           backIcon={<ChevronLeft size={30} color={appColors.black} />}
@@ -67,7 +69,7 @@ const ChangePasswordScreen = () => {
           </View>
           <View style={styles.container}>
             <TextComponent bold fontSize={22} textAlign="center">
-              Đổi Mật Khẩu Mới
+              {t('forgotPassword.changePassword')}
             </TextComponent>
             <TextComponent
               color={appColors.textDescription}
@@ -77,12 +79,12 @@ const ChangePasswordScreen = () => {
                 paddingTop: 4,
                 letterSpacing: 0.4,
               }}>
-              Vui lòng nhập chính xác các thông tin bên dưới để đặt mật khẩu mới{' '}
+              {t('forgotPassword.enterCorrectInfo')}
             </TextComponent>
 
             <FormControlComponent onErrors={error => setError(error)}>
               <InputComponent
-                label="Mật khẩu cũ"
+                label={t('forgotPassword.oldPassword')}
                 labelStyle={{
                   color: appColors.textDescription,
                   fontSize: 14,
@@ -93,7 +95,7 @@ const ChangePasswordScreen = () => {
                   setPassword({...password, oldPassword: text})
                 }
                 error={password.oldPassword === ''}
-                errorMessage="Mật khẩu cũ không được để trống"
+                errorMessage={t('forgotPassword.blankOldPassword')}
                 variant="underlined"
                 startIcon={
                   <SimpleLineIcons
@@ -114,13 +116,13 @@ const ChangePasswordScreen = () => {
                 }
                 containerStyle={{width: '100%'}}
                 type={showOldPassword ? 'text' : 'password'}
-                placeholder="Mật khẩu cũ"
+                placeholder={t('forgotPassword.oldPassword')}
                 onEndIconPress={() => {
                   setShowOldPassword(!showOldPassword);
                 }}
               />
               <InputComponent
-                label="Mật khẩu mới"
+                label={t('forgotPassword.newPassword')}
                 labelStyle={{
                   color: appColors.textDescription,
                   fontSize: 14,
@@ -136,8 +138,8 @@ const ChangePasswordScreen = () => {
                 }
                 errorMessage={
                   password.newPassword === ''
-                    ? 'Mật khẩu mới không được để trống'
-                    : 'Mật khẩu mới phải chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
+                    ? t('forgotPassword.blankNewPassword')
+                    : t('forgotPassword.passwordLengthError')
                 }
                 variant="underlined"
                 startIcon={
@@ -159,13 +161,13 @@ const ChangePasswordScreen = () => {
                 }
                 containerStyle={{width: '100%'}}
                 type={showNewPassword ? 'text' : 'password'}
-                placeholder="Mật khẩu mới"
+                placeholder={t('forgotPassword.newPassword')}
                 onEndIconPress={() => {
                   setShowNewPassword(!showNewPassword);
                 }}
               />
               <InputComponent
-                label="Xác nhận lại mật khẩu"
+                label={t('forgotPassword.confirmPassword')}
                 labelStyle={{
                   color: appColors.textDescription,
                   fontSize: 14,
@@ -181,8 +183,8 @@ const ChangePasswordScreen = () => {
                 }
                 errorMessage={
                   password.confirmNewPassword === ''
-                    ? 'Mật khẩu mới không được để trống'
-                    : 'Mật khẩu mới không trùng khớp với mật khẩu mới'
+                    ? t('forgotPassword.blankConfirmPassword')
+                    : t('forgotPassword.confirmPasswordNotMatch')
                 }
                 variant="underlined"
                 startIcon={
@@ -203,7 +205,7 @@ const ChangePasswordScreen = () => {
                 }
                 containerStyle={{width: '100%'}}
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Xác nhận lại mật khẩu"
+                placeholder={t('forgotPassword.confirmPassword')}
                 onEndIconPress={() => {
                   setShowConfirmPassword(!showConfirmPassword);
                 }}
@@ -222,7 +224,7 @@ const ChangePasswordScreen = () => {
                   fontWeight: 'bold',
                 }}
                 backgroundColor={appColors.primaryDark}>
-                Đổi mật khẩu
+                {t('forgotPassword.change')}
               </ButtonComponent>
             </View>
           </View>
