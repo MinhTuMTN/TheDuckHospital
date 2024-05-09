@@ -16,7 +16,7 @@ public class MedicalRecordResponse {
     private Doctor doctor;
     private String doctorEmail;
     private Date reExamDate;
-    private DoctorSchedule doctorSchedule;
+    private DoctorScheduleRoomResponse doctorSchedule;
     private double price;
     private List<PrescriptionItemResponse> prescription;
     private List<PrescriptionItem> prescription2;
@@ -30,7 +30,7 @@ public class MedicalRecordResponse {
         this.departmentName = record.getDoctorSchedule().getRoom().getDepartment().getDepartmentName();
         this.doctor = record.getDoctorSchedule().getDoctor();
         this.doctorEmail = record.getDoctorSchedule().getDoctor().getAccount().getEmail();
-        this.doctorSchedule = record.getDoctorSchedule();
+        this.doctorSchedule = new DoctorScheduleRoomResponse(record.getDoctorSchedule(), 0);
 
         Prescription prescription = record.getPrescription();
         List<PrescriptionItem> prescriptionItems;

@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
@@ -26,8 +27,9 @@ import {getPaginationMedMedicalServices} from '../../../services/medicalServiceS
 
 function ServiceListScreen() {
   const [showPopover, setShowPopover] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
-  const [selected, setSelected] = useState('all');
+  const [selected, setSelected] = useState('All');
   const [modalVisible, setModalVisible] = useState(false);
   const [services, setServices] = React.useState<any>([]);
   const [paginationParams, setPaginationParams] = React.useState({
@@ -38,15 +40,14 @@ function ServiceListScreen() {
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
   const [searchText, setSearchText] = React.useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, services, paginationParams.page]);
 
   const handleChangedText = (text: string) => {
@@ -59,6 +60,7 @@ function ServiceListScreen() {
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const handleGetServices = async () => {
@@ -67,15 +69,22 @@ function ServiceListScreen() {
       paginationParams.totalPages !== 0
     )
       return;
+
+    let serviceTypes: string[] = [];
+    if (selected === 'All') {
+      serviceTypes = ['MedicalExamination', 'MedicalTest'];
+    } else {
+      serviceTypes = [selected];
+    }
+
     setIsLoadingAPI(true);
     const response = await getPaginationMedMedicalServices(
       debouncedSearchText.trim(),
       paginationParams.limit,
       paginationParams.page,
+      serviceTypes,
     );
     setIsLoadingAPI(false);
-
-    console.log(response);
 
     if (response.success) {
       if (paginationParams.page === 0) {
@@ -95,38 +104,70 @@ function ServiceListScreen() {
     }
   };
 
-  React.useEffect(() => {
+  const handleResetList = () => {
+    setSearchText('');
     setPaginationParams((prevState: any) => ({
       ...prevState,
       page: 0,
     }));
+  };
+
+  React.useEffect(() => {
+    handleResetList();
   }, [refreshList]);
 
   React.useEffect(() => {
     handleGetServices();
-  }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
+  }, [
+    debouncedSearchText,
+    paginationParams.page,
+    paginationParams.limit,
+    selected,
+  ]);
+
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={32} style={styles.listLabel}>
-          Danh sách dịch vụ
-        </TextComponent>
-        <ButtonComponent
-          containerStyles={styles.addButtonContainer}
-          onPress={toggleModal}>
-          <View style={styles.buttonContent}>
-            <TextComponent
-              bold
-              fontSize={18}
-              color={appColors.textPrimary}
-              style={styles.addButtonText}>
-              Thêm
-            </TextComponent>
-            <Icon name="plus" size={20} color={appColors.textPrimary} />
-          </View>
-        </ButtonComponent>
-      </ContainerComponent>
+      {(!isKeyboardVisible || isEditing) && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={32} style={styles.listLabel}>
+            Danh sách dịch vụ
+          </TextComponent>
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={toggleModal}>
+            <View style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={18}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <Icon name="plus" size={20} color={appColors.textPrimary} />
+            </View>
+          </ButtonComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -168,15 +209,17 @@ function ServiceListScreen() {
             <FlexComponent style={styles.filterContainer}>
               <ButtonComponent
                 containerStyles={
-                  selected === 'all' ? styles.selectedButton : styles.button
+                  selected === 'All' ? styles.selectedButton : styles.button
                 }
                 onPress={() => {
-                  setSelected('all');
+                  setSelected('All');
+                  console.log(selected);
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'all'
+                    selected === 'All'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -185,17 +228,19 @@ function ServiceListScreen() {
               </ButtonComponent>
               <ButtonComponent
                 containerStyles={
-                  selected === 'examination'
+                  selected === 'MedicalExamination'
                     ? styles.selectedButton
                     : styles.button
                 }
                 onPress={() => {
-                  setSelected('examination');
+                  setSelected('MedicalExamination');
+                  console.log(selected);
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'examination'
+                    selected === 'MedicalExamination'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -204,15 +249,19 @@ function ServiceListScreen() {
               </ButtonComponent>
               <ButtonComponent
                 containerStyles={
-                  selected === 'test' ? styles.selectedButton : styles.button
+                  selected === 'MedicalTest'
+                    ? styles.selectedButton
+                    : styles.button
                 }
                 onPress={() => {
-                  setSelected('test');
+                  setSelected('MedicalTest');
+                  console.log(selected);
                   setShowPopover(false);
+                  handleResetList();
                 }}>
                 <TextComponent
                   style={
-                    selected === 'test'
+                    selected === 'MedicalTest'
                       ? styles.selectedButtonText
                       : styles.buttonText
                   }>
@@ -224,40 +273,44 @@ function ServiceListScreen() {
         </ContainerComponent>
       </ContainerComponent>
 
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={services}
-          keyExtractor={(item: any, index: number) =>
-            `service-${item.id}-${index}`
-          }
-          extraData={services}
-          refreshing={true}
-          renderItem={({item}) => (
-            <ServiceItemComponent
-              refreshList={refreshList}
-              setRefreshList={setRefreshList}
-              service={item}
-            />
-          )}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {(!isKeyboardVisible || isEditing) && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={services}
+            keyExtractor={(item: any, index: number) =>
+              `service-${item.serviceId}-${index}`
             }
-          }}
-          onEndReachedThreshold={0.7}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            extraData={services}
+            refreshing={true}
+            renderItem={({item}) => (
+              <ServiceItemComponent
+                setIsEditing={setIsEditing}
+                refreshList={refreshList}
+                setRefreshList={setRefreshList}
+                service={item}
+              />
+            )}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={0.7}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
 
       <ServiceDialogComponent
+        setIsEditing={setIsEditing}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}
@@ -269,7 +322,6 @@ function ServiceListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingTop: 0,
@@ -330,7 +382,6 @@ const styles = StyleSheet.create({
     borderRadius: Dimensions.get('window').width * 0.5,
   },
   searchContainer: {
-    flex: 1,
     paddingTop: 0,
     flexDirection: 'row',
     alignItems: 'center',

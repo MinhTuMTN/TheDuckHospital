@@ -23,18 +23,22 @@ const items = [
   {
     text: 'homeScreen.lookupMedicalResultNoNewLine',
     image: require('../../../assets/images/loupe.png'),
+    screenNavigate: 'AllPatientProfilesScreen',
   },
   {
     text: 'homeScreen.payHospitalFeeNoNewLine',
     image: require('../../../assets/images/payment.png'),
+    screenNavigate: 'EnterHospitalPaymentCodeScreen',
   },
   {
     text: 'homeScreen.medicineReminderNoNewLine',
     image: require('../../../assets/images/animal.png'),
+    screenNavigate: 'MedicineRemiderNavigator',
   },
   {
     text: 'homeScreen.quickSupport',
     image: require('../../../assets/images/chat.png'),
+    screenNavigate: 'ChatScreen',
   },
   {
     text: 'homeScreen.instructionBooking',
@@ -87,6 +91,7 @@ const MoreMenuComponent = (props: MoreMenuComponentProps) => {
               key={index}
               text={item.text}
               image={item.image}
+              screenNavigate={item.screenNavigate}
             />
           );
         })}

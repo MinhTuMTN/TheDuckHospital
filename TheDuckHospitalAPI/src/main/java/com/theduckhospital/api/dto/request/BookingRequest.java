@@ -12,4 +12,5 @@ public class BookingRequest {
     private List<String> timeSlotIds;
     private PaymentMethod paymentMethod;
     private boolean mobile = false;
+    private String pinCode;
 }

@@ -9,8 +9,9 @@ export const getPaginationMedMedicalServices = async (
   search: string,
   limit: number,
   page: number,
+  serviceTypes: string[],
 ) => {
-  return get(`/admin/services/filtered`, {search, limit, page});
+  return get(`/admin/services/filtered`, {search, limit, page, serviceTypes});
 };
 
 export const deleteService = async (serviceId: number) => {

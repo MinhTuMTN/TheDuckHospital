@@ -15,10 +15,11 @@ interface DepartmentItemComponentProps {
   department: any;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 function DepartmentItemComponent(props: DepartmentItemComponentProps) {
-  const {department, refreshList, setRefreshList} = props;
+  const {department, refreshList, setRefreshList, setIsEditing} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
 
@@ -26,6 +27,7 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const toggleAlert = () => {
@@ -107,6 +109,7 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
 
         <DepartmentDialogComponent
           edit
+          setIsEditing={setIsEditing}
           department={department}
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +23,8 @@ public class Booking {
     private String bookingCode;
 
     private int queueNumber;
+
+    private boolean rated = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
@@ -41,6 +44,11 @@ public class Booking {
     @JsonBackReference
     @ToStringExclude
     private MedicalExaminationRecord medicalExaminationRecord;
+
+    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Rating rating;
 
     private Date createdAt;
     private Date updatedAt;

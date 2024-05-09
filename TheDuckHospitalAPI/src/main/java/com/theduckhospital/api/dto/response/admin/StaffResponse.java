@@ -21,6 +21,7 @@ public class StaffResponse {
     private Date dateOfBirth;
     private boolean headOfDepartment;
     private Degree degree;
+    private String avatar;
     private boolean deleted;
 
     public StaffResponse(Staff staff) {
@@ -32,6 +33,7 @@ public class StaffResponse {
         this.gender = staff.getGender().ordinal();
         this.email = staff.getAccount().getEmail();
         this.deleted = staff.isDeleted();
+        this.avatar = staff.getAvatar();
 
         if (staff instanceof Doctor) {
             this.role = "Bác sĩ";

@@ -40,7 +40,7 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         if(request.getServiceType() == ServiceType.MedicalExamination) {
             department = departmentServices.getDepartmentById(request.getDepartmentId());
         }
-        
+
         if (request.getServiceType() == ServiceType.MedicalExamination
                 && department.getMedicalServices().stream().anyMatch(
                 medicalService -> medicalService.getServiceType() == ServiceType.MedicalExamination
@@ -82,19 +82,24 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     public FilteredMedicalServicesResponse getPaginationFilteredServices(
             String search,
             int page,
-            int limit
+            int limit,
+            List<ServiceType> serviceTypes
     ) {
         List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
 
         List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingOrDepartmentIn(search, departments);
 
+        List<MedicalService> filteredServices = services.stream()
+                .filter(service -> serviceTypes.contains(service.getServiceType()))
+                .toList();
+
         Pageable pageable = PageRequest.of(page, limit);
 
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), services.size());
-        List<MedicalService> medicalServices = services.subList(start, end);
+        int end = Math.min((start + pageable.getPageSize()), filteredServices.size());
+        List<MedicalService> medicalServices = filteredServices.subList(start, end);
 
-        return new FilteredMedicalServicesResponse(medicalServices, services.size(), page, limit);
+        return new FilteredMedicalServicesResponse(medicalServices, filteredServices.size(), page, limit);
     }
 
     @NotNull

@@ -29,19 +29,37 @@ import {globalStyles} from '../../../styles/globalStyles';
 import dayjs from 'dayjs';
 import {payment} from '../../../services/payment';
 import {useNavigation} from '@react-navigation/native';
-import {navigationProps} from '../../../types';
+import {RootState, navigationProps} from '../../../types';
 import {useToast} from '../../../hooks/ToastProvider';
+import {useSelector} from 'react-redux';
+import {useTranslation} from 'react-i18next';
+import RequestPinCodeComponent from '../../../components/patient/walletScreen/RequestPinCodeComponent';
 
 const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
   const [paymentLoading, setPaymentLoading] = React.useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [pinCodeVisible, setPinCodeVisible] = useState(false);
 
   const {aboutPayment, medicalCodeId} = route.params;
 
   const navigation = useNavigation<navigationProps>();
   const toast = useToast();
-  const handlePayment = async () => {
+  const userInfo = useSelector((state: RootState) => state.auth.userInfo);
+  const {t} = useTranslation();
+
+  const handlePaymentWithWallet = async () => {
+    if (
+      userInfo.balance &&
+      userInfo?.balance < aboutPayment.medicalTest?.price
+    ) {
+      toast?.showToast(t('billingInformation.notEnoughMoney'));
+      return;
+    }
+    setPinCodeVisible(true);
+  };
+
+  const handlePayment = async (pinCode: string = '') => {
     if (paymentMethod === '') {
       toast.showToast('Vui lòng chọn phương thức thanh toán');
       return;
@@ -49,6 +67,7 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
     const data = {
       medicalTestCode: medicalCodeId,
       paymentMethod: paymentMethod,
+      pinCode: pinCode,
     };
 
     setPaymentLoading(true);
@@ -57,8 +76,17 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
     console.log('Response: ', response);
 
     if (response.success) {
-      console.log('Deeplink: ', response.data.data.deepLink);
-      console.log('URL: ', response.data.data.paymentUrl);
+      if (paymentMethod === 'WALLET') {
+        const walletSuccess = response.data?.data?.walletSuccess;
+        if (walletSuccess) {
+          toast?.showToast(t('billingInformation.success'));
+          navigation.navigate('HomeScreen');
+          return;
+        } else {
+          toast?.showToast(t('billingInformation.fail'));
+          return;
+        }
+      }
 
       if (paymentMethod === 'MOMO')
         Linking.openURL(response.data.data.deepLink);
@@ -67,9 +95,10 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
         Linking.openURL(response.data.data.paymentUrl);
       }
     } else {
-      console.log(response.error);
-
-      toast.showToast(response.error);
+      const errorCode = response.statusCode;
+      if (errorCode === 10030)
+        toast?.showToast(t('billingInformation.notEnoughMoney'));
+      else toast?.showToast(t('billingInformation.fail'));
     }
   };
   return (
@@ -288,6 +317,20 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
                     Ví điện tử Momo
                   </TextComponent>
                 </View>
+              ) : paymentMethod === 'WALLET' ? (
+                <View style={styles.isChoose}>
+                  <Image
+                    source={require('../../../assets/images/logo-text-small.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="500"
+                    fontSize={17}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    The Duck Wallet
+                  </TextComponent>
+                </View>
               ) : (
                 <View style={styles.isChoose}>
                   <Image
@@ -329,7 +372,11 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
               <Space paddingTop={5} />
               <LineInfoComponent
                 label="Phí TGTT"
-                value={formatCurrency('1500') + ' đ'}
+                value={
+                  paymentMethod === 'WALLET'
+                    ? '0đ'
+                    : formatCurrency('1500') + 'đ'
+                }
                 valueTextAlign="right"
                 labelStyles={{
                   fontSize: 15,
@@ -349,7 +396,10 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
               <LineInfoComponent
                 label="Tổng tiền"
                 value={
-                  formatCurrency(aboutPayment.medicalTest?.price + 1500) + ' đ'
+                  formatCurrency(
+                    aboutPayment.medicalTest?.price +
+                      (paymentMethod === 'WALLET' ? 0 : 1500),
+                  ) + ' đ'
                 }
                 valueTextAlign="right"
                 labelStyles={{
@@ -380,7 +430,11 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
                 </TextComponent>
               </View>
               <ButtonComponent
-                onPress={handlePayment}
+                onPress={
+                  paymentMethod === 'WALLET'
+                    ? handlePaymentWithWallet
+                    : handlePayment
+                }
                 backgroundColor={appColors.primaryDark}
                 borderRadius={30}
                 isLoading={paymentLoading}
@@ -427,6 +481,32 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
                   />
                 </Pressable>
               </View>
+              {userInfo.balance && (
+                <Pressable
+                  style={[
+                    styles.option,
+                    {
+                      borderBottomColor: appColors.grayLine,
+                      borderBottomWidth: 1,
+                    },
+                  ]}
+                  onPress={() => {
+                    setPaymentMethod('WALLET');
+                    setModalVisible(false);
+                  }}>
+                  <Image
+                    source={require('../../../assets/images/logo-text-small.png')}
+                    style={{width: 30, height: 30}}
+                  />
+                  <TextComponent
+                    fontWeight="400"
+                    fontSize={16}
+                    color={appColors.black}
+                    style={{marginLeft: 10, letterSpacing: 0.2}}>
+                    The Duck Wallet
+                  </TextComponent>
+                </Pressable>
+              )}
               <Pressable
                 style={[
                   styles.option,
@@ -472,6 +552,16 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
             </View>
           </View>
         </Modal>
+        <RequestPinCodeComponent
+          visible={pinCodeVisible}
+          onClosed={() => {
+            setPinCodeVisible(false);
+          }}
+          onSucess={async (pinCode: string) => {
+            setPinCodeVisible(false);
+            handlePayment(pinCode);
+          }}
+        />
       </ContainerComponent>
     </GestureHandlerRootView>
   );

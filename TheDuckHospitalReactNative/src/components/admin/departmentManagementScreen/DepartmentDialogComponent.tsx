@@ -7,11 +7,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import {
-  FlexComponent,
-  InputComponent,
-  TextComponent,
-} from '../..';
+import {FlexComponent, InputComponent, TextComponent} from '../..';
 import ButtonComponent from '../../ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -27,7 +23,6 @@ import {
   getDoctorWithinDepartment,
   updateDepartment,
 } from '../../../services/departmentServices';
-import {ChevronDownIcon} from 'lucide-react-native';
 
 // const headDoctors = [
 //   {staffId: '1', fullName: 'Lâm Mộc Văn'},
@@ -42,6 +37,7 @@ interface DepartmentDialogComponentProps {
   refreshList: boolean;
   department?: any;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing?: (isEditing: boolean) => void;
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
@@ -51,6 +47,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
     refreshList,
     department,
     setRefreshList,
+    setIsEditing,
     setModalVisible,
     edit = false,
   } = props;
@@ -63,12 +60,14 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
     edit ? department?.headDoctor : {fullName: 'Chưa cập nhật', staffId: ''},
   );
   const [error, setError] = React.useState(false);
-  const [firstClick, setFirstClick] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  // const [firstClick, setFirstClick] = useState(true);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
+      if (setIsEditing) setIsEditing(false);
+      // if (!firstClick) setFirstClick(true);
       if (edit) {
         setName(department?.departmentName);
         setDescription(department?.description);
@@ -83,14 +82,11 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
 
   const handleCreateOrUpdateDepartment = async () => {
     try {
-      if (!firstClick) setFirstClick(true);
+      // if (firstClick) setFirstClick(false);
       if (error) {
-        console.log('error1');
-
         return;
       }
-
-      console.log('error2');
+      
       if (!edit) {
         const data = {
           departmentName: name,
@@ -135,7 +131,9 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
 
   React.useEffect(() => {
     const handleGetDoctorWithinDepartment = async () => {
-      const response = await getDoctorWithinDepartment(department?.departmentId);
+      const response = await getDoctorWithinDepartment(
+        department?.departmentId,
+      );
       if (response.success) {
         setHeadDoctors(response.data.data);
       } else {
@@ -183,6 +181,10 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
                 size="md"
                 placeholder="Tên khoa*"
                 value={name}
+                // enableFirstClick
+                // firstClick={firstClick}
+                error={name.trim() === '' || name.length <= 0}
+                errorMessage="Tên khoa không được để trống"
                 onChangeText={newValue => setName(newValue)}
                 startIcon={
                   <MaterialCommunityIcons
@@ -195,14 +197,12 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
                   backgroundColor: appColors.white,
                   borderColor: appColors.black,
                   borderRadius: 10,
-                  marginBottom: 5,
                   width: '100%',
                 }}
                 inputContainerFocusStyle={{
                   backgroundColor: appColors.white,
                   borderColor: appColors.primary,
                   borderRadius: 10,
-                  marginBottom: 5,
                   width: '100%',
                 }}
               />
@@ -235,7 +235,6 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
                   width: '100%',
                 }}
               />
-
               {edit && (
                 <>
                   <TextComponent bold style={styles.labelText}>
@@ -324,6 +323,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
+              enabled={!error}
               isLoading={isLoading}
               containerStyles={[styles.button, {marginRight: 15}]}
               onPress={handleCreateOrUpdateDepartment}>

@@ -1,8 +1,10 @@
 package com.theduckhospital.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.theduckhospital.api.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
@@ -36,6 +38,11 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient")
     private List<PatientProfile> patientProfiles;
+
+    @OneToMany(mappedBy = "patient")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Rating> ratings;
 
     @PreUpdate
     private void onUpdate() {

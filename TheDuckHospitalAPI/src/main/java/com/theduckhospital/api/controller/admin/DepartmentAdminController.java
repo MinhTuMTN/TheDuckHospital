@@ -20,6 +20,7 @@ public class DepartmentAdminController {
     public DepartmentAdminController(IDepartmentServices departmentServices) {
         this.departmentServices = departmentServices;
     }
+
     @PostMapping
     public ResponseEntity<?> createDepartment(@RequestBody @Valid CreateDepartmentRequest request) {
         return ResponseEntity.ok(

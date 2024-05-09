@@ -19,6 +19,7 @@ import {useAuth} from '../../hooks/AuthHooks';
 import {useToast} from '../../hooks/ToastProvider';
 import {updateProfile} from '../../services/authServices';
 import {RootState, navigationProps} from '../../types';
+import {useTranslation} from 'react-i18next';
 
 const ChangeAccountInfoScreen = () => {
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
@@ -28,6 +29,7 @@ const ChangeAccountInfoScreen = () => {
   const auth = useAuth();
   const toast = useToast();
   const navigation = useNavigation<navigationProps>();
+  const {t, i18n} = useTranslation();
 
   const handleGetImage = useCallback(async () => {
     const result = await launchImageLibrary({
@@ -57,7 +59,12 @@ const ChangeAccountInfoScreen = () => {
 
     if (response.success) {
       auth.handleCheckToken();
-      toast.showToast('Cập nhật thông tin thành công');
+
+      const message =
+        i18n.language === 'en'
+          ? 'Update successfully'
+          : 'Cập nhật thông tin thành công';
+      toast.showToast(message);
       navigation.goBack();
     }
   }, [uploadImage, fullName, auth]);
@@ -65,7 +72,7 @@ const ChangeAccountInfoScreen = () => {
   return (
     <ContainerComponent paddingTop={0}>
       <Header
-        title={'Thay đổi thông tin\ntài khoản'}
+        title={t('changeAccountInfo.title')}
         showBackButton={true}
         paddingTop={0}
         noBackground
@@ -107,14 +114,14 @@ const ChangeAccountInfoScreen = () => {
 
         <View style={styles.contentContainer}>
           <InputComponent
-            label="Họ và tên"
+            label={t('changeAccountInfo.fullName')}
             value={fullName}
             onChangeText={(text: string) => setFullName(text)}
             labelStyle={styles.labelStyle}
             _inputContainerStyle={styles.inputContainerStyle}
           />
           <InputComponent
-            label="Số điện thoại"
+            label={t('changeAccountInfo.phoneNumber')}
             value={userInfo.phoneNumber}
             disabled
             labelStyle={styles.labelStyle}
@@ -122,7 +129,7 @@ const ChangeAccountInfoScreen = () => {
           />
 
           <InputComponent
-            label="Số hồ sơ đã tạo (có thể tạo tối đa 10 hồ sơ)"
+            label={t('changeAccountInfo.numberOfCreatedProfiles')}
             value={
               userInfo.numberOfProfile
                 ? userInfo.numberOfProfile.toString()
@@ -134,22 +141,23 @@ const ChangeAccountInfoScreen = () => {
           />
 
           <InputComponent
-            label="Ngày tạo tài khoản"
+            label={t('changeAccountInfo.createdAt')}
             value={dayjs(userInfo.createdAt).format('DD/MM/YYYY HH:mm')}
             disabled
             labelStyle={styles.labelStyle}
             _inputContainerStyle={styles.inputContainerStyle}
           />
         </View>
-
-        <ButtonComponent
-          isLoading={isLoading}
-          onPress={handleUpdateProfile}
-          enabled={fullName !== userInfo.fullName || uploadImage !== null}
-          borderRadius={8}
-          backgroundColor={appColors.darkerBlue}>
-          Lưu
-        </ButtonComponent>
+        {fullName !== userInfo.fullName ||
+          (uploadImage !== null && (
+            <ButtonComponent
+              isLoading={isLoading}
+              onPress={handleUpdateProfile}
+              borderRadius={8}
+              backgroundColor={appColors.darkerBlue}>
+              {t('changeAccountInfo.save')}
+            </ButtonComponent>
+          ))}
       </ContentComponent>
     </ContainerComponent>
   );

@@ -37,6 +37,7 @@ public class FirebaseServicesImpl implements IFirebaseServices {
     @Override
     public void sendNotification(String token, String title, String body, Map<String, String> data)
             throws FirebaseMessagingException {
+
         Message message = Message.builder()
                 .setToken(token)
                 .setNotification(com.google.firebase.messaging.Notification.builder()
@@ -46,8 +47,13 @@ public class FirebaseServicesImpl implements IFirebaseServices {
                 .putAllData(data)
                 .build();
 
-        String response = firebaseMessaging.send(message);
-
+        try {
+            String response = firebaseMessaging.send(message);
+        } catch (Exception ignored) {
+            // If the device is not available,
+            // we will ignore it and continue to send to the next device
+            System.out.println("Error: No device available to send notification");
+        }
     }
 
     @Override

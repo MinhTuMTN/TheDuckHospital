@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {Image, Pressable, StyleSheet} from 'react-native';
 import {ContainerComponent, FlexComponent, TextComponent} from '../..';
 import {appColors} from '../../../constants/appColors';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
@@ -15,10 +15,11 @@ interface StaffItemComponentProps {
   staff: any;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 function StaffItemComponent(props: StaffItemComponentProps) {
-  const {staff, refreshList, setRefreshList} = props;
+  const {staff, refreshList, setRefreshList, setIsEditing} = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlertDialog, setShowAlertDialog] = useState(false);
 
@@ -26,6 +27,7 @@ function StaffItemComponent(props: StaffItemComponentProps) {
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const toggleAlert = () => {
@@ -38,8 +40,22 @@ function StaffItemComponent(props: StaffItemComponentProps) {
 
   return (
     <Pressable onPress={handleDetailsClick}>
-      <ContainerComponent style={styles.serviceItemContainer}>
-        <FlexComponent style={[styles.serviceInfoContainer, {flex: 0.6}]}>
+      <ContainerComponent style={styles.staffItemContainer}>
+        <FlexComponent style={[styles.staffInfoContainer, {flex: 0.6}]}>
+          <Image
+            source={{
+              uri: staff.avatar
+                ? staff.avatar
+                : 'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
+            }}
+            height={85}
+            width={85}
+            style={{
+              borderRadius: 18,
+            }}
+          />
+        </FlexComponent>
+        <FlexComponent style={[styles.staffInfoContainer, {flex: 0.6}]}>
           <TextComponent bold fontSize={19}>
             {staff.fullName}
           </TextComponent>
@@ -48,7 +64,7 @@ function StaffItemComponent(props: StaffItemComponentProps) {
 
         <FlexComponent
           style={[
-            styles.serviceInfoContainer,
+            styles.staffInfoContainer,
             {alignItems: 'center', flex: 0.4},
           ]}>
           <TextComponent fontSize={18}>{staff.role}</TextComponent>
@@ -69,7 +85,7 @@ function StaffItemComponent(props: StaffItemComponentProps) {
 
         <FlexComponent
           style={[
-            styles.serviceInfoContainer,
+            styles.staffInfoContainer,
             {alignItems: 'flex-end', flex: 0.2},
           ]}>
           <Pressable onPress={toggleModal}>
@@ -105,6 +121,7 @@ function StaffItemComponent(props: StaffItemComponentProps) {
         <StaffDialogComponent
           edit
           staff={staff}
+          setIsEditing={setIsEditing}
           setModalVisible={setModalVisible}
           modalVisible={modalVisible}
           refreshList={refreshList}
@@ -124,7 +141,7 @@ function StaffItemComponent(props: StaffItemComponentProps) {
 }
 
 const styles = StyleSheet.create({
-  serviceItemContainer: {
+  staffItemContainer: {
     flex: 0.6,
     flexDirection: 'row',
     borderRadius: 10,
@@ -139,7 +156,7 @@ const styles = StyleSheet.create({
     shadowOpacity: globalStyles.shadow.shadowOpacity,
     elevation: globalStyles.shadow.elevation,
   },
-  serviceInfoContainer: {
+  staffInfoContainer: {
     justifyContent: 'center',
   },
   statusContainer: {

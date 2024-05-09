@@ -28,10 +28,11 @@ public interface PatientProfileRepository extends JpaRepository<PatientProfile, 
             "INNER JOIN ward w ON p.ward_ward_id = w.ward_id " +
             "INNER JOIN district d ON w.district_district_id = d.district_id " +
             "INNER JOIN province pro ON d.province_province_id = pro.province_id " +
-            "WHERE FREETEXT(p.full_name, :fullName) " +
-            "AND YEAR(p.date_of_birth) = :dateOfBirth " +
+            "INNER JOIN FREETEXTTABLE(patient_profile, full_name, :fullName) f ON p.patient_profile_id = f.[KEY] " +
+            "WHERE YEAR(p.date_of_birth) = :dateOfBirth " +
             "AND pro.province_id = :provinceId " +
-            "AND p.gender = :gender",
+            "AND p.gender = :gender " +
+            "ORDER BY f.[RANK] DESC ",
             nativeQuery = true
     )
     List<PatientProfile> findPatientProfilesByInfo(

@@ -33,7 +33,6 @@ import RegisterScreen from './src/screens/auth/RegisterScreen';
 import VerifyPhoneScreen from './src/screens/auth/VerifyPhoneScreen';
 import AddProfileScreen from './src/screens/patient/AddProfileScreen';
 import ChangeAccountInfoScreen from './src/screens/patient/ChangeAccountInfoScreen';
-import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
 import DetailsMedicalBillScreen from './src/screens/patient/DetailsMedicalBillScreen';
 import DetailsProfileScreen from './src/screens/patient/DetailsProfileScreen';
 import DeviceManagementScreen from './src/screens/patient/DeviceManagementScreen';
@@ -58,9 +57,13 @@ import HospitalFeePaymentInformationScreen from './src/screens/patient/Payment/H
 import SuccessScreen from './src/screens/patient/Payment/SuccessScreen';
 import OpenWalletScreen from './src/screens/patient/Wallet/OpenWalletScreen';
 import TopUpScreen from './src/screens/patient/Wallet/TopUpScreen';
+import ChatScreen from './src/screens/patient/ChatScreen/ChatScreen';
+import MedicalTestDetailResultScreen from './src/screens/patient/LookUpMedicalResults/MedicalTestDetailResultScreen';
+import RatingScreen from './src/screens/patient/RatingScreen';
 import TransactionStatisticScreen from './src/screens/patient/Wallet/TransactionStatisticScreen';
 import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import store from './src/store/store';
+import DoctorInformationScreen from './src/screens/patient/DoctorInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -235,6 +238,14 @@ const App = () => {
                   />
                   <Stack.Screen name="ChatScreen" component={ChatScreen} />
                   <Stack.Screen
+                    name="MedicalTestDetailResultScreen"
+                    component={MedicalTestDetailResultScreen}
+                  />
+                  <Stack.Screen
+                    name="RatingScreen"
+                    component={RatingScreen}
+                    />
+                    <Stack.Screen
                     name="TransactionStatisticScreen"
                     component={TransactionStatisticScreen}
                   />
@@ -258,10 +269,13 @@ const App = () => {
                     name="ScheduleMedicationRemindersScreen"
                     component={ScheduleMedicationRemindersScreen}
                   />
-
                   <Stack.Screen
                     name="ChangeAccountInfoScreen"
                     component={ChangeAccountInfoScreen}
+                  />
+                  <Stack.Screen
+                    name="DoctorInformationScreen"
+                    component={DoctorInformationScreen}
                   />
                 </Stack.Navigator>
               </NavigationContainer>

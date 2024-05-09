@@ -139,18 +139,6 @@ function DepartmentDetailScreen() {
           </FlexComponent>
         </ButtonComponent>
       </ContainerComponent>
-      {/* <ScrollView style={styles.scrollViewContainer}>
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-        <DoctorItemComponent />
-      </ScrollView> */}
 
       {loading ? (
         <ContentLoaderComponent />

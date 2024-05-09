@@ -314,9 +314,10 @@ public class PatientProfileServicesImpl implements IPatientProfileServices {
                 .findById(request.getProvinceId())
                 .orElseThrow(() -> new NotFoundException("Province not found"));
 
+        String fullName = request.getFullName().trim();
         List<PatientProfile> patientProfiles = patientProfileRepository
                 .findPatientProfilesByInfo(
-                        request.getFullName(),
+                        fullName,
                         request.getYearOfBirth(),
                         province.getProvinceId(),
                         request.getGender().ordinal()

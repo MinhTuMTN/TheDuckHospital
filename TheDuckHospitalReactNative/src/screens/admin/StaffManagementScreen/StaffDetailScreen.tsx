@@ -1,16 +1,16 @@
 import React, {useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {Image, ScrollView, StyleSheet, View} from 'react-native';
 import {
   ContainerComponent,
   FlexComponent,
   Header,
+  Space,
   TextComponent,
 } from '../../../components';
 import {appColors} from '../../../constants/appColors';
-import {ScrollView} from '@gluestack-ui/themed';
-import {Calendar, Info} from 'lucide-react-native';
-import ScheduleItemComponent from '../../../components/admin/staffManagementScreen/ScheduleItemComponent';
-import { useRoute } from '@react-navigation/native';
+import {Info} from 'lucide-react-native';
+import {useRoute} from '@react-navigation/native';
+import {formatDate} from '../../../utils/dateUtils';
 
 function StaffDetailScreen() {
   const route = useRoute();
@@ -18,88 +18,125 @@ function StaffDetailScreen() {
   return (
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết nhân viên'} paddingTop={40} />
-      <ContainerComponent style={styles.container}>
-        <Info size={32} color={appColors.black} />
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
-          Thông tin cơ bản
-        </TextComponent>
-      </ContainerComponent>
+      <ScrollView>
+        <ContainerComponent
+          style={{width: '100%', alignItems: 'center', paddingTop: 10}}>
+          <View style={{backgroundColor: appColors.primary, borderRadius: 20}}>
+            <TextComponent
+              style={{paddingVertical: 8, paddingHorizontal: 10}}
+              fontSize={12}
+              color={appColors.white}
+              bold>{`staff-id: ${staff.staffId}`}</TextComponent>
+          </View>
+          <Space paddingTop={4} />
+          <Image
+            source={{
+              uri: staff.avatar
+                ? staff.avatar
+                : 'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
+            }}
+            height={250}
+            width={250}
+            style={{
+              borderRadius: 125,
+              borderWidth: 5,
+              borderColor: appColors.lightPrimary,
+            }}
+          />
+        </ContainerComponent>
+        <ContainerComponent style={styles.container}>
+          <Info size={32} color={appColors.black} />
+          <TextComponent bold fontSize={28} style={styles.listLabel}>
+            Thông tin cơ bản
+          </TextComponent>
+        </ContainerComponent>
 
-      <ContainerComponent style={styles.detailContainer}>
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Họ tên:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.fullName}
-          </TextComponent>
-        </FlexComponent>
+        <ContainerComponent style={styles.detailContainer}>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Họ tên:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {staff.fullName}
+            </TextComponent>
+          </FlexComponent>
 
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Chức vụ:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.role}
-          </TextComponent>
-        </FlexComponent>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Chức vụ:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {staff.role}
+            </TextComponent>
+          </FlexComponent>
+          {staff.role === 'Bác sĩ' && (
+            <>
+              <FlexComponent style={styles.staffInfoContainer}>
+                <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+                  Bằng cấp:
+                </TextComponent>
+                <TextComponent fontSize={20} style={{flex: 0.6}}>
+                  {staff.degree}
+                </TextComponent>
+              </FlexComponent>
 
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Số điện thoại:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.phoneNumber}
-          </TextComponent>
-        </FlexComponent>
+              <FlexComponent style={styles.staffInfoContainer}>
+                <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+                  Chuyên khoa:
+                </TextComponent>
+                <TextComponent fontSize={20} style={{flex: 0.6}}>
+                  {staff.departmentName}
+                </TextComponent>
+              </FlexComponent>
+            </>
+          )}
 
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Bằng cấp:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.degree}
-          </TextComponent>
-        </FlexComponent>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Số điện thoại:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {staff.phoneNumber}
+            </TextComponent>
+          </FlexComponent>
 
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            CCCD/CMND:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.identityNumber}
-          </TextComponent>
-        </FlexComponent>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Ngày sinh:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {formatDate(staff.dateOfBirth)}
+            </TextComponent>
+          </FlexComponent>
 
-        <FlexComponent style={[styles.staffInfoContainer]}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Email:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6, flexWrap: 'wrap'}}>
-            {staff.email}
-          </TextComponent>
-        </FlexComponent>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Giới tính:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {staff.gender === 0 ? 'Nam' : 'Nữ'}
+            </TextComponent>
+          </FlexComponent>
 
-        <FlexComponent style={styles.staffInfoContainer}>
-          <TextComponent bold fontSize={20} style={{flex: 0.4}}>
-            Giới tính:
-          </TextComponent>
-          <TextComponent fontSize={20} style={{flex: 0.6}}>
-            {staff.gender === 0 ? "Nam" : "Nữ"}
-          </TextComponent>
-        </FlexComponent>
-      </ContainerComponent>
+          <FlexComponent style={styles.staffInfoContainer}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              CCCD/CMND:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6}}>
+              {staff.identityNumber}
+            </TextComponent>
+          </FlexComponent>
 
-      {/* <ContainerComponent style={styles.container}>
-        <Calendar size={32} color={appColors.black} />
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
-          Lịch trực
-        </TextComponent>
-      </ContainerComponent>
-      <ScrollView style={styles.scrollViewContainer}>
-        <ScheduleItemComponent morning />
-        <ScheduleItemComponent />
-      </ScrollView> */}
+          <FlexComponent style={[styles.staffInfoContainer]}>
+            <TextComponent bold fontSize={20} style={{flex: 0.4}}>
+              Email:
+            </TextComponent>
+            <TextComponent fontSize={20} style={{flex: 0.6, flexWrap: 'wrap'}}>
+              {staff.email}
+            </TextComponent>
+          </FlexComponent>
+        </ContainerComponent>
+      </ScrollView>
     </ContainerComponent>
   );
 }

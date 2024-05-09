@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   FlatList,
+  Keyboard,
 } from 'react-native';
 import {
   ContainerComponent,
@@ -22,6 +23,7 @@ import {getPaginationRooms} from '../../../services/roomServices';
 
 function RoomListScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
   const [rooms, setRooms] = React.useState<any>([]);
   const [paginationParams, setPaginationParams] = React.useState({
@@ -32,15 +34,14 @@ function RoomListScreen() {
   const [isLoadingAPI, setIsLoadingAPI] = React.useState(true);
   const [searchText, setSearchText] = React.useState('');
   const [debouncedSearchText] = useDebounce(searchText, 500);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const listFooterComponent = useMemo(() => {
-    let _renderUI;
-    if (isLoadingAPI) {
-      _renderUI = <ActivityIndicator size="large" color={appColors.primary} />;
-    } else {
-      _renderUI = null;
-    }
-    return <View>{_renderUI}</View>;
+    let _renderUI = (
+      <ActivityIndicator size="large" color={appColors.primary} />
+    );
+
+    return <View style={{opacity: isLoadingAPI ? 1 : 0}}>{_renderUI}</View>;
   }, [isLoadingAPI, rooms, paginationParams.page]);
 
   const handleChangedText = (text: string) => {
@@ -53,6 +54,7 @@ function RoomListScreen() {
 
   const toggleModal = () => {
     setModalVisible(!modalVisible);
+    setIsEditing(true);
   };
 
   const handleGetRooms = async () => {
@@ -87,6 +89,7 @@ function RoomListScreen() {
   };
 
   React.useEffect(() => {
+    setSearchText('');
     setPaginationParams((prevState: any) => ({
       ...prevState,
       page: 0,
@@ -97,27 +100,49 @@ function RoomListScreen() {
     handleGetRooms();
   }, [debouncedSearchText, paginationParams.page, paginationParams.limit]);
 
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <ContainerComponent>
-      <ContainerComponent style={styles.container}>
-        <TextComponent bold fontSize={32} style={styles.listLabel}>
-          Danh sách phòng
-        </TextComponent>
-        <ButtonComponent
-          containerStyles={styles.addButtonContainer}
-          onPress={toggleModal}>
-          <View style={styles.buttonContent}>
-            <TextComponent
-              bold
-              fontSize={18}
-              color={appColors.textPrimary}
-              style={styles.addButtonText}>
-              Thêm
-            </TextComponent>
-            <Icon name="plus" size={20} color={appColors.textPrimary} />
-          </View>
-        </ButtonComponent>
-      </ContainerComponent>
+      {(!isKeyboardVisible || isEditing) && (
+        <ContainerComponent style={styles.container}>
+          <TextComponent bold fontSize={32} style={styles.listLabel}>
+            Danh sách phòng
+          </TextComponent>
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={toggleModal}>
+            <View style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={18}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <Icon name="plus" size={20} color={appColors.textPrimary} />
+            </View>
+          </ButtonComponent>
+        </ContainerComponent>
+      )}
 
       <ContainerComponent style={styles.searchContainer}>
         <InputComponent
@@ -143,40 +168,44 @@ function RoomListScreen() {
         />
       </ContainerComponent>
 
-      <SafeAreaView style={styles.flatListContainer}>
-        <FlatList
-          data={rooms}
-          keyExtractor={(item: any, index: number) =>
-            `room-${item.id}-${index}`
-          }
-          extraData={rooms}
-          refreshing={true}
-          renderItem={({item}) => (
-            <RoomItemComponent
-              refreshList={refreshList}
-              setRefreshList={setRefreshList}
-              room={item}
-            />
-          )}
-          style={{width: '100%'}}
-          initialNumToRender={5}
-          onEndReached={e => {
-            if (
-              paginationParams.page < paginationParams.totalPages - 1 &&
-              !isLoadingAPI
-            ) {
-              setPaginationParams((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
+      {(!isKeyboardVisible || isEditing) && (
+        <SafeAreaView style={styles.flatListContainer}>
+          <FlatList
+            data={rooms}
+            keyExtractor={(item: any, index: number) =>
+              `room-${item.roomId}-${index}`
             }
-          }}
-          onEndReachedThreshold={0.7}
-          ListFooterComponent={listFooterComponent}
-        />
-      </SafeAreaView>
+            extraData={rooms}
+            refreshing={true}
+            renderItem={({item}) => (
+              <RoomItemComponent
+                setIsEditing={setIsEditing}
+                refreshList={refreshList}
+                setRefreshList={setRefreshList}
+                room={item}
+              />
+            )}
+            style={{width: '100%'}}
+            initialNumToRender={5}
+            onEndReached={e => {
+              if (
+                paginationParams.page < paginationParams.totalPages - 1 &&
+                !isLoadingAPI
+              ) {
+                setPaginationParams((prevState: any) => ({
+                  ...prevState,
+                  page: prevState.page + 1,
+                }));
+              }
+            }}
+            onEndReachedThreshold={0.7}
+            ListFooterComponent={listFooterComponent}
+          />
+        </SafeAreaView>
+      )}
 
       <RoomDialogComponent
+        setIsEditing={setIsEditing}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         setModalVisible={setModalVisible}

@@ -27,6 +27,7 @@ import {appInfo} from '../../../constants/appInfo';
 import {getMedicalTestDetails} from '../../../services/payment';
 import {globalStyles} from '../../../styles/globalStyles';
 import {navigationProps} from '../../../types';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const EnterHospitalPaymentCodeScreen = () => {
   const [medicalCode, setMedicalCode] = React.useState('');
@@ -39,6 +40,7 @@ const EnterHospitalPaymentCodeScreen = () => {
       transform: [{translateY: top.value}],
     };
   });
+  const toast = useToast();
   const handleSearch = async () => {
     setLoading(true);
     const response = await getMedicalTestDetails(medicalCode);
@@ -50,7 +52,11 @@ const EnterHospitalPaymentCodeScreen = () => {
         medicalCodeId: medicalCode,
       });
     } else {
-      console.log('Error: ', response.error);
+      if (response.statusCode === 10010)
+        toast.showToast('Mã thanh toán không tồn tại');
+      else if (response.statusCode === 10011)
+        toast.showToast('Mã thanh toán đã được thanh toán');
+      else toast.showToast('Có lỗi xảy ra, vui lòng thử lại sau');
     }
   };
 

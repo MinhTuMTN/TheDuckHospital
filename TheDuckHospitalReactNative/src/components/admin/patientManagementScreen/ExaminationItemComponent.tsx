@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ContainerComponent, FlexComponent, TextComponent} from '../..';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
@@ -17,10 +17,20 @@ import PrescriptionItemComponent from './PrescriptionItemComponent';
 interface ExaminationItemComponentProps {
   value: string;
   item: any;
+  patient?: boolean;
 }
 
 const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
-  const {value, item} = props;
+  const {value, item, patient = false} = props;
+  const [medicalRecord, setMedicalRecord] = useState<any>();
+
+  useEffect(() => {
+    if (patient) {
+      setMedicalRecord(item);
+    } else {
+      setMedicalRecord(item.medicalRecord);
+    }
+  }, []);
 
   return (
     <AccordionItem value={value} mt="$5">
@@ -43,7 +53,7 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
                   </TextComponent>
                 </FlexComponent>
 
-                <FlexComponent flex={0.45} alignItems='center'>
+                <FlexComponent flex={0.45} alignItems="center">
                   <TextComponent bold fontSize={18}>
                     {`${formatCurrency(item.doctorSchedule.price)} VNĐ`}
                   </TextComponent>
@@ -51,19 +61,19 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
                     bold
                     fontSize={16}
                     color={
-                      item.medicalRecord === null
+                      medicalRecord === null
                         ? appColors.yellow
-                        : item.medicalRecord.state === 'DONE'
+                        : medicalRecord?.state === 'DONE'
                         ? appColors.green
-                        : item.medicalRecord.state === 'PROCESSING'
+                        : medicalRecord?.state === 'PROCESSING'
                         ? appColors.darkBlue
                         : appColors.yellow
                     }>
-                    {item.medicalRecord === null
+                    {medicalRecord === null
                       ? 'Đang chờ khám'
-                      : item.medicalRecord.state === 'DONE'
+                      : medicalRecord?.state === 'DONE'
                       ? 'Đang hoàn thành'
-                      : item.medicalRecord.state === 'PROCESSING'
+                      : medicalRecord?.state === 'PROCESSING'
                       ? 'Đang khám'
                       : 'Đang chờ khám'}
                   </TextComponent>
@@ -170,17 +180,17 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               fontSize={18}
               style={{flex: 0.5}}
               color={
-                item.medicalRecord === null
+                medicalRecord === null
                   ? appColors.black
-                  : item.medicalRecord.symptom === null
+                  : medicalRecord?.symptom === null
                   ? appColors.black
                   : appColors.darkRed
               }>
-              {item.medicalRecord === null
+              {medicalRecord === null
                 ? 'Chưa cập nhật'
-                : item.medicalRecord.symptom === null
+                : medicalRecord?.symptom === null
                 ? 'Chưa cập nhật'
-                : item.medicalRecord.symptom}
+                : medicalRecord?.symptom}
             </TextComponent>
           </FlexComponent>
 
@@ -192,56 +202,55 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
               fontSize={18}
               style={{flex: 0.5}}
               color={
-                item.medicalRecord === null
+                medicalRecord === null
                   ? appColors.black
-                  : item.medicalRecord.diagnosis === null
+                  : medicalRecord?.diagnosis === null
                   ? appColors.black
                   : appColors.darkRed
               }>
-              {item.medicalRecord === null
+              {medicalRecord === null
                 ? 'Chưa cập nhật'
-                : item.medicalRecord.diagnosis === null
+                : medicalRecord?.diagnosis === null
                 ? 'Chưa cập nhật'
-                : item.medicalRecord.diagnosis}
+                : medicalRecord?.diagnosis}
             </TextComponent>
           </FlexComponent>
         </ContainerComponent>
 
-        {item.medicalRecord?.prescription && (
-          <>
-            <ContainerComponent style={styles.container}>
-              <Pill size={24} color={appColors.black} />
-              <TextComponent bold fontSize={24} style={styles.listLabel}>
-                Đơn thuốc
-              </TextComponent>
-            </ContainerComponent>
+        {medicalRecord?.prescription &&
+          medicalRecord?.prescription.length > 0 && (
+            <>
+              <ContainerComponent style={styles.container}>
+                <Pill size={24} color={appColors.black} />
+                <TextComponent bold fontSize={24} style={styles.listLabel}>
+                  Đơn thuốc
+                </TextComponent>
+              </ContainerComponent>
 
-            <ContainerComponent style={styles.detailContainer}>
-              {item.medicalRecord?.prescription.map(
-                (item: any, index: number) => (
+              <ContainerComponent style={styles.detailContainer}>
+                {medicalRecord?.prescription.map((item: any, index: number) => (
                   <PrescriptionItemComponent item={item} key={index} />
-                ),
-              )}
+                ))}
 
-              <View
-                style={{
-                  borderBottomColor: appColors.black,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                  paddingVertical: 5,
-                }}
-              />
+                <View
+                  style={{
+                    borderBottomColor: appColors.black,
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                    paddingVertical: 5,
+                  }}
+                />
 
-              <FlexComponent style={styles.presciptionInfoContainer}>
-                <TextComponent bold fontSize={18}>
-                  Tổng cộng
-                </TextComponent>
-                <TextComponent bold fontSize={18}>
-                  {`${formatCurrency(item.medicalRecord.price)} VNĐ`}
-                </TextComponent>
-              </FlexComponent>
-            </ContainerComponent>
-          </>
-        )}
+                <FlexComponent style={styles.presciptionInfoContainer}>
+                  <TextComponent bold fontSize={18}>
+                    Tổng cộng
+                  </TextComponent>
+                  <TextComponent bold fontSize={18}>
+                    {`${formatCurrency(medicalRecord?.price)} VNĐ`}
+                  </TextComponent>
+                </FlexComponent>
+              </ContainerComponent>
+            </>
+          )}
       </AccordionContent>
     </AccordionItem>
   );

@@ -6,6 +6,7 @@ import com.theduckhospital.api.entity.Patient;
 import com.theduckhospital.api.entity.PatientProfile;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class PatientProfileResponse {
     private Date dateOfBirth;
     private boolean deleted;
     private List<MedicalExaminationRecord> medicalExaminationRecords;
+    private List<MedicalRecordResponse> medicalRecords;
 
     public PatientProfileResponse(PatientProfile patientProfile) {
         this.patientProfileId = patientProfile.getPatientProfileId();
@@ -34,6 +36,13 @@ public class PatientProfileResponse {
         this.nation = patientProfile.getNation().getNationName();
         this.deleted = patientProfile.isDeleted();
         this.medicalExaminationRecords = patientProfile.getMedicalExaminationRecords();
+
+        List<MedicalRecordResponse> medicalRecords = new ArrayList<>();
+        for (MedicalExaminationRecord medicalRecord: patientProfile.getMedicalExaminationRecords()) {
+            medicalRecords.add(new MedicalRecordResponse(medicalRecord, new ArrayList<>()));
+        }
+        this.medicalRecords = medicalRecords;
+
         this.gender = patientProfile.getGender();
         this.address = String.format("%s, %s, %s, %s",
                 patientProfile.getStreetName(),

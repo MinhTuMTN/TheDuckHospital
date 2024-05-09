@@ -7,7 +7,7 @@ import {
 } from '../../components';
 
 const DetailsProfileScreen = ({route}: {route: any}) => {
-  const [firstClick, setFirstClick] = React.useState(false);
+  const [firstClick, setFirstClick] = React.useState(true);
   const [editProfile, setEditProfile] = React.useState({
     fullName: '',
     fullPhoneNumber: '',
@@ -53,7 +53,6 @@ const DetailsProfileScreen = ({route}: {route: any}) => {
         />
         <DetailsInfomation
           firstClick={firstClick}
-          setFirstClick={setFirstClick}
           editProfile={editProfile}
           setEditProfile={setEditProfile}
           selectedProvince={selectedProvince}

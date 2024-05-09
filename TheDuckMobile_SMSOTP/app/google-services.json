@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "857988276575",
-    "project_id": "the-duck-mobile",
-    "storage_bucket": "the-duck-mobile.appspot.com"
+    "project_number": "906025022359",
+    "project_id": "the-duck-hospital-21a4b",
+    "storage_bucket": "the-duck-hospital-21a4b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:857988276575:android:d20f3a7e28e2bd8be1d6ea",
+        "mobilesdk_app_id": "1:906025022359:android:a3418b399007a1be25cad2",
         "android_client_info": {
           "package_name": "com.example.theduckmobile"
         }
@@ -15,7 +15,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDVCTABaJMicSKam_rfkyOdlZZOpVNyVMQ"
+          "current_key": "AIzaSyBEsp_3MEfk8CQnbufrROdo5P_NihhJbWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906025022359:android:f7585ee28ffca7a025cad2",
+        "android_client_info": {
+          "package_name": "com.theduckhospitalreactnative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEsp_3MEfk8CQnbufrROdo5P_NihhJbWA"
         }
       ],
       "services": {

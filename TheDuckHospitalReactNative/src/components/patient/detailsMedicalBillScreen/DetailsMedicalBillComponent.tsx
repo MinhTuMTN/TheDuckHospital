@@ -27,7 +27,6 @@ const DetailsMedicalBillComponent = (
   props: DetailsMedicalBillComponentProps,
 ) => {
   const {booking} = props;
-  console.log(booking.date);
 
   const navigation = useNavigation<navigationProps>();
 
@@ -267,6 +266,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 16,
     marginVertical: 16,
+  },
+  textInput: {
+    marginHorizontal: 12,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    color: 'black',
+    borderWidth: 1,
+    borderColor: 'black',
+    fontSize: 18,
+  },
+  contentContainer: {
+    width: '100%',
   },
 });
 export default DetailsMedicalBillComponent;

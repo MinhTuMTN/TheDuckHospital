@@ -7,12 +7,11 @@ import {
   Space,
   TextComponent,
 } from '../../components';
-import {globalStyles} from '../../styles/globalStyles';
 import {Mail} from 'lucide-react-native';
 import {appColors} from '../../constants/appColors';
 import {useTranslation} from 'react-i18next';
 import ButtonComponent from '../../components/ButtonComponent';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {forgetPassword} from '../../services/authServices';
 import {navigationProps} from '../../types';
 
@@ -30,6 +29,7 @@ const ForgotPasswordScreen = () => {
           phoneNumber: emailOrPhoneNumber,
         });
       } else {
+        console.log(emailOrPhoneNumber);
         console.error('Số điện thoại không hợp lệ');
       }
     } catch (error) {
@@ -78,6 +78,7 @@ const ForgotPasswordScreen = () => {
           }}
           variant="rounded"
           onChangeText={text => setEmailOrPhoneNumber(text)}
+          maxLength={10}
         />
         <Space paddingTop={20} />
         <ButtonComponent

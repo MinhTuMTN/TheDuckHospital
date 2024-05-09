@@ -7,4 +7,5 @@ import lombok.Data;
 public class PayMedicalTestRequest {
     private String medicalTestCode;
     private PaymentMethod paymentMethod;
+    private String pinCode;
 }

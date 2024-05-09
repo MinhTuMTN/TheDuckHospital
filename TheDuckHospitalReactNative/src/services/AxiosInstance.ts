@@ -64,13 +64,8 @@ const handleRequest = async (
     result.statusCode = requestMethod.status;
   } catch (error: any) {
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.log('Axios has response error');
-
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
+      result.statusCode =
+        error.response.data?.statusCode || error.response?.status;
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -83,7 +78,6 @@ const handleRequest = async (
     }
 
     result.error = error.message;
-    result.statusCode = error.response?.status;
     if (error.response) {
       result.error = error.response.data.message;
     }
