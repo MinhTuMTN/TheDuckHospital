@@ -67,96 +67,36 @@ Front-end tiến hành call API đến Back-end để có thể truy vấn dữ 
 ### Phiên bản Mobile
 
 <p display="flex">
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/1.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/2.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/3.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/4.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/5.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/6.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/7.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/8.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/9.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/10.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/11.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/12.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/13.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/14.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/15.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/16.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/17.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/18.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/19.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/20.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/21.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/22.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/23.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/24.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/25.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/26.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/27.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/28.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/29.jpg" />
-    </div>
-    <div style="flex-basis: 33.33%; padding: 5px;">
-        <img src="Images/mobile/30.jpg" />
-    </div>
+       <img src="Images/mobile/1.jpg" width='30%' />
+<img src="Images/mobile/2.jpg" width='30%' />
+<img src="Images/mobile/3.jpg" width='30%' />
+<img src="Images/mobile/4.jpg" width='30%' />
+<img src="Images/mobile/5.jpg" width='30%' />
+<img src="Images/mobile/6.jpg" width='30%' />
+<img src="Images/mobile/7.jpg" width='30%' />
+<img src="Images/mobile/8.jpg" width='30%' />
+<img src="Images/mobile/9.jpg" width='30%' />
+<img src="Images/mobile/10.jpg" width='30%' />
+<img src="Images/mobile/11.jpg" width='30%' />
+<img src="Images/mobile/12.jpg" width='30%' />
+<img src="Images/mobile/13.jpg" width='30%' />
+<img src="Images/mobile/14.jpg" width='30%' />
+<img src="Images/mobile/15.jpg" width='30%' />
+<img src="Images/mobile/16.jpg" width='30%' />
+<img src="Images/mobile/17.jpg" width='30%' />
+<img src="Images/mobile/18.jpg" width='30%' />
+<img src="Images/mobile/19.jpg" width='30%' />
+<img src="Images/mobile/20.jpg" width='30%' />
+<img src="Images/mobile/21.jpg" width='30%' />
+<img src="Images/mobile/22.jpg" width='30%' />
+<img src="Images/mobile/23.jpg" width='30%' />
+<img src="Images/mobile/24.jpg" width='30%' />
+<img src="Images/mobile/25.jpg" width='30%' />
+<img src="Images/mobile/26.jpg" width='30%' />
+<img src="Images/mobile/27.jpg" width='30%' />
+<img src="Images/mobile/28.jpg" width='30%' />
+<img src="Images/mobile/29.jpg" width='30%' />
+<img src="Images/mobile/30.jpg" width='30%' />
 </p>
 
 ### Phiên bản Web
