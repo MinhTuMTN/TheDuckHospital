@@ -47,7 +47,6 @@ const FilterComponent = (props: FilterComponentProps) => {
         data={items}
         contentContainerStyle={{
           alignItems: 'center',
-          flex: 1,
         }}
         horizontal
         keyExtractor={(item, index) => `${item}-${index}`}

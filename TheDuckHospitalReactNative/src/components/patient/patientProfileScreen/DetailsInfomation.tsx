@@ -126,18 +126,27 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
               value={editProfile.fullName}
               disabled
               editabled={false}
+              _inputContainerStyle={{
+                borderColor: appColors.grayLight,
+              }}
             />
             <InputComponent
               label="Ngày sinh"
               value={formatDate(editProfile.dateOfBirth)}
               disabled
               editabled={false}
+              _inputContainerStyle={{
+                borderColor: appColors.grayLight,
+              }}
             />
             <InputComponent
               label="Giới tính"
               value={editProfile.gender === 'MALE' ? 'Nam' : 'Nữ'}
               disabled
               editabled={false}
+              _inputContainerStyle={{
+                borderColor: appColors.grayLight,
+              }}
             />
             <InputComponent
               label="CCCD/CMND"
@@ -145,12 +154,18 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
               value={editProfile.identityNumber}
               disabled
               editabled={false}
+              _inputContainerStyle={{
+                borderColor: appColors.grayLight,
+              }}
             />
             <InputComponent
               label="Dân tộc"
               value={editProfile.nation?.nationName}
               disabled
               editabled={false}
+              _inputContainerStyle={{
+                borderColor: appColors.grayLight,
+              }}
             />
           </>
         )}
