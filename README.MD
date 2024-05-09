@@ -14,31 +14,29 @@
 - IDE/ Text Editor: IntelliJ IDEA Ultimate, Visual Studio Code
 - Database: Microsoft SQL Server
 - Back-end: Java Spring Boot
-- Front-end: ReactJS
+- Front-end: ReactJS, React Native
 
 ## Những tính năng chính
 
-|                   | Tên chức năng                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Người dùng khách  | - Đăng nhập bằng số điện thoại hoặc tài khoản Microsoft. <br> - Đăng ký tài khoản bệnh nhân.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Bệnh nhân         | - Đăng xuất. <br> - Tạo hồ sơ bệnh nhân. <br> - Xem thông tin hồ sơ bệnh nhân. <br> - Chỉnh sửa thông tin hồ sơ bệnh nhân. <br> - Xóa hồ sơ bệnh nhân. <br> - Tìm hồ sơ bệnh nhân đã mất. <br> - Xem phiếu khám bệnh của hồ sơ bệnh nhân. <br> - Đặt lịch khám bệnh. <br> - Xem lịch sử khám chữa bệnh.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| Điều dưỡng        | - Đăng xuất. <br> - Tạo hồ sơ cho bệnh nhân. <br> - Tiếp nhận bệnh nhân tại quầy và phòng khám. <br> - Cập nhật số thứ tự khám bệnh.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Bác sĩ            | - Đăng xuất. <br> - Tiếp nhận bệnh nhân vào khám bệnh. <br> - Tạo phiếu chuẩn đoán cho bệnh nhân. <br> - Tạo, xóa toa thuốc trong phiếu chuẩn đoán. <br> - Xuất toa thuốc cho bệnh nhân. <br> - Tạo, xóa dịch vụ xét nghiệm trong phiếu chuẩn đoán. <br> - Xuất phiếu xét nghiệm cho bệnh nhân. <br> - Xem kết quả xét nghiệm của bệnh nhân. <br> - Xem lịch sử khám bệnh của bệnh nhân. <br> - Xem lịch trực của bản thân.                                                                                                                                                                                                                                                                                                                              |
-| Trưởng khoa       | - Có toàn bộ chức năng của bác sĩ. <br> - Tạo, sửa và xóa ca trực của các bác sĩ trong khoa.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Bác sĩ xét nghiệm | - Đăng xuất. <br> - Tiếp nhận bệnh nhân vào xét nghiệm. <br> - Thêm báo cáo xét nghiệm cho bệnh nhân.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Quản lý           | - Đăng xuất. <br> - Thực hiện thống kê doanh thu, lượt đăng ký, phương thức thanh toán, bệnh nhân, lượt khám tại khoa. <br> - Xem danh sách các bệnh nhân và thông tin chi tiết của bệnh nhân. <br> - Xem danh sách các thanh toán và thông tin chi tiết của thanh toán. <br> - Quản lý nhân viên: Thêm, sửa, khóa, mở khóa nhân viên, xem thông tin lịch trực của nhân viên. <br> - Quản lý khoa: Thêm, sửa, khóa, mở khóa khoa, thêm hoặc xóa bác sĩ khỏi khoa, thêm hoặc xóa trưởng khoa. <br> - Quản lý phòng: Thêm, sửa, khóa, mở khóa phòng, xem thông tin lịch trực của phòng. <br> - Quản lý dịch vụ: Thêm, sửa, khóa, mở khóa dịch vụ. <br> - Quản lý thuốc: Thêm, sửa, khóa, mở khóa thuốc. <br> - Quản lý tài khoản: Khóa, mở khóa tài khoản. |
+| Người dùng       | Chức năng                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Người dùng khách | - Đăng nhập bằng số điện thoại. <br> - Đăng ký tài khoản bệnh nhân. <br> - Quên mật khẩu.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Bệnh nhân        | - Đăng xuất. <br> - Tạo hồ sơ bệnh nhân. <br> - Xem thông tin hồ sơ bệnh nhân. <br> - Chỉnh sửa thông tin hồ sơ bệnh nhân. <br> - Xóa hồ sơ bệnh nhân. <br> - Tìm hồ sơ bệnh nhân đã mất. <br> - Xem phiếu khám bệnh của hồ sơ bệnh nhân. <br> - Đặt lịch khám bệnh. <br> - Xem lịch sử khám chữa bệnh. <br> - Tra cứu kết quả xét nghiệm. <br> - Chat với tư vấn viên. <br> - Thanh toán viện phí. <br> - Đặt lịch nhắc thuốc.                                                                                                                                                                                                                                                                                                           |
+| Quản lý          | - Đăng xuất. <br> - Thực hiện thống kê doanh thu, lượt đặt khám, phương thức thanh toán, bệnh nhân, các khoa có nhiều lượt khám nhất, số lượng bệnh nhân, số khoa. <br> - Xem danh sách các bệnh nhân và thông tin chi tiết của bệnh nhân. <br> - Xem danh sách các thanh toán và thông tin chi tiết của thanh toán. <br> - Quản lý nhân viên: Thêm, sửa, khóa, mở khóa nhân viên, xem thông tin của nhân viên. <br> - Quản lý khoa: Tìm kiếm, thêm, sửa, khóa, mở khóa khoa, thêm hoặc xóa bác sĩ khỏi khoa, thêm hoặc xóa trưởng khoa. <br> - Quản lý phòng: Tìm kiếm thêm, sửa, khóa, mở khóa phòng. <br> - Quản lý dịch vụ: Tìm kiếm thêm, sửa, khóa, mở khóa dịch vụ. <br> - Quản lý thuốc: Tìm kiếm thêm, sửa, khóa, mở khóa thuốc. |
 
 ## Urls
 
-1. [Font-end deploy với Firebase](https://the-duck-hospital.web.app/)
+1. [Font-end (web) deploy với Firebase](https://the-duck-hospital.web.app/)
 2. [Diagrams (Class Diagram, Sequence Diagram, Activity Diagram, Use Cases)](https://app.diagrams.net/#G1Wsjw0nT924APhNPSe_pyxop5M0Kck5tE)
 3. [File báo cáo](https://minhtunguyen-my.sharepoint.com/:w:/g/personal/baobao_minhtunguyen_onmicrosoft_com/Ef6XF8Eh_D1DueTpRPFfSvYBSujaRHg_bLJmuiJ5qo5coQ?e=1XhIym)
 4. [Github](https://github.com/MinhTuMTN/TheDuckHospital)
 5. [Test case](https://minhtunguyen-my.sharepoint.com/:x:/g/personal/tuyetvi_minhtunguyen_onmicrosoft_com/Ebibym9lZ6FOo2lzRCIy3BEB-hj1H5nBzu9snPC3-TR8vQ?e=7nwyzc)
 6. [Automation test code](https://github.com/MinhTuMTN/TheDuckHospital/tree/main/automation-test)
 7. [Video demo](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EYm0k_BFIAtPt15zGWi3wDoBkQOCJooHPKp8nHQmkPVMPQ)
-8. [Video giải thích code - Phần 1](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EdlbNOKyBA1Av6UQD9yN1yEBCHEUGZfJtyD2Ce5tYxGMNA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=DgBSO2)
-9. [Video giải thích code - Phần 2](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EXr9hAoOqx1Ck96HJ-Nz1_gBPisb7WqOqG8HmkAeCttoJQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=nFvhLf)  
+8. [Video demo - Mobile - P1](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EUboRo8WCaxDnfXJJ5UqSkYBDkK5JGGutWrBEbw9hJZs8A?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=2jVyp3)
+9. [Video demo - Mobile - P2](https://drive.google.com/drive/folders/1xcdGRl73srZPAsEJ4HenKSPcVE-m_THH)
+10. [Video giải thích code - Phần 1](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EdlbNOKyBA1Av6UQD9yN1yEBCHEUGZfJtyD2Ce5tYxGMNA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=DgBSO2)
+11. [Video giải thích code - Phần 2](https://minhtunguyen-my.sharepoint.com/:v:/g/personal/admin_minhtunguyen_onmicrosoft_com/EXr9hAoOqx1Ck96HJ-Nz1_gBPisb7WqOqG8HmkAeCttoJQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=nFvhLf)
 
 ## Cài đặt và cấu hình
 
@@ -66,11 +64,108 @@ Front-end tiến hành call API đến Back-end để có thể truy vấn dữ 
 
 ## Một số hình ảnh
 
-### Bệnh nhân (Mobile Version)
+### Phiên bản Mobile
+
+<p display="flex">
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/1.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/2.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/3.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/4.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/5.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/6.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/7.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/8.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/9.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/10.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/11.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/12.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/13.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/14.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/15.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/16.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/17.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/18.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/19.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/20.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/21.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/22.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/23.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/24.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/25.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/26.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/27.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/28.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/29.jpg" />
+    </div>
+    <div style="flex-basis: 33.33%; padding: 5px;">
+        <img src="Images/mobile/30.jpg" />
+    </div>
+</p>
+
+### Phiên bản Web
+
+#### Bệnh nhân (Mobile Web Version)
 
 ![Mobile Version](/Images/mobile.png)
 
-### Bệnh nhân
+#### Bệnh nhân
 
 ![1](/Images/1.png)
 ![2](/Images/2.png)
@@ -81,12 +176,12 @@ Front-end tiến hành call API đến Back-end để có thể truy vấn dữ 
 ![7](/Images/7.png)
 ![8](/Images/8.png)
 
-### Điều dưỡng
+#### Điều dưỡng
 
 ![9](/Images/9.png)
 ![10](/Images/10.png)
 
-### Bác sĩ
+#### Bác sĩ
 
 ![11](/Images/11.png)
 ![12](/Images/12.png)
