@@ -11,7 +11,7 @@ import Pdf from 'react-native-pdf';
 const MedicalTestDetailResultScreen = ({route}: {route: any}) => {
   const result = route.params?.result;
   const source = {
-    uri: 'http://samples.leanpub.com/thereactnativebook-sample.pdf'
+    uri: result,
   };
 
   return (
@@ -20,7 +20,7 @@ const MedicalTestDetailResultScreen = ({route}: {route: any}) => {
       <ContentComponent>
         <View style={styles.container}>
           <Pdf
-            source={result}
+            source={source}
             onLoadComplete={(numberOfPages, filePath) => {
               console.log(`Number of pages: ${numberOfPages}`);
             }}
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    marginHorizontal: 20,
   },
   pdf: {
     flex: 1,

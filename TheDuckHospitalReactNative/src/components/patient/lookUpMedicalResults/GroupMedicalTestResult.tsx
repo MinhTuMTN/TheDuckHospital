@@ -35,7 +35,7 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   );
   const _renderItem = useCallback(
     ({item}: any) => (
-      <TouchableOpacity onPress={item => handleMedicalTestPress(item)}>
+      <TouchableOpacity onPress={() => handleMedicalTestPress(item)}>
         <MedicalTestResultItem medicalTest={item} />
       </TouchableOpacity>
     ),
@@ -59,14 +59,14 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
 
   const handleMedicalTestPress = (medicalTest: any) => {
     if (
-      medicalTest.resultFileUrl === null ||
-      medicalTest.resultFileUrl === undefined ||
-      medicalTest.resultFileUrl === ''
+      medicalTest.medicalTest?.resultFileUrl === null ||
+      medicalTest.medicalTest?.resultFileUrl === undefined ||
+      medicalTest.medicalTest?.resultFileUrl === ''
     ) {
       toast.showToast('Chưa có kết quả xét nghiệm');
     } else {
       navigate.navigate('MedicalTestDetailResultScreen', {
-        result: medicalTest.resultFileUrl,
+        result: medicalTest.medicalTest?.resultFileUrl,
       });
     }
   };
