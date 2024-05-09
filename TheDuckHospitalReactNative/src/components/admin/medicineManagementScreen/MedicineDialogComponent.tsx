@@ -132,8 +132,8 @@ const MedicineDialogComponent = (props: MedicineDialogComponentProps) => {
       setIsLoading(false);
 
       if (responseUpdateMedicine.success) {
-        setRefreshList(!refreshList);
         closeModal();
+        setRefreshList(!refreshList);
       }
     }
   };

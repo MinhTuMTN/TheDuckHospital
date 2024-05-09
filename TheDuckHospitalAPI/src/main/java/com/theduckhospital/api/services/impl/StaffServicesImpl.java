@@ -116,17 +116,17 @@ public class StaffServicesImpl implements IStaffServices {
             String password = "MinhTu@3005";
             account.setPassword(passwordEncoder.encode(password));
 
-            if (request.getEmail().endsWith("@theduckhospital.onmicrosoft.com")) {
-                String msGraphId = graphServices.createMSGraphUser(
-                        request.getFullName(),
-                        request.getEmail(),
-                        password
-                );
-                if (msGraphId == null) {
-                    throw new RuntimeException("An error occurred while creating user");
-                }
-                staff.setMsGraphId(msGraphId);
-            }
+//            if (request.getEmail().endsWith("@theduckhospital.onmicrosoft.com")) {
+//                String msGraphId = graphServices.createMSGraphUser(
+//                        request.getFullName(),
+//                        request.getEmail(),
+//                        password
+//                );
+//                if (msGraphId == null) {
+//                    throw new RuntimeException("An error occurred while creating user");
+//                }
+//                staff.setMsGraphId(msGraphId);
+//            }
 
             accountRepository.save(account);
             staffRepository.save(staff);

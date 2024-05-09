@@ -83,6 +83,7 @@ const ChooseDateFilterComponent = (props: ChooseDateFilterComponentProps) => {
     }
 
     onChange?.(fromDate, toDate);
+    setMessage('');
     setDateFilterVisible(false);
   };
   return (
@@ -270,7 +271,9 @@ const ChooseDateFilterComponent = (props: ChooseDateFilterComponentProps) => {
             Áp dụng
           </ButtonComponent>
           <ButtonComponent
-            onPress={() => setDateFilterVisible(false)}
+            onPress={() => {
+              setDateFilterVisible(false);
+            }}
             containerStyles={[
               styles.button,
               {backgroundColor: '#fd4949', flex: 1},

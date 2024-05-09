@@ -445,17 +445,18 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
             </ButtonComponent>
             <ButtonComponent
               enabled={
-                !(
+                (!(
                   name.trim() === '' &&
                   serviceType?.value !== 'MedicalExamination'
                 ) &&
-                !(
-                  (department === undefined ||
-                    department.departmentName === '') &&
-                  serviceType?.value === 'MedicalExamination'
-                ) &&
-                !(price.trim() === '') &&
-                !(price.trim() === '0')
+                  !(
+                    (department === undefined ||
+                      department.departmentName === '') &&
+                    serviceType?.value === 'MedicalExamination'
+                  ) &&
+                  !(price.trim() === '') &&
+                  !(price.trim() === '0')) ||
+                (!(price.trim() === '') && !(price.trim() === '0') && edit)
               }
               isLoading={isLoading}
               onPress={handleCreateOrUpdateService}

@@ -44,6 +44,7 @@ const LoginScreen = () => {
   const handleSignUpClick = () => {
     navigation.navigate('RegisterScreen');
   };
+
   const handlForgotPasswordClick = () => {
     navigation.navigate('ForgotPasswordScreen');
   };
@@ -59,11 +60,9 @@ const LoginScreen = () => {
 
       await auth.login(token, true);
 
-      // navigation.navigate('HomeScreen');
       reset({
         index: 0,
         routes: [{name: 'PatientBottom'}],
-        // routes: [{name: 'AdminLeftSideDrawer'}],
       });
     } else {
       setIsLoadingAPI(false);

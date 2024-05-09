@@ -107,7 +107,6 @@ function TransactionListScreen() {
   React.useEffect(() => {
     handleGetTransactions();
   }, [
-    debouncedSearchText,
     paginationParams.page,
     paginationParams.limit,
     selected,
@@ -143,7 +142,7 @@ function TransactionListScreen() {
         </ContainerComponent>
       )}
 
-      <ContainerComponent style={styles.searchContainer}>
+      {/* <ContainerComponent style={styles.searchContainer}>
         <InputComponent
           size="md"
           placeholder="Tìm kiếm thanh toán..."
@@ -238,7 +237,7 @@ function TransactionListScreen() {
             </FlexComponent>
           </Popover>
         </ContainerComponent>
-      </ContainerComponent>
+      </ContainerComponent> */}
 
       {!isKeyboardVisible && (
         <SafeAreaView style={styles.flatListContainer}>
