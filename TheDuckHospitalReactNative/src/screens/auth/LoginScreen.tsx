@@ -25,6 +25,7 @@ import {loginDataProps, navigationProps} from '../../types';
 import FormControlComponent from '../../components/FormControlComponent';
 import {loginWithPassword} from '../../services/authServices';
 import {useAuth} from '../../hooks/AuthHooks';
+import {useToast} from '../../hooks/ToastProvider';
 
 const LoginScreen = () => {
   const [rememberMe, setRememberMe] = React.useState(['rememberMe']);
@@ -40,6 +41,7 @@ const LoginScreen = () => {
   const navigation = useNavigation<navigationProps>();
   const {reset} = useNavigation<navigationProps>();
   const auth = useAuth();
+  const toast = useToast();
 
   const handleSignUpClick = () => {
     navigation.navigate('RegisterScreen');
@@ -66,7 +68,9 @@ const LoginScreen = () => {
       });
     } else {
       setIsLoadingAPI(false);
-      console.log('Error', response);
+      toast.showToast(
+        'Tài khoản hoặc mật khẩu không chính xác. Vui lòng thử lại!',
+      );
     }
   };
 

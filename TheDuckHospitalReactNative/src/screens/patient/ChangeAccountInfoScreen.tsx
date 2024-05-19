@@ -151,16 +151,14 @@ const ChangeAccountInfoScreen = () => {
             _inputContainerStyle={styles.inputContainerStyle}
           />
         </View>
-        {fullName !== userInfo.fullName ||
-          (uploadImage !== null && (
-            <ButtonComponent
-              isLoading={isLoading}
-              onPress={handleUpdateProfile}
-              borderRadius={8}
-              backgroundColor={appColors.darkerBlue}>
-              {t('changeAccountInfo.save')}
-            </ButtonComponent>
-          ))}
+
+        <ButtonComponent
+          isLoading={isLoading}
+          onPress={handleUpdateProfile}
+          borderRadius={8}
+          backgroundColor={appColors.darkerBlue}>
+          {t('changeAccountInfo.save')}
+        </ButtonComponent>
       </ContentComponent>
     </ContainerComponent>
   );

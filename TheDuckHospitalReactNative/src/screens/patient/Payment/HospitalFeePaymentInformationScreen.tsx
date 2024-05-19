@@ -91,8 +91,11 @@ const HospitalFeePaymentInformationScreen = ({route}: {route: any}) => {
       if (paymentMethod === 'MOMO')
         Linking.openURL(response.data.data.deepLink);
       else {
-        navigation.navigate('HomeScreen');
-        Linking.openURL(response.data.data.paymentUrl);
+        // navigation.navigate('HomeScreen');
+        // Linking.openURL(response.data.data.paymentUrl);
+        navigation.navigate('WebViewScreen', {
+          url: response.data.data.paymentUrl,
+        });
       }
     } else {
       const errorCode = response.statusCode;

@@ -26,8 +26,9 @@ import {useToast} from '../../../hooks/ToastProvider';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LoadingComponent from '../../../components/LoadingComponent';
 import {topUpWallet} from '../../../services/walletServices';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../types';
+import {useSelector} from 'react-redux';
+import {RootState, navigationProps} from '../../../types';
+import {useNavigation} from '@react-navigation/native';
 
 const TopUpScreen = () => {
   const [amount, setAmount] = React.useState(0);
@@ -63,6 +64,7 @@ const TopUpScreen = () => {
   }, [amount]);
 
   const toast = useToast();
+  const navigation = useNavigation<navigationProps>();
   const userInfo = useSelector((state: RootState) => state.auth.userInfo);
 
   const handlePayment = async () => {
@@ -99,7 +101,12 @@ const TopUpScreen = () => {
         Linking.openURL(data.deepLink);
         return;
       } else {
-        Linking.openURL(data.paymentUrl);
+        // Linking.openURL(data.paymentUrl);
+        // return;
+
+        navigation.navigate('WebViewScreen', {
+          url: response.data.data.paymentUrl,
+        });
         return;
       }
     },
@@ -129,7 +136,10 @@ const TopUpScreen = () => {
                   Số dư ví
                 </TextComponent>
                 <TextComponent fontWeight="500" fontSize={24}>
-                  {formatCurrency(userInfo.balance ? userInfo.balance.toString() : '0')} VNĐ
+                  {formatCurrency(
+                    userInfo.balance ? userInfo.balance.toString() : '0',
+                  )}{' '}
+                  VNĐ
                 </TextComponent>
               </FlexComponent>
               <InputComponent

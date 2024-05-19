@@ -17,12 +17,12 @@ import {useIsFocused} from '@react-navigation/native';
 import LoginRequireComponent from '../../../components/LoginRequireComponent';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../types';
-import {globalStyles} from '../../../styles/globalStyles';
 import {appInfo} from '../../../constants/appInfo';
 
 const MedicalBillScreen = () => {
   const [isLoadingAPI, setIsLoadingAPI] = useState(true);
   const [fillter, setFillter] = useState('Chưa khám');
+  const [symbolisms, setSymbolisms] = useState([0, 0, 0, 0] as number[]);
   const [patientNames, setPatientNames] = useState([]);
   const [selectedPatientName, setSelectedPatientName] = useState({
     fullName: null,
@@ -30,6 +30,7 @@ const MedicalBillScreen = () => {
   });
   const [bookings, setBookings] = useState<any[]>([]);
   const [bookingToDisplay, setBookingToDisplay] = useState([]);
+  const [bookingToDisplayTemp, setBookingToDisplayTemp] = useState([] as any[]);
   const isFocused = useIsFocused();
 
   const {t} = useTranslation();
@@ -115,53 +116,73 @@ const MedicalBillScreen = () => {
 
   useEffect(() => {
     setIsLoadingAPI(true);
+
+    switch (fillter) {
+      case 'Tất cả':
+        setBookingToDisplay(bookingToDisplayTemp[1]);
+        break;
+      case 'Đã khám':
+        setBookingToDisplay(bookingToDisplayTemp[2]);
+        break;
+      case 'Chưa khám':
+        setBookingToDisplay(bookingToDisplayTemp[0]);
+        break;
+      case 'Bị hủy':
+        setBookingToDisplay(bookingToDisplayTemp[3]);
+        break;
+    }
+
+    const timeOutId = setTimeout(() => {
+      setIsLoadingAPI(false);
+    }, 10);
+
+    return () => {
+      clearTimeout(timeOutId);
+    };
+  }, [fillter, bookingToDisplayTemp]);
+
+  useEffect(() => {
+    setIsLoadingAPI(true);
     const temp = bookings.filter(
       (booking: any) =>
         booking.patientProfileId === selectedPatientName.patientProfileId,
     );
+
     var bookingToDisplayTemp = temp[0]?.bookings;
-    if (fillter === 'Chưa khám') {
-      bookingToDisplayTemp?.sort((a: any, b: any) => {
+    const allBookingTemp = bookingToDisplayTemp?.sort((a: any, b: any) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+
+      return dateB.getTime() - dateA.getTime();
+    });
+    const usedBooking = allBookingTemp?.filter(
+      (booking: any) => booking.status && !booking.cancelled,
+    );
+    const notUsedBooking = allBookingTemp
+      ?.filter((booking: any) => !booking.status && !booking.cancelled)
+      ?.sort((a: any, b: any) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
 
         return dateA.getTime() - dateB.getTime();
       });
-    } else {
-      bookingToDisplayTemp?.sort((a: any, b: any) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-
-        return dateB.getTime() - dateA.getTime();
-      });
-    }
-
-    switch (fillter) {
-      case 'Tất cả':
-        setBookingToDisplay(bookingToDisplayTemp);
-        break;
-      case 'Đã khám':
-        setBookingToDisplay(
-          bookingToDisplayTemp?.filter(
-            (booking: any) => booking.status && !booking.cancelled,
-          ),
-        );
-        break;
-      case 'Chưa khám':
-        setBookingToDisplay(
-          bookingToDisplayTemp?.filter(
-            (booking: any) => !booking.status && !booking.cancelled,
-          ),
-        );
-        break;
-      case 'Bị hủy':
-        setBookingToDisplay(
-          bookingToDisplayTemp?.filter((booking: any) => booking.cancelled),
-        );
-        break;
-    }
+    const cancelledBooking = allBookingTemp?.filter(
+      (booking: any) => booking.cancelled,
+    );
+    setSymbolisms([
+      notUsedBooking?.length,
+      allBookingTemp?.length,
+      usedBooking?.length,
+      cancelledBooking?.length,
+    ]);
+    setBookingToDisplayTemp([
+      notUsedBooking,
+      allBookingTemp,
+      usedBooking,
+      cancelledBooking,
+    ]);
     setIsLoadingAPI(false);
-  }, [fillter, selectedPatientName, bookings]);
+  }, [selectedPatientName, bookings]);
 
   return (
     <LoginRequireComponent>
@@ -201,6 +222,7 @@ const MedicalBillScreen = () => {
         <FilterComponent
           items={['Chưa khám', 'Tất cả', 'Đã khám', 'Bị hủy']}
           value={fillter}
+          symbolisms={symbolisms}
           onChange={value => setFillter(value)}
         />
         <ContentComponent style={{backgroundColor: appColors.backgroundGray}}>
