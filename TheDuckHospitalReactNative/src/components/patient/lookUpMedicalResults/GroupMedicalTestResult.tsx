@@ -5,6 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import React, {useCallback} from 'react';
 import TextComponent from '../../TextComponent';
@@ -35,9 +36,9 @@ const GroupMedicalTestResult = (props: GroupMedicalTestResultProps) => {
   );
   const _renderItem = useCallback(
     ({item}: any) => (
-      <TouchableOpacity onPress={() => handleMedicalTestPress(item)}>
+      <Pressable onPress={() => handleMedicalTestPress(item)}>
         <MedicalTestResultItem medicalTest={item} />
-      </TouchableOpacity>
+      </Pressable>
     ),
     [],
   );
