@@ -45,6 +45,11 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
+    private HospitalAdmission hospitalAdmission;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
     private Account account;
 
     private PaymentType paymentType;

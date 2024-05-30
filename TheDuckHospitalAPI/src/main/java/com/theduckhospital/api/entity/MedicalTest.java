@@ -42,6 +42,16 @@ public class MedicalTest {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
+    private HospitalAdmission hospitalAdmission;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
     private LaboratoryTechnician laboratoryTechnician;
 
     private MedicalTestState state = MedicalTestState.WAITING;

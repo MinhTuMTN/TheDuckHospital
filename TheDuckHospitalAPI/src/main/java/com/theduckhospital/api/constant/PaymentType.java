@@ -1,5 +1,10 @@
 package com.theduckhospital.api.constant;
 
 public enum PaymentType {
-    BOOKING, MEDICAL_TEST, TOP_UP, REFUND
+    BOOKING,
+    MEDICAL_TEST,
+    TOP_UP,
+    REFUND,
+    ADVANCE_FEE,
+    DISCHARGE
 }

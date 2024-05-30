@@ -319,6 +319,10 @@ public class AccountServicesImpl implements IAccountServices {
                 if (((Doctor) account.getStaff()).isHeadOfDepartment()) {
                     role = "HeadDoctor";
                 }
+            } else if (Objects.equals(role, "Nurse")) {
+                if (((Nurse) account.getStaff()).isHeadOfDepartment()) {
+                    role = "HeadNurse";
+                }
             }
         }
 

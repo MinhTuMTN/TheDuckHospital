@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.RoomType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,6 @@ public class Room {
     private String description;
     private boolean deleted;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
@@ -36,6 +36,33 @@ public class Room {
     @JsonBackReference
     @ToStringExclude
     private List<DoctorSchedule> doctorSchedule;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private List<NurseSchedule> nurseSchedules;
+
+    private RoomType roomType;
+    private Integer beingUsed;
+
+    // 2 thuộc tính này reset lại mỗi ngày
+    private int queueNumber;
+    private int numberOfPatients;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private List<HospitalAdmission> hospitalAdmissions;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private MedicalService medicalService;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private List<MedicalTest> medicalTests;
 
     private Date createdDate;
     private Date updatedDate;

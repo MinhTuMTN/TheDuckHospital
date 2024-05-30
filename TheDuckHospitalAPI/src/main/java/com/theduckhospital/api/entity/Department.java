@@ -33,12 +33,22 @@ public class Department {
     @OneToMany(mappedBy = "department")
     @ToString.Exclude
     @JsonBackReference
+    private List<Nurse> nurses;
+
+    @OneToMany(mappedBy = "department")
+    @ToString.Exclude
+    @JsonBackReference
     private List<Room> rooms;
 
     @OneToMany(mappedBy = "department")
     @ToString.Exclude
     @JsonBackReference
     private List<MedicalService> medicalServices;
+
+    @OneToMany(mappedBy = "department")
+    @ToString.Exclude
+    @JsonBackReference
+    private List<HospitalAdmission> hospitalAdmissions;
 
     @PrePersist
     private void onCreate() {

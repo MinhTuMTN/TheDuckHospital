@@ -90,4 +90,9 @@ public class PatientProfile {
     @ToStringExclude
     @JsonBackReference
     private List<MedicineReminder> medicineReminders;
+
+    @OneToMany(mappedBy = "patientProfile")
+    @ToStringExclude
+    @JsonBackReference
+    private List<HospitalAdmission> hospitalAdmissions;
 }

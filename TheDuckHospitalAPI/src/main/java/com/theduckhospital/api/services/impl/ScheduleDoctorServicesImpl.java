@@ -2,7 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.constant.NotificationState;
-import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.headdoctor.CreateDoctorScheduleRequest;
 import com.theduckhospital.api.dto.request.headdoctor.UpdateDoctorScheduleRequest;
@@ -29,8 +29,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.theduckhospital.api.constant.ScheduleType.AFTERNOON;
-import static com.theduckhospital.api.constant.ScheduleType.MORNING;
+import static com.theduckhospital.api.constant.ScheduleSession.AFTERNOON;
+import static com.theduckhospital.api.constant.ScheduleSession.MORNING;
 
 @Service
 public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
@@ -397,7 +397,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Department department,
             Doctor doctor,
             Date date,
-            ScheduleType scheduleType,
+            ScheduleSession scheduleSession,
             CreateDoctorScheduleRequest request
     ) throws ParseException {
         List<DoctorSchedule> doctorSchedules = new ArrayList<>();
@@ -412,7 +412,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
                         room,
                         date,
-                        scheduleType
+                        scheduleSession
                 );
         if (doctorScheduleOptional.isPresent()) {
             throw new BadRequestException("Room is not available");
@@ -423,7 +423,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
                         doctor,
                         date,
-                        scheduleType
+                        scheduleSession
                 );
         if (optional.isPresent()) {
             throw new BadRequestException("Doctor is not available");
@@ -439,10 +439,10 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         doctorSchedule.setSlot(request.getSlotPerTimeSlot() * 4);
         doctorSchedule.setDayOfWeek(time.get(Calendar.DAY_OF_WEEK));
         doctorSchedule.setDate(date);
-        doctorSchedule.setScheduleType(scheduleType);
+        doctorSchedule.setScheduleSession(scheduleSession);
         doctorSchedule.setDeleted(false);
 
-        int startTimeSlotId = scheduleType == MORNING ? 0 : 4;
+        int startTimeSlotId = scheduleSession == MORNING ? 0 : 4;
         List<TimeSlot> timeSlots = new ArrayList<>();
         for (int i = startTimeSlotId; i < startTimeSlotId + 4; i++)
         {
@@ -642,16 +642,16 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private List<Date> getInvalidDate(
             Room room,
             Doctor doctor,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
             ) {
         List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
                 doctor,
-                scheduleType
+                scheduleSession
         );
 
         List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
                 room,
-                scheduleType
+                scheduleSession
         );
 
         List<DoctorSchedule> mergedList = Stream.concat(doctorSchedules1.stream(), doctorSchedules2.stream())

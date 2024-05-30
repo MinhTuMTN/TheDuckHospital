@@ -223,6 +223,10 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         medicalTest.setPrice(
                 medicalService.getPrice()
         );
+
+        // Thay đổi
+        // B1: Tìm ra phòng có số lượng ít nhất mà xét nghiệm dịch vụ đó
+        // B2: Lấy số thứ tự + 1
         medicalTest.setQueueNumber(
                 (int) (medicalTestRepository
                         .countByMedicalServiceAndDateAndDeletedIsFalse(

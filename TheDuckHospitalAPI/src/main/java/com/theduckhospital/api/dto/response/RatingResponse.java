@@ -1,13 +1,9 @@
 package com.theduckhospital.api.dto.response;
 
-import com.theduckhospital.api.constant.Gender;
-import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.Booking;
-import com.theduckhospital.api.entity.Rating;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Data
 public class RatingResponse {

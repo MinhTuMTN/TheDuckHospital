@@ -38,4 +38,19 @@ public class Doctor extends Staff{
     @ToStringExclude
     @JsonBackReference
     private List<DoctorSchedule> doctorSchedules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "doctor")
+    @JsonBackReference
+    @ToStringExclude
+    private List<HospitalAdmission> hospitalAdmissions;
+
+    @OneToMany(mappedBy = "treatingDoctor")
+    @JsonBackReference
+    @ToStringExclude
+    private List<HospitalizationDetail> hospitalizationDetails;
+
+    @OneToMany(mappedBy = "doctor")
+    @JsonBackReference
+    @ToStringExclude
+    private List<Discharge> discharges;
 }

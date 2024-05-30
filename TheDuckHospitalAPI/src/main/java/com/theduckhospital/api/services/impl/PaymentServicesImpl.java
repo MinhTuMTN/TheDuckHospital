@@ -151,6 +151,8 @@ public class PaymentServicesImpl implements IPaymentServices {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
+                // Print Data response
+                System.out.println(response.body().string());
                 throw new StatusCodeException("Internal server error", 500);
             }
 

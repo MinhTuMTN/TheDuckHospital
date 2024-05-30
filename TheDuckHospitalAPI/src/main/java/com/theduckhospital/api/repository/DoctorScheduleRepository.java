@@ -1,6 +1,6 @@
 package com.theduckhospital.api.repository;
 
-import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Room;
@@ -17,13 +17,13 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     Optional<DoctorSchedule> findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
             Room room,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
             Room room,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     List<DoctorSchedule> findByRoomAndDateOrderByScheduleType(
@@ -34,12 +34,12 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     Optional<DoctorSchedule> findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
             Doctor doctor,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     List<DoctorSchedule> findByDoctorAndScheduleTypeAndDeletedIsFalse(
             Doctor doctor,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     List<DoctorSchedule> findByDoctorAndDateOrderByScheduleType(
@@ -49,7 +49,7 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
 
     List<DoctorSchedule> findByRoomAndScheduleTypeAndDeletedIsFalse(
             Room room,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     List<DoctorSchedule> findByRoomAndDateAndDeletedIsFalse(
