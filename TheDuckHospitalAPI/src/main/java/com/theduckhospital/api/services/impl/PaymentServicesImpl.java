@@ -10,6 +10,7 @@ import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.services.IPaymentServices;
 import okhttp3.*;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,16 @@ import java.util.*;
 
 @Service
 public class PaymentServicesImpl implements IPaymentServices {
-    private final Environment environment;
+    // Value from application.properties
+    @Value("${server.callback.url}")
+    private String callbackUrl;
+
+    private final String vnPayUrl;
+    private final String notifyUrl;
 
     public PaymentServicesImpl(Environment environment) {
-        this.environment = environment;
+        this.vnPayUrl = callbackUrl + "/api/booking/callback/vnPay";
+        this.notifyUrl = callbackUrl + "/api/booking/callback/momo";
     }
     @Override
     public PaymentResponse vnPayCreatePaymentUrl(double amount, UUID transactionId)  throws UnsupportedEncodingException {
@@ -51,7 +58,7 @@ public class PaymentServicesImpl implements IPaymentServices {
         vnp_Params.put("vnp_OrderType", orderType);
 
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -107,7 +114,7 @@ public class PaymentServicesImpl implements IPaymentServices {
         String amount = String.valueOf((int) amountInput);
 
         String requestType = "captureWallet";
-        String notifyUrl = "https://tb7drp6q-8080.asse.devtunnels.ms/api/booking/callback/momo";
+        String notifyUrl = this.notifyUrl;
         String returnUrl = "https://the-duck-hospital.web.app/payment-success?transactionId=" + transactionId;
         if (mobile)
             returnUrl = "theduck://app/payment/" + transactionId;
