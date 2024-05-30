@@ -46,8 +46,8 @@ public class Room {
     private Integer beingUsed;
 
     // 2 thuộc tính này reset lại mỗi ngày
-    private int queueNumber;
-    private int numberOfPatients;
+    private Integer queueNumber;
+    private Integer numberOfPatients;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     @JsonBackReference
