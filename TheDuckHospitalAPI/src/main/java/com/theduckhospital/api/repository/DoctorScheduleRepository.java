@@ -14,40 +14,40 @@ import java.util.UUID;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, UUID> {
-    Optional<DoctorSchedule> findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+    Optional<DoctorSchedule> findByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
             Room room,
             Date date,
             ScheduleSession scheduleSession
     );
 
-    DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+    DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
             Room room,
             Date date,
             ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByRoomAndDateOrderByScheduleType(
+    List<DoctorSchedule> findByRoomAndDateOrderByScheduleSession(
             Room room,
             Date date
     );
 
-    Optional<DoctorSchedule> findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
+    Optional<DoctorSchedule> findByDoctorAndDateAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
             Date date,
             ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByDoctorAndScheduleTypeAndDeletedIsFalse(
+    List<DoctorSchedule> findByDoctorAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
             ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByDoctorAndDateOrderByScheduleType(
+    List<DoctorSchedule> findByDoctorAndDateOrderByScheduleSession(
             Doctor doctor,
             Date date
     );
 
-    List<DoctorSchedule> findByRoomAndScheduleTypeAndDeletedIsFalse(
+    List<DoctorSchedule> findByRoomAndScheduleSessionAndDeletedIsFalse(
             Room room,
             ScheduleSession scheduleSession
     );
@@ -65,8 +65,8 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalse(Doctor doctor, Date date);
 
     List<DoctorSchedule> findByDateBetween(Date startDate, Date endDate);
-    List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalseOrderByScheduleTypeAsc(Doctor doctor, Date date);
-    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleTypeAsc(
+    List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalseOrderByScheduleSessionAsc(Doctor doctor, Date date);
+    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
             Doctor doctor, Date date, Date date2
     );
 }

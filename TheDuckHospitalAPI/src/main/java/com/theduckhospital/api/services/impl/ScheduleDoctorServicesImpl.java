@@ -160,7 +160,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         Room room = roomServices.findRoomById(roomId);
 
-        List<DoctorSchedule> schedules = doctorScheduleRepository.findByRoomAndDateOrderByScheduleType(room, date);
+        List<DoctorSchedule> schedules = doctorScheduleRepository.findByRoomAndDateOrderByScheduleSession(room, date);
 
         return schedules.stream()
                 .map(schedule -> new DoctorScheduleRoomResponse(
@@ -178,7 +178,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         Doctor doctor = doctorServices.getDoctorById(staffId);
 
-        List<DoctorSchedule> schedules = doctorScheduleRepository.findByDoctorAndDateOrderByScheduleType(doctor, date);
+        List<DoctorSchedule> schedules = doctorScheduleRepository.findByDoctorAndDateOrderByScheduleSession(doctor, date);
 
         return schedules.stream()
                 .map(schedule -> new DoctorScheduleRoomResponse(
@@ -262,7 +262,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         Doctor doctor = doctorServices.getDoctorByToken(authorization);
         Date today = DateCommon.getToday();
         return doctorScheduleRepository
-                .findByDoctorAndDateAndDeletedIsFalseOrderByScheduleTypeAsc(
+                .findByDoctorAndDateAndDeletedIsFalseOrderByScheduleSessionAsc(
                         doctor,
                         today
                 )
@@ -336,7 +336,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         Date startDate = calendar.getTime();
 
         return doctorScheduleRepository
-                .findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleTypeAsc(
+                .findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
                         doctor,
                         startDate,
                         endDate
@@ -409,7 +409,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         Optional<DoctorSchedule> doctorScheduleOptional = doctorScheduleRepository
-                .findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+                .findByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
                         room,
                         date,
                         scheduleSession
@@ -420,7 +420,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         // Check doctor is available
         Optional<DoctorSchedule> optional = doctorScheduleRepository
-                .findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
+                .findByDoctorAndDateAndScheduleSessionAndDeletedIsFalse(
                         doctor,
                         date,
                         scheduleSession
@@ -503,14 +503,14 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         DoctorSchedule morningDoctorSchedule = doctorScheduleRepository
-                .findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(room, date, MORNING);
+                .findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(room, date, MORNING);
         ScheduleRoomItemResponse morningSchedule = new ScheduleRoomItemResponse(
                 morningDoctorSchedule,
                 calculateNumberOfBookings(morningDoctorSchedule)
         );
 
         DoctorSchedule afternoonDoctorSchedule = doctorScheduleRepository
-                .findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(room, date, AFTERNOON);
+                .findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(room, date, AFTERNOON);
         ScheduleRoomItemResponse afternoonSchedule = new ScheduleRoomItemResponse(
                 afternoonDoctorSchedule,
                 calculateNumberOfBookings(afternoonDoctorSchedule)
@@ -590,12 +590,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     private List<DoctorSchedule> getMergedScheduleRoom(Room room) {
-        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByRoomAndScheduleSessionAndDeletedIsFalse(
                 room,
                 MORNING
         );
 
-        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByRoomAndScheduleSessionAndDeletedIsFalse(
                 room,
                 AFTERNOON
         );
@@ -608,12 +608,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     public List<Date> getDateHasDoctorSchedule(UUID staffId){
         Doctor doctor = doctorServices.getDoctorById(staffId);
 
-        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> morningSchedules = doctorScheduleRepository.findByDoctorAndScheduleSessionAndDeletedIsFalse(
                 doctor,
                 MORNING
         );
 
-        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> afternoonSchedules = doctorScheduleRepository.findByDoctorAndScheduleSessionAndDeletedIsFalse(
                 doctor,
                 AFTERNOON
         );
@@ -644,12 +644,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Doctor doctor,
             ScheduleSession scheduleSession
             ) {
-        List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository.findByDoctorAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository.findByDoctorAndScheduleSessionAndDeletedIsFalse(
                 doctor,
                 scheduleSession
         );
 
-        List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+        List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository.findByRoomAndScheduleSessionAndDeletedIsFalse(
                 room,
                 scheduleSession
         );
