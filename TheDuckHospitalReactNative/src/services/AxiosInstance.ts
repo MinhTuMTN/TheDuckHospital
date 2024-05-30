@@ -9,7 +9,8 @@ interface ResultProps {
 
 var qs = require('qs');
 const axiosInstance = axios.create({
-  baseURL: 'http://theduck.ddns.net:7071/api',
+  baseURL: 'https://theduckhospital.click/api',
+  // baseURL: 'http://theduck.ddns.net:7071/api',
   // baseURL: 'https://tb7drp6q-8080.asse.devtunnels.ms/api',
   // baseURL: 'https://z58krthx-8080.asse.devtunnels.ms/api',
   timeout: 3000,
