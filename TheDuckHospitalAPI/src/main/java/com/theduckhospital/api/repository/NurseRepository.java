@@ -12,5 +12,5 @@ import java.util.UUID;
 @Repository
 public interface NurseRepository extends JpaRepository<Nurse, UUID> {
     Optional<Nurse> findByStaffIdAndDepartment(UUID staffId, Department department);
-    List<Nurse> findByDepartmentIsNull();
+    List<Nurse> findByDepartmentIsNullAndNurseTypeIsNotNull();
 }

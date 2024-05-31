@@ -19,7 +19,7 @@ public class NurseAdminController {
     }
 
     @DeleteMapping("/{staffId}/head-nurse")
-    public ResponseEntity<?> deleteHeadDoctor(@PathVariable UUID staffId) {
+    public ResponseEntity<?> deleteHeadNurrse(@PathVariable UUID staffId) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
@@ -30,12 +30,12 @@ public class NurseAdminController {
     }
 
     @GetMapping("/not-in-department")
-    public ResponseEntity<?> getDoctorsNotInDepartment() {
+    public ResponseEntity<?> getNursesNotInDepartment() {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get all nurse not in department successfully")
-                        .data(nurseServices.getNurseNotInDepartment())
+                        .data(nurseServices.getNursesNotInDepartment())
                         .build()
         );
     }

@@ -7,7 +7,6 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StaffDetail from "../../../components/Admin/StaffManagement/StaffDetail";
@@ -18,7 +17,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import ScheduleTable from "../../../components/Admin/ScheduleTable";
-import { getDateHasDoctorSchedule, getSchedulesByStaffIdAndDate } from "../../../services/admin/DoctorScheduleServices";
+import {
+  getDateHasDoctorSchedule,
+  getSchedulesByStaffIdAndDate,
+} from "../../../services/admin/DoctorScheduleServices";
 
 const StaffId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -29,7 +31,6 @@ const StaffId = styled(Typography)(({ theme }) => ({
   fontWeight: "500",
   width: "fit-content",
 }));
-
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -64,8 +65,8 @@ function StaffDetailPage() {
   const [dateSchedule, setDateSchedule] = useState([]);
 
   const handleGetSchedules = useCallback(async () => {
-    if(!isDoctor) return;
-    let date = dateSelected.format("YYYY/MM/DD")
+    if (!isDoctor) return;
+    let date = dateSelected.format("YYYY/MM/DD");
     const response = await getSchedulesByStaffIdAndDate({
       staffId: staffId,
       date: date,
@@ -83,7 +84,7 @@ function StaffDetailPage() {
     const response = await getStaffById(staffId);
     if (response.success) {
       setStaff(response.data.data);
-      if(response.data.data.role === "Bác sĩ") {
+      if (response.data.data.role === "Bác sĩ") {
         setIsDoctor(true);
       }
     }
@@ -98,16 +99,14 @@ function StaffDetailPage() {
       const response = await getDateHasDoctorSchedule(staffId);
       if (response.success) {
         setDateSchedule(
-          response.data.data.map(
-            (date) => dayjs(date).format("YYYY/MM/DD")
-          )
+          response.data.data.map((date) => dayjs(date).format("YYYY/MM/DD"))
         );
       }
     };
-   
+
     handleGetDateHasSchedule();
   }, [staffId]);
- 
+
   function disableDateNotHasSchedule(date) {
     return !dateSchedule?.includes(date.format("YYYY/MM/DD"));
   }
@@ -137,9 +136,9 @@ function StaffDetailPage() {
               margin="0"
               color="#111927"
               onClick={() => {
-                state ?
-                  navigate(`/admin/department-management/${departmentId}`) :
-                  navigate("/admin/staff-management");
+                state
+                  ? navigate(`/admin/department-management/${departmentId}`)
+                  : navigate("/admin/staff-management");
               }}
             >
               <ArrowBackIosIcon />
@@ -152,33 +151,47 @@ function StaffDetailPage() {
                 color: "#111927",
               }}
             >
-              {state ? `Thông tin khoa ${state?.departmentName}` : "Danh sách nhân viên"}
+              {state
+                ? `Thông tin khoa ${state?.departmentName}`
+                : "Danh sách nhân viên"}
             </Typography>
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-              <Stack direction={"column"}>
-                <Typography
-                  variant="h4"
-                  fontWeight={600}
+              <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                <img
+                  src={staff?.avatar}
+                  alt="top-product"
                   style={{
-                    textTransform: "uppercase",
-                    fontSize: ["1.5rem", "2rem"],
+                    width: 100,
+                    height: 100,
+                    objectFit: "contain",
+                    borderRadius: "50%",
                   }}
-                >
-                  {staff.fullName}
-                </Typography>
-                <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                />
+                <Stack direction={"column"}>
                   <Typography
-                    variant="body1"
-                    fontWeight={450}
+                    variant="h4"
+                    fontWeight={600}
                     style={{
-                      fontSize: "14px",
+                      textTransform: "uppercase",
+                      fontSize: ["1.5rem", "2rem"],
                     }}
                   >
-                    staff_id:
+                    {staff.fullName}
                   </Typography>
-                  <StaffId>{staff.staffId}</StaffId>
+                  <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={450}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      staff_id:
+                    </Typography>
+                    <StaffId>{staff.staffId}</StaffId>
+                  </Stack>
                 </Stack>
               </Stack>
             </Grid>
@@ -199,49 +212,48 @@ function StaffDetailPage() {
             </Grid>
           </Grid>
 
-          {isDoctor &&
-          <Grid container>
-            <Grid item xs={12}>
-              <Stack
-                component={Paper}
-                elevation={3}
-                sx={{
-                  marginTop: 4,
-                  borderRadius: "15px",
-                }}
-                spacing={"2px"}
-              >
+          {isDoctor && (
+            <Grid container>
+              <Grid item xs={12}>
                 <Stack
+                  component={Paper}
+                  elevation={3}
                   sx={{
+                    marginTop: 4,
                     borderRadius: "15px",
-                    paddingTop: 1,
                   }}
+                  spacing={"2px"}
                 >
-                  <BoxStyle>
-                    <Stack direction={"row"}>
-                      <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
-                      <LocalizationProvider
-                        dateAdapter={AdapterDayjs}
-                        adapterLocale="en-gb"
-                      >
-                        <CustomDatePicker
-                          label="Ngày làm việc"
-                          value={dayjs(dateSelected)}
-                          shouldDisableDate={disableDateNotHasSchedule}
-                          onChange={(newDate) => {
-                            setDateSelected(newDate);
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Stack>
-                  </BoxStyle>
-                  {schedules &&
-                    <ScheduleTable items={schedules} />
-                  }
+                  <Stack
+                    sx={{
+                      borderRadius: "15px",
+                      paddingTop: 1,
+                    }}
+                  >
+                    <BoxStyle>
+                      <Stack direction={"row"}>
+                        <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
+                        <LocalizationProvider
+                          dateAdapter={AdapterDayjs}
+                          adapterLocale="en-gb"
+                        >
+                          <CustomDatePicker
+                            label="Ngày làm việc"
+                            value={dayjs(dateSelected)}
+                            shouldDisableDate={disableDateNotHasSchedule}
+                            onChange={(newDate) => {
+                              setDateSelected(newDate);
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Stack>
+                    </BoxStyle>
+                    {schedules && <ScheduleTable items={schedules} />}
+                  </Stack>
                 </Stack>
-              </Stack>
+              </Grid>
             </Grid>
-          </Grid>}
+          )}
         </Stack>
       </Stack>
     </Box>

@@ -23,7 +23,7 @@ import React, { useMemo, useState } from "react";
 import DialogConfirm from "../../General/DialogConfirm";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
-import { removeDoctorDepartment } from "../../../services/admin/DepartmentServices";
+import { removeNurseDepartment } from "../../../services/admin/DepartmentServices";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -79,7 +79,7 @@ function Row(props) {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [doctorId, setDoctorId] = useState("");
+  const [nurseId, setNurseId] = useState("");
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -91,10 +91,10 @@ function Row(props) {
 
   const maxWidth = useCustomMediaQuery();
 
-  const handleRemoveDoctorDepartment = async () => {
-    const response = await removeDoctorDepartment(departmentId, doctorId);
+  const handleRemoveNurseDepartment = async () => {
+    const response = await removeNurseDepartment(departmentId, nurseId);
     if (response.success) {
-      enqueueSnackbar("Xóa bác sĩ khỏi khoa thành công", {
+      enqueueSnackbar("Xóa điều dưỡng khỏi khoa thành công", {
         variant: "success",
       });
       navigate(0);
@@ -116,7 +116,7 @@ function Row(props) {
             }}
           >
             {row.fullName}
-            {row.headOfDepartment ? " (Trưởng khoa)" : ""}
+            {row.headOfDepartment ? " (Điều dưỡng trưởng)" : ""}
           </CustomText>
         </TableCell>
         <TableCell>
@@ -220,7 +220,7 @@ function Row(props) {
                         textAlign: "left",
                       }}
                       onClick={(e) => {
-                        setDoctorId(row.staffId);
+                        setNurseId(row.staffId);
                         setDeleteDialog(true);
                       }}
                     >
@@ -250,7 +250,7 @@ function Row(props) {
                 <IconButton
                   color="black"
                   onClick={(e) => {
-                    setDoctorId(row.staffId);
+                    setNurseId(row.staffId);
                     setDeleteDialog(true);
                   }}
                 >
@@ -263,11 +263,11 @@ function Row(props) {
       </TableRow>
       <DialogConfirm
         open={deleteDialog}
-        title={"Xóa bác sĩ"}
-        content={"Bạn có chắc chắn muốn xóa bác sĩ này khỏi khoa?"}
+        title={"Xóa điều dưỡng"}
+        content={"Bạn có chắc chắn muốn xóa điều dưỡng này khỏi khoa?"}
         okText={"Xóa"}
         cancelText={"Hủy"}
-        onOk={handleRemoveDoctorDepartment}
+        onOk={handleRemoveNurseDepartment}
         onCancel={() => setDeleteDialog(false)}
         onClose={() => setDeleteDialog(false)}
       />
@@ -275,11 +275,11 @@ function Row(props) {
   );
 }
 
-function DoctorTable(props) {
+function NurseTable(props) {
   const {
     items,
-    setOpenPopup,
-    handleGetAllDoctorsNotInDepartment,
+    setOpenPopupNurse,
+    handleGetAllNursesNotInDepartment,
     departmentId,
     departmentName,
   } = props;
@@ -294,15 +294,15 @@ function DoctorTable(props) {
       >
         <BoxStyle>
           <Stack direction={"row"}>
-            <TieuDe>Danh sách bác sĩ</TieuDe>
+            <TieuDe>Danh sách điều dưỡng</TieuDe>
             <CustomButton
               color="normal2"
               variant="contained"
               size="medium"
               sx={{ width: "10%" }}
               onClick={() => {
-                handleGetAllDoctorsNotInDepartment();
-                setOpenPopup(true);
+                handleGetAllNursesNotInDepartment();
+                setOpenPopupNurse(true);
               }}
             >
               Thêm
@@ -387,4 +387,4 @@ function DoctorTable(props) {
   );
 }
 
-export default DoctorTable;
+export default NurseTable;

@@ -258,23 +258,23 @@ function StaffListPage(props) {
 
     // let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
 
-    let image = {
-      uri: "https://png.pngtree.com/png-clipart/20230817/original/pngtree-avatar-of-happy-nurse-with-brown-hairs-art-design-emergency-vector-picture-image_10988469.png",
-      name: "avatar.jpeg",
-      type: "image/jpeg",
-    };
-
     const formData = new FormData();
     formData.append("fullName", staff.fullName);
     formData.append("phoneNumber", staff.phoneNumber);
     formData.append("identityNumber", staff.identityNumber);
     formData.append("email", staff.email);
-    formData.append("dateOfBirth", dayjs(staff.dateOfBirth).format('MM/DD/YYYY'));
+    formData.append(
+      "dateOfBirth",
+      dayjs(staff.dateOfBirth).format("MM/DD/YYYY")
+    );
     formData.append("role", staff.role);
     formData.append("gender", staff.gender);
     formData.append("degree", staff.degree ? staff.degree : "");
     formData.append("departmentId", staff.departmentId);
-    formData.append("nurseType", staff.nurseType);
+    formData.append(
+      "nurseType",
+      staff.nurseType === null ? "" : staff.nurseType
+    );
     formData.append("avatar", selectedFile);
 
     // const response = await createStaff({
@@ -497,21 +497,47 @@ function StaffListPage(props) {
           });
         }}
       >
-        <TextField
-          variant="outlined"
-          type="text"
-          value={selectedFile ? selectedFile.name : ""}
-          disabled
-          InputProps={{
-            endAdornment: (
-              <IconButton component="label">
-                <FileUploadOutlined />
-                <input type="file" hidden onChange={handleFileChange} />
-              </IconButton>
-            ),
-          }}
-        />
         <Stack width={"30rem"} mt={1} spacing={3}>
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            spacing={1}
+          >
+            <img
+              src={
+                selectedFile
+                  ? URL.createObjectURL(selectedFile)
+                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+              }
+              alt="top-product"
+              style={{
+                width: 200,
+                height: 200,
+                objectFit: "contain",
+                borderRadius: "50%",
+              }}
+            />
+            <TextField
+              variant="outlined"
+              type="text"
+              value={selectedFile ? selectedFile.name : ""}
+              disabled
+              InputProps={{
+                endAdornment: (
+                  <IconButton component="label">
+                    <FileUploadOutlined />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleFileChange}
+                    />
+                  </IconButton>
+                ),
+              }}
+            />
+          </Stack>
           <MuiTextFeild
             label={"Họ tên"}
             autoFocus
@@ -690,7 +716,9 @@ function StaffListPage(props) {
           {staff.role === "NURSE" && (
             <Stack>
               <FormControl>
-                <CustomTypography variant="body1">Loại điều dưỡng</CustomTypography>
+                <CustomTypography variant="body1">
+                  Loại điều dưỡng
+                </CustomTypography>
                 <RadioGroup defaultValue="null" value={staff.nurseType} row>
                   <FormControlLabel
                     // checked={staff.nurseType === null}

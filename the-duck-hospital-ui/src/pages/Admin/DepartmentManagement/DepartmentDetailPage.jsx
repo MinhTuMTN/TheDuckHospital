@@ -20,11 +20,17 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DepartmentDetail from "../../../components/Admin/DepartmentManagement/DepartmentDetail";
-import { addDoctorDepartment, getDepartmentById } from "../../../services/admin/DepartmentServices";
+import {
+  addDoctorDepartment,
+  addNurseDepartment,
+  getDepartmentById,
+} from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
 import CloseIcon from "@mui/icons-material/Close";
 import { getDoctorsNotInDepartment } from "../../../services/admin/DoctorServices";
+import { getNursesNotInDepartment } from "../../../services/admin/NurseServices";
 import DoctorTable from "../../../components/Admin/DepartmentManagement/DoctorTable";
+import NurseTable from "../../../components/Admin/DepartmentManagement/NurseTable";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -35,20 +41,31 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-
 function DepartmentDetailPage() {
   const { departmentId } = useParams();
   const navigate = useNavigate();
   const [department, setDepartment] = useState({});
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [openPopupNurse, setOpenPopupNurse] = useState(false);
+  const [selectedNurse, setSelectedNurse] = useState("");
   const [doctors, setDoctors] = useState([]);
+  const [nurses, setNurses] = useState([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   const handleGetDepartment = useCallback(async () => {
     const response = await getDepartmentById(departmentId);
     if (response.success) {
       response.data.data.doctors.sort((a, b) => {
+        if (a.headOfDepartment === b.headOfDepartment) {
+          return 0;
+        } else if (a.headOfDepartment) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+      response.data.data.nurses.sort((a, b) => {
         if (a.headOfDepartment === b.headOfDepartment) {
           return 0;
         } else if (a.headOfDepartment) {
@@ -68,18 +85,38 @@ function DepartmentDetailPage() {
   const handleAddDoctorDepartment = async () => {
     const response = await addDoctorDepartment(departmentId, selectedDoctor);
     if (response.success) {
-      enqueueSnackbar("Thêm bác sĩ vào khoa thành công", { variant: "success" });
+      enqueueSnackbar("Thêm bác sĩ vào khoa thành công", {
+        variant: "success",
+      });
       setOpenPopup(false);
       handleGetDepartment();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  }
+  };
 
-  const handleGetAllDoctorNotInDepartment = async () => {
+  const handleAddNurseDepartment = async () => {
+    const response = await addNurseDepartment(departmentId, selectedNurse);
+    if (response.success) {
+      enqueueSnackbar("Thêm điều dưỡng vào khoa thành công", {
+        variant: "success",
+      });
+      setOpenPopupNurse(false);
+      handleGetDepartment();
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  };
+
+  const handleGetAllDoctorsNotInDepartment = async () => {
     const response = await getDoctorsNotInDepartment();
     if (response.success) {
       setDoctors(response.data.data);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  }
+  };
+
+  const handleGetAllNursesNotInDepartment = async () => {
+    const response = await getNursesNotInDepartment();
+    if (response.success) {
+      setNurses(response.data.data);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  };
 
   return (
     <Box
@@ -151,6 +188,8 @@ function DepartmentDetailPage() {
                   department={department}
                   headDoctorId={department.headDoctorId}
                   headDoctorName={department.headDoctorName}
+                  headNurseId={department.headNurseId}
+                  headNurseName={department.headNurseName}
                   handleGetDepartment={handleGetDepartment}
                 />
               </Stack>
@@ -170,7 +209,33 @@ function DepartmentDetailPage() {
                 <DoctorTable
                   items={department.doctors}
                   setOpenPopup={setOpenPopup}
-                  handleGetAllDoctorNotInDepartment={handleGetAllDoctorNotInDepartment}
+                  handleGetAllDoctorsNotInDepartment={
+                    handleGetAllDoctorsNotInDepartment
+                  }
+                  departmentId={departmentId}
+                  departmentName={department.departmentName}
+                />
+              </Stack>
+            </Grid>
+          </Grid>
+
+          <Grid container>
+            <Grid item xs={12}>
+              <Stack
+                component={Paper}
+                elevation={3}
+                sx={{
+                  marginTop: 4,
+                  borderRadius: "15px",
+                }}
+                spacing={"2px"}
+              >
+                <NurseTable
+                  items={department.nurses}
+                  setOpenPopupNurse={setOpenPopupNurse}
+                  handleGetAllNursesNotInDepartment={
+                    handleGetAllNursesNotInDepartment
+                  }
                   departmentId={departmentId}
                   departmentName={department.departmentName}
                 />
@@ -231,9 +296,7 @@ function DepartmentDetailPage() {
               <FormControl fullWidth>
                 <Select
                   value={selectedDoctor}
-                  onChange={(e) =>
-                    setSelectedDoctor(e.target.value,)
-                  }
+                  onChange={(e) => setSelectedDoctor(e.target.value)}
                   displayEmpty
                   required
                   size="small"
@@ -243,7 +306,7 @@ function DepartmentDetailPage() {
                   inputProps={{ "aria-label": "Without label" }}
                 >
                   {doctors?.map((item, index) => (
-                    <MenuItem value={item.staffId} key={index} >
+                    <MenuItem value={item.staffId} key={index}>
                       <Typography style={{ fontSize: "14px" }}>
                         {item.fullName}
                       </Typography>
@@ -256,6 +319,86 @@ function DepartmentDetailPage() {
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={handleAddDoctorDepartment}>
+            Thêm
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
+
+      <BootstrapDialog
+        open={openPopupNurse}
+        onClose={() => setOpenPopupNurse(false)}
+        aria-labelledby="customized-dialog-title"
+        sx={{
+          maxHeight: "calc(100vh - 64px)",
+        }}
+      >
+        <DialogTitle sx={{ m: 0, px: 4, py: 2 }} id="customized-dialog-title">
+          <Typography
+            style={{
+              fontSize: "24px",
+            }}
+            sx={{
+              fontWeight: 700,
+            }}
+          >
+            Thêm điều dưỡng vào {department.departmentName}
+          </Typography>
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={() => setOpenPopupNurse(false)}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "text.secondary",
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent
+          style={{
+            padding: "0px 32px 0px 32px",
+            width: isSmallScreen ? "30rem" : "35rem",
+          }}
+        >
+          <Stack direction={"column"} spacing={2}>
+            <Box>
+              <Typography
+                variant="body1"
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "4px",
+                }}
+              >
+                Điều dưỡng
+              </Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedNurse}
+                  onChange={(e) => setSelectedNurse(e.target.value)}
+                  displayEmpty
+                  required
+                  size="small"
+                  sx={{
+                    fontSize: "14px !important",
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  {nurses?.map((item, index) => (
+                    <MenuItem value={item.staffId} key={index}>
+                      <Typography style={{ fontSize: "14px" }}>
+                        {item.fullName}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button autoFocus onClick={handleAddNurseDepartment}>
             Thêm
           </Button>
         </DialogActions>

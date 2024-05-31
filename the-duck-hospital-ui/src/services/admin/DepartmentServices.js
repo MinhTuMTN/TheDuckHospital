@@ -16,6 +16,10 @@ export const getActiveDoctorsDepartment = (departmentId) => {
   return get(`/admin/departments/${departmentId}/doctors`);
 };
 
+export const getActiveNursesDepartment = (departmentId) => {
+  return get(`/admin/departments/${departmentId}/nurses`);
+};
+
 export const getDepartmentById = (departmentId) => {
   return get(`/admin/departments/${departmentId}`);
 };
@@ -42,4 +46,12 @@ export const addDoctorDepartment = (departmentId, doctorId) => {
 
 export const removeDoctorDepartment = (departmentId, doctorId) => {
   return del(`/admin/departments/${departmentId}/doctors/${doctorId}`);
+};
+
+export const addNurseDepartment = (departmentId, nurseId) => {
+  return put(`/admin/departments/${departmentId}/nurses/${nurseId}`);
+};
+
+export const removeNurseDepartment = (departmentId, nurseId) => {
+  return del(`/admin/departments/${departmentId}/nurses/${nurseId}`);
 };

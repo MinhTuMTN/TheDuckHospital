@@ -15,7 +15,9 @@ export const createStaff = (data) => {
 };
 
 export const updateStaff = (staffId, data) => {
-  return put(`/admin/staffs/${staffId}`, data);
+  return put(`/admin/staffs/${staffId}`, data, {
+    "Content-Type": "multipart/form-data",
+  });
 };
 
 export const getStaffById = (staffId) => {

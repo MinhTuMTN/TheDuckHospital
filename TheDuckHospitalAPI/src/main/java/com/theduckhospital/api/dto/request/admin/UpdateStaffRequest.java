@@ -24,7 +24,7 @@ public class UpdateStaffRequest {
     private String dateOfBirth;
     @NotNull(message = "Gender is required")
     private Integer gender;
-    @NotNull(message = "Avatar is required")
+
     private MultipartFile avatar;
 
     private Degree degree;
