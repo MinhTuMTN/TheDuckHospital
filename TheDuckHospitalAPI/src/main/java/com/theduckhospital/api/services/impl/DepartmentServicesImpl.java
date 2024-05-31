@@ -52,9 +52,11 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         if (request.getDepartmentName() != null) {
             department.setDepartmentName(request.getDepartmentName());
         }
+
         if (request.getDescription() != null) {
             department.setDescription(request.getDescription());
         }
+
         if (request.getStaffId() != null) {
             department.getDoctors().stream()
                     .filter(Doctor::isHeadOfDepartment)
@@ -66,6 +68,19 @@ public class DepartmentServicesImpl implements IDepartmentServices {
             }
             optional.get().setHeadOfDepartment(true);
             doctorRepository.save(optional.get());
+        }
+
+        if (request.getHeadNurseId() != null) {
+            department.getNurses().stream()
+                    .filter(Nurse::isHeadOfDepartment)
+                    .findFirst()
+                    .ifPresent(headDoctor -> headDoctor.setHeadOfDepartment(false));
+            Optional<Nurse> optional = nurseRepository.findById(request.getHeadNurseId());
+            if (optional.isEmpty() || optional.get().isDeleted()) {
+                throw new NotFoundException("Doctor not found");
+            }
+            optional.get().setHeadOfDepartment(true);
+            nurseRepository.save(optional.get());
         }
 
         return departmentRepository.save(department);
