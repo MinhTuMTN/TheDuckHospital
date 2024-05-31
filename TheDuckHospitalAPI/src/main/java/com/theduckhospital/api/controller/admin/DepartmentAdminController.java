@@ -80,6 +80,17 @@ public class DepartmentAdminController {
         );
     }
 
+    @GetMapping("/{departmentId}/nurses")
+    public ResponseEntity<?> getNursesDepartment(@PathVariable int departmentId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get nurses by department id successfully")
+                        .data(departmentServices.getActiveNursesDepartment(departmentId))
+                        .build()
+        );
+    }
+
     @GetMapping("/without-services")
     public ResponseEntity<?> getDepartmentsWithoutServices() {
         return ResponseEntity.ok(
@@ -109,6 +120,17 @@ public class DepartmentAdminController {
                         .success(true)
                         .message("Delete doctor from department successfully")
                         .data(departmentServices.removeDoctorDepartment(departmentId, doctorId))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{departmentId}/nurses/{nurseId}")
+    public ResponseEntity<?> deleteNurseDepartment(@PathVariable int departmentId, @PathVariable UUID nurseId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Delete nurse from department successfully")
+                        .data(departmentServices.removeNurseDepartment(departmentId, nurseId))
                         .build()
         );
     }
@@ -144,6 +166,17 @@ public class DepartmentAdminController {
                         .success(true)
                         .message("Add doctor to department successfully")
                         .data(departmentServices.addDoctorDepartment(departmentId, doctorId))
+                        .build()
+        );
+    }
+
+    @PutMapping("/{departmentId}/nurses/{nurseId}")
+    public ResponseEntity<?> addNurseDepartment(@PathVariable int departmentId, @PathVariable UUID nurseId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Add nurse to department successfully")
+                        .data(departmentServices.addNurseDepartment(departmentId, nurseId))
                         .build()
         );
     }

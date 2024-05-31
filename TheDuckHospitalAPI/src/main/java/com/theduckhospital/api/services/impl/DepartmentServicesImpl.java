@@ -6,12 +6,8 @@ import com.theduckhospital.api.dto.response.admin.DepartmentResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredDepartmentsResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.DepartmentRepository;
-import com.theduckhospital.api.repository.DoctorRepository;
-import com.theduckhospital.api.repository.MedicalServiceRepository;
-import com.theduckhospital.api.repository.RoomRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.IDepartmentServices;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,16 +21,18 @@ import java.util.UUID;
 public class DepartmentServicesImpl implements IDepartmentServices {
     private final DepartmentRepository departmentRepository;
     private final DoctorRepository doctorRepository;
+    private final NurseRepository nurseRepository;
     private final MedicalServiceRepository medicalServiceRepository;
     private final RoomRepository roomRepository;
 
     public DepartmentServicesImpl(DepartmentRepository departmentRepository,
                                   DoctorRepository doctorRepository,
-                                  MedicalServiceRepository medicalServiceRepository,
+                                  NurseRepository nurseRepository, MedicalServiceRepository medicalServiceRepository,
                                   RoomRepository roomRepository
     ) {
         this.departmentRepository = departmentRepository;
         this.doctorRepository = doctorRepository;
+        this.nurseRepository = nurseRepository;
         this.medicalServiceRepository = medicalServiceRepository;
         this.roomRepository = roomRepository;
     }
@@ -148,6 +146,16 @@ public class DepartmentServicesImpl implements IDepartmentServices {
     }
 
     @Override
+    public List<Nurse> getActiveNursesDepartment(int departmentId) {
+        Department department = getDepartmentById(departmentId);
+
+        List<Nurse> nurses = department.getNurses();
+        nurses.removeIf(Nurse::isDeleted);
+
+        return nurses;
+    }
+
+    @Override
     public FilteredDepartmentsResponse getPaginationFilteredDepartments(
             String search,
             int page,
@@ -224,6 +232,25 @@ public class DepartmentServicesImpl implements IDepartmentServices {
     }
 
     @Override
+    public Nurse addNurseDepartment(int departmentId, UUID nurseId) {
+        Department department = getDepartmentById(departmentId);
+
+        Optional<Nurse> optional = nurseRepository.findById(nurseId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Nurse not found");
+        }
+
+        Nurse nurse = optional.get();
+        if (nurse.getDepartment() != null) {
+            throw new IllegalStateException("Nurse already belongs to another department");
+        }
+
+        nurse.setDepartment(department);
+
+        return nurseRepository.save(nurse);
+    }
+
+    @Override
     public boolean removeDoctorDepartment(int departmentId, UUID doctorId) {
         Department department = getDepartmentById(departmentId);
 
@@ -241,6 +268,28 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         doctor.setDepartment(null);
 
         doctorRepository.save(doctor);
+
+        return true;
+    }
+
+    @Override
+    public boolean removeNurseDepartment(int departmentId, UUID nurseId) {
+        Department department = getDepartmentById(departmentId);
+
+        Optional<Nurse> optionalNurse = nurseRepository.findByStaffIdAndDepartment(nurseId, department);
+        if (optionalNurse.isEmpty()) {
+            throw new NotFoundException("Nurse not found");
+        }
+
+        Nurse nurse = optionalNurse.get();
+
+        if (nurse.isHeadOfDepartment()) {
+            nurse.setHeadOfDepartment(false);
+        }
+
+        nurse.setDepartment(null);
+
+        nurseRepository.save(nurse);
 
         return true;
     }

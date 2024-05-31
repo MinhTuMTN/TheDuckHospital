@@ -50,7 +50,6 @@ public class StaffAdminController {
     }
 
     @PutMapping("/{staffId}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateStaff(
             @PathVariable UUID staffId,
             @ModelAttribute("data") UpdateStaffRequest request
