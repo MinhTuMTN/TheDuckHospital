@@ -1,6 +1,6 @@
 package com.theduckhospital.api.dto.response;
 
-import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.TimeSlot;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class DoctorScheduleItemResponse {
     private int queueNumber = 0;
     private int dayOfWeek;
     private Date date;
-    private ScheduleType scheduleType;
+    private ScheduleSession scheduleSession;
     private boolean deleted;
     private Date createdDate;
     private Date updatedDate;
@@ -29,7 +29,7 @@ public class DoctorScheduleItemResponse {
         this.queueNumber = doctorSchedule.getQueueNumber();
         this.dayOfWeek = doctorSchedule.getDayOfWeek();
         this.date = doctorSchedule.getDate();
-        this.scheduleType = doctorSchedule.getScheduleType();
+        this.scheduleSession = doctorSchedule.getScheduleSession();
         this.deleted = doctorSchedule.isDeleted();
         this.createdDate = doctorSchedule.getCreatedDate();
         this.updatedDate = doctorSchedule.getUpdatedDate();

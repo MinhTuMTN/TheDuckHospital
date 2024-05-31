@@ -319,6 +319,10 @@ public class AccountServicesImpl implements IAccountServices {
                 if (((Doctor) account.getStaff()).isHeadOfDepartment()) {
                     role = "HeadDoctor";
                 }
+            } else if (Objects.equals(role, "Nurse")) {
+                if (((Nurse) account.getStaff()).isHeadOfDepartment()) {
+                    role = "HeadNurse";
+                }
             }
         }
 
@@ -454,12 +458,12 @@ public class AccountServicesImpl implements IAccountServices {
         Map<String, String> data = new HashMap<>();
         data.put("phoneNumber", phoneNumber);
         data.put("message", "Mã xác nhận của bạn là: " + otp);
-//        firebaseServices.sendNotification(
-//                fcmToken,
-//                "OTP",
-//                "Mã xác nhận của bạn là: " + otp,
-//                data
-//        );
+        firebaseServices.sendNotification(
+                fcmToken,
+                "OTP",
+                "Mã xác nhận của bạn là: " + otp,
+                data
+        );
 
         return true;
     }

@@ -92,8 +92,12 @@ const BillingInformationScreen = ({route}: {route: any}) => {
       if (response.data?.data?.deepLink) {
         Linking.openURL(response.data.data.deepLink);
       } else if (response.data?.data?.paymentUrl) {
-        navigation.navigate('HomeScreen');
-        Linking.openURL(response.data.data.paymentUrl);
+        // navigation.navigate('HomeScreen');
+        // Linking.openURL(response.data.data.paymentUrl);
+
+        navigation.navigate('WebViewScreen', {
+          url: response.data.data.paymentUrl,
+        });
       }
     } else {
       const errorCode = response.statusCode;

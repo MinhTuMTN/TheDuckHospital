@@ -76,6 +76,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
 
         Pageable pageable = PageRequest.of(page, size);
+
+        // Thêm Room
         Page<MedicalTest> medicalTests =
                 medicalTestRepository
                         .findByMedicalServiceAndDeletedIsFalseAndMedicalExaminationRecord_PatientProfile_FullNameContainingIgnoreCaseAndStateOrderByQueueNumber(

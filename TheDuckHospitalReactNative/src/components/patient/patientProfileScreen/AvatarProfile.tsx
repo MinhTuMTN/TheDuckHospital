@@ -63,7 +63,6 @@ const AvatarProfile = (props: AvatarProfileProps) => {
     if (editProfile.streetName.length <= 0) return;
 
     console.log(1);
-    return;
     let wardId: number = +selectedWard?.wardId;
     const data = {
       fullName: editProfile.fullName,

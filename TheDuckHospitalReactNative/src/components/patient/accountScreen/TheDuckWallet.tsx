@@ -10,7 +10,7 @@ import ButtonComponent from '../../ButtonComponent';
 import {Bookmark, Clipboard, Secure} from '../../../assets/svgs';
 import {useNavigation} from '@react-navigation/native';
 import {RootState, navigationProps} from '../../../types';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
 const TheDuckWallet = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -25,7 +25,7 @@ const TheDuckWallet = () => {
   };
   const handleOpenWallet = () => {
     setModalVisible(false);
-    navigation.navigate('WalletScreen');
+    navigation.navigate('OpenWalletScreen');
   };
   const handleModalClose = () => {
     setModalVisible(false);

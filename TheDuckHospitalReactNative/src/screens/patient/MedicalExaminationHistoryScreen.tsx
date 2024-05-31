@@ -1,13 +1,4 @@
-import React from 'react';
-import {FlatList, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
-import {
-  ContainerComponent,
-  FlexComponent,
-  Header,
-  SectionComponent,
-} from '../../components';
-import {appColors} from '../../constants/appColors';
-import LineInfoComponent from '../../components/LineInfoComponent';
+import Clipboard from '@react-native-clipboard/clipboard';
 import {
   Barcode,
   CalendarDays,
@@ -15,17 +6,28 @@ import {
   Copy,
   Pill,
   Stethoscope,
+  View,
 } from 'lucide-react-native';
+import React from 'react';
+import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  ContainerComponent,
+  Header,
+  SectionComponent,
+  TextComponent,
+} from '../../components';
 import HorizontalLineComponent from '../../components/HorizontalLineComponent';
-import Clipboard from '@react-native-clipboard/clipboard';
-import {getMedicalRecordDetail} from '../../services/medicalRecordServices';
+import LineInfoComponent from '../../components/LineInfoComponent';
 import PrescriptionItemComponent from '../../components/patient/medicalExaminationHistoryScreen/PrescriptionItemComponent';
+import {appColors} from '../../constants/appColors';
+import {getMedicalRecordDetail} from '../../services/medicalRecordServices';
 import {formatDate} from '../../utils/dateUtils';
-import {View} from 'react-native';
 
 const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
   const [medicalRecord, setMedicalRecord] = React.useState<any>();
-  const {medicalRecordId} = route.params;
+  const {medicalRecordId} = route.params || 1;
+  const number = medicalRecord?.prescriptionItems?.length || 0;
+  //console.log(medicalRecord?.prescriptionItems.length);
 
   React.useEffect(() => {
     const handleGetMedicalRecordDetail = async () => {
@@ -45,7 +47,8 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
       <Header
         title={'Lịch sử khám bệnh'}
         noBackground
-        paddingTop={40}
+        paddingTop={30}
+        paddingStart={10}
         titleColor={appColors.textDarker}
         titleSize={19}
         backButtonColor={appColors.textDarker}
@@ -127,11 +130,11 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
         </ContainerComponent>
 
         <HorizontalLineComponent
-          borderWidth={5}
+          borderWidth={4}
           lineColor={'#EEEEEE'}
           paddingTop={10}
-          marginLeft={30}
-          marginRight={30}
+          marginLeft={15}
+          marginRight={15}
         />
 
         <ContainerComponent style={styles.detailContainer}>
@@ -144,7 +147,11 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
                 color={appColors.black}
                 style={{marginBottom: 10, marginRight: 5}}
               />
-            }>
+            }
+            tilteStyle={{
+              fontWeight: '700',
+              fontSize: 19,
+            }}>
             <LineInfoComponent
               label="Họ tên:"
               value={medicalRecord?.patientProfile.fullName}
@@ -152,7 +159,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={2}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -166,20 +173,22 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={2}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
             <LineInfoComponent
               label="Giới tính:"
               value={
-                medicalRecord?.patientProfile.gender === 'MALE' ? 'Nam' : 'Nữ'
+                (medicalRecord?.patientProfile.gender === 'MALE'
+                  ? 'Nam'
+                  : 'Nữ') || 'Nam'
               }
               valueColor={appColors.textGray}
               flexLabel={1}
               flexValue={2}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -190,7 +199,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={2}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -201,18 +210,18 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={2}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
           </SectionComponent>
         </ContainerComponent>
 
         <HorizontalLineComponent
-          borderWidth={5}
+          borderWidth={4}
           lineColor={'#EEEEEE'}
           paddingTop={10}
-          marginLeft={30}
-          marginRight={30}
+          marginLeft={15}
+          marginRight={15}
         />
 
         <ContainerComponent style={styles.detailContainer}>
@@ -233,7 +242,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={1}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -244,7 +253,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={1}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -255,7 +264,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={1}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -266,7 +275,7 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
               flexLabel={1}
               flexValue={1}
               valueStyles={styles.lineInfo}
-              labelStyles={styles.lineInfo}
+              labelStyles={styles.lineInfoTitle}
               containerStyles={{paddingTop: 10}}
             />
 
@@ -286,87 +295,48 @@ const MedicalExaminationHistoryScreen = ({route}: {route: any}) => {
         </ContainerComponent>
 
         <HorizontalLineComponent
-          borderWidth={5}
+          borderWidth={4}
           lineColor={'#EEEEEE'}
           paddingTop={10}
-          marginLeft={30}
-          marginRight={30}
+          marginLeft={15}
+          marginRight={15}
         />
 
-        {medicalRecord?.prescriptionItems && (
-          <ContainerComponent style={styles.detailContainer}>
-            <SectionComponent
-              title="Toa thuốc"
-              paddingTop={20}
-              startIcon={
-                <Pill
-                  size={24}
-                  color={appColors.black}
-                  style={{marginBottom: 10, marginRight: 5}}
-                />
-              }>
-              {/* <FlexComponent style={styles.prescriptionItemContainer}>
-              <FlexComponent>
-                <TextComponent fontWeight="600" fontSize={18}>
-                  {prescriptionItem?.medicine.medicineName || "Clinozpam"}
-                </TextComponent>
-                <TextComponent italic fontSize={16}>
-                  {prescriptionItem?.dosageInstruction || "Sáng 1v, trưa 1v, tối 1v"}
-                </TextComponent>
-              </FlexComponent>
-              <TextComponent fontWeight="600" fontSize={16}>
-                {`${prescriptionItem?.quantity} ${prescriptionItem?.medicine.unit}` || "90 viên"}
+        <ContainerComponent style={styles.detailContainer}>
+          <SectionComponent
+            title="Toa thuốc"
+            paddingTop={20}
+            startIcon={
+              <Pill
+                size={24}
+                color={appColors.black}
+                style={{marginBottom: 10, marginRight: 5}}
+              />
+            }>
+            {number === 0 ? (
+              <TextComponent
+                color={appColors.darkBlue}
+                style={{
+                  fontStyle: 'italic',
+                  fontWeight: '600',
+                  fontSize: 17,
+                }}>
+                Toa không thuốc
               </TextComponent>
-            </FlexComponent>
-
-            <FlexComponent style={styles.prescriptionItemContainer}>
-              <FlexComponent>
-                <TextComponent fontWeight="600" fontSize={18}>
-                  Stodal
-                </TextComponent>
-                <TextComponent fontSize={16}>Sáng 1v, trưa 1v</TextComponent>
-              </FlexComponent>
-              <TextComponent fontWeight="600" fontSize={16}>
-                2 chai
-              </TextComponent>
-            </FlexComponent>
-
-            <FlexComponent style={styles.prescriptionItemContainer}>
-              <FlexComponent>
-                <TextComponent
-                  fontWeight="600"
-                  fontSize={18}
-                  style={{flex: 0.4}}>
-                  Paracetamol 5mg
-                </TextComponent>
-                <TextComponent fontSize={16} style={{flex: 0.6}}>
-                  Sáng 1v, trưa 1v, tối 1v
-                </TextComponent>
-              </FlexComponent>
-              <TextComponent fontWeight="600" fontSize={16}>
-                90 viên
-              </TextComponent>
-            </FlexComponent> */}
-
-              {medicalRecord?.prescriptionItems?.map(
-                (item: any, index: number) => (
-                  <PrescriptionItemComponent
-                    key={index}
-                    prescriptionItem={item}
-                  />
-                ),
-              )}
-              {/* <FlatList
-              showsVerticalScrollIndicator={false}
-              data={medicalRecord?.prescriptionItems}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({item}) => (
-                <PrescriptionItemComponent prescriptionItem={item} />
-              )}
-            /> */}
-            </SectionComponent>
-          </ContainerComponent>
-        )}
+            ) : (
+              medicalRecord?.prescriptionItems?.map(
+                (item: any, index: number) => {
+                  return (
+                    <PrescriptionItemComponent
+                      key={`item-${index}`}
+                      prescriptionItem={item}
+                    />
+                  );
+                },
+              )
+            )}
+          </SectionComponent>
+        </ContainerComponent>
       </ScrollView>
     </ContainerComponent>
   );
@@ -380,7 +350,7 @@ const styles = StyleSheet.create({
   },
   detailContainer: {
     paddingTop: 0,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
   },
   prescriptionItemContainer: {
     flexDirection: 'row',
@@ -393,7 +363,13 @@ const styles = StyleSheet.create({
   },
   lineInfo: {
     fontWeight: '600',
-    fontSize: 19,
+    fontSize: 17,
+  },
+  lineInfoTitle: {
+    color: appColors.textDescription,
+    fontWeight: '500',
+    fontSize: 17,
+    letterSpacing: 0.2,
   },
 });
 

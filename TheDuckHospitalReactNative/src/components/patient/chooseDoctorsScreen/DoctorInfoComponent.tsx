@@ -10,7 +10,7 @@ import {navigationProps} from '../../../types';
 import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
 import {useTranslation} from 'react-i18next';
-import {Star} from 'lucide-react-native';
+import {BadgeInfo, Info, Star} from 'lucide-react-native';
 
 interface DoctorInfoComponentProps {
   item: any;
@@ -19,7 +19,7 @@ interface DoctorInfoComponentProps {
 
 const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
   const {item} = props;
-  
+
   const {t} = useTranslation();
   const [dayOfWeek, setDayOfWeek] = React.useState('');
   const navigation = useNavigation<navigationProps>();
@@ -79,6 +79,8 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             flexWrap="wrap"
             fontWeight="700"
             textAlign="justify"
+            numberOfLines={1}
+            ellipsizeMode="head"
             fontSize={15}>
             <TextComponent fontWeight="700" fontSize={15}>
               {item.degree}.
@@ -153,9 +155,6 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
         </View>
 
         <View style={styles.nextPage}>
-          <Icon name="navigate-next" color={appColors.primary} size={20} />
-        </View>
-        <View style={styles.info}>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('DoctorInformationScreen', {
@@ -163,22 +162,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
                 dayOfWeek,
               });
             }}>
-            <View
-              style={{
-                width: 30,
-                height: 30,
-                borderColor: appColors.primary,
-                borderWidth: 1,
-                borderRadius: 15,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <MaterialCommunityIcons
-                name="information-variant"
-                color={appColors.primary}
-                size={20}
-              />
-            </View>
+            <BadgeInfo size={30} color={appColors.primary} />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -211,8 +195,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 30,
     height: 30,
-    borderColor: appColors.primary,
-    borderWidth: 1,
     bottom: 16,
     right: 20,
     borderRadius: 15,
@@ -225,7 +207,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderColor: appColors.primary,
     borderWidth: 1,
-    top: 16,
+    top: 8,
     right: 20,
     borderRadius: 15,
     justifyContent: 'center',

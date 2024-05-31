@@ -1,6 +1,6 @@
 package com.theduckhospital.api.repository;
 
-import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Room;
@@ -14,42 +14,42 @@ import java.util.UUID;
 
 @Repository
 public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, UUID> {
-    Optional<DoctorSchedule> findByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+    Optional<DoctorSchedule> findByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
             Room room,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
-    DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleTypeAndDeletedIsFalse(
+    DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
             Room room,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByRoomAndDateOrderByScheduleType(
+    List<DoctorSchedule> findByRoomAndDateOrderByScheduleSession(
             Room room,
             Date date
     );
 
-    Optional<DoctorSchedule> findByDoctorAndDateAndScheduleTypeAndDeletedIsFalse(
+    Optional<DoctorSchedule> findByDoctorAndDateAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
             Date date,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByDoctorAndScheduleTypeAndDeletedIsFalse(
+    List<DoctorSchedule> findByDoctorAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
-    List<DoctorSchedule> findByDoctorAndDateOrderByScheduleType(
+    List<DoctorSchedule> findByDoctorAndDateOrderByScheduleSession(
             Doctor doctor,
             Date date
     );
 
-    List<DoctorSchedule> findByRoomAndScheduleTypeAndDeletedIsFalse(
+    List<DoctorSchedule> findByRoomAndScheduleSessionAndDeletedIsFalse(
             Room room,
-            ScheduleType scheduleType
+            ScheduleSession scheduleSession
     );
 
     List<DoctorSchedule> findByRoomAndDateAndDeletedIsFalse(
@@ -65,8 +65,8 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalse(Doctor doctor, Date date);
 
     List<DoctorSchedule> findByDateBetween(Date startDate, Date endDate);
-    List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalseOrderByScheduleTypeAsc(Doctor doctor, Date date);
-    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleTypeAsc(
+    List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalseOrderByScheduleSessionAsc(Doctor doctor, Date date);
+    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
             Doctor doctor, Date date, Date date2
     );
 }

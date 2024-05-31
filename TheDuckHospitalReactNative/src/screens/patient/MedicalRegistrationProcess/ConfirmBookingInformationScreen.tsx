@@ -52,7 +52,8 @@ const ConfirmBookingInformationScreen = ({route}: {route: any}) => {
               <TextComponent fontSize={13} fontWeight="500">
                 {t('confirmBookingInformationInBooking.departmentHaveChoosen')}
                 <TextComponent fontSize={13} fontWeight="700">
-                  (3)
+                  {' '}
+                  ({timeSlotsState.length})
                 </TextComponent>
               </TextComponent>
               <Pressable

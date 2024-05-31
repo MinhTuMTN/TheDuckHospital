@@ -1,13 +1,22 @@
-import {View, Text} from 'react-native';
-import React, {useEffect} from 'react';
+import React from 'react';
+import {StyleProp, View, ViewStyle} from 'react-native';
 
 interface FormControlComponentProps {
   children: any;
   onErrors?: (errors: boolean) => void;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const FormControlComponent = (props: FormControlComponentProps) => {
-  const {children} = props;
+  const {
+    children,
+    containerStyle = {
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  } = props;
 
   React.useEffect(() => {
     let hasError = false;
@@ -23,17 +32,7 @@ const FormControlComponent = (props: FormControlComponentProps) => {
     props.onErrors?.(hasError);
   }, [children]);
 
-  return (
-    <View
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      {children}
-    </View>
-  );
+  return <View style={containerStyle}>{children}</View>;
 };
 
 export default FormControlComponent;

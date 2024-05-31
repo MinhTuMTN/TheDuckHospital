@@ -1,7 +1,6 @@
 package com.theduckhospital.api.dto.response.admin;
 
 import com.theduckhospital.api.constant.MedicalExamState;
-import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.*;
 import lombok.Data;
 

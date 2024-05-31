@@ -57,7 +57,7 @@ public class WalletServicesImpl implements IWalletServices {
             int totalAmount = (int) (request.getAmount() + MomoConfig.medicalTestFee);
             Transaction transaction = new Transaction();
             transaction.setAccount(account);
-            transaction.setAmount(totalAmount);
+            transaction.setAmount(request.getAmount());
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.TOP_UP);
             transactionRepository.save(transaction);

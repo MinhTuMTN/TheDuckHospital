@@ -31,9 +31,12 @@ public class CustomUserDetails implements UserDetails {
                     role = "DOCTOR";
             } else if (staff instanceof Cashier)
                 role = "CASHIER";
-            else if (staff instanceof Nurse)
-                role = "NURSE";
-            else if (staff instanceof LaboratoryTechnician)
+            else if (staff instanceof Nurse) {
+                if (((Nurse) staff).isHeadOfDepartment())
+                    role = "HEAD_NURSE";
+                else
+                    role = "NURSE";
+            } else if (staff instanceof LaboratoryTechnician)
                 role = "LABORATORY_TECHNICIAN";
             else if (staff instanceof SupportAgent)
                 role = "SUPPORT_AGENT";

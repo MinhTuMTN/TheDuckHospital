@@ -15,6 +15,9 @@ import InfoProfileSearchComponent from '../../../components/patient/lookUpMedica
 import {appColors} from '../../../constants/appColors';
 import {getAllProvinces} from '../../../services/addressServices';
 import {findProfileCode} from '../../../services/patientProfileServices';
+import {set} from '@gluestack-style/react';
+import FormControlComponent from '../../../components/FormControlComponent';
+import {useToast} from '../../../hooks/ToastProvider';
 
 const genders = [
   {
@@ -28,14 +31,18 @@ const genders = [
 ];
 
 const FindProfileCodeScreen = () => {
+  const [isLoading, setIsLoading] = React.useState(false);
   const [provices, setProvices] = React.useState([]);
   const [isFind, setIsFind] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
   const [profileData, setProfileData] = React.useState<any>([]);
 
   const [selectedGender, setSelectedGender] = React.useState<any>({
     genderId: 'MALE',
     genderName: 'Nam',
   });
+  const toast = useToast();
   const [fullName, setFullName] = React.useState('');
   const [selectedProvince, setSelectedProvince] = React.useState<any>(null);
   const [yearOfBirth, setYearOfBirth] = React.useState<number>(1985);
@@ -48,12 +55,18 @@ const FindProfileCodeScreen = () => {
       gender: selectedGender.genderId,
     };
 
+    setIsLoading(true);
     const response = await findProfileCode(data);
+    setIsLoading(false);
     console.log(response.data?.data);
 
     if (response.success) {
       setProfileData(response.data?.data);
-      setIsFind(true);
+      if (response.data?.data.length > 0) {
+        setIsFind(true);
+      } else {
+        toast.showToast('Không tìm thấy hồ sơ tương ứng');
+      }
     } else {
       console.log(response.error);
     }
@@ -87,153 +100,159 @@ const FindProfileCodeScreen = () => {
             Vui lòng nhập chính xác các thông bên dưới
           </TextComponent>
         </View>
-        <View style={styles.form}>
-          <InputComponent
-            label="Họ và tên"
-            autoFocus
-            onChangeText={text => setFullName(text)}
-            labelStyle={{
-              color: appColors.grayText,
-              fontSize: 14,
-              fontWeight: '500',
-            }}
-            containerStyle={{
-              width: '100%',
-            }}
-            placeholder="Nguyễn Văn A"
-            inputStyle={{paddingHorizontal: 10}}
-            _inputContainerStyle={{
-              borderRadius: 10,
-              borderColor: appColors.darkGray,
-              paddingHorizontal: 4,
-            }}
-            inputFocusStyle={{
-              paddingHorizontal: 10,
-            }}
-          />
-          <View style={styles.line}>
-            <View
-              style={{
-                flex: 2,
-              }}>
-              <TextComponent
-                color={appColors.grayText}
-                fontSize={14}
-                fontWeight="500"
-                style={{paddingBottom: 5}}>
-                Giới tính
-              </TextComponent>
-              <SelectComponent
-                options={genders}
-                keyTitle="genderName"
-                size="lg"
-                borderColor={appColors.darkGray}
-                value={selectedGender.genderName}
-                selectInputStyle={{
-                  paddingHorizontal: 12,
-                }}
-                placeholderColor={appColors.darkGray}
-                title="Chọn giới tính"
-                error={selectedGender.genderId === ''}
-                errorMessage="Giới tính không được để trống"
-                onChange={value => setSelectedGender(value)}
-                selectTextColor={'black'}
-                placeholder="Giới tính"
-                width="100%"
-                paddingRight={10}
-                selectInputIcon={
-                  <ChevronDownIcon color={appColors.black} size={20} />
-                }
-              />
-            </View>
-
+        <FormControlComponent onErrors={error => setError(error)}>
+          <View style={styles.form}>
             <InputComponent
-              label="Năm sinh"
-              keyboardType="phone-pad"
-              onChangeText={text => setYearOfBirth(parseInt(text))}
+              label="Họ và tên"
+              autoFocus
+              onChangeText={text => setFullName(text)}
               labelStyle={{
                 color: appColors.grayText,
                 fontSize: 14,
                 fontWeight: '500',
-                paddingBottom: 5,
               }}
-              placeholder="Năm sinh"
-              error={yearOfBirth > dayjs().get('year') || yearOfBirth < 1900}
-              errorMessage="Năm sinh không hợp lệ"
+              containerStyle={{
+                width: '100%',
+              }}
+              error={fullName === ''}
+              errorMessage="Họ và tên không được để trống"
+              placeholder="Nguyễn Văn A"
               inputStyle={{paddingHorizontal: 10}}
               _inputContainerStyle={{
                 borderRadius: 10,
                 borderColor: appColors.darkGray,
                 paddingHorizontal: 4,
               }}
-              containerStyle={{flex: 3}}
               inputFocusStyle={{
                 paddingHorizontal: 10,
               }}
             />
-          </View>
-
-          <View>
-            <TextComponent
-              color={appColors.grayText}
-              fontSize={14}
-              fontWeight="500"
-              style={{paddingBottom: 5}}>
-              Tỉnh/Thành phố
-            </TextComponent>
-            <SelectComponent
-              options={provices}
-              keyTitle="provinceName"
-              size="lg"
-              borderColor={appColors.darkGray}
-              value={selectedProvince?.provinceName}
-              placeholderColor={appColors.darkGray}
-              title="Tỉnh/Thành phố"
-              error={selectedProvince?.provinceId === ''}
-              errorMessage="Tỉnh/thành không được để trống"
-              onChange={value => setSelectedProvince(value)}
-              selectTextColor={'black'}
-              placeholder="Tỉnh/Thành phố"
-              width={'100%'}
-              selectInputStyle={{
-                paddingHorizontal: 10,
-              }}
-              selectInputIcon={
-                <ChevronDownIcon color={appColors.black} size={20} />
-              }
-            />
-          </View>
-          <ButtonComponent
-            onPress={handleSearch}
-            borderRadius={15}
-            backgroundColor={appColors.primaryDark}
-            containerStyles={{
-              marginTop: 16,
-            }}
-            textStyles={{
-              fontSize: 16,
-              fontWeight: '600',
-              textTransform: 'uppercase',
-            }}>
-            Tìm kiếm
-          </ButtonComponent>
-          {isFind && (
-            <View style={styles.info}>
-              <TextComponent
+            <View style={styles.line}>
+              <View
                 style={{
-                  letterSpacing: 0.5,
+                  flex: 2,
+                }}>
+                <TextComponent
+                  color={appColors.grayText}
+                  fontSize={14}
+                  fontWeight="500"
+                  style={{paddingBottom: 5}}>
+                  Giới tính
+                </TextComponent>
+                <SelectComponent
+                  options={genders}
+                  keyTitle="genderName"
+                  size="lg"
+                  borderColor={appColors.darkGray}
+                  value={selectedGender.genderName}
+                  selectInputStyle={{
+                    paddingHorizontal: 12,
+                  }}
+                  placeholderColor={appColors.darkGray}
+                  title="Chọn giới tính"
+                  error={selectedGender.genderId === ''}
+                  errorMessage="Giới tính không được để trống"
+                  onChange={value => setSelectedGender(value)}
+                  selectTextColor={'black'}
+                  placeholder="Giới tính"
+                  width="100%"
+                  paddingRight={10}
+                  selectInputIcon={
+                    <ChevronDownIcon color={appColors.black} size={20} />
+                  }
+                />
+              </View>
+
+              <InputComponent
+                label="Năm sinh"
+                keyboardType="phone-pad"
+                onChangeText={text => setYearOfBirth(parseInt(text))}
+                labelStyle={{
+                  color: appColors.grayText,
+                  fontSize: 14,
+                  fontWeight: '500',
+                  paddingBottom: 5,
                 }}
-                fontSize={18}
-                fontWeight="600"
-                color={appColors.primaryDark}>
-                Kết quả tra cứu:
-              </TextComponent>
-              {profileData.map((item: any, index: number) => (
-                <InfoProfileSearchComponent key={index} info={item} />
-              ))}
+                placeholder="Năm sinh"
+                error={yearOfBirth > dayjs().get('year') || yearOfBirth < 1900}
+                errorMessage="Năm sinh không hợp lệ"
+                inputStyle={{paddingHorizontal: 10}}
+                _inputContainerStyle={{
+                  borderRadius: 10,
+                  borderColor: appColors.darkGray,
+                  paddingHorizontal: 4,
+                }}
+                containerStyle={{flex: 3}}
+                inputFocusStyle={{
+                  paddingHorizontal: 10,
+                }}
+              />
             </View>
-          )}
-        </View>
+
+            <View>
+              <TextComponent
+                color={appColors.grayText}
+                fontSize={14}
+                fontWeight="500"
+                style={{paddingBottom: 5}}>
+                Tỉnh/Thành phố
+              </TextComponent>
+              <SelectComponent
+                options={provices}
+                keyTitle="provinceName"
+                size="lg"
+                borderColor={appColors.darkGray}
+                value={selectedProvince?.provinceName}
+                placeholderColor={appColors.darkGray}
+                title="Tỉnh/Thành phố"
+                error={selectedProvince?.provinceId === ''}
+                errorMessage={'Tỉnh/Thành phố không được để trống'}
+                onChange={value => setSelectedProvince(value)}
+                selectTextColor={'black'}
+                placeholder="Tỉnh/Thành phố"
+                width={'100%'}
+                selectInputStyle={{
+                  paddingHorizontal: 10,
+                }}
+                selectInputIcon={
+                  <ChevronDownIcon color={appColors.black} size={20} />
+                }
+              />
+            </View>
+            <ButtonComponent
+              isLoading={isLoading}
+              enabled={!error}
+              onPress={handleSearch}
+              borderRadius={15}
+              backgroundColor={appColors.primaryDark}
+              containerStyles={{
+                marginTop: 16,
+              }}
+              textStyles={{
+                fontSize: 16,
+                fontWeight: '600',
+                textTransform: 'uppercase',
+              }}>
+              Tìm kiếm
+            </ButtonComponent>
+            {isFind && (
+              <View style={styles.info}>
+                <TextComponent
+                  style={{
+                    letterSpacing: 0.5,
+                  }}
+                  fontSize={18}
+                  fontWeight="600"
+                  color={appColors.primaryDark}>
+                  Kết quả tra cứu:
+                </TextComponent>
+                {profileData.map((item: any, index: number) => (
+                  <InfoProfileSearchComponent key={index} info={item} />
+                ))}
+              </View>
+            )}
+          </View>
+        </FormControlComponent>
       </View>
     </ContainerComponent>
   );
@@ -255,8 +274,8 @@ const styles = StyleSheet.create({
   },
   form: {
     flexDirection: 'column',
-    flex: 1,
     rowGap: 12,
+    width: '100%',
   },
   line: {
     flexDirection: 'row',

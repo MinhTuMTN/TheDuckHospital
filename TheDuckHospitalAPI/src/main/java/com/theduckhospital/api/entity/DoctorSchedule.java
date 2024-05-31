@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.ScheduleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,6 @@ public class DoctorSchedule {
     @ToStringExclude
     private Room room;
 
-    // List MedicalExaminationRecord
     @OneToMany(mappedBy = "doctorSchedule", fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
@@ -46,10 +46,12 @@ public class DoctorSchedule {
     @ToStringExclude
     private List<TimeSlot> timeSlots;
 
-    private int slot;
+    private int slot = 0;
     private int queueNumber = 0;
-    private int dayOfWeek;
+    private int dayOfWeek = 0;
     private Date date;
+
+    private ScheduleSession scheduleSession;
     private ScheduleType scheduleType;
 
     private boolean deleted;

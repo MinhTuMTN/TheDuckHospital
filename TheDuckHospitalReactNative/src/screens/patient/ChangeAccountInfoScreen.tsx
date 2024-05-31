@@ -90,12 +90,15 @@ const ChangeAccountInfoScreen = () => {
               <View style={styles.cameraButton}>
                 <Camera size={28} color={appColors.white} />
               </View>
-              <AvatarImage
-                alt="avatar"
-                source={{
-                  uri: uploadImage !== null ? uploadImage.uri : userInfo.avatar,
-                }}
-              />
+              {(uploadImage || userInfo.avatar) && (
+                <AvatarImage
+                  alt="avatar"
+                  source={{
+                    uri:
+                      uploadImage !== null ? uploadImage.uri : userInfo.avatar,
+                  }}
+                />
+              )}
             </Pressable>
           </Avatar>
 
@@ -148,16 +151,14 @@ const ChangeAccountInfoScreen = () => {
             _inputContainerStyle={styles.inputContainerStyle}
           />
         </View>
-        {fullName !== userInfo.fullName ||
-          (uploadImage !== null && (
-            <ButtonComponent
-              isLoading={isLoading}
-              onPress={handleUpdateProfile}
-              borderRadius={8}
-              backgroundColor={appColors.darkerBlue}>
-              {t('changeAccountInfo.save')}
-            </ButtonComponent>
-          ))}
+
+        <ButtonComponent
+          isLoading={isLoading}
+          onPress={handleUpdateProfile}
+          borderRadius={8}
+          backgroundColor={appColors.darkerBlue}>
+          {t('changeAccountInfo.save')}
+        </ButtonComponent>
       </ContentComponent>
     </ContainerComponent>
   );

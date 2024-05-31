@@ -28,6 +28,12 @@ public class Prescription {
     @ToStringExclude
     private MedicalExaminationRecord medicalExaminationRecord;
 
+    @OneToOne
+    @JoinColumn(name = "dischargeId", referencedColumnName = "dischargeId")
+    @JsonBackReference
+    @ToStringExclude
+    private Discharge discharge;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude

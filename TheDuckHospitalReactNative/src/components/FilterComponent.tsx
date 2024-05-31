@@ -6,6 +6,7 @@ import {TextComponent} from '.';
 
 interface FilterComponentProps {
   items: string[];
+  symbolisms?: number[];
   value: string;
   onChange: (value: string) => void;
   backgroundColor?: ColorValue | undefined;
@@ -14,9 +15,10 @@ interface FilterComponentProps {
 const FilterItem = (props: {
   item: string;
   value: string;
+  symbolism?: number;
   onChange: (value: string) => void;
 }) => {
-  const {item, value, onChange} = props;
+  const {item, value, symbolism, onChange} = props;
   return (
     <TouchableOpacity
       onPress={() => {
@@ -27,7 +29,7 @@ const FilterItem = (props: {
           color={appColors.textDarker}
           fontWeight="700"
           fontSize={14}>
-          {item}
+          {symbolism || symbolism === 0 ? `${item} (${symbolism})` : item}
         </TextComponent>
       </View>
     </TouchableOpacity>
@@ -35,7 +37,8 @@ const FilterItem = (props: {
 };
 
 const FilterComponent = (props: FilterComponentProps) => {
-  const {items, value, onChange, backgroundColor} = props;
+  const {items, symbolisms, value, onChange, backgroundColor} = props;
+
   return (
     <View
       style={{
@@ -47,12 +50,16 @@ const FilterComponent = (props: FilterComponentProps) => {
         data={items}
         contentContainerStyle={{
           alignItems: 'center',
-          flex: 1,
         }}
         horizontal
         keyExtractor={(item, index) => `${item}-${index}`}
-        renderItem={({item}) => (
-          <FilterItem item={item} value={value} onChange={onChange} />
+        renderItem={({item, index}) => (
+          <FilterItem
+            item={item}
+            value={value}
+            symbolism={symbolisms ? symbolisms[index] : undefined}
+            onChange={onChange}
+          />
         )}
       />
     </View>

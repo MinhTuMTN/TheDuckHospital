@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -30,10 +31,18 @@ public class AccountResponse {
         if (staff != null) {
             if (staff instanceof Doctor) {
                 this.role = "Bác sĩ";
-                this.departmentName = ((Doctor) staff).getDepartment().getDepartmentName();
+                this.departmentName = Optional
+                        .ofNullable(((Doctor) staff).getDepartment())
+                        .map(Department::getDepartmentName)
+                        .orElse(null);
                 this.headOfDepartment = ((Doctor) staff).isHeadOfDepartment();
             } else if (staff instanceof Nurse) {
                 this.role = "Điều dưỡng";
+                this.departmentName = Optional
+                        .ofNullable(((Nurse) staff).getDepartment())
+                        .map(Department::getDepartmentName)
+                        .orElse(null);
+                this.headOfDepartment = ((Nurse) staff).isHeadOfDepartment();
             } else if (staff instanceof Cashier) {
                 this.role = "Thu ngân";
             } else if (staff instanceof Pharmacist) {

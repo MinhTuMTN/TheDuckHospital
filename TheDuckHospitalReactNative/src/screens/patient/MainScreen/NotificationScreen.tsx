@@ -200,7 +200,7 @@ const NotificationScreen = () => {
             onChange={value => setFilter(value)}
           />
 
-          {numberNotification === 0 ? (
+          {numberNotification === 0 && !isLoadingAPI ? (
             <NotFoundComponent
               imageSrc={require('../../../assets/images/no-notifications.png')}
               imgStyle={{width: 300, height: 300, marginBottom: 20}}

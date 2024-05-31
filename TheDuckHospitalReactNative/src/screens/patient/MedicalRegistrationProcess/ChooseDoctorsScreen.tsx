@@ -148,7 +148,17 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
       </View>
     );
   }, [isLoadingAPI, doctors, pagination.page, pagination.totalPages]);
-
+  const _onEndReached = useCallback(
+    (e: any) => {
+      if (pagination.page < pagination.totalPages && !isLoadingAPI) {
+        setPagination((prevState: any) => ({
+          ...prevState,
+          page: prevState.page + 1,
+        }));
+      }
+    },
+    [pagination, isLoadingAPI],
+  );
   const handleChangedText = (text: string) => {
     setSearchText(text);
     setPagination((prevState: any) => ({
@@ -339,16 +349,9 @@ const ChooseDoctorsScreen = ({route}: {route: any}) => {
           data={doctors}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          style={{width: '100%'}}
+          style={styles.flatList}
           initialNumToRender={5}
-          onEndReached={e => {
-            if (pagination.page < pagination.totalPages && !isLoadingAPI) {
-              setPagination((prevState: any) => ({
-                ...prevState,
-                page: prevState.page + 1,
-              }));
-            }
-          }}
+          onEndReached={_onEndReached}
           onEndReachedThreshold={0.7}
           ListFooterComponent={listFooterComponent}
         />
@@ -362,6 +365,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#F1F9FC',
+  },
+  flatList: {
+    width: '100%',
   },
   header: {
     paddingTop: 30,

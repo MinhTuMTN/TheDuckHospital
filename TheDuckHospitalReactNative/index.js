@@ -1,23 +1,23 @@
 import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import { AppRegistry } from 'react-native';
+import {AppRegistry} from 'react-native';
 import App from './App';
-import { name as appName } from './app.json';
+import {name as appName} from './app.json';
 import {
   NotificationState,
   updateNotificationState,
 } from './src/services/notificationServices';
-import { AppNotification } from './src/utils/appNotification';
+import {AppNotification} from './src/utils/appNotification';
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   AppNotification.displayNotification(remoteMessage);
-  const notificationId = remoteMessage.data?.notificationId;
-  if (notificationId && remoteMessage.data?.channelId !== 'reminder') {
-    const response = await updateNotificationState(
-      notificationId,
-      NotificationState.RECEIVED,
-    );
-    console.log(response);
+  if (remoteMessage.data?.channelId === 'reminder') {
+    const notificationId = remoteMessage.data?.notificationId;
+    const comfirmId = remoteMessage.data?.confirmId;
+
+    if (notificationId && comfirmId) {
+      await confirmReceivedReminder(notificationId, comfirmId);
+    }
   }
 });
 

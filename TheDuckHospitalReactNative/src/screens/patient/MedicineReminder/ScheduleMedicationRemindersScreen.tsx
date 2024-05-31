@@ -52,7 +52,7 @@ const ScheduleMedicationRemindersScreen = ({route}: {route: any}) => {
   const [dateStartVisible, setDateStartVisible] = useState(false);
   const [amountOfMedicine, setAmountOfMedicine] = useState(
     isEdit
-      ? medicationInfo.medicineReminder.amount
+      ? medicationInfo.medicineReminder.remainingAmount
       : medicationInfo.prescriptionItem.quantity,
   );
   const [amountOfMedicineModalVisible, setAmountOfMedicineModalVisible] =
