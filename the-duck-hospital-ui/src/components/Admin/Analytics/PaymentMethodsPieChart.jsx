@@ -69,7 +69,7 @@ function PaymentMethodsPieChart(props) {
         <Stack direction={"row"} spacing={1} alignItems={"center"}>
           {pieChartData &&
             <PieChart
-              colors={["#00bbff", "#00ff80"]}
+              colors={["#00bbff", "#00ff80", "#ff00a6"]}
               series={[
                 {
                   data: pieChartData,

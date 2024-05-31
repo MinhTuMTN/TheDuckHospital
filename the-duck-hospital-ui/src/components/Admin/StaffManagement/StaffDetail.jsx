@@ -181,6 +181,7 @@ function StaffDetail(props) {
       identityNumber: staff.identityNumber,
       dateOfBirth: staff.dateOfBirth,
       degree: staff.degree,
+      nurseType: staff.role
     });
   };
 
