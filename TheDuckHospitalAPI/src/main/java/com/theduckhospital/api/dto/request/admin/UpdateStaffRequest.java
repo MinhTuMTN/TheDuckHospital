@@ -1,6 +1,7 @@
 package com.theduckhospital.api.dto.request.admin;
 
 import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,4 +29,6 @@ public class UpdateStaffRequest {
 
     private Degree degree;
     private Integer departmentId;
+
+    private NurseType nurseType;
 }

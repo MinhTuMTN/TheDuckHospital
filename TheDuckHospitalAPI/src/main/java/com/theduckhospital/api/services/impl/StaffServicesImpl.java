@@ -78,7 +78,7 @@ public class StaffServicesImpl implements IStaffServices {
             Staff staff;
             switch (request.getRole()) {
                 case DOCTOR -> staff = createDoctor(request);
-                case NURSE -> staff = new Nurse();
+                case NURSE -> staff = createNurse(request);
                 case CASHIER -> staff = new Cashier();
                 case PHARMACIST -> staff = new Pharmacist();
                 case LABORATORY_TECHNICIAN ->  staff = new LaboratoryTechnician();
@@ -86,10 +86,7 @@ public class StaffServicesImpl implements IStaffServices {
                 default -> staff = new Staff();
             }
 
-            String url = cloudinaryServices.uploadFile(request.getAvatar());
-            if (url.isEmpty()) {
-                throw new BadRequestException("Đã có lỗi xảy ra");
-            }
+            String url = request.getAvatar() == null ? "" : cloudinaryServices.uploadFile(request.getAvatar());
             staff.setAvatar(url);
             staff.setStaffId(UUID.randomUUID());
             staff.setGender(Gender.values()[request.getGender()]);
@@ -162,7 +159,9 @@ public class StaffServicesImpl implements IStaffServices {
                 if (optional.isEmpty()) {
                     throw new NotFoundException("Nurse not found");
                 }
-                staff = (Nurse) optional.get();
+                Nurse nurse = (Nurse) optional.get();
+                nurse.setNurseType(request.getNurseType());
+                staff = nurse;
             }
             case CASHIER -> {
                 optional = cashierRepository.findById(staffId);
@@ -207,10 +206,7 @@ public class StaffServicesImpl implements IStaffServices {
         }
         staff.setDateOfBirth(dateOfBirth);
 
-        String url = cloudinaryServices.uploadFile(request.getAvatar());
-        if (url.isEmpty()) {
-            throw new BadRequestException("Đã có lỗi xảy ra");
-        }
+        String url = request.getAvatar() == null ? "" : cloudinaryServices.uploadFile(request.getAvatar());
         staff.setAvatar(url);
 
         return staffRepository.save(staff);
@@ -223,6 +219,18 @@ public class StaffServicesImpl implements IStaffServices {
         doctor.setDegree(request.getDegree());
         doctor.setDepartment(department);
         return doctor;
+    }
+
+    private Nurse createNurse(CreateStaffRequest request) {
+        if (request.getDepartmentId() == null || request.getNurseType() == null) {
+            return new Nurse();
+        }
+        Department department = departmentServices.getDepartmentById(request.getDepartmentId());
+
+        Nurse nurse = new Nurse();
+        nurse.setNurseType(request.getNurseType());
+        nurse.setDepartment(department);
+        return nurse;
     }
 
     private String generatePassword() {
