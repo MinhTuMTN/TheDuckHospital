@@ -15,7 +15,6 @@ const StatisticsItemComponent = (props: StatisticsItemComponentProps) => {
   const {marginLeft, icon, label, value} = props;
 
   return (
-    <ScrollView>
       <ContainerComponent
         style={[styles.cardStatistics, {marginLeft: marginLeft}]}>
         <FlexComponent alignItems="center" justifyContent="center">
@@ -38,7 +37,6 @@ const StatisticsItemComponent = (props: StatisticsItemComponentProps) => {
           <TextComponent fontSize={28}>{value}</TextComponent>
         </FlexComponent>
       </ContainerComponent>
-    </ScrollView>
   );
 };
 
