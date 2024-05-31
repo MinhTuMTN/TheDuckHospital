@@ -62,6 +62,10 @@ import SupportPage from "../pages/customer/SupportPage";
 import ChatPage from "../pages/SupportAgent/ChatPage";
 import SupportAgentLayout from "../layouts/SupportAgentLayout";
 import WelcomePage from "../pages/SupportAgent/WelcomePage";
+import NurseScheduleLayout from "../layouts/NurseScheduleLayout";
+import NurseSchedulePage from "../pages/Nurse/NurseSchedulePage";
+import NurseScheduleManagementPage from "../pages/Nurse/HeadNurse/NurseScheduleManagementPage";
+import CreateNurseSchedulePage from "../pages/Nurse/HeadNurse/CreateNurseSchedulePage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -214,7 +218,7 @@ function Router(props) {
     },
     {
       path: "/",
-      element: <ProtectedLayout forRole={["Nurse"]} />,
+      element: <ProtectedLayout forRole={["Nurse", "HeadNurse"]} />,
       children: [
         {
           path: "/nurse-room",
@@ -250,6 +254,30 @@ function Router(props) {
             {
               path: "choose-doctor-and-time",
               element: <ChooseDoctorAndTime />,
+            },
+          ],
+        },
+        {
+          path: "/nurse-schedule",
+          element: <NurseScheduleLayout />,
+          children: [
+            {
+              index: true,
+              element: <NurseSchedulePage />,
+            },
+            {
+              path: "head-nurse",
+              element: <ProtectedLayout forRole={["HeadNurse"]} />,
+              children: [
+                {
+                  path: "schedule-management",
+                  element: <NurseScheduleManagementPage />,
+                },
+                {
+                  path: "schedule-management/create",
+                  element: <CreateNurseSchedulePage />,
+                },
+              ],
             },
           ],
         },
