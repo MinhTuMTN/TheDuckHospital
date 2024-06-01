@@ -3,6 +3,8 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
+import com.theduckhospital.api.dto.request.headnurse.ExamNurseScheduleItemRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.headnurse.ActiveNurseResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
@@ -75,10 +77,6 @@ public class NurseServicesImpl implements INurseServices {
             int limit
     ) {
         Nurse headNurse = getNurseByToken(authorization);
-        if (!headNurse.isHeadOfDepartment()) {
-            throw new RuntimeException("You are not head of department");
-        }
-
         Department department = headNurse.getDepartment();
 
         Pageable pageable = PageRequest.of(page, limit);
@@ -108,10 +106,6 @@ public class NurseServicesImpl implements INurseServices {
     @Override
     public List<Room> getRoomsDepartment(String authorization, RoomType roomType) {
         Nurse headNurse = getNurseByToken(authorization);
-        if (!headNurse.isHeadOfDepartment()) {
-            throw new RuntimeException("You are not head of department");
-        }
-
         Department department = headNurse.getDepartment();
 
         return department.getRooms()
@@ -123,10 +117,6 @@ public class NurseServicesImpl implements INurseServices {
     @Override
     public List<ExaminationNurseScheduleResponse> getExaminationRoomSchedules(String authorization, int roomId) {
         Nurse headNurse = getNurseByToken(authorization);
-        if (!headNurse.isHeadOfDepartment()) {
-            throw new RuntimeException("You are not head of department");
-        }
-
         Room room = getRoomById(roomId, headNurse.getDepartment());
         if (room.getRoomType() != RoomType.EXAMINATION_ROOM) {
             throw new BadRequestException("Room is not examination room");
@@ -143,6 +133,42 @@ public class NurseServicesImpl implements INurseServices {
         }
 
         return responses;
+    }
+
+    @Override
+    public boolean createExaminationRoomSchedules(
+            String authorization,
+            int roomId,
+            CreateExamNurseScheduleRequest request
+    ) {
+        Nurse headNurse = getNurseByToken(authorization);
+        Room room = getRoomById(roomId, headNurse.getDepartment());
+        if (room.getRoomType() != RoomType.EXAMINATION_ROOM) {
+            throw new BadRequestException("Room is not examination room");
+        }
+
+        for (ExamNurseScheduleItemRequest item : request.getSchedules()) {
+            Nurse nurse = nurseRepository.findById(request.getNurseId())
+                    .orElseThrow(() -> new NotFoundException("Nurse not found"));
+            if (nurse.isDeleted()) {
+                throw new NotFoundException("Nurse not found");
+            }
+
+            NurseSchedule nurseSchedule = new NurseSchedule();
+            nurseSchedule.setNurse(nurse);
+            nurseSchedule.setNurseName(nurse.getFullName());
+            nurseSchedule.setRoom(room);
+            nurseSchedule.setScheduleType(ScheduleType.EXAMINATION);
+            nurseSchedule.setScheduleSession(item.getSession());
+            nurseSchedule.setDayOfWeek(item.getDayOfWeek());
+            nurseSchedule.setDeleted(false);
+
+            room.getNurseSchedules().add(nurseSchedule);
+        }
+
+        roomRepository.save(room);
+
+        return true;
     }
 
     public Nurse getNurseByToken(String token) {

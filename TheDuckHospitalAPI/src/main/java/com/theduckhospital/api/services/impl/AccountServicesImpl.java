@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.dto.request.ChangePasswordRequest;
 import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
@@ -240,9 +241,14 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         String role = getRoleFromAccount(account);
+        NurseType nurseType = null;
+        if (Objects.equals(role, "Nurse") || Objects.equals(role, "HeadNurse")) {
+            nurseType = ((Nurse) account.getStaff()).getNurseType();
+        }
         return CheckTokenResponse.builder()
                 .valid(true)
                 .role(role)
+                .nurseType(nurseType)
                 .fullName(account.getFullName())
                 .balance(account.getBalance())
                 .phoneNumber(account.getPhoneNumber())
@@ -285,10 +291,15 @@ public class AccountServicesImpl implements IAccountServices {
 
         String fullName = account.getFullName();
         String role = getRoleFromAccount(account);
+        NurseType nurseType = null;
+        if (Objects.equals(role, "Nurse") || Objects.equals(role, "HeadNurse")) {
+            nurseType = ((Nurse) account.getStaff()).getNurseType();
+        }
 
         Map<String, String> data = new HashMap<>();
         data.put("fullName", fullName);
         data.put("role", role);
+        data.put("nurseType", nurseType == null ? null : nurseType.toString());
 
         return data;
     }

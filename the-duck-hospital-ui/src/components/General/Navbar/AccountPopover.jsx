@@ -52,7 +52,7 @@ function AccountPopover(props) {
         {role === "User" && (
           <PatientMenuList onClose={onClose} setToken={setToken} />
         )}
-        {role === "Nurse" && (
+        {(role === "Nurse" || role === "HeadNurse") && (
           <NurseMenuList onClose={onClose} setToken={setToken} />
         )}
         {(role === "Doctor" || role === "HeadDoctor") && (

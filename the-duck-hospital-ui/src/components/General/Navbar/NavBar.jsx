@@ -68,7 +68,7 @@ function NavBar(props) {
   const { onDrawerClick } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const accountPopover = usePopover();
-  const { token, setFullName, fullName, setRole } = useAuth();
+  const { token, setFullName, fullName, setRole, setNurseType } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,10 +77,11 @@ function NavBar(props) {
       if (response.success) {
         setFullName(response.data.data.fullName);
         setRole(response.data.data.role);
+        setNurseType(response.data.data.nurseType);
       }
     };
     handleGetFullName();
-  }, [setFullName, setRole]);
+  }, [setFullName, setRole, setNurseType]);
   //const accountPopover = usePopover(); // Sử dụng usePopover để lấy ra giá trị của popover.
   return (
     <Wrapper>

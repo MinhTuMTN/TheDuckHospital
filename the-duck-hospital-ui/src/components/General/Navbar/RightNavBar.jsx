@@ -32,7 +32,7 @@ import {
   SwipeableDrawer,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
 import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
@@ -117,11 +117,25 @@ const nurseMainItems = [
     display: "Quầy dịch vụ",
     icon: <LocalPharmacyOutlined />,
     to: "/nurse-counter",
+    nurseType: null,
   },
   {
     display: "Phòng khám",
     icon: <LocalHospitalOutlined />,
     onClick: "nurse",
+    nurseType: "CLINICAL_NURSE",
+  },
+  {
+    display: "Phòng khám nội trú",
+    icon: <LocalHospitalOutlined />,
+    onClick: "nurse",
+    nurseType: "INPATIENT_NURSE",
+  },
+  {
+    display: "Lịch trực",
+    icon: <CalendarMonthOutlined />,
+    to: "/nurse-schedule",
+    nurseType: "",
   },
 ];
 
@@ -187,7 +201,7 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
 
 function RightNavBar(props) {
   const { open, onOpenClose } = props;
-  const { token, setToken, fullName, role } = useAuth();
+  const { token, setToken, fullName, role, nurseType } = useAuth();
   const navigate = useNavigate();
 
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -206,29 +220,36 @@ function RightNavBar(props) {
     handleGetTodaySchedule();
   }, [openDialog]);
 
-  let mainItems = [];
-  switch (role) {
-    case "User":
-      mainItems = userMainItems;
-      break;
-    case "Doctor":
-      mainItems = doctorMainItems;
-      break;
-    case "HeadDoctor":
-      mainItems = doctorMainItems.concat(headDoctorMainItems);
-      break;
-    case "Nurse":
-      mainItems = nurseMainItems;
-      break;
-    case "LaboratoryTechnician":
-      mainItems = laboratoryTechnicianMainItems;
-      break;
-    case "SupportAgent":
-      mainItems = supportAgentMainItems;
-      break;
-    default:
-      break;
-  }
+  const mainItems = useMemo(() => {
+    let mainItems = [];
+    switch (role) {
+      case "User":
+        mainItems = userMainItems;
+        break;
+      case "Doctor":
+        mainItems = doctorMainItems;
+        break;
+      case "HeadDoctor":
+        mainItems = doctorMainItems.concat(headDoctorMainItems);
+        break;
+      case "Nurse":
+      case "HeadNurse":
+        mainItems = nurseMainItems.filter(
+          (item) => item.nurseType === nurseType || item.nurseType === ""
+        );
+        break;
+      case "LaboratoryTechnician":
+        mainItems = laboratoryTechnicianMainItems;
+        break;
+      case "SupportAgent":
+        mainItems = supportAgentMainItems;
+        break;
+      default:
+        break;
+    }
+    console.log("MainItems", mainItems);
+    return mainItems;
+  }, [role, nurseType]);
   const [nurseDialogOpen, setNurseDialogOpen] = React.useState(false);
   const content = (
     <Box

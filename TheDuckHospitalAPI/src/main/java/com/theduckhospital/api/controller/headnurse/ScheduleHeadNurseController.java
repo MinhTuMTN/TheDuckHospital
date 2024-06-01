@@ -2,6 +2,7 @@ package com.theduckhospital.api.controller.headnurse;
 
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.INurseServices;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,25 @@ public class ScheduleHeadNurseController {
                         .data(nurseServices.getExaminationRoomSchedules(
                                 authorizationHeader,
                                 roomId
+                        ))
+                        .build()
+        );
+    }
+
+    @PostMapping("/rooms/{roomId}/examination-room-schedules")
+    public ResponseEntity<?> createExaminationRoomSchedules(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable int roomId,
+            @RequestBody CreateExamNurseScheduleRequest request
+    ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Create examination room schedules successfully")
+                        .data(nurseServices.createExaminationRoomSchedules(
+                                authorizationHeader,
+                                roomId,
+                                request
                         ))
                         .build()
         );

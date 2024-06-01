@@ -644,12 +644,14 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Doctor doctor,
             ScheduleSession scheduleSession
             ) {
-        List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository.findByDoctorAndScheduleSessionAndDeletedIsFalse(
+        List<DoctorSchedule> doctorSchedules1 = doctorScheduleRepository
+                .findByDoctorAndScheduleSessionAndDeletedIsFalse(
                 doctor,
                 scheduleSession
         );
 
-        List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository.findByRoomAndScheduleSessionAndDeletedIsFalse(
+        List<DoctorSchedule> doctorSchedules2 = doctorScheduleRepository
+                .findByRoomAndScheduleSessionAndDeletedIsFalse(
                 room,
                 scheduleSession
         );

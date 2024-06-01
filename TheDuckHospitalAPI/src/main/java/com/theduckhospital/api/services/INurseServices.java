@@ -2,6 +2,7 @@ package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
@@ -25,4 +26,9 @@ public interface INurseServices {
     );
     List<Room> getRoomsDepartment(String authorization, RoomType roomType);
     List<ExaminationNurseScheduleResponse> getExaminationRoomSchedules(String authorization, int roomId);
+    boolean createExaminationRoomSchedules(
+            String authorization,
+            int roomId,
+            CreateExamNurseScheduleRequest request
+    );
 }

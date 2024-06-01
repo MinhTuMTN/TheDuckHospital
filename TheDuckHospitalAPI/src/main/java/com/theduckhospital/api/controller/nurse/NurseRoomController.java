@@ -10,7 +10,7 @@ import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/nurse/rooms")
-@PreAuthorize("hasRole('ROLE_NURSE')")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NurseRoomController {
     private final IRoomServices roomServices;
 
