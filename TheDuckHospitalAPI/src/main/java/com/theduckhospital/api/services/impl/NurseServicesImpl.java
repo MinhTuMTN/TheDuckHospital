@@ -34,8 +34,8 @@ public class NurseServicesImpl implements INurseServices {
     }
 
     @Override
-    public List<Nurse> getNurseNotInDepartment() {
-        return nurseRepository.findByDepartmentIsNull();
+    public List<Nurse> getNursesNotInDepartment() {
+        return nurseRepository.findByDepartmentIsNullAndNurseTypeIsNotNull();
     }
 
     @Override

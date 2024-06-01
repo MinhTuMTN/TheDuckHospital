@@ -82,7 +82,7 @@ function Analytics(props) {
                 </Stack>
               </Grid>
               <Grid item xs={12} md={4}>
-                <TopDepartment topDepartments={statistics.topDepartments} />
+                <TopDepartment topDepartments={statistics.topDepartments?.slice(0, 5)} />
                 <TotalPatients statisticData={statistics} />
                 <PaymentMethodsPieChart
                   pieChartData={statistics.paymentMethodStatistics}

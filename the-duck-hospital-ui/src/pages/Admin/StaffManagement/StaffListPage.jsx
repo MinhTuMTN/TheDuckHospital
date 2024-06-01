@@ -13,9 +13,11 @@ import {
   Select,
   Stack,
   TextField,
+  IconButton,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
+import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import SearchStaffList from "../../../components/Admin/StaffManagement/SearchStaffList";
@@ -134,6 +136,7 @@ function StaffListPage(props) {
   const [addButtonClicked, setAddButtonClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const maxDateOfBirth = dayjs().subtract(18, "year");
+  const [selectedFile, setSelectedFile] = React.useState(null);
   const [staff, setStaff] = useState({
     fullName: "",
     phoneNumber: "",
@@ -143,8 +146,13 @@ function StaffListPage(props) {
     role: "",
     gender: 1,
     email: "",
-    departmentId: null,
+    departmentId: "",
+    nurseType: "null",
   });
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage + 1);
@@ -219,6 +227,8 @@ function StaffListPage(props) {
   };
 
   const handleCreateStaff = async () => {
+    // console.log(staff.nurseType);
+    // return;
     setAddButtonClicked(true);
     setIsLoading(true);
 
@@ -235,25 +245,53 @@ function StaffListPage(props) {
     }
 
     if (staff.role?.trim() === "DOCTOR") {
-      if (staff.degree === null || staff.departmentId === null) {
+      if (staff.degree === null || staff.departmentId === "") {
         enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
         setIsLoading(false);
         return;
       }
     }
 
-    let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
-    const response = await createStaff({
-      fullName: staff.fullName,
-      phoneNumber: staff.phoneNumber,
-      identityNumber: staff.identityNumber,
-      dateOfBirth: dateOfBirth,
-      degree: staff.degree,
-      role: staff.role,
-      gender: staff.gender,
-      email: staff.email,
-      departmentId: staff.departmentId,
-    });
+    // if (staff.role?.trim() === "NURSE") {
+    //   if(nurseType === "")
+    // }
+
+    // let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
+
+    const formData = new FormData();
+    formData.append("fullName", staff.fullName);
+    formData.append("phoneNumber", staff.phoneNumber);
+    formData.append("identityNumber", staff.identityNumber);
+    formData.append("email", staff.email);
+    formData.append(
+      "dateOfBirth",
+      dayjs(staff.dateOfBirth).format("MM/DD/YYYY")
+    );
+    formData.append("role", staff.role);
+    formData.append("gender", staff.gender);
+    formData.append("degree", staff.degree ? staff.degree : "");
+    formData.append("departmentId", staff.departmentId);
+    formData.append(
+      "nurseType",
+      staff.nurseType === null ? "" : staff.nurseType
+    );
+    formData.append("avatar", selectedFile);
+
+    // const response = await createStaff({
+    //   fullName: staff.fullName,
+    //   phoneNumber: staff.phoneNumber,
+    //   identityNumber: staff.identityNumber,
+    //   dateOfBirth: dateOfBirth,
+    //   degree: staff.degree,
+    //   role: staff.role,
+    //   gender: staff.gender,
+    //   email: staff.email,
+    //   departmentId:
+    //     staff.role === "NURSE" && staff.departmentId === ""
+    //       ? null
+    //       : staff.departmentId,
+    // });
+    const response = await createStaff(formData);
     setIsLoading(false);
     if (response.success) {
       enqueueSnackbar("Thêm nhân viên thành công", { variant: "success" });
@@ -304,9 +342,10 @@ function StaffListPage(props) {
                     dateOfBirth: maxDateOfBirth,
                     degree: null,
                     role: "",
-                    gender: 1,
+                    gender: 0,
                     email: "",
-                    departmentId: null,
+                    departmentId: "",
+                    nurseType: null,
                   });
                   handleGetDepartment();
                   setOpenDialogForm(true);
@@ -431,9 +470,10 @@ function StaffListPage(props) {
             dateOfBirth: dayjs(),
             degree: null,
             role: "",
-            gender: 1,
+            gender: 0,
             email: "",
-            departmentId: null,
+            departmentId: "",
+            nurseType: null,
           });
         }}
         onOk={handleCreateStaff}
@@ -450,13 +490,54 @@ function StaffListPage(props) {
             dateOfBirth: maxDateOfBirth,
             degree: null,
             role: "",
-            gender: 1,
+            gender: 0,
             email: "",
-            departmentId: null,
+            departmentId: "",
+            nurseType: null,
           });
         }}
       >
         <Stack width={"30rem"} mt={1} spacing={3}>
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            spacing={1}
+          >
+            <img
+              src={
+                selectedFile
+                  ? URL.createObjectURL(selectedFile)
+                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+              }
+              alt="top-product"
+              style={{
+                width: 200,
+                height: 200,
+                objectFit: "contain",
+                borderRadius: "50%",
+              }}
+            />
+            <TextField
+              variant="outlined"
+              type="text"
+              value={selectedFile ? selectedFile.name : ""}
+              disabled
+              InputProps={{
+                endAdornment: (
+                  <IconButton component="label">
+                    <FileUploadOutlined />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleFileChange}
+                    />
+                  </IconButton>
+                ),
+              }}
+            />
+          </Stack>
           <MuiTextFeild
             label={"Họ tên"}
             autoFocus
@@ -542,9 +623,9 @@ function StaffListPage(props) {
             <Stack>
               <FormControl>
                 <CustomTypography variant="body1">Giới tính</CustomTypography>
-                <RadioGroup defaultValue="female" value={staff.gender} row>
+                <RadioGroup defaultValue="0" value={staff.gender} row>
                   <FormControlLabel
-                    checked={staff.gender === 0}
+                    // checked={staff.gender === 0}
                     onChange={(e) => {
                       setStaff((prev) => ({
                         ...prev,
@@ -556,7 +637,7 @@ function StaffListPage(props) {
                     label="Nam"
                   />
                   <FormControlLabel
-                    checked={staff.gender === 1}
+                    // checked={staff.gender === 1}
                     onChange={(e) => {
                       setStaff((prev) => ({
                         ...prev,
@@ -632,71 +713,121 @@ function StaffListPage(props) {
               )}
             </FormControl>
           </Box>
-          {staff.role === "DOCTOR" && (
+          {staff.role === "NURSE" && (
+            <Stack>
+              <FormControl>
+                <CustomTypography variant="body1">
+                  Loại điều dưỡng
+                </CustomTypography>
+                <RadioGroup defaultValue="null" value={staff.nurseType} row>
+                  <FormControlLabel
+                    // checked={staff.nurseType === null}
+                    onChange={(e) => {
+                      setStaff((prev) => ({
+                        ...prev,
+                        nurseType: null,
+                      }));
+                    }}
+                    value="null"
+                    control={<Radio />}
+                    label="Không"
+                  />
+                  <FormControlLabel
+                    // checked={staff.nurseType === 0}
+                    onChange={(e) => {
+                      setStaff((prev) => ({
+                        ...prev,
+                        nurseType: e.target.value,
+                      }));
+                    }}
+                    value="CLINICAL_NURSE"
+                    control={<Radio />}
+                    label="Phòng khám"
+                  />
+                  <FormControlLabel
+                    // checked={staff.nurseType === 1}
+                    onChange={(e) => {
+                      setStaff((prev) => ({
+                        ...prev,
+                        nurseType: e.target.value,
+                      }));
+                    }}
+                    value="INPATIENT_NURSE"
+                    control={<Radio />}
+                    label="Nội trú"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Stack>
+          )}
+          {(staff.role === "DOCTOR" ||
+            (staff.role === "NURSE" && staff.nurseType !== null)) && (
             <Box>
               <Stack direction={"row"} spacing={2}>
-                <Box style={{ width: "50%" }}>
-                  <CustomTypography
-                    variant="body1"
-                    style={{
-                      color:
+                {staff.role === "DOCTOR" && (
+                  <Box style={{ width: "50%" }}>
+                    <CustomTypography
+                      variant="body1"
+                      style={{
+                        color:
+                          staff.degree === null &&
+                          staff.role === "DOCTOR" &&
+                          addButtonClicked
+                            ? "red"
+                            : "",
+                      }}
+                    >
+                      Bằng cấp
+                    </CustomTypography>
+                    <FormControl
+                      fullWidth
+                      error={
                         staff.degree === null &&
                         staff.role === "DOCTOR" &&
                         addButtonClicked
-                          ? "red"
-                          : "",
-                    }}
-                  >
-                    Bằng cấp
-                  </CustomTypography>
-                  <FormControl
-                    fullWidth
-                    error={
-                      staff.degree === null &&
-                      staff.role === "DOCTOR" &&
-                      addButtonClicked
-                    }
-                  >
-                    <Select
-                      value={staff.degree}
-                      onChange={(e) =>
-                        setStaff((prev) => {
-                          return {
-                            ...prev,
-                            degree: e.target.value,
-                          };
-                        })
                       }
-                      displayEmpty
-                      required
-                      sx={{
-                        fontSize: "16px !important",
-                      }}
-                      inputProps={{ "aria-label": "Without label" }}
                     >
-                      {degrees?.map((item, index) => (
-                        <MenuItem key={index} value={item}>
-                          <Typography style={{ fontSize: "16px" }}>
-                            {item}
-                          </Typography>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {staff.degree === null &&
-                      staff.role === "DOCTOR" &&
-                      addButtonClicked && (
-                        <FormHelperText>
-                          Bằng cấp không được để trống
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Box>
-                <Box style={{ width: "50%" }}>
+                      <Select
+                        value={staff.degree}
+                        onChange={(e) =>
+                          setStaff((prev) => {
+                            return {
+                              ...prev,
+                              degree: e.target.value,
+                            };
+                          })
+                        }
+                        displayEmpty
+                        required
+                        sx={{
+                          fontSize: "16px !important",
+                        }}
+                        inputProps={{ "aria-label": "Without label" }}
+                      >
+                        {degrees?.map((item, index) => (
+                          <MenuItem key={index} value={item}>
+                            <Typography style={{ fontSize: "16px" }}>
+                              {item}
+                            </Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {staff.degree === null &&
+                        staff.role === "DOCTOR" &&
+                        addButtonClicked && (
+                          <FormHelperText>
+                            Bằng cấp không được để trống
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Box>
+                )}
+                <Box style={{ width: staff.role === "NURSE" ? "100%" : "50%" }}>
                   <CustomTypography
                     variant="body1"
                     style={{
                       color:
-                        staff.departmentId === null &&
+                        staff.departmentId === "" &&
                         staff.role === "DOCTOR" &&
                         addButtonClicked
                           ? "red"
@@ -708,7 +839,7 @@ function StaffListPage(props) {
                   <FormControl
                     fullWidth
                     error={
-                      staff.departmentId === null &&
+                      staff.departmentId === "" &&
                       staff.role === "DOCTOR" &&
                       addButtonClicked
                     }
@@ -730,6 +861,11 @@ function StaffListPage(props) {
                       }}
                       inputProps={{ "aria-label": "Without label" }}
                     >
+                      <MenuItem key={-1} value={""}>
+                        <Typography style={{ fontSize: "16px" }}>
+                          Trống
+                        </Typography>
+                      </MenuItem>
                       {departments?.map((item, index) => (
                         <MenuItem key={index} value={item.departmentId}>
                           <Typography style={{ fontSize: "16px" }}>
@@ -738,7 +874,7 @@ function StaffListPage(props) {
                         </MenuItem>
                       ))}
                     </Select>
-                    {staff.departmentId === null &&
+                    {staff.departmentId === "" &&
                       staff.role === "DOCTOR" &&
                       addButtonClicked && (
                         <FormHelperText>

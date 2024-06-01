@@ -11,14 +11,21 @@ import {
   Radio,
   RadioGroup,
   Select,
+  IconButton,
   Stack,
   Typography,
+  TextField,
   useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import FileUploadOutlined from "@mui/icons-material/FileUploadOutlined";
 import DialogConfirm from "../../General/DialogConfirm";
 import FormatDate from "../../General/FormatDate";
-import { deleteStaff, restoreStaff, updateStaff } from "../../../services/admin/StaffServices";
+import {
+  deleteStaff,
+  restoreStaff,
+  updateStaff,
+} from "../../../services/admin/StaffServices";
 import { enqueueSnackbar } from "notistack";
 import DialogForm from "../../General/DialogForm";
 import MuiTextFeild from "../../General/MuiTextFeild";
@@ -100,13 +107,18 @@ function StaffDetail(props) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [staffEdit, setStaffEdit] = useState({});
   const [openPopup, setOpenPopup] = useState(false);
+  const [selectedFile, setSelectedFile] = React.useState(null);
   const [updateButtonClicked, setUpdateButtonClicked] = useState(false);
-  const maxDateOfBirth = dayjs().subtract(18, 'year');
+  const maxDateOfBirth = dayjs().subtract(18, "year");
 
   useEffect(() => {
     setEditStatus(status);
     setStatusStaff(status);
   }, [status]);
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
 
   const handleStatusChange = (event) => {
     setEditStatus(event.target.value);
@@ -124,7 +136,9 @@ function StaffDetail(props) {
     if (statusStaff) {
       response = await restoreStaff(staff.staffId);
       if (response.success) {
-        enqueueSnackbar("Mở khóa nhân viên thành công!", { variant: "success" });
+        enqueueSnackbar("Mở khóa nhân viên thành công!", {
+          variant: "success",
+        });
         setDisabledButton(true);
         handleGetStaff();
       } else {
@@ -142,26 +156,51 @@ function StaffDetail(props) {
     }
   };
 
-
   const handleUpdateStaff = async () => {
     setUpdateButtonClicked(true);
 
     if (staffEdit.fullName?.trim() === "") {
-      enqueueSnackbar("Tên nhân viên không được để trống", { variant: "error" });
+      enqueueSnackbar("Tên nhân viên không được để trống", {
+        variant: "error",
+      });
       return;
     }
 
-    let dateOfBirth = dayjs(staffEdit.dateOfBirth).format("YYYY-MM-DD");
-    const response = await updateStaff(staff.staffId, {
-      fullName: staffEdit.fullName,
-      gender: staffEdit.gender,
-      phoneNumber: staffEdit.phoneNumber,
-      identityNumber: staffEdit.identityNumber,
-      email: staff.email,
-      dateOfBirth: dateOfBirth,
-      degree: staffEdit.degree,
-      role: roleOptions.find(option => option.name === staff.role)?.value
-    });
+    const formData = new FormData();
+    formData.append("fullName", staffEdit.fullName);
+    formData.append("phoneNumber", staffEdit.phoneNumber);
+    formData.append("identityNumber", staffEdit.identityNumber);
+    formData.append("email", staff.email);
+    formData.append(
+      "dateOfBirth",
+      dayjs(staffEdit.dateOfBirth).format("MM/DD/YYYY")
+    );
+    formData.append(
+      "role",
+      roleOptions.find((option) => option.name === staff.role)?.value
+    );
+    formData.append("gender", staffEdit.gender);
+    formData.append("degree", staffEdit.degree ? staffEdit.degree : "");
+    formData.append(
+      "nurseType",
+      staffEdit.nurseType === null ? "" : staffEdit.nurseType
+    );
+    if (selectedFile) {
+      formData.append("avatar", selectedFile);
+    }
+
+    // let dateOfBirth = dayjs(staffEdit.dateOfBirth).format("YYYY-MM-DD");
+    // const response = await updateStaff(staff.staffId, {
+    //   fullName: staffEdit.fullName,
+    //   gender: staffEdit.gender,
+    //   phoneNumber: staffEdit.phoneNumber,
+    //   identityNumber: staffEdit.identityNumber,
+    //   email: staff.email,
+    //   dateOfBirth: dateOfBirth,
+    //   degree: staffEdit.degree,
+    //   role: roleOptions.find((option) => option.name === staff.role)?.value,
+    // });
+    const response = await updateStaff(staff.staffId, formData);
     if (response.success) {
       enqueueSnackbar("Cập nhật thông tin nhân viên thành công!", {
         variant: "success",
@@ -181,6 +220,7 @@ function StaffDetail(props) {
       identityNumber: staff.identityNumber,
       dateOfBirth: staff.dateOfBirth,
       degree: staff.degree,
+      nurseType: staff.role === "Điều dưỡng" ? staff.nurseType : null,
     });
   };
 
@@ -191,11 +231,7 @@ function StaffDetail(props) {
         paddingTop: 1,
       }}
     >
-      <BoxStyle
-        component={Grid}
-        alignItems={"center"}
-        container
-      >
+      <BoxStyle component={Grid} alignItems={"center"} container>
         <Grid item xs={6}>
           <TieuDe>Thông tin cơ bản</TieuDe>
         </Grid>
@@ -214,7 +250,6 @@ function StaffDetail(props) {
           </Button>
         </Grid>
       </BoxStyle>
-
 
       <BoxStyle>
         <Grid container>
@@ -235,7 +270,19 @@ function StaffDetail(props) {
           </Grid>
           <Grid item xs={8} md={9}>
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-              <NoiDung>{staff.role}  {staff.headOfDepartment ? "(Trưởng khoa)" : ""}</NoiDung>
+              <NoiDung>
+                {staff.role}{" "}
+                {staff.nurseType === "INPATIENT_NURSE"
+                  ? "nội trú "
+                  : staff.nurseType === "CLINICAL_NURSE"
+                  ? "phòng khám "
+                  : ""}
+                {staff.headOfDepartment
+                  ? staff.role === "Bác sĩ"
+                    ? "(Trưởng khoa)"
+                    : "(Điều dưỡng trưởng)"
+                  : ""}
+              </NoiDung>
             </Stack>
           </Grid>
         </Grid>
@@ -247,7 +294,9 @@ function StaffDetail(props) {
               <TieuDeCot>Khoa</TieuDeCot>
             </Grid>
             <Grid item xs={8} md={9}>
-              <NoiDung>{staff.departmentName ? staff.departmentName : "Đang cập nhật"}</NoiDung>
+              <NoiDung>
+                {staff.departmentName ? staff.departmentName : "Đang cập nhật"}
+              </NoiDung>
             </Grid>
           </Grid>
         </BoxStyle>
@@ -294,7 +343,9 @@ function StaffDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={staff.dateOfBirth} /></NoiDung>
+            <NoiDung>
+              <FormatDate dateTime={staff.dateOfBirth} />
+            </NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -386,6 +437,48 @@ function StaffDetail(props) {
         }}
       >
         <Stack width={"30rem"} mt={1} spacing={3}>
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            spacing={1}
+          >
+            <img
+              src={
+                selectedFile
+                  ? URL.createObjectURL(selectedFile)
+                  : staff?.avatar
+                  ? staff?.avatar
+                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+              }
+              alt="top-product"
+              style={{
+                width: 200,
+                height: 200,
+                objectFit: "contain",
+                borderRadius: "50%",
+              }}
+            />
+            <TextField
+              variant="outlined"
+              type="text"
+              value={selectedFile ? selectedFile.name : ""}
+              disabled
+              InputProps={{
+                endAdornment: (
+                  <IconButton component="label">
+                    <FileUploadOutlined />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleFileChange}
+                    />
+                  </IconButton>
+                ),
+              }}
+            />
+          </Stack>
           <MuiTextFeild
             label={"Họ tên"}
             autoFocus
@@ -418,7 +511,9 @@ function StaffDetail(props) {
                 }));
               }}
               required
-              error={staffEdit.phoneNumber?.trim() === "" && updateButtonClicked}
+              error={
+                staffEdit.phoneNumber?.trim() === "" && updateButtonClicked
+              }
               helperText={
                 staffEdit.phoneNumber?.trim() === "" &&
                 updateButtonClicked &&
@@ -437,7 +532,9 @@ function StaffDetail(props) {
                 }));
               }}
               required
-              error={staffEdit.identityNumber?.trim() === "" && updateButtonClicked}
+              error={
+                staffEdit.identityNumber?.trim() === "" && updateButtonClicked
+              }
               helperText={
                 staffEdit.identityNumber?.trim() === "" &&
                 updateButtonClicked &&
@@ -446,8 +543,7 @@ function StaffDetail(props) {
             />
           </Stack>
           <Stack direction={"row"} spacing={2}>
-            <Box
-              style={{ width: "50%" }}>
+            <Box style={{ width: "50%" }}>
               <LocalizationProvider
                 dateAdapter={AdapterDayjs}
                 adapterLocale="en-gb"
@@ -504,23 +600,29 @@ function StaffDetail(props) {
               </FormControl>
             </Stack>
           </Stack>
-          {staff.role === "Bác sĩ" &&
+          {staff.role === "Bác sĩ" && (
             <Box>
               <CustomTypography
                 variant="body1"
                 style={{
-                  color: staffEdit.degree === null &&
+                  color:
+                    staffEdit.degree === null &&
                     staff.role === "Bác sĩ" &&
-                    updateButtonClicked ? "red" : "",
+                    updateButtonClicked
+                      ? "red"
+                      : "",
                 }}
               >
                 Bằng cấp
               </CustomTypography>
-              <FormControl fullWidth error={
-                staffEdit.degree === null &&
-                staff.role === "Bác sĩ" &&
-                updateButtonClicked
-              }>
+              <FormControl
+                fullWidth
+                error={
+                  staffEdit.degree === null &&
+                  staff.role === "Bác sĩ" &&
+                  updateButtonClicked
+                }
+              >
                 <Select
                   value={staffEdit.degree ? staffEdit.degree : ""}
                   onChange={(e) =>
@@ -549,12 +651,66 @@ function StaffDetail(props) {
                 {staffEdit.degree === null &&
                   staff.role === "Bác sĩ" &&
                   updateButtonClicked && (
-                    <FormHelperText>Bằng cấp không được để trống</FormHelperText>
+                    <FormHelperText>
+                      Bằng cấp không được để trống
+                    </FormHelperText>
                   )}
               </FormControl>
-            </Box>}
-        </Stack >
-      </DialogForm >
+            </Box>
+          )}
+          {staff.role === "Điều dưỡng" && (
+            <Stack>
+              <FormControl>
+                <CustomTypography variant="body1">
+                  Loại điều dưỡng
+                </CustomTypography>
+                <RadioGroup
+                  defaultValue={staff.nurseType ? staff.nurseType : "null"}
+                  value={staffEdit ? staffEdit.nurseType : staffEdit.nurseType}
+                  row
+                >
+                  <FormControlLabel
+                    // checked={staff.nurseType === null}
+                    onChange={(e) => {
+                      setStaffEdit((prev) => ({
+                        ...prev,
+                        nurseType: null,
+                      }));
+                    }}
+                    value="null"
+                    control={<Radio />}
+                    label="Không"
+                  />
+                  <FormControlLabel
+                    // checked={staff.nurseType === 0}
+                    onChange={(e) => {
+                      setStaffEdit((prev) => ({
+                        ...prev,
+                        nurseType: e.target.value,
+                      }));
+                    }}
+                    value="CLINICAL_NURSE"
+                    control={<Radio />}
+                    label="Phòng khám"
+                  />
+                  <FormControlLabel
+                    // checked={staff.nurseType === 1}
+                    onChange={(e) => {
+                      setStaffEdit((prev) => ({
+                        ...prev,
+                        nurseType: e.target.value,
+                      }));
+                    }}
+                    value="INPATIENT_NURSE"
+                    control={<Radio />}
+                    label="Nội trú"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Stack>
+          )}
+        </Stack>
+      </DialogForm>
     </Stack>
   );
 }

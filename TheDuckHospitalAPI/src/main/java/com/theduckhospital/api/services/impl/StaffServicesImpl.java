@@ -161,6 +161,10 @@ public class StaffServicesImpl implements IStaffServices {
                 }
                 Nurse nurse = (Nurse) optional.get();
                 nurse.setNurseType(request.getNurseType());
+                if(request.getNurseType() == null) {
+                    nurse.setHeadOfDepartment(false);
+                    nurse.setDepartment(null);
+                }
                 staff = nurse;
             }
             case CASHIER -> {
@@ -206,8 +210,10 @@ public class StaffServicesImpl implements IStaffServices {
         }
         staff.setDateOfBirth(dateOfBirth);
 
-        String url = request.getAvatar() == null ? "" : cloudinaryServices.uploadFile(request.getAvatar());
-        staff.setAvatar(url);
+        if(request.getAvatar() != null) {
+            String url = cloudinaryServices.uploadFile(request.getAvatar());
+            staff.setAvatar(url);
+        }
 
         return staffRepository.save(staff);
     }
@@ -257,6 +263,8 @@ public class StaffServicesImpl implements IStaffServices {
         staff.setDeleted(true);
 
         if (staff instanceof  Doctor) {
+            ((Doctor)staff).setHeadOfDepartment(false);
+            ((Doctor)staff).setDepartment(null);
             List<DoctorSchedule> schedules = ((Doctor)staff).getDoctorSchedules();
             if(!schedules.isEmpty()) {
                 schedules.forEach(schedule -> {
@@ -264,6 +272,16 @@ public class StaffServicesImpl implements IStaffServices {
                     doctorScheduleRepository.save(schedule);
                 });
             }
+        } else if (staff instanceof  Nurse) {
+            ((Nurse)staff).setHeadOfDepartment(false);
+            ((Nurse)staff).setDepartment(null);
+//            List<DoctorSchedule> schedules = ((Nurse)staff).getDoctorSchedules();
+//            if(!schedules.isEmpty()) {
+//                schedules.forEach(schedule -> {
+//                    schedule.setDeleted(true);
+//                    doctorScheduleRepository.save(schedule);
+//                });
+//            }
         }
 
         Account account = staff.getAccount();

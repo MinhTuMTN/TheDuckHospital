@@ -110,15 +110,15 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
     if (price.trim() === '' || price.trim().length <= 0 || price.trim() === '0')
       return;
 
-    if (
-      serviceType?.value === 'MedicalExamination' &&
-      department.departmentName === ''
-    )
-      return;
-
-    if (serviceType?.value === 'MedicalTest' && name.trim() === '') return;
-
     if (!edit) {
+      if (
+        serviceType?.value === 'MedicalExamination' &&
+        department?.departmentName === ''
+      )
+        return;
+
+      if (serviceType?.value === 'MedicalTest' && name.trim() === '') return;
+
       let medicinePrice: number = +price;
 
       const data = {

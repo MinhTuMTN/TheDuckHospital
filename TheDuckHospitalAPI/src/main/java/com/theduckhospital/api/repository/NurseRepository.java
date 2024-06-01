@@ -22,4 +22,5 @@ public interface NurseRepository extends JpaRepository<Nurse, UUID> {
             NurseType nurseType,
             Pageable pageable
     );
+    List<Nurse> findByDepartmentIsNullAndNurseTypeIsNotNull();
 }
