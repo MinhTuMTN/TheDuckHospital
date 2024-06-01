@@ -100,4 +100,15 @@ public class RoomAdminController {
                         .build()
         );
     }
+
+    @GetMapping("/room-types")
+    public ResponseEntity<?> getRoomTypes() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get room types successfully")
+                        .data(roomServices.getRoomTypes())
+                        .build()
+        );
+    }
 }

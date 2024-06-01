@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.request.admin;
 
+import com.theduckhospital.api.constant.RoomType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -9,4 +10,5 @@ public class CreateRoomRequest {
     private String roomName;
     private String description;
     private Integer departmentId;
+    private RoomType roomType;
 }

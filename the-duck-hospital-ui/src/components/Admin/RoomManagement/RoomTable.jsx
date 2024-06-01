@@ -21,6 +21,7 @@ import {
 import PropTypes from "prop-types";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getRoomType } from "../../../utils/roomTypesUtils";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -87,6 +88,19 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
+            {getRoomType(row.roomType)}
+          </CustomText>
+        </TableCell>
+        <TableCell>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
             {row.departmentName ? row.departmentName : "Đang cập nhật"}
           </CustomText>
         </TableCell>
@@ -98,7 +112,9 @@ function Row(props) {
                 color: row.deleted ? "#c52700" : "#00C58D",
               }}
             />
-            <CustomText>{row.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</CustomText>
+            <CustomText>
+              {row.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}
+            </CustomText>
           </Stack>
         </TableCell>
         <TableCell align="center">
@@ -136,7 +152,6 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-
                       onClick={(e) => {
                         navigate(`/admin/room-management/${row.roomId}`);
                       }}
@@ -187,35 +202,28 @@ function RoomTable(props) {
               }}
             >
               <TableRow>
-                <TableCell style={{ width: "35%" }}>
-                  <CustomText
-                    color={"#101828"}
-                    style={{ fontWeight: "500" }}
-                  >
+                <TableCell style={{ width: "15%" }}>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>
                     Phòng
                   </CustomText>
                 </TableCell>
+                <TableCell style={{ width: "35%" }}>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>
+                    Loại phòng
+                  </CustomText>
+                </TableCell>
                 <TableCell style={{ width: "25%" }}>
-                  <CustomText
-                    color={"#101828"}
-                    style={{ fontWeight: "500" }}
-                  >
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>
                     Khoa
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "25%" }}>
-                  <CustomText
-                    color={"#101828"}
-                    style={{ fontWeight: "500" }}
-                  >
+                <TableCell style={{ width: "20%" }}>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>
                     Trạng thái
                   </CustomText>
                 </TableCell>
-                <TableCell align="center" style={{ width: "15%" }}>
-                  <CustomText
-                    color={"#101828"}
-                    style={{ fontWeight: "500" }}
-                  >
+                <TableCell align="center" style={{ width: "10%" }}>
+                  <CustomText color={"#101828"} style={{ fontWeight: "500" }}>
                     Tùy chọn
                   </CustomText>
                 </TableCell>

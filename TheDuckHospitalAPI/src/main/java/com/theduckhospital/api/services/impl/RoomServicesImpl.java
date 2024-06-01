@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
@@ -60,6 +61,7 @@ public class RoomServicesImpl implements IRoomServices {
         room.setRoomName(request.getRoomName());
         room.setDescription(request.getDescription());
         room.setDepartment(department);
+        room.setRoomType(request.getRoomType());
         room.setDeleted(false);
 
         return new RoomResponse(roomRepository.save(room));
@@ -86,6 +88,9 @@ public class RoomServicesImpl implements IRoomServices {
         room.setDepartment(department == null ?
                 room.getDepartment() :
                 department);
+        room.setRoomType(request.getRoomType() == null ?
+                room.getRoomType() :
+                request.getRoomType());
 
         return new RoomResponse(roomRepository.save(room));
     }
@@ -233,5 +238,10 @@ public class RoomServicesImpl implements IRoomServices {
                 page,
                 limit
         );
+    }
+
+    @Override
+    public List<RoomType> getRoomTypes() {
+        return List.of(RoomType.values());
     }
 }

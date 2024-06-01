@@ -25,9 +25,11 @@ import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import { enqueueSnackbar } from "notistack";
 import {
   deleteRoom,
+  getRoomTypes,
   restoreRoom,
   updateRoom,
 } from "../../../services/admin/RoomServices";
+import { getRoomType } from "../../../utils/roomTypesUtils";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -90,12 +92,20 @@ function RoomDetail(props) {
   const [disabledButton, setDisabledButton] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
-  const [roomEdit, setRoomEdit] = useState({});
+  const [roomEdit, setRoomEdit] = useState({
+    roomName: "",
+    departmentId: "",
+    description: "",
+    roomType: "",
+  });
   const [departments, setDepartments] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
   const [statusSelected, setStatusSelected] = useState(false);
 
   useEffect(() => {
-    setStatusSelected(typeof room.deleted !== "undefined" ? room.deleted : false);
+    setStatusSelected(
+      typeof room.deleted !== "undefined" ? room.deleted : false
+    );
   }, [room]);
 
   const handleStatusChange = (event) => {
@@ -141,6 +151,13 @@ function RoomDetail(props) {
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, []);
 
+  const handleGetRoomTypes = useCallback(async () => {
+    const response = await getRoomTypes();
+    if (response.success) {
+      setRoomTypes(response.data.data);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }, []);
+
   const handleUpdateRoom = async () => {
     if (roomEdit.roomName?.trim() === "") {
       enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
@@ -156,6 +173,7 @@ function RoomDetail(props) {
       roomName: roomEdit.roomName,
       departmentId: roomEdit.departmentId,
       description: roomEdit.description,
+      roomType: roomEdit.roomType,
     });
     if (response.success) {
       enqueueSnackbar("Cập nhật thông tin phòng thành công!", {
@@ -169,11 +187,13 @@ function RoomDetail(props) {
 
   const handleEditButtonClick = () => {
     handleGetDepartment();
+    handleGetRoomTypes();
     setOpenPopup(true);
     setRoomEdit({
       roomName: room.roomName,
-      departmentId: room.departmentId,
+      departmentId: room.departmentId || "",
       description: room.description,
+      roomType: room.roomType || "",
     });
   };
 
@@ -230,7 +250,20 @@ function RoomDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{room.departmentName ? room.departmentName : "Đang cập nhật"}</NoiDung>
+            <NoiDung>
+              {room.departmentName ? room.departmentName : "Đang cập nhật"}
+            </NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Loại phòng</TieuDeCot>
+          </Grid>
+
+          <Grid item xs={8} md={9}>
+            <NoiDung>{getRoomType(room.roomType)}</NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -318,6 +351,7 @@ function RoomDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
+
       <BootstrapDialog
         open={openPopup}
         onClose={() => setOpenPopup(false)}
@@ -439,6 +473,52 @@ function RoomDetail(props) {
                 </FormControl>
               </Box>
             </Stack>
+            <Box>
+              <Typography
+                variant="body1"
+                style={{
+                  fontSize: "14px",
+                  marginBottom: "4px",
+                  color: roomEdit.departmentId === -1 ? "red" : "",
+                }}
+              >
+                Loại phòng
+              </Typography>
+              <FormControl fullWidth error={roomEdit.roomType === -1}>
+                <Select
+                  value={roomEdit.roomType || ""}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setRoomEdit((prev) => {
+                      return {
+                        ...prev,
+                        roomType: e.target.value,
+                      };
+                    });
+                  }}
+                  displayEmpty
+                  required
+                  size="small"
+                  sx={{
+                    fontSize: "14px !important",
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  {roomTypes?.map((item, index) => (
+                    <MenuItem value={item} key={index}>
+                      <Typography style={{ fontSize: "14px" }}>
+                        {getRoomType(item)}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+                {roomEdit.roomType === -1 && (
+                  <FormHelperText>
+                    Loại phòng không được để trống
+                  </FormHelperText>
+                )}
+              </FormControl>
+            </Box>
             <Box>
               <Typography
                 variant="body1"

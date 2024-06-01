@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
@@ -35,4 +36,5 @@ public interface IRoomServices {
             int page,
             int limit
     );
+    List<RoomType> getRoomTypes();
 }

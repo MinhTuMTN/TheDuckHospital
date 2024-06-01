@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.response.admin;
 
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Room;
 import lombok.Data;
@@ -12,6 +13,7 @@ public class RoomResponse {
     private Integer departmentId;
     private String departmentName;
     private Department department;
+    private RoomType roomType;
     private boolean deleted;
 
     public RoomResponse(Room room) {
@@ -22,5 +24,6 @@ public class RoomResponse {
         this.departmentName = room.getDepartment() == null ? null : room.getDepartment().getDepartmentName();
         this.department = room.getDepartment();
         this.deleted = room.isDeleted();
+        this.roomType = room.getRoomType();
     }
 }

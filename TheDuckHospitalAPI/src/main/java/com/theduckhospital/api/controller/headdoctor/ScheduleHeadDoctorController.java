@@ -163,7 +163,12 @@ public class ScheduleHeadDoctorController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get active doctors pagination successfully")
-                        .data(doctorServices.getPaginationActiveDoctorsDepartment(authorizationHeader, search, page, limit))
+                        .data(doctorServices.getPaginationActiveDoctorsDepartment(
+                                authorizationHeader,
+                                search,
+                                page,
+                                limit
+                        ))
                         .build()
         );
     }

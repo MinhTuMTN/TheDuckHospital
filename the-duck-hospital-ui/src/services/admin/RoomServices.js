@@ -27,3 +27,7 @@ export const deleteRoom = (roomId) => {
 export const restoreRoom = (roomId) => {
   return put(`/admin/rooms/${roomId}/restore`);
 };
+
+export const getRoomTypes = () => {
+  return get("/admin/rooms/room-types");
+};

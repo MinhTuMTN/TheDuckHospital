@@ -20,9 +20,11 @@ import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
 import {
   addRoom,
   getPaginationRooms,
+  getRoomTypes,
 } from "../../../services/admin/RoomServices";
 import { enqueueSnackbar } from "notistack";
 import { getAllDepartments } from "../../../services/admin/DepartmentServices";
+import { getRoomType } from "../../../utils/roomTypesUtils";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "white",
@@ -46,6 +48,7 @@ function RoomListPage(props) {
   const [pageChange, setPageChange] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
   const [page, setPage] = useState(1);
@@ -55,6 +58,7 @@ function RoomListPage(props) {
     roomName: "",
     departmentId: "",
     description: "",
+    roomType: "",
   });
 
   const handlePageChange = (event, newPage) => {
@@ -93,7 +97,7 @@ function RoomListPage(props) {
     if (event.key === "Enter" && event.target === document.activeElement) {
       setEnterPressed(true);
     }
-  }
+  };
 
   useEffect(() => {
     const handleGetDepartment = async () => {
@@ -102,7 +106,16 @@ function RoomListPage(props) {
         setDepartments(response.data.data);
       } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     };
+
+    const handleGetRoomTypes = async () => {
+      const response = await getRoomTypes();
+      if (response.success) {
+        setRoomTypes(response.data.data);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+
     handleGetDepartment();
+    handleGetRoomTypes();
   }, []);
 
   const handleAddRoom = async () => {
@@ -117,10 +130,16 @@ function RoomListPage(props) {
       return;
     }
 
+    if (room.roomType === "" || room.roomType === -1) {
+      enqueueSnackbar("Loại phòng không được để trống", { variant: "error" });
+      return;
+    }
+
     const response = await addRoom({
       roomName: room.roomName,
       description: room.description,
       departmentId: room.departmentId,
+      roomType: room.roomType,
     });
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
@@ -227,7 +246,9 @@ function RoomListPage(props) {
             required
             error={room.roomName?.trim() === "" && addButtonClicked}
             helperText={
-              room.roomName?.trim() === "" && "Tên phòng không được để trống" && addButtonClicked
+              room.roomName?.trim() === "" &&
+              "Tên phòng không được để trống" &&
+              addButtonClicked
             }
           />
           <MuiTextFeild
@@ -247,13 +268,17 @@ function RoomListPage(props) {
             <CustomTypography
               variant="body1"
               style={{
-                color: room.departmentId === "" && addButtonClicked ? "red" : "",
+                color:
+                  room.departmentId === "" && addButtonClicked ? "red" : "",
               }}
             >
               Khoa
             </CustomTypography>
 
-            <FormControl fullWidth error={room.departmentId === "" && addButtonClicked}>
+            <FormControl
+              fullWidth
+              error={room.departmentId === "" && addButtonClicked}
+            >
               <Select
                 value={room.departmentId}
                 onChange={(e) =>
@@ -282,6 +307,37 @@ function RoomListPage(props) {
               {room.departmentId === "" && addButtonClicked && (
                 <FormHelperText>Khoa không được để trống</FormHelperText>
               )}
+            </FormControl>
+          </Box>
+          <Box>
+            <CustomTypography variant="body1">Loại phòng</CustomTypography>
+
+            <FormControl fullWidth>
+              <Select
+                value={room.roomType}
+                onChange={(e) =>
+                  setRoom((prev) => {
+                    return {
+                      ...prev,
+                      roomType: e.target.value,
+                    };
+                  })
+                }
+                displayEmpty
+                required
+                sx={{
+                  fontSize: "16px !important",
+                }}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                {roomTypes?.map((item, index) => (
+                  <MenuItem key={`room-type-${index}`} value={item}>
+                    <Typography style={{ fontSize: "16px" }}>
+                      {getRoomType(item)}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Box>
         </Stack>
