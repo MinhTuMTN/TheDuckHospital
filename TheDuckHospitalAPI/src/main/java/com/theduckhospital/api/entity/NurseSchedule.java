@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
 import java.util.UUID;
@@ -22,12 +23,15 @@ public class NurseSchedule {
     @JsonBackReference
     @ToStringExclude
     private Nurse nurse;
+    @Nationalized
     private String nurseName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
     private Room room;
+
+    private String roomName;
 
     // For INPATIENT_SCHEDULE Only
     private Date date;
@@ -44,6 +48,7 @@ public class NurseSchedule {
 
     @PrePersist
     public void prePersist() {
+        this.nurseScheduleId = UUID.randomUUID();
         this.createdDate = new Date();
         this.updatedDate = new Date();
     }

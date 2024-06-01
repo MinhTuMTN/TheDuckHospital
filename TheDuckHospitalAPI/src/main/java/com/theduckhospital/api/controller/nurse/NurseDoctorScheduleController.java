@@ -3,6 +3,7 @@ package com.theduckhospital.api.controller.nurse;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +13,7 @@ import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/nurse/doctor-schedules")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NurseDoctorScheduleController {
     private final IScheduleDoctorServices scheduleDoctorServices;
 

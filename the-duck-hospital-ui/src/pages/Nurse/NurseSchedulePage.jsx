@@ -10,7 +10,11 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect } from "react";
+import { useAuth } from "../../auth/AuthProvider";
+import { getClinicalSchedule } from "../../services/nurse/NurseScheduleServices";
+import { useSnackbar } from "notistack";
+import { getScheduleSession } from "../../utils/scheduleSessionUtils";
 
 const LayoutContainer = styled(Grid)(({ theme }) => ({
   paddingLeft: 20,
@@ -83,16 +87,15 @@ function Line(props) {
 
 function ServerDay(props) {
   const {
-    highlight = [],
+    clinicalSchedules = [],
     day,
     outsideCurrentMonth,
     selected,
     ...other
   } = props;
-  onclick = () => {
-    console.log("clicked");
-  };
-  const isSelected = highlight.indexOf(props.day.date()) >= 0;
+  const clinicalSchedule = clinicalSchedules.filter(
+    (schedule) => dayjs(day).get("day") + 1 === schedule.dayOfWeek
+  );
 
   return (
     <PickersDay
@@ -117,12 +120,20 @@ function ServerDay(props) {
         }}
       >
         <Typography fontSize={"18px"}>{dayjs(day).get("date")}</Typography>
-        {isSelected && (
-          <>
-            <Line color={shiftColors.afternoon} />
-            <Line color={shiftColors.night} />
-          </>
-        )}
+        {clinicalSchedule
+          .sort((a, b) => {
+            const order = ["MORNING", "AFTERNOON", "EVENING", "NIGHT"];
+            return (
+              order.indexOf(a.scheduleSession) -
+              order.indexOf(b.scheduleSession)
+            );
+          })
+          .map((schedule) => (
+            <Line
+              key={schedule.nurseScheduleId}
+              color={shiftColors[schedule.scheduleSession.toLowerCase()]}
+            />
+          ))}
       </Stack>
     </PickersDay>
   );
@@ -130,6 +141,39 @@ function ServerDay(props) {
 
 function NurseSchedulePage() {
   const [selectedDate, setSelectedDate] = React.useState(dayjs());
+  const { nurseType } = useAuth();
+  const [clinicalSchedule, setClinicalSchedule] = React.useState([]);
+  const [selectedSchedule, setSelectedSchedule] = React.useState([]);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    const selectedSchedule = clinicalSchedule
+      .filter((schedule) => selectedDate.get("day") + 1 === schedule.dayOfWeek)
+      .sort((a, b) => {
+        const order = ["MORNING", "AFTERNOON", "EVENING", "NIGHT"];
+        return (
+          order.indexOf(a.scheduleSession) - order.indexOf(b.scheduleSession)
+        );
+      });
+
+    setSelectedSchedule(selectedSchedule);
+  }, [selectedDate, clinicalSchedule]);
+
+  useEffect(() => {
+    const handleGetClinicalSchedule = async () => {
+      const response = await getClinicalSchedule();
+      if (response.success) {
+        setClinicalSchedule(response.data.data);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+      }
+    };
+
+    if (nurseType === "CLINICAL_NURSE") {
+      handleGetClinicalSchedule();
+    }
+  }, [nurseType, enqueueSnackbar]);
   return (
     <LayoutContainer container>
       <BoxLayout item md={3}>
@@ -173,14 +217,24 @@ function NurseSchedulePage() {
                 flex: 1,
               }}
             >
-              <Stack direction={"row"} spacing={0.5} alignItems={"center"}>
-                <RemoveIcon fontSize="1" />
-                <Typography>Ca sáng: phòng A101</Typography>
-              </Stack>
-              <Stack direction={"row"} spacing={0.5} alignItems={"center"}>
-                <RemoveIcon fontSize="1" />
-                <Typography>Ca tối: phòng C202</Typography>
-              </Stack>
+              {selectedSchedule.map((schedule) => (
+                <Stack
+                  key={schedule.nurseScheduleId}
+                  direction={"row"}
+                  spacing={0.5}
+                  alignItems={"center"}
+                >
+                  <RemoveIcon fontSize="1" />
+                  <Typography>
+                    Ca {getScheduleSession(schedule.scheduleSession)}: phòng{" "}
+                    {schedule.roomName}
+                  </Typography>
+                </Stack>
+              ))}
+
+              {selectedSchedule.length === 0 && (
+                <Typography>Không có ca trực nào</Typography>
+              )}
             </Stack>
             <Typography fontSize={12} fontStyle={"italic"}>
               *Vui lòng liên hệ điều dưỡng trưởng để đổi lịch trực
@@ -262,7 +316,7 @@ function NurseSchedulePage() {
             }}
             slotProps={{
               day: {
-                highlight: [1, 2, 10],
+                clinicalSchedules: clinicalSchedule,
                 sx: {
                   "& .MuiPickersDay-root": {
                     "&.Mui-selected": {

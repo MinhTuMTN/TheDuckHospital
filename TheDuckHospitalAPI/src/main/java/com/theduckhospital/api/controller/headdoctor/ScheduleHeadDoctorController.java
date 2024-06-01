@@ -12,14 +12,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api/head-doctor/schedules")
 @PreAuthorize("hasRole('ROLE_HEAD_DOCTOR')")
 public class ScheduleHeadDoctorController {
     private final IScheduleDoctorServices scheduleDoctorServices;
+    private final ReentrantLock lock = new ReentrantLock();
     private final IDoctorServices doctorServices;
     private final IRoomServices roomServices;
 
@@ -38,15 +41,20 @@ public class ScheduleHeadDoctorController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid CreateDoctorScheduleRequest request
     ) throws ParseException {
-        return ResponseEntity.ok(
-                GeneralResponse.builder()
-                        .success(true)
-                        .message("Create doctor schedule successfully")
-                        .data(scheduleDoctorServices
-                                .createDoctorSchedule(authorizationHeader, request)
-                        )
-                        .build()
-        );
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Create doctor schedule successfully")
+                            .data(scheduleDoctorServices
+                                    .createDoctorSchedule(authorizationHeader, request)
+                            )
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
     }
 
     @GetMapping("/invalid-date")
@@ -99,12 +107,12 @@ public class ScheduleHeadDoctorController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<?> getRoomsDepartment(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> getExaminationRoomsDepartment(@RequestHeader("Authorization") String authorizationHeader) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get rooms in department successfully")
-                        .data(roomServices.getRoomsDepartment(authorizationHeader))
+                        .data(roomServices.getExaminationRoomsDepartment(authorizationHeader))
                         .build()
         );
     }

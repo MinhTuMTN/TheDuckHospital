@@ -200,7 +200,7 @@ public class RoomServicesImpl implements IRoomServices {
     }
 
     @Override
-    public List<Room> getRoomsDepartment(String authorization) {
+    public List<Room> getExaminationRoomsDepartment(String authorization) {
         Doctor headDoctor = doctorServices.getDoctorByToken(authorization);
         if (!headDoctor.isHeadOfDepartment()) {
             throw new RuntimeException("You are not head of department");
@@ -208,7 +208,11 @@ public class RoomServicesImpl implements IRoomServices {
 
         Department department = headDoctor.getDepartment();
 
-        return department.getRooms();
+        return department.getRooms()
+                .stream()
+                .filter(room -> !room.isDeleted()
+                        && room.getRoomType() == RoomType.EXAMINATION_ROOM
+                ).toList();
     }
 
     @Override

@@ -29,7 +29,7 @@ public interface IRoomServices {
 
     Object getTodayDoctorSchedules(int roomId) throws ParseException;
 
-    List<Room> getRoomsDepartment(String authorization);
+    List<Room> getExaminationRoomsDepartment(String authorization);
 
     PaginationRoomsResponse getPaginationRooms(
             String authorization,

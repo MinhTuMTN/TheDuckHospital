@@ -13,6 +13,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.NurseRepository;
+import com.theduckhospital.api.repository.NurseScheduleRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.INurseServices;
@@ -29,16 +30,18 @@ import java.util.UUID;
 @Service
 public class NurseServicesImpl implements INurseServices {
     private final NurseRepository nurseRepository;
+    private final NurseScheduleRepository nurseScheduleRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
     private final RoomRepository roomRepository;
     public NurseServicesImpl(
             NurseRepository nurseRepository,
-            JwtTokenProvider jwtTokenProvider,
+            NurseScheduleRepository nurseScheduleRepository, JwtTokenProvider jwtTokenProvider,
             AccountRepository accountRepository,
             RoomRepository roomRepository
     ) {
         this.nurseRepository = nurseRepository;
+        this.nurseScheduleRepository = nurseScheduleRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
         this.roomRepository = roomRepository;
@@ -147,28 +150,70 @@ public class NurseServicesImpl implements INurseServices {
             throw new BadRequestException("Room is not examination room");
         }
 
-        for (ExamNurseScheduleItemRequest item : request.getSchedules()) {
-            Nurse nurse = nurseRepository.findById(request.getNurseId())
-                    .orElseThrow(() -> new NotFoundException("Nurse not found"));
-            if (nurse.isDeleted()) {
-                throw new NotFoundException("Nurse not found");
-            }
-
-            NurseSchedule nurseSchedule = new NurseSchedule();
-            nurseSchedule.setNurse(nurse);
-            nurseSchedule.setNurseName(nurse.getFullName());
-            nurseSchedule.setRoom(room);
-            nurseSchedule.setScheduleType(ScheduleType.EXAMINATION);
-            nurseSchedule.setScheduleSession(item.getSession());
-            nurseSchedule.setDayOfWeek(item.getDayOfWeek());
-            nurseSchedule.setDeleted(false);
-
-            room.getNurseSchedules().add(nurseSchedule);
+        Nurse nurse = nurseRepository.findById(request.getNurseId())
+                .orElseThrow(() -> new NotFoundException("Nurse not found"));
+        if (nurse.isDeleted() || nurse.getNurseType() != NurseType.CLINICAL_NURSE) {
+            throw new NotFoundException("Nurse not found");
         }
 
-        roomRepository.save(room);
+        List<NurseSchedule> nurseSchedules = new ArrayList<>();
+        for (ExamNurseScheduleItemRequest item : request.getSchedules()) {
+            NurseSchedule nurseSchedule = createExaminationRoomSchedule(nurse, room, item);
+            nurseSchedules.add(nurseSchedule);
+        }
 
+        nurseScheduleRepository.saveAll(nurseSchedules);
         return true;
+    }
+
+    @Override
+    public List<NurseSchedule> getNurseSchedules(String authorization, Integer month, Integer year) {
+        Nurse nurse = getNurseByToken(authorization);
+
+        if (nurse.getNurseType() == NurseType.CLINICAL_NURSE) {
+            return nurse.getNurseSchedules();
+        }
+        return new ArrayList<>();
+    }
+
+    private NurseSchedule createExaminationRoomSchedule(Nurse nurse, Room room, ExamNurseScheduleItemRequest item) {
+        // Check nurse is available
+        // Find by nurse, dayOfWeek, session
+        Optional<NurseSchedule> optionalNurseCheck = nurseScheduleRepository
+                .findAvailableNurseSchedule(
+                        nurse,
+                        item.getDayOfWeek(),
+                        item.getSession(),
+                        ScheduleType.EXAMINATION
+                );
+        if (optionalNurseCheck.isPresent()) {
+            throw new BadRequestException("Nurse is not available");
+        }
+
+        // Check room is not scheduled yet
+        // Find by room, dayOfWeek, session
+        Optional<NurseSchedule> optionalRoomCheck = nurseScheduleRepository
+                .findAvailableRoomSchedule(
+                        room,
+                        item.getDayOfWeek(),
+                        item.getSession(),
+                        ScheduleType.EXAMINATION
+                );
+        if (optionalRoomCheck.isPresent()) {
+            throw new BadRequestException("Room is not available");
+        }
+
+        NurseSchedule nurseSchedule = new NurseSchedule();
+        nurseSchedule.setNurse(nurse);
+        nurseSchedule.setNurseName(nurse.getFullName());
+        nurseSchedule.setRoom(room);
+        nurseSchedule.setRoomName(room.getRoomName());
+        nurseSchedule.setScheduleType(ScheduleType.EXAMINATION);
+        nurseSchedule.setScheduleSession(item.getSession());
+        nurseSchedule.setDayOfWeek(item.getDayOfWeek());
+        nurseSchedule.setDeleted(false);
+
+        return nurseSchedule;
     }
 
     public Nurse getNurseByToken(String token) {

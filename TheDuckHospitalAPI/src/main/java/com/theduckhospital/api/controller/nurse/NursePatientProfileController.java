@@ -6,10 +6,12 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IPatientProfileServices;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/nurse/patient-profiles")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NursePatientProfileController {
     private final IPatientProfileServices patientProfileServices;
 

@@ -16,7 +16,7 @@ import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/nurse/medical-exams")
-@PreAuthorize("hasRole('ROLE_NURSE')")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NurseMedicalExamController {
     private final IMedicalExamServices medicalExamServices;
 

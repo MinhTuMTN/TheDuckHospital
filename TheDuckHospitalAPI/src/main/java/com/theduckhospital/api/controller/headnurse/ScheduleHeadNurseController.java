@@ -9,11 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 @RestController
 @RequestMapping("/api/head-nurse/schedules")
 @PreAuthorize("hasRole('ROLE_HEAD_NURSE')")
 public class ScheduleHeadNurseController {
     private final INurseServices nurseServices;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public ScheduleHeadNurseController(INurseServices nurseServices) {
         this.nurseServices = nurseServices;
@@ -82,16 +85,21 @@ public class ScheduleHeadNurseController {
             @PathVariable int roomId,
             @RequestBody CreateExamNurseScheduleRequest request
     ){
-        return ResponseEntity.ok(
-                GeneralResponse.builder()
-                        .success(true)
-                        .message("Create examination room schedules successfully")
-                        .data(nurseServices.createExaminationRoomSchedules(
-                                authorizationHeader,
-                                roomId,
-                                request
-                        ))
-                        .build()
-        );
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Create examination room schedules successfully")
+                            .data(nurseServices.createExaminationRoomSchedules(
+                                    authorizationHeader,
+                                    roomId,
+                                    request
+                            ))
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
     }
 }

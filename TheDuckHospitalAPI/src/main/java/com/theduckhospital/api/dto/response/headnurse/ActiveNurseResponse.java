@@ -15,6 +15,7 @@ public class ActiveNurseResponse {
     private Department department;
     private NurseType nurseType;
     private String email;
+    private String avatar;
 
     public ActiveNurseResponse(Nurse nurse) {
         this.staffId = nurse.getStaffId();
@@ -23,5 +24,6 @@ public class ActiveNurseResponse {
         this.department = nurse.getDepartment();
         this.nurseType = nurse.getNurseType();
         this.email = nurse.getAccount().getEmail();
+        this.avatar = nurse.getAvatar();
     }
 }

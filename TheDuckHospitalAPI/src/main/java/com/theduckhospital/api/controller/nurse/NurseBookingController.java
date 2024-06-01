@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/nurse/bookings")
-@PreAuthorize("hasRole('ROLE_NURSE')")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NurseBookingController {
     private final IBookingServices bookingServices;
     private final IMedicalExamServices medicalExamServices;

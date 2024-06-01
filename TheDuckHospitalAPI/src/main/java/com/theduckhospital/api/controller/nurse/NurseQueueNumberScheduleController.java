@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/nurse/queue-number-schedules")
-@PreAuthorize("hasRole('ROLE_NURSE')")
+@PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
 public class NurseQueueNumberScheduleController {
     private final IScheduleDoctorServices scheduleDoctorServices;
 

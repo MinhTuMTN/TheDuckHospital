@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.Nurse;
+import com.theduckhospital.api.entity.NurseSchedule;
 import com.theduckhospital.api.entity.Room;
 
 import java.util.List;
@@ -31,4 +32,5 @@ public interface INurseServices {
             int roomId,
             CreateExamNurseScheduleRequest request
     );
+    List<NurseSchedule> getNurseSchedules(String authorization, Integer month, Integer year);
 }
