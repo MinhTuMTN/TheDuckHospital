@@ -2,14 +2,16 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.response.PaginationResponse;
-import com.theduckhospital.api.dto.response.admin.ActiveDoctorResponse;
-import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.dto.response.headnurse.ActiveNurseResponse;
+import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
 import com.theduckhospital.api.entity.*;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.NurseRepository;
+import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.INurseServices;
 import org.springframework.data.domain.Page;
@@ -27,10 +29,17 @@ public class NurseServicesImpl implements INurseServices {
     private final NurseRepository nurseRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
-    public NurseServicesImpl(NurseRepository nurseRepository, JwtTokenProvider jwtTokenProvider, AccountRepository accountRepository) {
+    private final RoomRepository roomRepository;
+    public NurseServicesImpl(
+            NurseRepository nurseRepository,
+            JwtTokenProvider jwtTokenProvider,
+            AccountRepository accountRepository,
+            RoomRepository roomRepository
+    ) {
         this.nurseRepository = nurseRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -111,6 +120,31 @@ public class NurseServicesImpl implements INurseServices {
                 .toList();
     }
 
+    @Override
+    public List<ExaminationNurseScheduleResponse> getExaminationRoomSchedules(String authorization, int roomId) {
+        Nurse headNurse = getNurseByToken(authorization);
+        if (!headNurse.isHeadOfDepartment()) {
+            throw new RuntimeException("You are not head of department");
+        }
+
+        Room room = getRoomById(roomId, headNurse.getDepartment());
+        if (room.getRoomType() != RoomType.EXAMINATION_ROOM) {
+            throw new BadRequestException("Room is not examination room");
+        }
+
+        List<NurseSchedule> nurseSchedules = room.getNurseSchedules()
+                .stream().filter(nurseSchedule -> !nurseSchedule.isDeleted()
+                        && nurseSchedule.getScheduleType() == ScheduleType.EXAMINATION
+                ).toList();
+
+        List<ExaminationNurseScheduleResponse> responses = new ArrayList<>();
+        for (NurseSchedule nurseSchedule : nurseSchedules) {
+            responses.add(new ExaminationNurseScheduleResponse(nurseSchedule));
+        }
+
+        return responses;
+    }
+
     public Nurse getNurseByToken(String token) {
         token = token.substring(7);
 
@@ -130,5 +164,18 @@ public class NurseServicesImpl implements INurseServices {
             throw new NotFoundException("Nurse not found");
 
         return nurse;
+    }
+
+    private Room getRoomById(int roomId, Department department) {
+        Optional<Room> optional = roomRepository
+                .findRoomByRoomIdAndDepartmentAndDeletedIsFalse(
+                        roomId,
+                        department
+                );
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Room not found");
+        }
+
+        return optional.get();
     }
 }

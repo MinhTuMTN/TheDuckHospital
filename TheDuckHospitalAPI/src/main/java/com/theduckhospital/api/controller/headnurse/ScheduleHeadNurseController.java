@@ -57,4 +57,21 @@ public class ScheduleHeadNurseController {
                         .build()
         );
     }
+
+    @GetMapping("/rooms/{roomId}/examination-room-schedules")
+    public ResponseEntity<?> getExaminationRoomSchedules(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable int roomId
+    ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get examination room schedules successfully")
+                        .data(nurseServices.getExaminationRoomSchedules(
+                                authorizationHeader,
+                                roomId
+                        ))
+                        .build()
+        );
+    }
 }

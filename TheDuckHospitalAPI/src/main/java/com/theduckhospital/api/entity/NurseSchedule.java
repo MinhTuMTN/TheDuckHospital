@@ -22,13 +22,19 @@ public class NurseSchedule {
     @JsonBackReference
     @ToStringExclude
     private Nurse nurse;
+    private String nurseName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude
     private Room room;
 
+    // For INPATIENT_SCHEDULE Only
     private Date date;
+
+    // For EXAMINATION_SCHEDULE Only
+    private int dayOfWeek;
+
     private ScheduleSession scheduleSession;
     private ScheduleType scheduleType;
 

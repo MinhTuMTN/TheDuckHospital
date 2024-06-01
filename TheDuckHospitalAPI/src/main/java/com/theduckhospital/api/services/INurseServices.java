@@ -4,6 +4,7 @@ import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.Nurse;
 import com.theduckhospital.api.entity.Room;
@@ -23,4 +24,5 @@ public interface INurseServices {
             int limit
     );
     List<Room> getRoomsDepartment(String authorization, RoomType roomType);
+    List<ExaminationNurseScheduleResponse> getExaminationRoomSchedules(String authorization, int roomId);
 }
