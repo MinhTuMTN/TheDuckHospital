@@ -2,10 +2,7 @@ package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.theduckhospital.api.constant.NurseType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -16,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@DiscriminatorValue("Nurse")
 public class Nurse extends Staff{
     private boolean headOfDepartment = false;
     private NurseType nurseType;

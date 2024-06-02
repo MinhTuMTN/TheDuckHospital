@@ -47,8 +47,8 @@ const scheduleTypes = [
   {
     key: "AFTERNOON",
     value: "Buổi chiều",
-  }
-]
+  },
+];
 
 function Row(props) {
   const { row } = props;
@@ -108,7 +108,10 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {scheduleTypes.find(type => type.key === row.scheduleType).value}
+            {
+              scheduleTypes.find((type) => type.key === row.scheduleSession)
+                ?.value
+            }
           </CustomText>
         </TableCell>
         <TableCell>
@@ -185,13 +188,13 @@ function Row(props) {
                         paddingY: 1,
                         textAlign: "left",
                       }}
-                    // onClick={(e) => {
-                    //   navigate(`/admin/product-management/${row.productId}`, {
-                    //     state: {
-                    //       id: row.productId,
-                    //     },
-                    //   });
-                    // }}
+                      // onClick={(e) => {
+                      //   navigate(`/admin/product-management/${row.productId}`, {
+                      //     state: {
+                      //       id: row.productId,
+                      //     },
+                      //   });
+                      // }}
                     >
                       Xem
                     </Button>
@@ -203,13 +206,13 @@ function Row(props) {
               <>
                 <IconButton
                   color="black"
-                // onClick={(e) => {
-                //   navigate(`/admin/product-management/${row.productId}`, {
-                //     state: {
-                //       id: row.productId,
-                //     },
-                //   });
-                // }}
+                  // onClick={(e) => {
+                  //   navigate(`/admin/product-management/${row.productId}`, {
+                  //     state: {
+                  //       id: row.productId,
+                  //     },
+                  //   });
+                  // }}
                 >
                   <InfoOutlinedIcon color="black" />
                 </IconButton>

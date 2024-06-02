@@ -25,8 +25,7 @@ public class AccountAdminController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "PATIENT, DOCTOR, NURSE, PHARMACIST, CASHIER, LABORATORY_TECHNICIAN")
-            List<Role> accountRole,
+            @RequestParam(required = false) List<Role> accountRole,
             @RequestParam(defaultValue = "false, true") List<Boolean> accountStatus
     ) {
         return ResponseEntity.ok(

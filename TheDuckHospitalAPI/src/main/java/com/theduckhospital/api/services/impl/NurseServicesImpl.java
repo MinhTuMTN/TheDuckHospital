@@ -1,12 +1,12 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.NurseType;
-import com.theduckhospital.api.constant.RoomType;
-import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
+import com.theduckhospital.api.dto.request.headnurse.CreateInpatientNurseSchedule;
 import com.theduckhospital.api.dto.request.headnurse.ExamNurseScheduleItemRequest;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.headnurse.ActiveNurseResponse;
+import com.theduckhospital.api.dto.response.headnurse.DateHasInpatientScheduleResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
@@ -22,10 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class NurseServicesImpl implements INurseServices {
@@ -155,10 +152,57 @@ public class NurseServicesImpl implements INurseServices {
         if (nurse.isDeleted() || nurse.getNurseType() != NurseType.CLINICAL_NURSE) {
             throw new NotFoundException("Nurse not found");
         }
+        if (nurse.getDepartment() != headNurse.getDepartment()) {
+            throw new BadRequestException("Nurse is not in department");
+        }
 
         List<NurseSchedule> nurseSchedules = new ArrayList<>();
         for (ExamNurseScheduleItemRequest item : request.getSchedules()) {
             NurseSchedule nurseSchedule = createExaminationRoomSchedule(nurse, room, item);
+            nurseSchedules.add(nurseSchedule);
+        }
+
+        nurseScheduleRepository.saveAll(nurseSchedules);
+        return true;
+    }
+
+    @Override
+    public boolean createInpatientRoomSchedules(String authorization, int roomId, CreateInpatientNurseSchedule request) {
+        Nurse headNurse = getNurseByToken(authorization);
+        Room room = getRoomById(roomId, headNurse.getDepartment());
+        if (room.getRoomType() != RoomType.TREATMENT_ROOM_VIP
+                && room.getRoomType() != RoomType.TREATMENT_ROOM_STANDARD
+        ) {
+            throw new BadRequestException("Room is not treatment room");
+        }
+
+        Nurse nurse = nurseRepository.findById(request.getNurseId())
+                .orElseThrow(() -> new NotFoundException("Nurse not found"));
+        if (nurse.isDeleted() || nurse.getNurseType() != NurseType.INPATIENT_NURSE) {
+            throw new NotFoundException("Nurse not found");
+        }
+        if (nurse.getDepartment() != headNurse.getDepartment()) {
+            throw new BadRequestException("Nurse is not in department");
+        }
+
+        List<NurseSchedule> nurseSchedules = new ArrayList<>();
+        for (Date date : request.getMorningDates()) {
+            NurseSchedule nurseSchedule = createInpatientNurseSchedule(nurse, room, date, ScheduleSession.MORNING);
+            nurseSchedules.add(nurseSchedule);
+        }
+
+        for (Date date : request.getAfternoonDates()) {
+            NurseSchedule nurseSchedule = createInpatientNurseSchedule(nurse, room, date, ScheduleSession.AFTERNOON);
+            nurseSchedules.add(nurseSchedule);
+        }
+
+        for (Date date : request.getEveningDates()) {
+            NurseSchedule nurseSchedule = createInpatientNurseSchedule(nurse, room, date, ScheduleSession.EVENING);
+            nurseSchedules.add(nurseSchedule);
+        }
+
+        for (Date date : request.getNightDates()) {
+            NurseSchedule nurseSchedule = createInpatientNurseSchedule(nurse, room, date, ScheduleSession.NIGHT);
             nurseSchedules.add(nurseSchedule);
         }
 
@@ -174,6 +218,74 @@ public class NurseServicesImpl implements INurseServices {
             return nurse.getNurseSchedules();
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public DateHasInpatientScheduleResponse getInpatientRoomSchedules(
+            String authorization,
+            UUID nurseId,
+            int roomId,
+            int month,
+            int year
+    ) {
+        Nurse nurse = getNurseByToken(authorization);
+        if (nurse.getNurseType() != NurseType.INPATIENT_NURSE) {
+            throw new BadRequestException("Nurse is not inpatient nurse");
+        }
+
+        Room room = getRoomById(roomId, nurse.getDepartment());
+        if (room.getRoomType() != RoomType.TREATMENT_ROOM_VIP
+                && room.getRoomType() != RoomType.TREATMENT_ROOM_STANDARD
+        ) {
+            throw new BadRequestException("Room is not treatment room");
+        }
+
+        List<Date> morning = nurseScheduleRepository
+                .findInpatientScheduleAlreadyScheduled(
+                        room,
+                        nurse,
+                        month,
+                        year,
+                        ScheduleSession.MORNING,
+                        ScheduleType.INPATIENT_EXAMINATION
+                ).stream().map(NurseSchedule::getDate).toList();
+
+        List<Date> afternoon = nurseScheduleRepository
+                .findInpatientScheduleAlreadyScheduled(
+                        room,
+                        nurse,
+                        month,
+                        year,
+                        ScheduleSession.AFTERNOON,
+                        ScheduleType.INPATIENT_EXAMINATION
+                ).stream().map(NurseSchedule::getDate).toList();
+
+        List<Date> evening = nurseScheduleRepository
+                .findInpatientScheduleAlreadyScheduled(
+                        room,
+                        nurse,
+                        month,
+                        year,
+                        ScheduleSession.EVENING,
+                        ScheduleType.INPATIENT_EXAMINATION
+                ).stream().map(NurseSchedule::getDate).toList();
+
+        List<Date> night = nurseScheduleRepository
+                .findInpatientScheduleAlreadyScheduled(
+                        room,
+                        nurse,
+                        month,
+                        year,
+                        ScheduleSession.NIGHT,
+                        ScheduleType.INPATIENT_EXAMINATION
+                ).stream().map(NurseSchedule::getDate).toList();
+
+        return DateHasInpatientScheduleResponse.builder()
+                .morning(morning)
+                .afternoon(afternoon)
+                .evening(evening)
+                .night(night)
+                .build();
     }
 
     private NurseSchedule createExaminationRoomSchedule(Nurse nurse, Room room, ExamNurseScheduleItemRequest item) {
@@ -211,6 +323,35 @@ public class NurseServicesImpl implements INurseServices {
         nurseSchedule.setScheduleType(ScheduleType.EXAMINATION);
         nurseSchedule.setScheduleSession(item.getSession());
         nurseSchedule.setDayOfWeek(item.getDayOfWeek());
+        nurseSchedule.setDeleted(false);
+
+        return nurseSchedule;
+    }
+
+    private NurseSchedule createInpatientNurseSchedule(Nurse nurse, Room room, Date date, ScheduleSession session) {
+        // Check already scheduled
+        // Find by nurse, date, room, session
+        date = DateCommon.getStarOfDay(date);
+
+        Optional<NurseSchedule> optional = nurseScheduleRepository
+                .findInpatientAlreadyScheduled(
+                        room,
+                        nurse,
+                        session,
+                        ScheduleType.INPATIENT_EXAMINATION
+                );
+        if (optional.isPresent()) {
+            throw new BadRequestException("Already scheduled");
+        }
+
+        NurseSchedule nurseSchedule = new NurseSchedule();
+        nurseSchedule.setNurse(nurse);
+        nurseSchedule.setNurseName(nurse.getFullName());
+        nurseSchedule.setRoom(room);
+        nurseSchedule.setRoomName(room.getRoomName());
+        nurseSchedule.setScheduleType(ScheduleType.INPATIENT_EXAMINATION);
+        nurseSchedule.setScheduleSession(session);
+        nurseSchedule.setDate(date);
         nurseSchedule.setDeleted(false);
 
         return nurseSchedule;

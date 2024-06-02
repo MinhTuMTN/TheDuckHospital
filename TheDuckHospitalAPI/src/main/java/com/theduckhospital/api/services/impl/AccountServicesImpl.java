@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.constant.RoleCommon;
 import com.theduckhospital.api.dto.request.ChangePasswordRequest;
 import com.theduckhospital.api.dto.request.ForgetPasswordDataRequest;
 import com.theduckhospital.api.dto.request.RegisterRequest;
@@ -19,6 +20,7 @@ import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -348,29 +350,35 @@ public class AccountServicesImpl implements IAccountServices {
             List<Role> accountRole,
             List<Boolean> accountStatus
     ) {
-        List<Account> accounts = accountRepository.findByFullNameContainingAndDeletedIn(search, accountStatus);
-
-        List<Account> filteredAccounts = accounts.stream()
-                .filter(account -> (accountRole.contains(PATIENT) && account.getStaff() == null)
-                        || (accountRole.contains(DOCTOR) && account.getStaff() instanceof Doctor)
-                        || (accountRole.contains(NURSE) && account.getStaff() instanceof Nurse)
-                        || (accountRole.contains(CASHIER) && account.getStaff() instanceof Cashier)
-                        || (accountRole.contains(PHARMACIST) && account.getStaff() instanceof Pharmacist)
-                        || (accountRole.contains(LABORATORY_TECHNICIAN) && account.getStaff() instanceof LaboratoryTechnician))
-                .collect(Collectors.toList());
+        boolean hasPatientRole = accountRole == null || accountRole.isEmpty() || accountRole.contains(PATIENT);
+        List<String> classes = RoleCommon.getStringClassesByRoles(accountRole);
 
         Pageable pageable = PageRequest.of(page, limit);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), filteredAccounts.size());
-        List<Account> pageContent = filteredAccounts.subList(start, end);
+        Page<Account> accounts = hasPatientRole ?
+                accountRepository.findAccount(
+                        search,
+                        accountStatus,
+                        classes,
+                        pageable
+                ) :
+                accountRepository.findAccountWithoutPatient(
+                        search,
+                        accountStatus,
+                        classes,
+                        pageable
+                );
 
         List<AccountResponse> response = new ArrayList<>();
-        for (Account account : pageContent) {
+        for (Account account : accounts.getContent()) {
             response.add(new AccountResponse(account));
         }
 
-        return new FilteredAccountsResponse(response, filteredAccounts.size(), page, limit);
+        return FilteredAccountsResponse.builder()
+                .accounts(response)
+                .total((int) accounts.getTotalElements())
+                .page(page)
+                .limit(limit)
+                .build();
     }
 
     @Override

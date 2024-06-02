@@ -1,5 +1,6 @@
 package com.theduckhospital.api.repository;
 
+import com.theduckhospital.api.constant.Role;
 import com.theduckhospital.api.entity.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +15,23 @@ import java.util.UUID;
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, UUID> {
     Page<Staff> findPaginationByOrderByDeleted(Pageable pageable);
-    List<Staff> findByFullNameContainingAndDeletedIn(String fullName, List<Boolean> deleted);
 
-    @Query(value = "SELECT * FROM staff WHERE FREETEXT(fullName, :fullName) AND deleted IN :deleted", nativeQuery = true)
+    @Query(value = "SELECT s FROM Staff s " +
+            "WHERE s.deleted IN :deleted " +
+            "AND TYPE(s) IN :classes " +
+            "AND s.fullName LIKE %:fullName%"
+    )
+    Page<Staff> findStaff(String fullName,
+                          List<Boolean> deleted,
+                          List<Class<? extends Staff>> classes,
+                          Pageable pageable
+    );
+
+    @Query(value = "SELECT * FROM staff " +
+            "WHERE FREETEXT(fullName, :fullName) " +
+            "AND deleted IN :deleted",
+            nativeQuery = true
+    )
     List<Staff> findFullTextSearchByFullNameAndDeletedIn(
             @Param("fullName") String fullName,
             @Param("deleted") List<Boolean> deleted);

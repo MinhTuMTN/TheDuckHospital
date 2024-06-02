@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Setter
 @Getter
+@DiscriminatorValue("Doctor")
 public class Doctor extends Staff{
     @Nullable
     private Degree degree;

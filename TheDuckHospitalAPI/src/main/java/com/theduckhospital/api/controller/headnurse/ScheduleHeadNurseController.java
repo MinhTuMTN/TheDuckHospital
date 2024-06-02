@@ -3,12 +3,14 @@ package com.theduckhospital.api.controller.headnurse;
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
+import com.theduckhospital.api.dto.request.headnurse.CreateInpatientNurseSchedule;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.INurseServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
@@ -29,7 +31,7 @@ public class ScheduleHeadNurseController {
             @RequestParam(defaultValue = "CLINICAL_NURSE") NurseType nurseType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int limit
-    ){
+    ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
@@ -49,7 +51,7 @@ public class ScheduleHeadNurseController {
     public ResponseEntity<?> getRoomsDepartment(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(defaultValue = "EXAMINATION_ROOM") RoomType roomType
-    ){
+    ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
@@ -66,7 +68,7 @@ public class ScheduleHeadNurseController {
     public ResponseEntity<?> getExaminationRoomSchedules(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable int roomId
-    ){
+    ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
@@ -84,7 +86,7 @@ public class ScheduleHeadNurseController {
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable int roomId,
             @RequestBody CreateExamNurseScheduleRequest request
-    ){
+    ) {
         lock.lock();
         try {
             return ResponseEntity.ok(
@@ -101,5 +103,53 @@ public class ScheduleHeadNurseController {
         } finally {
             lock.unlock();
         }
+    }
+
+    @PostMapping("/rooms/{roomId}/inpatient-room-schedules")
+    public ResponseEntity<?> createInpatientRoomSchedules(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable int roomId,
+            @RequestBody CreateInpatientNurseSchedule request
+    ) {
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Create inpatient room schedules successfully")
+                            .data(nurseServices.createInpatientRoomSchedules(
+                                    authorizationHeader,
+                                    roomId,
+                                    request
+                            ))
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+    @GetMapping("/rooms/{roomId}/inpatient-room-schedules")
+    public ResponseEntity<?> getInpatientRoomSchedules(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam("nurseId") UUID nurseId,
+            @RequestParam("month") int month,
+            @RequestParam("year") int year,
+            @PathVariable int roomId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get inpatient room schedules successfully")
+                        .data(nurseServices.getInpatientRoomSchedules(
+                                authorizationHeader,
+                                nurseId,
+                                roomId,
+                                month,
+                                year
+                        ))
+                        .build()
+        );
     }
 }

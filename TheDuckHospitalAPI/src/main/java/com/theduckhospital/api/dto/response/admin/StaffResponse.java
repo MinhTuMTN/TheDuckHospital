@@ -37,19 +37,20 @@ public class StaffResponse {
         this.deleted = staff.isDeleted();
         this.avatar = staff.getAvatar();
 
+        Department department;
         if (staff instanceof Doctor) {
+            department = ((Doctor) staff).getDepartment();
             this.role = "Bác sĩ";
-            this.departmentName = ((Doctor) staff).getDepartment().getDepartmentName();
-            this.department = ((Doctor) staff).getDepartment();
+            this.departmentName = department == null ? null : department.getDepartmentName();
+            this.department = department;
             this.headOfDepartment = ((Doctor) staff).isHeadOfDepartment();
             this.degree = ((Doctor) staff).getDegree();
         } else if (staff instanceof Nurse) {
+            department = ((Nurse) staff).getDepartment();
             this.role = "Điều dưỡng";
             this.nurseType = ((Nurse) staff).getNurseType();
-            this.departmentName = ((Nurse) staff).getDepartment() == null ?
-                    null :
-                    ((Nurse) staff).getDepartment().getDepartmentName();
-            this.department = ((Nurse) staff).getDepartment();
+            this.departmentName = department == null ? null : department.getDepartmentName();
+            this.department = department;
             this.headOfDepartment = ((Nurse) staff).isHeadOfDepartment();
         } else if (staff instanceof Cashier) {
             this.role = "Thu ngân";

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Setter
 @Getter
+@DiscriminatorValue("LaboratoryTechnician")
 public class LaboratoryTechnician extends Staff{
     @OneToMany(mappedBy = "laboratoryTechnician")
     @JsonBackReference

@@ -1,10 +1,12 @@
 package com.theduckhospital.api.dto.response.admin;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class FilteredStaffsResponse {
     private List<StaffResponse> staffs;
     private int total;

@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.Role;
+import com.theduckhospital.api.constant.RoleCommon;
 import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.*;
@@ -13,6 +14,7 @@ import com.theduckhospital.api.services.ICloudinaryServices;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -331,27 +333,22 @@ public class StaffServicesImpl implements IStaffServices {
             List<Role> staffRole,
             List<Boolean> staffStatus
     ) {
-        List<Staff> staffs = staffRepository.findByFullNameContainingAndDeletedIn(search, staffStatus);
-
-        List<Staff> filteredStaffs = staffs.stream()
-                .filter(staff -> (staffRole.contains(DOCTOR) && staff instanceof Doctor)
-                        || (staffRole.contains(NURSE) && staff instanceof Nurse)
-                        || (staffRole.contains(CASHIER) && staff instanceof Cashier)
-                        || (staffRole.contains(PHARMACIST) && staff instanceof Pharmacist)
-                        || (staffRole.contains(LABORATORY_TECHNICIAN) && staff instanceof LaboratoryTechnician))
-                .collect(Collectors.toList());
+        List<Class<? extends Staff>> classes = RoleCommon.getClassesByRoles(staffRole);
 
         Pageable pageable = PageRequest.of(page, limit);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), filteredStaffs.size());
-        List<Staff> pageContent = filteredStaffs.subList(start, end);
+        Page<Staff> staffs = staffRepository
+                .findStaff(search, staffStatus, classes, pageable);
 
         List<StaffResponse> response = new ArrayList<>();
-        for (Staff staff : pageContent) {
+        for (Staff staff : staffs.getContent()) {
             response.add(new StaffResponse(staff));
         }
 
-        return new FilteredStaffsResponse(response, filteredStaffs.size(), page, limit);
+        return new FilteredStaffsResponse(
+                response,
+                (int) staffs.getTotalElements(),
+                page,
+                limit
+        );
     }
 }

@@ -3,8 +3,10 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
+import com.theduckhospital.api.dto.request.headnurse.CreateInpatientNurseSchedule;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.dto.response.headnurse.DateHasInpatientScheduleResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.Nurse;
@@ -32,5 +34,17 @@ public interface INurseServices {
             int roomId,
             CreateExamNurseScheduleRequest request
     );
+    boolean createInpatientRoomSchedules(
+            String authorization,
+            int roomId,
+            CreateInpatientNurseSchedule request
+    );
     List<NurseSchedule> getNurseSchedules(String authorization, Integer month, Integer year);
+    DateHasInpatientScheduleResponse getInpatientRoomSchedules(
+            String authorization,
+            UUID nurseId,
+            int roomId,
+            int month,
+            int year
+    );
 }
