@@ -60,8 +60,10 @@ function DialogTodayExamSchedule(props) {
       if (response.success) setSchedules(response.data.data);
       else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     };
+
+    if (!open) return;
     handleGetTodayExaminationDoctorSchedule();
-  }, [enqueueSnackbar]);
+  }, [enqueueSnackbar, open]);
   return (
     <Dialog
       open={open}

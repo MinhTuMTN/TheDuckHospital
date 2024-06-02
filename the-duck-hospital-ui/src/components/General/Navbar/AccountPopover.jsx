@@ -7,11 +7,34 @@ import DoctorMenuList from "./DoctorMenuList";
 import AdminMenuList from "./AdminMenuList";
 import LaboratoryTechnicalList from "./LaboratoryTechnicalList";
 import SupportAgentList from "./SupportAgentList";
+import { useMemo } from "react";
 
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
   const { setToken, fullName, role } = useAuth();
 
+  const MenuList = useMemo(() => {
+    switch (role) {
+      case "User":
+        return <PatientMenuList onClose={onClose} setToken={setToken} />;
+      case "Nurse":
+      case "HeadNurse":
+        return <NurseMenuList onClose={onClose} setToken={setToken} />;
+      case "Doctor":
+      case "HeadDoctor":
+        return <DoctorMenuList onClose={onClose} setToken={setToken} />;
+      case "Admin":
+        return <AdminMenuList onClose={onClose} setToken={setToken} />;
+      case "LaboratoryTechnician":
+        return (
+          <LaboratoryTechnicalList onClose={onClose} setToken={setToken} />
+        );
+      case "SupportAgent":
+        return <SupportAgentList onClose={onClose} setToken={setToken} />;
+      default:
+        return null;
+    }
+  }, [role, onClose, setToken]);
   return (
     <Popover
       anchorEl={anchorEl}
@@ -49,24 +72,7 @@ function AccountPopover(props) {
           </Stack>
         </Stack>
         <Divider />
-        {role === "User" && (
-          <PatientMenuList onClose={onClose} setToken={setToken} />
-        )}
-        {(role === "Nurse" || role === "HeadNurse") && (
-          <NurseMenuList onClose={onClose} setToken={setToken} />
-        )}
-        {(role === "Doctor" || role === "HeadDoctor") && (
-          <DoctorMenuList onClose={onClose} setToken={setToken} />
-        )}
-        {role === "Admin" && (
-          <AdminMenuList onClose={onClose} setToken={setToken} />
-        )}
-        {role === "LaboratoryTechnician" && (
-          <LaboratoryTechnicalList onClose={onClose} setToken={setToken} />
-        )}
-        {role === "SupportAgent" && (
-          <SupportAgentList onClose={onClose} setToken={setToken} />
-        )}
+        {MenuList}
       </Stack>
     </Popover>
   );

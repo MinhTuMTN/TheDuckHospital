@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.admin.StaffResponse;
 import com.theduckhospital.api.entity.Staff;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +17,9 @@ import java.util.UUID;
 public interface IStaffServices {
     Map<String, Object> createStaff(CreateStaffRequest request);
 
-    Staff updateStaff(UUID staffId, UpdateStaffRequest request);
+    void updateAvatarAsync(UUID staffId, Object avatar);
+
+    Staff updateStaff(UUID staffId, UpdateStaffRequest request) throws IOException;
 
     List<StaffResponse> getAllStaffs();
 

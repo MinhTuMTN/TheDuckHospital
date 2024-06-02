@@ -8,6 +8,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 public class CloudinaryServicesImpl implements ICloudinaryServices {
     @Value("${cloudinary.url}")
@@ -21,12 +23,21 @@ public class CloudinaryServicesImpl implements ICloudinaryServices {
 
     @Override
     public String uploadFile(MultipartFile file) {
+        try {
+            return uploadFile(file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String uploadFile(Object file) {
         Cloudinary cloudinary = new Cloudinary(environment.getProperty("cloudinary.url"));
         cloudinary.config.secure = true;
 
         try {
             return cloudinary.uploader().upload(
-                    file.getBytes(),
+                    file,
                     ObjectUtils.asMap(
                             "use_filename", false,
                             "unique_filename", true

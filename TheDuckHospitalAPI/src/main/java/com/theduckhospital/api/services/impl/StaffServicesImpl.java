@@ -7,7 +7,6 @@ import com.theduckhospital.api.dto.request.admin.CreateStaffRequest;
 import com.theduckhospital.api.dto.request.admin.UpdateStaffRequest;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
-import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.ICloudinaryServices;
@@ -21,15 +20,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static com.theduckhospital.api.constant.Role.*;
 
 @Service
 public class StaffServicesImpl implements IStaffServices {
@@ -88,8 +86,7 @@ public class StaffServicesImpl implements IStaffServices {
                 default -> staff = new Staff();
             }
 
-            String url = request.getAvatar() == null ? "" : cloudinaryServices.uploadFile(request.getAvatar());
-            staff.setAvatar(url);
+            staff.setAvatar(null);
             staff.setStaffId(UUID.randomUUID());
             staff.setGender(Gender.values()[request.getGender()]);
             staff.setFullName(request.getFullName());
@@ -99,8 +96,7 @@ public class StaffServicesImpl implements IStaffServices {
             Date dateOfBirth = new Date();
             try {
                 dateOfBirth = df.parse(request.getDateOfBirth());
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (ParseException ignored) {
             }
             staff.setDateOfBirth(dateOfBirth);
 
@@ -129,6 +125,7 @@ public class StaffServicesImpl implements IStaffServices {
 
             accountRepository.save(account);
             staffRepository.save(staff);
+            updateAvatarAsync(staff.getStaffId(), request.getAvatar().getBytes());
 
             return Map.of(
                     "phoneNumber", request.getPhoneNumber(),
@@ -143,7 +140,26 @@ public class StaffServicesImpl implements IStaffServices {
     }
 
     @Override
-    public Staff updateStaff(UUID staffId, UpdateStaffRequest request) {
+    public void updateAvatarAsync(UUID staffId, Object avatar) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                String url = cloudinaryServices.uploadFile(avatar);
+                Optional<Staff> optional = staffRepository.findById(staffId);
+                if (optional.isEmpty()) {
+                    throw new NotFoundException("Staff not found");
+                }
+
+                Staff staff = optional.get();
+                staff.setAvatar(url);
+                staffRepository.save(staff);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public Staff updateStaff(UUID staffId, UpdateStaffRequest request) throws IOException {
         Staff staff;
         Optional<?> optional;
         switch (request.getRole()) {
@@ -213,8 +229,7 @@ public class StaffServicesImpl implements IStaffServices {
         staff.setDateOfBirth(dateOfBirth);
 
         if(request.getAvatar() != null) {
-            String url = cloudinaryServices.uploadFile(request.getAvatar());
-            staff.setAvatar(url);
+            updateAvatarAsync(staffId, request.getAvatar().getBytes());
         }
 
         return staffRepository.save(staff);
