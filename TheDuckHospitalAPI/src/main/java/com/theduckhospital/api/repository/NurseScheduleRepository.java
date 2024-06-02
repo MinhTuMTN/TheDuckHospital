@@ -2,6 +2,7 @@ package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Nurse;
 import com.theduckhospital.api.entity.NurseSchedule;
 import com.theduckhospital.api.entity.Room;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,6 +78,23 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
             int month,
             int year,
             ScheduleSession scheduleSession,
+            ScheduleType scheduleType
+    );
+
+    @Query(
+            value = "SELECT ds FROM NurseSchedule ns, DoctorSchedule ds "+
+                    "WHERE ns.nurse = :nurse " +
+                    "AND ns.dayOfWeek = :dayOfWeek " +
+                    "AND ds.date = :date " +
+                    "AND ns.scheduleSession = ds.scheduleSession " +
+                    "AND ns.room = ds.room " +
+                    "AND ns.scheduleType = :scheduleType " +
+                    "AND ns.deleted = false"
+    )
+    List<DoctorSchedule> findTodayExaminationSchedules(
+            Nurse nurse,
+            int dayOfWeek,
+            Date date,
             ScheduleType scheduleType
     );
 }

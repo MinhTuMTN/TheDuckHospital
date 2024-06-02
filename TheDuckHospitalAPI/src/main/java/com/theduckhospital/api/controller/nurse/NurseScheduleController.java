@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/api/nurse/schedules")
 @PreAuthorize("hasRole('NURSE') || hasRole('HEAD_NURSE')")
@@ -32,6 +34,19 @@ public class NurseScheduleController {
                                 month,
                                 year
                         ))
+                        .build()
+        );
+    }
+
+    @GetMapping("/today-examination-schedules")
+    public ResponseEntity<?> getTodayDoctorSchedules(
+            @RequestHeader(value = "Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(nurseServices.getTodayExaminationSchedules(token))
                         .build()
         );
     }

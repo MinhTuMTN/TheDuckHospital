@@ -6,10 +6,10 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { CardMedia, MenuList } from "@mui/material";
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
 import { CustomMenuItem, CustomMenuItemLogOut } from "./PatientMenuList";
 import { NurseContext } from "../../../auth/NurseProvider";
 import { useAuth } from "../../../auth/AuthProvider";
+import DialogTodayExamSchedule from "../../Nurse/DialogTodayExamSchedule";
 
 function NurseMenuList(props) {
   const { onClose, setToken } = props;
@@ -116,7 +116,11 @@ function NurseMenuList(props) {
         </CustomMenuItemLogOut>
       </MenuList>
 
-      <DialogSearchRoom open={open} setOpen={setOpen} onClose={onClose} />
+      <DialogTodayExamSchedule
+        open={open}
+        setOpen={setOpen}
+        onClose={onClose}
+      />
     </>
   );
 }

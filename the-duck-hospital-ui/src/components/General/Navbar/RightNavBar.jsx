@@ -35,8 +35,8 @@ import {
 import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
-import DialogSearchRoom from "../../Nurse/DialogSearchRoom";
 import { getTodaySchedule } from "../../../services/doctor/DoctorScheduleServices";
+import DialogTodayExamSchedule from "../../Nurse/DialogTodayExamSchedule";
 import { DoctorScheduleItem } from "./DoctorMenuList";
 
 const userMainItems = [
@@ -247,7 +247,6 @@ function RightNavBar(props) {
       default:
         break;
     }
-    console.log("MainItems", mainItems);
     return mainItems;
   }, [role, nurseType]);
   const [nurseDialogOpen, setNurseDialogOpen] = React.useState(false);
@@ -521,7 +520,7 @@ function RightNavBar(props) {
         )}
       </Stack>
 
-      <DialogSearchRoom
+      <DialogTodayExamSchedule
         open={nurseDialogOpen}
         setOpen={setNurseDialogOpen}
         onClose={() => onOpenClose(false)}

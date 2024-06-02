@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
 import com.theduckhospital.api.dto.response.headnurse.DateHasInpatientScheduleResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
+import com.theduckhospital.api.dto.response.nurse.NurseDoctorScheduleItemResponse;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.Nurse;
 import com.theduckhospital.api.entity.NurseSchedule;
@@ -47,4 +48,5 @@ public interface INurseServices {
             int month,
             int year
     );
+    List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization);
 }

@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.headnurse.ActiveNurseResponse;
 import com.theduckhospital.api.dto.response.headnurse.DateHasInpatientScheduleResponse;
 import com.theduckhospital.api.dto.response.headnurse.ExaminationNurseScheduleResponse;
+import com.theduckhospital.api.dto.response.nurse.NurseDoctorScheduleItemResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
@@ -17,11 +18,14 @@ import com.theduckhospital.api.repository.NurseScheduleRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.INurseServices;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -31,6 +35,8 @@ public class NurseServicesImpl implements INurseServices {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
     private final RoomRepository roomRepository;
+    @Value("${settings.date}")
+    private String appToday;
     public NurseServicesImpl(
             NurseRepository nurseRepository,
             NurseScheduleRepository nurseScheduleRepository, JwtTokenProvider jwtTokenProvider,
@@ -286,6 +292,33 @@ public class NurseServicesImpl implements INurseServices {
                 .evening(evening)
                 .night(night)
                 .build();
+    }
+
+    @Override
+    public List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date today;
+        try {
+             today = format.parse(appToday);
+        } catch (ParseException e) {
+            throw new BadRequestException("Invalid date");
+        }
+
+        Nurse nurse = getNurseByToken(authorization);
+        List<DoctorSchedule> doctorSchedules = nurseScheduleRepository
+                .findTodayExaminationSchedules(
+                        nurse,
+                        DateCommon.getCalendar(today).get(Calendar.DAY_OF_WEEK),
+                        today,
+                        ScheduleType.EXAMINATION
+                );
+
+        List<NurseDoctorScheduleItemResponse> responses = new ArrayList<>();
+        for (DoctorSchedule doctorSchedule : doctorSchedules) {
+            responses.add(new NurseDoctorScheduleItemResponse(doctorSchedule));
+        }
+
+        return responses;
     }
 
     private NurseSchedule createExaminationRoomSchedule(Nurse nurse, Room room, ExamNurseScheduleItemRequest item) {

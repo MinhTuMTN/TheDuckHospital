@@ -15,22 +15,15 @@ public interface IRoomServices {
     RoomResponse updateRoom(int roomId, CreateRoomRequest request);
     boolean deleteRoom(int roomId);
     RoomResponse restoreRoom(int roomId);
-
     FilteredRoomsResponse getPaginationFilteredRooms(
             String authorization,
             int page,
             int limit
     );
-
     List<RoomResponse> getAllRoomsDeleted();
     RoomResponse getRoomById(int roomId);
     Room findRoomById(int roomId);
-    List<RoomResponse> findRoomByRoomName(String roomName);
-
-    Object getTodayDoctorSchedules(int roomId) throws ParseException;
-
     List<Room> getExaminationRoomsDepartment(String authorization);
-
     PaginationRoomsResponse getPaginationRooms(
             String authorization,
             int page,

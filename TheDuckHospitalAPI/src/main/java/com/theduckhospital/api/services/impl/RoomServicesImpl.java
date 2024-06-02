@@ -36,8 +36,6 @@ public class RoomServicesImpl implements IRoomServices {
     private final DepartmentRepository departmentRepository;
     private final IDepartmentServices departmentServices;
     private final IDoctorServices doctorServices;
-    @Value("${settings.date}")
-    private String appToday;
 
     public RoomServicesImpl(RoomRepository roomRepository,
                             IDepartmentServices departmentServices,
@@ -173,30 +171,6 @@ public class RoomServicesImpl implements IRoomServices {
     @Override
     public Room findRoomById(int roomId) {
         return roomRepository.findById(roomId).orElseThrow(() -> new NotFoundException("Room not found"));
-    }
-
-    @Override
-    public List<RoomResponse> findRoomByRoomName(String roomName) {
-        return roomRepository
-                .findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
-                        roomName
-                )
-                .stream()
-                .map(RoomResponse::new)
-                .toList();
-    }
-
-    @Override
-    public List<NurseDoctorScheduleItemResponse> getTodayDoctorSchedules(int roomId) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date today = format.parse(appToday);
-
-        Room room = findRoomById(roomId);
-
-        return doctorScheduleRepository.findByRoomAndDateAndDeletedIsFalse(
-                room,
-                today
-        ).stream().map(NurseDoctorScheduleItemResponse::new).toList();
     }
 
     @Override

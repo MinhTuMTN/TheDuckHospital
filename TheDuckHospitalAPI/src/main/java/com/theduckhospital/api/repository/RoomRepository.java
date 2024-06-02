@@ -15,8 +15,5 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     Page<Room> findByDepartmentAndDeletedIsFalse(Department department, Pageable pageable);
     long countByDepartmentAndDeletedIsFalse(Department department);
     List<Room> findAllByOrderByDeletedAscRoomNameAsc();
-    List<Room> findRoomsByRoomNameContainingIgnoreCaseAndDeletedIsFalse(
-            String roomName
-    );
     List<Room> findByRoomNameContainingOrDepartmentInOrderByRoomName(String roomName, List<Department> departments);
 }
