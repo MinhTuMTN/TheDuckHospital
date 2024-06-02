@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class StaffAdminController {
     public ResponseEntity<?> updateStaff(
             @PathVariable UUID staffId,
             @ModelAttribute("data") UpdateStaffRequest request
-    ) {
+    ) throws IOException {
         Staff result = staffServices.updateStaff(staffId, request);
         if (result == null) {
             return ResponseEntity.badRequest().body(
