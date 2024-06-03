@@ -49,4 +49,5 @@ public interface INurseServices {
             int year
     );
     List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization);
+    boolean deleteExaminationRoomSchedule(String authorization, UUID scheduleId);
 }

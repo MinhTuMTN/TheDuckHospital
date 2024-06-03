@@ -62,30 +62,7 @@ public class WalletServicesImpl implements IWalletServices {
             transaction.setPaymentType(PaymentType.TOP_UP);
             transactionRepository.save(transaction);
 
-            return switch (request.getPaymentMethod()) {
-                case VNPAY -> {
-                    try {
-                        yield paymentServices.vnPayCreatePaymentUrl(
-                                totalAmount,
-                                transaction.getTransactionId()
-                        );
-                    } catch (UnsupportedEncodingException e) {
-                        throw new BadRequestException("Error when create payment url");
-                    }
-                }
-                case MOMO -> {
-                    try {
-                        yield paymentServices.momoCreatePaymentUrl(
-                                totalAmount,
-                                transaction.getTransactionId(),
-                                true
-                        );
-                    } catch (IOException e) {
-                        throw new BadRequestException("Error when create payment url");
-                    }
-                }
-                default -> throw new BadRequestException("Invalid payment method");
-            };
+            return paymentServices.createTopUpWalletPaymentUrl(transaction, request.getPaymentMethod());
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode() == 0 ? 400 : e.getErrorCode());

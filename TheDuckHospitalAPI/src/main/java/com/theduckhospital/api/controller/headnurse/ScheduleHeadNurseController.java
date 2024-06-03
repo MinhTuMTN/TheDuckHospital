@@ -152,4 +152,26 @@ public class ScheduleHeadNurseController {
                         .build()
         );
     }
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<?> deleteExaminationRoomSchedule(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable UUID scheduleId
+    ) {
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Delete examination room schedule successfully")
+                            .data(nurseServices.deleteExaminationRoomSchedule(
+                                    authorizationHeader,
+                                    scheduleId
+                            ))
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
+    }
 }

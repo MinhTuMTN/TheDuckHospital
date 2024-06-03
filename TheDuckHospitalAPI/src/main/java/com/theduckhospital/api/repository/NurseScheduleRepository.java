@@ -97,4 +97,6 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
             Date date,
             ScheduleType scheduleType
     );
+
+    Optional<NurseSchedule> findByNurseScheduleId(UUID nurseScheduleId);
 }

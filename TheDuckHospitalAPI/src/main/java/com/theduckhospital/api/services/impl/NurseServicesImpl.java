@@ -234,7 +234,13 @@ public class NurseServicesImpl implements INurseServices {
             int month,
             int year
     ) {
-        Nurse nurse = getNurseByToken(authorization);
+        Nurse headNurse = getNurseByToken(authorization);
+
+        Nurse nurse = nurseRepository.findById(nurseId)
+                .orElseThrow(() -> new NotFoundException("Nurse not found"));
+        if (nurse.isDeleted() || nurse.getDepartment() != headNurse.getDepartment()) {
+            throw new NotFoundException("Nurse not found");
+        }
         if (nurse.getNurseType() != NurseType.INPATIENT_NURSE) {
             throw new BadRequestException("Nurse is not inpatient nurse");
         }
@@ -321,6 +327,22 @@ public class NurseServicesImpl implements INurseServices {
         return responses;
     }
 
+    @Override
+    public boolean deleteExaminationRoomSchedule(String authorization, UUID scheduleId) {
+        Nurse nurse = getNurseByToken(authorization);
+        Optional<NurseSchedule> optional = nurseScheduleRepository
+                .findByNurseScheduleId(scheduleId);
+
+        if (optional.isEmpty() || optional.get().getNurse().getDepartment() != nurse.getDepartment()) {
+            throw new NotFoundException("Schedule not found");
+        }
+
+        NurseSchedule nurseSchedule = optional.get();
+        nurseScheduleRepository.delete(nurseSchedule);
+
+        return true;
+    }
+
     private NurseSchedule createExaminationRoomSchedule(Nurse nurse, Room room, ExamNurseScheduleItemRequest item) {
         // Check nurse is available
         // Find by nurse, dayOfWeek, session
@@ -332,7 +354,7 @@ public class NurseServicesImpl implements INurseServices {
                         ScheduleType.EXAMINATION
                 );
         if (optionalNurseCheck.isPresent()) {
-            throw new BadRequestException("Nurse is not available");
+            throw new BadRequestException("Nurse is not available-" + optionalNurseCheck.get().getRoom().getRoomName());
         }
 
         // Check room is not scheduled yet

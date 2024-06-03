@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -148,21 +147,7 @@ public class BookingServicesImpl implements IBookingServices {
             }
 
             transaction.setBookings(bookings);
-            return switch (request.getPaymentMethod()) {
-                case VNPAY -> paymentServices.vnPayCreatePaymentUrl(
-                        totalAmount + VNPayConfig.fee,
-                        transaction.getTransactionId()
-                );
-                case MOMO -> paymentServices.momoCreatePaymentUrl(
-                        totalAmount + MomoConfig.fee,
-                        transaction.getTransactionId(),
-                        request.isMobile()
-                );
-                case WALLET -> paymentWithWallet(transaction, request.getPinCode()) ? PaymentResponse
-                        .builder().walletSuccess(true).build() : PaymentResponse
-                        .builder().walletSuccess(false).build();
-                default -> throw new BadRequestException("Invalid payment method");
-            };
+            return paymentServices.createBookingPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode());
@@ -171,129 +156,6 @@ public class BookingServicesImpl implements IBookingServices {
             throw new BadRequestException(e.getMessage(), 400);
         }
     }
-
-    @Override
-    public boolean paymentWithWallet(Transaction transaction, String pinCode) {
-        if (pinCode == null || pinCode.isEmpty())
-            throw new BadRequestException("Pin code is required", 10031);
-        
-        Account account = transaction.getAccount();
-        if (!passwordEncoder.matches(pinCode, account.getWalletPin()))
-            throw new BadRequestException("Invalid pin code", 10014);
-        if (account.getBalance().compareTo(BigDecimal.valueOf(transaction.getAmount())) < 0
-                || account.getWalletLocked()
-        )
-            throw new BadRequestException("Not enough balance", 10030);
-
-        account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
-
-        Transaction transactionResult = updateTransactionAndBooking(
-                transaction.getTransactionId(),
-                "WALLET",
-                "WALLET",
-                TransactionStatus.SUCCESS
-        );
-        accountServices.saveAccount(account);
-
-        return transactionResult != null;
-    }
-
-    @Override
-    public String checkVNPayBookingCallback(Map<String, String> vnpParams) {
-        Map<String, String> results = new HashMap<>();
-        List<String> keys = vnpParams.keySet().stream().toList();
-        for (String key : keys) {
-            results.put(
-                    URLEncoder.encode(key, StandardCharsets.US_ASCII),
-                    URLEncoder.encode(vnpParams.get(key), StandardCharsets.US_ASCII)
-            );
-        }
-
-        results.remove("vnp_SecureHashType");
-        results.remove("vnp_SecureHash");
-        String secureHash = VNPayConfig.hashAllFields(results);
-        String vnp_SecureHash = vnpParams.get("vnp_SecureHash");
-
-        UUID transactionId = UUID.fromString(vnpParams.get("vnp_OrderInfo").split(":")[1]);
-
-        if (!secureHash.equals(vnp_SecureHash)
-                || !vnpParams.get("vnp_ResponseCode").equals("00")
-        ) {
-            Transaction transaction = updateTransactionAndBooking(
-                    transactionId,
-                    null,
-                    null,
-                    TransactionStatus.FAILED
-            );
-            if (transaction == null)
-                return null;
-
-            if (transaction.getOrigin() == null)
-                return  "https://the-duck-hospital.web.app/payment-failed";
-            return transaction.getOrigin() + "/payment-failed";
-        }
-
-        Transaction transaction = updateTransactionAndBooking(
-                transactionId,
-                vnpParams.get("vnp_BankCode"),
-                "VNPAY",
-                TransactionStatus.SUCCESS
-        );
-
-        if (transaction == null)
-            return null;
-
-        if (transaction.getOrigin() == null)
-            return "https://the-duck-hospital.web.app/payment-success?transactionId=" + transaction.getTransactionId();
-
-        return transaction.getOrigin() + "/payment-success?transactionId=" + transaction.getTransactionId();
-    }
-
-    @Override
-    public boolean checkMomoBookingCallback(Map<String, String> params) throws Exception {
-        String accessKey = MomoConfig.accessKey;
-        String amount = params.get("amount");
-        String extraData = params.get("extraData");
-        String message = params.get("message");
-        String orderId = params.get("orderId");
-        String orderInfo = params.get("orderInfo");
-        String orderType = params.get("orderType");
-        String partnerCode = params.get("partnerCode");
-        String payType = params.get("payType");
-        String requestId = params.get("requestId");
-        String responseTime = params.get("responseTime");
-        String resultCode = params.get("resultCode");
-        String transId = params.get("transId");
-        String signatureFromMomo = params.get("signature");
-        UUID transactionId = UUID.fromString(orderId.split(":")[1]);
-
-        String signatureRaw = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
-                + "&message=" + message + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&orderType=" + orderType
-                + "&partnerCode=" + partnerCode + "&payType=" + payType + "&requestId=" + requestId
-                + "&responseTime=" + responseTime + "&resultCode=" + resultCode + "&transId=" + transId;
-        String signature = MomoConfig.hashSignature(signatureRaw, MomoConfig.secretKey);
-
-        if (!signature.equals(signatureFromMomo) || !resultCode.equals("0")) {
-            updateTransactionAndBooking(
-                    transactionId,
-                    null,
-                    null,
-                    TransactionStatus.FAILED
-            );
-
-            return false;
-        }
-
-        Transaction transaction = updateTransactionAndBooking(
-                transactionId,
-                transId,
-                "MOMO",
-                TransactionStatus.SUCCESS
-        );
-
-        return transaction != null;
-    }
-
     @Override
     public List<AccountBookingResponse> getBookings(String token) {
         List<AccountBookingResponse> responses = new ArrayList<>();
@@ -428,44 +290,4 @@ public class BookingServicesImpl implements IBookingServices {
 
         return booking;
     }
-
-    private Transaction updateTransactionAndBooking(UUID transactionId, String bankCode, String paymentMethod, TransactionStatus status) {
-        Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
-        if (transaction == null)
-            return null;
-
-        if (status == TransactionStatus.FAILED) {
-            transaction.setStatus(status);
-            transactionRepository.save(transaction);
-            return transaction;
-        }
-        transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
-        transaction.setPaymentMethod(paymentMethod);
-        transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
-        transactionRepository.save(transaction);
-
-        // Update Booking
-        if (transaction.getPaymentType() == PaymentType.BOOKING) {
-            List<Booking> bookings = transaction.getBookings();
-            for (Booking booking : bookings) {
-                TimeSlot timeSlot = booking.getTimeSlot();
-
-                booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
-                booking.setDeleted(false);
-                bookingRepository.save(booking);
-
-                timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
-                timeSlotRepository.save(timeSlot);
-            }
-        }
-        else if (transaction.getPaymentType() == PaymentType.TOP_UP) {
-            Account account = transaction.getAccount();
-            account.setBalance(account.getBalance().add(BigDecimal.valueOf(transaction.getAmount() - MomoConfig.medicalTestFee)));
-            accountServices.saveAccount(account);
-        }
-
-        return transaction;
-    }
-
 }

@@ -294,7 +294,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
               </View>
 
               {selectedDoctorSchedule?.some(
-                ds => ds.scheduleType === 'MORNING',
+                ds => ds.scheduleSession === 'MORNING',
               ) && (
                 <>
                   <Space paddingTop={16} />
@@ -313,7 +313,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                         rowGap: 8,
                       }}>
                       {selectedDoctorSchedule
-                        ?.find(ds => ds.scheduleType === 'MORNING')
+                        ?.find(ds => ds.scheduleSession === 'MORNING')
                         ?.timeSlots.map((timeSlot: any, index: number) => (
                           <Pressable
                             onPress={
@@ -344,7 +344,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
               )}
 
               {selectedDoctorSchedule?.some(
-                ds => ds.scheduleType === 'AFTERNOON',
+                ds => ds.scheduleSession === 'AFTERNOON',
               ) && (
                 <>
                   <Space paddingTop={16} />
@@ -363,7 +363,7 @@ const ChooseDateScreen = ({route}: {route: any}) => {
                         rowGap: 8,
                       }}>
                       {selectedDoctorSchedule
-                        ?.find(ds => ds.scheduleType === 'AFTERNOON')
+                        ?.find(ds => ds.scheduleSession === 'AFTERNOON')
                         ?.timeSlots.map((timeSlot: any, index: number) => (
                           <Pressable
                             key={timeSlot.timeSlotId}
