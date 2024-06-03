@@ -32,7 +32,6 @@ import {
   getRoomSchedules,
 } from "../../../services/nurse/ScheduleServices";
 import { appColors } from "../../../utils/appColorsUtils";
-import { set } from "firebase/database";
 const style = {
   position: "absolute",
   top: "50%",
