@@ -1,5 +1,8 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Box, Grid, Stack, Typography, styled, useTheme } from "@mui/material";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CircleIcon from "@mui/icons-material/Circle";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { Box, Grid, Stack, Typography, styled } from "@mui/material";
 import {
   DateCalendar,
   LocalizationProvider,
@@ -8,19 +11,17 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useSnackbar } from "notistack";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../auth/AuthProvider";
-import { getScheduleSession } from "../../utils/scheduleSessionUtils";
 import { getNurseSchedules } from "../../services/nurse/NurseScheduleServices";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CircleIcon from "@mui/icons-material/Circle";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import RemoveIcon from "@mui/icons-material/Remove";
+import { getScheduleSession } from "../../utils/scheduleSessionUtils";
 
 const LayoutContainer = styled(Grid)(({ theme }) => ({
   paddingLeft: 20,
   paddingRight: 20,
   backgroundColor: "#F5F7FB",
   height: "100%",
+  minHeight: "100vh",
   [theme.breakpoints.up("lg")]: {
     paddingTop: 30,
   },
@@ -152,6 +153,13 @@ const InpatientScheduleDay = React.memo((props) => {
       ),
     [inpatientSchedules, day]
   );
+  const distictFilter = (value, index, schedules) => {
+    return (
+      schedules.findIndex(
+        (schedule) => schedule.scheduleSession === value.scheduleSession
+      ) === index
+    );
+  };
 
   return (
     <PickersDay
@@ -171,6 +179,7 @@ const InpatientScheduleDay = React.memo((props) => {
       <Stack sx={{ width: "100%" }}>
         <Typography fontSize="18px">{dayjs(day).get("date")}</Typography>
         {inpatientSchedule
+          .filter(distictFilter)
           .sort(
             (a, b) =>
               ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(

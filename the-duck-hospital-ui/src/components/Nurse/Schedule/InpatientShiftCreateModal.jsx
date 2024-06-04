@@ -173,10 +173,10 @@ function InpatientShiftCreateModal(props) {
     const response = await createInpatientShiftSchedule(
       roomId,
       nurse.staffId,
-      morningDays.map((date) => dayjs(date)),
-      afternoonDays.map((date) => dayjs(date)),
-      eveningDays.map((date) => dayjs(date)),
-      nightDays.map((date) => dayjs(date))
+      morningDays?.map((date) => dayjs(date)),
+      afternoonDays?.map((date) => dayjs(date)),
+      eveningDays?.map((date) => dayjs(date)),
+      nightDays?.map((date) => dayjs(date))
     );
     if (response.success) {
       enqueueSnackbar("Tạo ca trực thành công", {
@@ -208,16 +208,16 @@ function InpatientShiftCreateModal(props) {
       if (response.success) {
         const invalidDates = response.data.data;
         setInvalidDate({
-          mornings: invalidDates.morning.map((date) =>
+          mornings: invalidDates.morning?.map((date) =>
             dayjs(date).format("YYYY/MM/DD")
           ),
-          afternoons: invalidDates.afternoon.map((date) =>
+          afternoons: invalidDates.afternoon?.map((date) =>
             dayjs(date).format("YYYY/MM/DD")
           ),
-          evenings: invalidDates.evening.map((date) =>
+          evenings: invalidDates.evening?.map((date) =>
             dayjs(date).format("YYYY/MM/DD")
           ),
-          nights: invalidDates.night.map((date) =>
+          nights: invalidDates.night?.map((date) =>
             dayjs(date).format("YYYY/MM/DD")
           ),
         });
@@ -298,7 +298,7 @@ function InpatientShiftCreateModal(props) {
                   label="Phòng trực"
                   onChange={handleChange}
                 >
-                  {roomSchedules.map((room) => (
+                  {roomSchedules?.map((room) => (
                     <MenuItem key={`room-${room.roomId}`} value={room.roomId}>
                       Phòng {room.roomName} ({room.description})
                     </MenuItem>
@@ -309,7 +309,7 @@ function InpatientShiftCreateModal(props) {
 
             <Box width="100%">
               <Stack direction={"row"} spacing={2}>
-                {shifts.map((shift) => (
+                {shifts?.map((shift) => (
                   <Button
                     key={shift.value}
                     variant="contained"
