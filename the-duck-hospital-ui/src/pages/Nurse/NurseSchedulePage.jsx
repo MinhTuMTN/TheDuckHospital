@@ -1,8 +1,5 @@
-import CircleIcon from "@mui/icons-material/Circle";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { Box, Grid, Stack, Typography, styled } from "@mui/material";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Box, Grid, Stack, Typography, styled, useTheme } from "@mui/material";
 import {
   DateCalendar,
   LocalizationProvider,
@@ -10,30 +7,32 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import React, { useEffect } from "react";
-import { useAuth } from "../../auth/AuthProvider";
-import { getClinicalSchedule } from "../../services/nurse/NurseScheduleServices";
 import { useSnackbar } from "notistack";
+import { useAuth } from "../../auth/AuthProvider";
 import { getScheduleSession } from "../../utils/scheduleSessionUtils";
+import { getNurseSchedules } from "../../services/nurse/NurseScheduleServices";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CircleIcon from "@mui/icons-material/Circle";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const LayoutContainer = styled(Grid)(({ theme }) => ({
   paddingLeft: 20,
   paddingRight: 20,
   backgroundColor: "#F5F7FB",
   height: "100%",
-
   [theme.breakpoints.up("lg")]: {
     paddingTop: 30,
   },
 }));
 
-const BoxLayout = styled(Grid)(({ theme }) => ({
+const BoxLayout = styled(Grid)({
   justifyContent: "center",
   alignItems: "center",
   marginBottom: 20,
-}));
+});
 
-const CategoryLine = styled(Stack)(({ theme }) => ({
+const CategoryLine = styled(Stack)({
   alignItems: "center",
   justifyContent: "left",
   borderBottom: "1px solid #E0E0E0",
@@ -41,7 +40,7 @@ const CategoryLine = styled(Stack)(({ theme }) => ({
   paddingLeft: 10,
   paddingBottom: 5,
   marginBottom: 10,
-}));
+});
 
 const MainCalenderLayout = styled(Grid)(({ theme }) => ({
   marginBottom: 20,
@@ -61,31 +60,28 @@ const shiftColors = {
   night: "#f56d61",
 };
 
-const ShiftLegend = ({ color, text }) => (
-  <CategoryLine spacing={1} direction={"row"}>
+const ShiftLegend = React.memo(({ color, text }) => (
+  <CategoryLine spacing={1} direction="row">
     <CircleIcon sx={{ color, fontSize: 15 }} />
-    <Typography variant="body1" align="left" width={"100%"}>
+    <Typography variant="body1" align="left" width="100%">
       {text}
     </Typography>
   </CategoryLine>
-);
+));
 
-function Line(props) {
-  const { color } = props;
-  return (
-    <Box
-      sx={{
-        display: "block",
-        width: "100%",
-        height: "4px",
-        backgroundColor: `${color} !important`,
-        marginTop: "2px",
-      }}
-    />
-  );
-}
+const Line = React.memo(({ color }) => (
+  <Box
+    sx={{
+      display: "block",
+      width: "100%",
+      height: "4px",
+      backgroundColor: `${color} !important`,
+      marginTop: "2px",
+    }}
+  />
+));
 
-function ServerDay(props) {
+const ClinicalScheduleDay = React.memo((props) => {
   const {
     clinicalSchedules = [],
     day,
@@ -93,8 +89,12 @@ function ServerDay(props) {
     selected,
     ...other
   } = props;
-  const clinicalSchedule = clinicalSchedules.filter(
-    (schedule) => dayjs(day).get("day") + 1 === schedule.dayOfWeek
+  const clinicalSchedule = useMemo(
+    () =>
+      clinicalSchedules.filter(
+        (schedule) => dayjs(day).get("day") + 1 === schedule.dayOfWeek
+      ),
+    [clinicalSchedules, day]
   );
 
   return (
@@ -104,9 +104,7 @@ function ServerDay(props) {
       day={day}
       sx={{
         borderRadius: "10px",
-        "&:hover": {
-          backgroundColor: "rgba(0, 0, 0, 0.04)",
-        },
+        "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
         backgroundColor: selected
           ? "rgba(42, 209, 246, 0.329) !important"
           : "transparent",
@@ -114,20 +112,18 @@ function ServerDay(props) {
         height: "25%",
       }}
     >
-      <Stack
-        sx={{
-          width: "100%",
-        }}
-      >
-        <Typography fontSize={"18px"}>{dayjs(day).get("date")}</Typography>
+      <Stack sx={{ width: "100%" }}>
+        <Typography fontSize="18px">{dayjs(day).get("date")}</Typography>
         {clinicalSchedule
-          .sort((a, b) => {
-            const order = ["MORNING", "AFTERNOON", "EVENING", "NIGHT"];
-            return (
-              order.indexOf(a.scheduleSession) -
-              order.indexOf(b.scheduleSession)
-            );
-          })
+          .sort(
+            (a, b) =>
+              ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+                a.scheduleSession
+              ) -
+              ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+                b.scheduleSession
+              )
+          )
           .map((schedule) => (
             <Line
               key={schedule.nurseScheduleId}
@@ -137,43 +133,130 @@ function ServerDay(props) {
       </Stack>
     </PickersDay>
   );
-}
+});
+
+const InpatientScheduleDay = React.memo((props) => {
+  const {
+    inpatientSchedules = [],
+    day,
+    outsideCurrentMonth,
+    selected,
+    ...other
+  } = props;
+  const inpatientSchedule = useMemo(
+    () =>
+      inpatientSchedules.filter(
+        (schedule) =>
+          dayjs(day).format("YYYY/MM/DD") ===
+          dayjs(schedule.date).format("YYYY/MM/DD")
+      ),
+    [inpatientSchedules, day]
+  );
+
+  return (
+    <PickersDay
+      {...other}
+      outsideCurrentMonth={outsideCurrentMonth}
+      day={day}
+      sx={{
+        borderRadius: "10px",
+        "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
+        backgroundColor: selected
+          ? "rgba(42, 209, 246, 0.329) !important"
+          : "transparent",
+        padding: 1,
+        height: "25%",
+      }}
+    >
+      <Stack sx={{ width: "100%" }}>
+        <Typography fontSize="18px">{dayjs(day).get("date")}</Typography>
+        {inpatientSchedule
+          .sort(
+            (a, b) =>
+              ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+                a.scheduleSession
+              ) -
+              ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+                b.scheduleSession
+              )
+          )
+          .map((schedule) => (
+            <Line
+              key={schedule.nurseScheduleId}
+              color={shiftColors[schedule.scheduleSession.toLowerCase()]}
+            />
+          ))}
+      </Stack>
+    </PickersDay>
+  );
+});
 
 function NurseSchedulePage() {
-  const [selectedDate, setSelectedDate] = React.useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const { nurseType } = useAuth();
-  const [clinicalSchedule, setClinicalSchedule] = React.useState([]);
-  const [selectedSchedule, setSelectedSchedule] = React.useState([]);
-
+  const [clinicalSchedule, setClinicalSchedule] = useState([]);
+  const [inpatientSchedule, setInpatientSchedule] = useState([]);
+  const [selectedSchedule, setSelectedSchedule] = useState([]);
+  const [currentMonth, setCurrentMonth] = useState(dayjs());
   const { enqueueSnackbar } = useSnackbar();
+
+  const handleMonthChange = useCallback((month) => setCurrentMonth(month), []);
 
   useEffect(() => {
     const selectedSchedule = clinicalSchedule
       .filter((schedule) => selectedDate.get("day") + 1 === schedule.dayOfWeek)
-      .sort((a, b) => {
-        const order = ["MORNING", "AFTERNOON", "EVENING", "NIGHT"];
-        return (
-          order.indexOf(a.scheduleSession) - order.indexOf(b.scheduleSession)
-        );
-      });
+      .sort(
+        (a, b) =>
+          ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+            a.scheduleSession
+          ) -
+          ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+            b.scheduleSession
+          )
+      );
 
-    setSelectedSchedule(selectedSchedule);
-  }, [selectedDate, clinicalSchedule]);
+    const selectedInpatientSchedule = inpatientSchedule
+      .filter(
+        (schedule) =>
+          dayjs(selectedDate).format("YYYY/MM/DD") ===
+          dayjs(schedule.date).format("YYYY/MM/DD")
+      )
+      .sort(
+        (a, b) =>
+          ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+            a.scheduleSession
+          ) -
+          ["MORNING", "AFTERNOON", "EVENING", "NIGHT"].indexOf(
+            b.scheduleSession
+          )
+      );
+
+    setSelectedSchedule(
+      nurseType === "CLINICAL_NURSE"
+        ? selectedSchedule
+        : selectedInpatientSchedule
+    );
+  }, [selectedDate, clinicalSchedule, inpatientSchedule, nurseType]);
 
   useEffect(() => {
-    const handleGetClinicalSchedule = async () => {
-      const response = await getClinicalSchedule();
+    const handleGetNurseSchedule = async () => {
+      const response = await getNurseSchedules(
+        currentMonth.get("month") + 1,
+        currentMonth.get("year")
+      );
       if (response.success) {
-        setClinicalSchedule(response.data.data);
+        nurseType === "CLINICAL_NURSE"
+          ? setClinicalSchedule(response.data.data)
+          : setInpatientSchedule(response.data.data);
       } else {
         enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
       }
     };
 
-    if (nurseType === "CLINICAL_NURSE") {
-      handleGetClinicalSchedule();
+    if (["CLINICAL_NURSE", "INPATIENT_NURSE"].includes(nurseType)) {
+      handleGetNurseSchedule();
     }
-  }, [nurseType, enqueueSnackbar]);
+  }, [nurseType, enqueueSnackbar, currentMonth]);
   return (
     <LayoutContainer container>
       <BoxLayout item md={3}>
@@ -284,6 +367,7 @@ function NurseSchedulePage() {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar
             date={selectedDate}
+            onMonthChange={handleMonthChange}
             onChange={(newDate) => setSelectedDate(dayjs(newDate.toDate()))}
             sx={{
               margin: "0 auto",
@@ -312,11 +396,15 @@ function NurseSchedulePage() {
               },
             }}
             slots={{
-              day: ServerDay,
+              day:
+                nurseType === "CLINICAL_NURSE"
+                  ? ClinicalScheduleDay
+                  : InpatientScheduleDay,
             }}
             slotProps={{
               day: {
                 clinicalSchedules: clinicalSchedule,
+                inpatientSchedules: inpatientSchedule,
                 sx: {
                   "& .MuiPickersDay-root": {
                     "&.Mui-selected": {
