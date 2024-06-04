@@ -222,6 +222,18 @@ public class NurseServicesImpl implements INurseServices {
 
         if (nurse.getNurseType() == NurseType.CLINICAL_NURSE) {
             return nurse.getNurseSchedules();
+        } else if (nurse.getNurseType() == NurseType.INPATIENT_NURSE) {
+            if (month == null || year == null) {
+                throw new BadRequestException("Month and year are required");
+            }
+
+            return nurseScheduleRepository
+                    .findInpatientNurseSchedule(
+                            nurse,
+                            month,
+                            year,
+                            ScheduleType.INPATIENT_EXAMINATION
+                    );
         }
         return new ArrayList<>();
     }
@@ -298,6 +310,33 @@ public class NurseServicesImpl implements INurseServices {
                 .evening(evening)
                 .night(night)
                 .build();
+    }
+
+    @Override
+    public List<NurseSchedule> getInpatientRoomSchedulesByWeek(
+            String authorization,
+            int roomId,
+            Integer week,
+            Integer year
+    ) {
+        Map<String, Date> startAndEndOfWeek = DateCommon.getStartAndEndOfWeek(week, year);
+
+        Date startOfWeek = startAndEndOfWeek.get("startOfWeek");
+        Date endOfWeek = startAndEndOfWeek.get("endOfWeek");
+
+        Room room = getRoomById(roomId, getNurseByToken(authorization).getDepartment());
+        if (room.getRoomType() != RoomType.TREATMENT_ROOM_VIP
+                && room.getRoomType() != RoomType.TREATMENT_ROOM_STANDARD
+        ) {
+            throw new BadRequestException("Room is not treatment room");
+        }
+        return nurseScheduleRepository
+                .findInpatientScheduleByWeek(
+                        room,
+                        startOfWeek,
+                        endOfWeek,
+                        ScheduleType.INPATIENT_EXAMINATION
+                );
     }
 
     @Override
