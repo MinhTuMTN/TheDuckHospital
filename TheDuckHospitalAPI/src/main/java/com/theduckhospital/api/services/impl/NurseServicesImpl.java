@@ -313,6 +313,33 @@ public class NurseServicesImpl implements INurseServices {
     }
 
     @Override
+    public List<NurseSchedule> getInpatientRoomSchedulesByWeek(
+            String authorization,
+            int roomId,
+            Integer week,
+            Integer year
+    ) {
+        Map<String, Date> startAndEndOfWeek = DateCommon.getStartAndEndOfWeek(week, year);
+
+        Date startOfWeek = startAndEndOfWeek.get("startOfWeek");
+        Date endOfWeek = startAndEndOfWeek.get("endOfWeek");
+
+        Room room = getRoomById(roomId, getNurseByToken(authorization).getDepartment());
+        if (room.getRoomType() != RoomType.TREATMENT_ROOM_VIP
+                && room.getRoomType() != RoomType.TREATMENT_ROOM_STANDARD
+        ) {
+            throw new BadRequestException("Room is not treatment room");
+        }
+        return nurseScheduleRepository
+                .findInpatientScheduleByWeek(
+                        room,
+                        startOfWeek,
+                        endOfWeek,
+                        ScheduleType.INPATIENT_EXAMINATION
+                );
+    }
+
+    @Override
     public List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date today;

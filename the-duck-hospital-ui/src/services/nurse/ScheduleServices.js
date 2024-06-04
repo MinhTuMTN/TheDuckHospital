@@ -62,9 +62,11 @@ export const createInpatientShiftSchedule = (
 };
 
 export const getInpatientShift = (roomId, nurseId, month, year) => {
-  return get(`/head-nurse/schedules/rooms/${roomId}/inpatient-room-schedules`, {
-    nurseId,
-    month,
-    year,
-  });
+  return get(
+    `/head-nurse/schedules/rooms/${roomId}/inpatient-room-schedules/${nurseId}`,
+    {
+      month,
+      year,
+    }
+  );
 };

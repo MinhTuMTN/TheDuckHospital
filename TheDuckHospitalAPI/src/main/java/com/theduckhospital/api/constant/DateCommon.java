@@ -1,5 +1,6 @@
 package com.theduckhospital.api.constant;
 
+import com.theduckhospital.api.error.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class DateCommon {
@@ -64,4 +67,28 @@ public class DateCommon {
         return calendar.getTime();
     }
 
+    public static Map<String, Date> getStartAndEndOfWeek(Integer week, Integer year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        year = year == null ? calendar.get(Calendar.YEAR) : year;
+        week = week == null ? calendar.get(Calendar.WEEK_OF_YEAR) : week;
+
+        // Check week and year
+        if (week < 1 || week > 52 || year < 1970 || year > 2100) {
+            throw new BadRequestException("Invalid week");
+        }
+        calendar.set(Calendar.WEEK_OF_YEAR, week);
+        calendar.set(Calendar.YEAR, year);
+
+        Date startOfWeek = DateCommon.getStarOfDay(calendar.getTime());
+        calendar.add(Calendar.DATE, 6);
+        Date endOfWeek = DateCommon.getEndOfDay(calendar.getTime());
+
+        Map<String, Date> startAndEndOfWeek = new HashMap<>();
+        startAndEndOfWeek.put("startOfWeek", startOfWeek);
+        startAndEndOfWeek.put("endOfWeek", endOfWeek);
+
+        return startAndEndOfWeek;
+    }
 }

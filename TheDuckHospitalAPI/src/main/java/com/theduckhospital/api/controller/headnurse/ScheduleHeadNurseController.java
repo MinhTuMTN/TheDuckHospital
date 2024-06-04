@@ -130,10 +130,10 @@ public class ScheduleHeadNurseController {
     }
 
 
-    @GetMapping("/rooms/{roomId}/inpatient-room-schedules")
+    @GetMapping("/rooms/{roomId}/inpatient-room-schedules/{nurseId}")
     public ResponseEntity<?> getInpatientRoomSchedules(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam("nurseId") UUID nurseId,
+            @PathVariable UUID nurseId,
             @RequestParam("month") int month,
             @RequestParam("year") int year,
             @PathVariable int roomId
@@ -147,6 +147,27 @@ public class ScheduleHeadNurseController {
                                 nurseId,
                                 roomId,
                                 month,
+                                year
+                        ))
+                        .build()
+        );
+    }
+
+    @GetMapping("/rooms/{roomId}/inpatient-room-schedules")
+    public ResponseEntity<?> getInpatientRoomSchedulesByWeek(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "week", required = false) Integer week,
+            @RequestParam(value = "year", required = false) Integer year,
+            @PathVariable int roomId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get inpatient room schedules successfully")
+                        .data(nurseServices.getInpatientRoomSchedulesByWeek(
+                                authorizationHeader,
+                                roomId,
+                                week,
                                 year
                         ))
                         .build()
