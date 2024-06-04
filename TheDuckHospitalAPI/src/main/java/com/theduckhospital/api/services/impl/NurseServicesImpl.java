@@ -222,6 +222,18 @@ public class NurseServicesImpl implements INurseServices {
 
         if (nurse.getNurseType() == NurseType.CLINICAL_NURSE) {
             return nurse.getNurseSchedules();
+        } else if (nurse.getNurseType() == NurseType.INPATIENT_NURSE) {
+            if (month == null || year == null) {
+                throw new BadRequestException("Month and year are required");
+            }
+
+            return nurseScheduleRepository
+                    .findInpatientNurseSchedule(
+                            nurse,
+                            month,
+                            year,
+                            ScheduleType.INPATIENT_EXAMINATION
+                    );
         }
         return new ArrayList<>();
     }

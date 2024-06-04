@@ -82,6 +82,21 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
     );
 
     @Query(
+            value = "SELECT ns FROM NurseSchedule ns " +
+                    "WHERE ns.nurse = :nurse " +
+                    "AND EXTRACT(MONTH FROM ns.date) = :month " +
+                    "AND EXTRACT(YEAR FROM ns.date) = :year " +
+                    "AND ns.scheduleType = :scheduleType " +
+                    "AND ns.deleted = false"
+    )
+    List<NurseSchedule> findInpatientNurseSchedule(
+            Nurse nurse,
+            int month,
+            int year,
+            ScheduleType scheduleType
+    );
+
+    @Query(
             value = "SELECT ds FROM NurseSchedule ns, DoctorSchedule ds "+
                     "WHERE ns.nurse = :nurse " +
                     "AND ns.dayOfWeek = :dayOfWeek " +
