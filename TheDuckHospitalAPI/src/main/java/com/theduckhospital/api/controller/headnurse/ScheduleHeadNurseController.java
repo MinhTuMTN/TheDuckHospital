@@ -130,10 +130,10 @@ public class ScheduleHeadNurseController {
     }
 
 
-    @GetMapping("/rooms/{roomId}/inpatient-room-schedules")
+    @GetMapping("/rooms/{roomId}/inpatient-room-schedules/{nurseId}")
     public ResponseEntity<?> getInpatientRoomSchedules(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam("nurseId") UUID nurseId,
+            @PathVariable UUID nurseId,
             @RequestParam("month") int month,
             @RequestParam("year") int year,
             @PathVariable int roomId
@@ -151,5 +151,48 @@ public class ScheduleHeadNurseController {
                         ))
                         .build()
         );
+    }
+
+    @GetMapping("/rooms/{roomId}/inpatient-room-schedules")
+    public ResponseEntity<?> getInpatientRoomSchedulesByWeek(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(value = "week", required = false) Integer week,
+            @RequestParam(value = "year", required = false) Integer year,
+            @PathVariable int roomId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get inpatient room schedules successfully")
+                        .data(nurseServices.getInpatientRoomSchedulesByWeek(
+                                authorizationHeader,
+                                roomId,
+                                week,
+                                year
+                        ))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<?> deleteExaminationRoomSchedule(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable UUID scheduleId
+    ) {
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Delete examination room schedule successfully")
+                            .data(nurseServices.deleteExaminationRoomSchedule(
+                                    authorizationHeader,
+                                    scheduleId
+                            ))
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
     }
 }

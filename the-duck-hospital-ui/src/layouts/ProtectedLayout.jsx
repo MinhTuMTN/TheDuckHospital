@@ -34,7 +34,15 @@ function ProtectedLayout(props) {
     return <Navigate to="/auth/login" />;
   }
 
-  return <Outlet />;
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+      }}
+    >
+      <Outlet />
+    </div>
+  );
 }
 
 export default ProtectedLayout;

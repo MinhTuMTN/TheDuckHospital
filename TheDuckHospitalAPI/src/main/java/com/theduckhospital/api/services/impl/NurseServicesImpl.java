@@ -222,6 +222,18 @@ public class NurseServicesImpl implements INurseServices {
 
         if (nurse.getNurseType() == NurseType.CLINICAL_NURSE) {
             return nurse.getNurseSchedules();
+        } else if (nurse.getNurseType() == NurseType.INPATIENT_NURSE) {
+            if (month == null || year == null) {
+                throw new BadRequestException("Month and year are required");
+            }
+
+            return nurseScheduleRepository
+                    .findInpatientNurseSchedule(
+                            nurse,
+                            month,
+                            year,
+                            ScheduleType.INPATIENT_EXAMINATION
+                    );
         }
         return new ArrayList<>();
     }
@@ -234,7 +246,13 @@ public class NurseServicesImpl implements INurseServices {
             int month,
             int year
     ) {
-        Nurse nurse = getNurseByToken(authorization);
+        Nurse headNurse = getNurseByToken(authorization);
+
+        Nurse nurse = nurseRepository.findById(nurseId)
+                .orElseThrow(() -> new NotFoundException("Nurse not found"));
+        if (nurse.isDeleted() || nurse.getDepartment() != headNurse.getDepartment()) {
+            throw new NotFoundException("Nurse not found");
+        }
         if (nurse.getNurseType() != NurseType.INPATIENT_NURSE) {
             throw new BadRequestException("Nurse is not inpatient nurse");
         }
@@ -295,6 +313,33 @@ public class NurseServicesImpl implements INurseServices {
     }
 
     @Override
+    public List<NurseSchedule> getInpatientRoomSchedulesByWeek(
+            String authorization,
+            int roomId,
+            Integer week,
+            Integer year
+    ) {
+        Map<String, Date> startAndEndOfWeek = DateCommon.getStartAndEndOfWeek(week, year);
+
+        Date startOfWeek = startAndEndOfWeek.get("startOfWeek");
+        Date endOfWeek = startAndEndOfWeek.get("endOfWeek");
+
+        Room room = getRoomById(roomId, getNurseByToken(authorization).getDepartment());
+        if (room.getRoomType() != RoomType.TREATMENT_ROOM_VIP
+                && room.getRoomType() != RoomType.TREATMENT_ROOM_STANDARD
+        ) {
+            throw new BadRequestException("Room is not treatment room");
+        }
+        return nurseScheduleRepository
+                .findInpatientScheduleByWeek(
+                        room,
+                        startOfWeek,
+                        endOfWeek,
+                        ScheduleType.INPATIENT_EXAMINATION
+                );
+    }
+
+    @Override
     public List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date today;
@@ -321,6 +366,22 @@ public class NurseServicesImpl implements INurseServices {
         return responses;
     }
 
+    @Override
+    public boolean deleteExaminationRoomSchedule(String authorization, UUID scheduleId) {
+        Nurse nurse = getNurseByToken(authorization);
+        Optional<NurseSchedule> optional = nurseScheduleRepository
+                .findByNurseScheduleId(scheduleId);
+
+        if (optional.isEmpty() || optional.get().getNurse().getDepartment() != nurse.getDepartment()) {
+            throw new NotFoundException("Schedule not found");
+        }
+
+        NurseSchedule nurseSchedule = optional.get();
+        nurseScheduleRepository.delete(nurseSchedule);
+
+        return true;
+    }
+
     private NurseSchedule createExaminationRoomSchedule(Nurse nurse, Room room, ExamNurseScheduleItemRequest item) {
         // Check nurse is available
         // Find by nurse, dayOfWeek, session
@@ -332,7 +393,7 @@ public class NurseServicesImpl implements INurseServices {
                         ScheduleType.EXAMINATION
                 );
         if (optionalNurseCheck.isPresent()) {
-            throw new BadRequestException("Nurse is not available");
+            throw new BadRequestException("Nurse is not available-" + optionalNurseCheck.get().getRoom().getRoomName());
         }
 
         // Check room is not scheduled yet

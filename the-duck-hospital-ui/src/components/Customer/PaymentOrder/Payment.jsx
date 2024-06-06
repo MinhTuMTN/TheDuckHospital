@@ -8,6 +8,7 @@ import {
   Button,
   Grid,
   Radio,
+  RadioGroup,
   Stack,
   Typography,
   useMediaQuery,
@@ -116,13 +117,18 @@ function Payment(props) {
   const theme = useTheme();
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [isLoading, setIsLoading] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState("VNPAY");
+
+  const handleChangePaymentMethod = (event) => {
+    setPaymentMethod(event.target.value);
+  };
 
   const handlePayment = async () => {
     setIsLoading(true);
     const response = await createBooking({
       patientProfileId: profile.patientProfileId,
       timeSlotIds: schedules.map((schedule) => schedule.timeSlot.timeSlotId),
-      paymentMethod: "VNPAY",
+      paymentMethod: paymentMethod,
       mobile: false,
     });
     setIsLoading(false);
@@ -148,23 +154,54 @@ function Payment(props) {
         >
           Phương thức thanh toán:
         </Typography>
-        <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
-          <Radio size="small" color="text" defaultChecked sx={{ p: 0 }} />
-          <img
-            width="40px"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702101343/06ncktiwd6dc1694418196384-removebg-preview_kd8y6g.png"
-            alt="VNPAY"
-          />
-          <Typography
-            sx={{
-              color: theme.palette.template.darker,
-              fontSize: "16px",
-              textAlign: "left",
-            }}
-          >
-            Thanh toán bằng VNPAY
-          </Typography>
-        </Stack>
+        <RadioGroup value={paymentMethod} onChange={handleChangePaymentMethod}>
+          <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
+            <Radio
+              value={"VNPAY"}
+              size="small"
+              color="text"
+              defaultChecked
+              sx={{ p: 0 }}
+            />
+            <img
+              width="40px"
+              src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702101343/06ncktiwd6dc1694418196384-removebg-preview_kd8y6g.png"
+              alt="VNPAY"
+            />
+            <Typography
+              sx={{
+                color: theme.palette.template.darker,
+                fontSize: "16px",
+                textAlign: "left",
+              }}
+            >
+              Thanh toán bằng VNPAY
+            </Typography>
+          </Stack>
+          <Stack direction={"row"} alignItems={"center"} spacing={0.5}>
+            <Radio
+              value={"MOMO"}
+              size="small"
+              color="text"
+              defaultChecked
+              sx={{ p: 0 }}
+            />
+            <img
+              width="40px"
+              src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1717401212/v7mhl3ibipnqt47iqqoc.png"
+              alt="MOMO"
+            />
+            <Typography
+              sx={{
+                color: theme.palette.template.darker,
+                fontSize: "16px",
+                textAlign: "left",
+              }}
+            >
+              Thanh toán bằng MOMO
+            </Typography>
+          </Stack>
+        </RadioGroup>
       </Grid>
       <Grid item xs={12} sm={12} md={7.5}>
         <Stack

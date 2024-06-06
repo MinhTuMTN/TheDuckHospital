@@ -1,7 +1,10 @@
 import { get } from "../AxiosInstance";
 
-export const getClinicalSchedule = () => {
-  return get("/nurse/schedules");
+export const getNurseSchedules = (month, year) => {
+  return get("/nurse/schedules", {
+    month,
+    year,
+  });
 };
 
 export const getTodayExaminationDoctorSchedule = () => {

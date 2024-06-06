@@ -261,41 +261,12 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             }
 
             transaction.setMedicalTest(medicalTest);
-            return switch (request.getPaymentMethod()) {
-                case VNPAY -> {
-                    try {
-                        yield paymentServices.vnPayCreatePaymentUrl(
-                                totalAmount,
-                                transaction.getTransactionId()
-                        );
-                    } catch (UnsupportedEncodingException e) {
-                        throw new BadRequestException("Error when create payment url");
-                    }
-                }
-                case MOMO -> {
-                    try {
-                        yield paymentServices.momoCreatePaymentUrl(
-                                totalAmount,
-                                transaction.getTransactionId(),
-                                true
-                        );
-                    } catch (IOException e) {
-                        throw new BadRequestException("Error when create payment url");
-                    }
-                }
-                case WALLET -> {
-                    boolean result = bookingServices.paymentWithWallet(transaction, request.getPinCode());
-                    yield result ? PaymentResponse
-                            .builder().walletSuccess(true).build() : PaymentResponse
-                            .builder().walletSuccess(false).build();
-                }
-                default -> throw new BadRequestException("Invalid payment method");
-            };
+            return paymentServices.createMedicalTestPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             throw new BadRequestException(e.getMessage(), e.getErrorCode() == 0 ? 400 : e.getErrorCode());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             throw new BadRequestException("Error when pay medical test", 400);
         }
     }
@@ -314,12 +285,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             int serviceId
     ) {
         Calendar fromDateCalendar = DateCommon.getCalendar(fromDate);
-        Calendar toDateCalendar = DateCommon.getCalendar(toDate);
-
-        toDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        toDateCalendar.set(Calendar.MINUTE, 59);
-        toDateCalendar.set(Calendar.SECOND, 59);
-        toDateCalendar.set(Calendar.MILLISECOND, 99);
+        Calendar toDateCalendar = DateCommon.getCalendar(DateCommon.getEndOfDay(toDate));
 
         Patient patient = patientServices.findPatientByPatientCode(patientCode);
 

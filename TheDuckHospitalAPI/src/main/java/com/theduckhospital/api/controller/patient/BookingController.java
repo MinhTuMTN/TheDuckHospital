@@ -3,6 +3,7 @@ package com.theduckhospital.api.controller.patient;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IBookingServices;
+import com.theduckhospital.api.services.IPaymentServices;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,9 +18,14 @@ import java.util.UUID;
 @RequestMapping("/api/booking")
 public class BookingController {
     private final IBookingServices bookingServices;
+    private final IPaymentServices paymentServices;
 
-    public BookingController(IBookingServices bookingServices) {
+    public BookingController(
+            IBookingServices bookingServices,
+            IPaymentServices paymentServices
+    ) {
         this.bookingServices = bookingServices;
+        this.paymentServices = paymentServices;
     }
 
     @PostMapping
@@ -48,7 +54,7 @@ public class BookingController {
             @RequestParam(required=false) Map<String,String> params,
             HttpServletResponse response
     ) throws IOException {
-        String url = bookingServices.checkVNPayBookingCallback(params);
+        String url = paymentServices.checkVNPayBookingCallback(params);
         response.sendRedirect(url);
     }
 
@@ -56,7 +62,7 @@ public class BookingController {
     public ResponseEntity<?> callBackMomo(
             @RequestBody Map<String,String> params
     ) throws Exception {
-        if (bookingServices.checkMomoBookingCallback(params))
+        if (paymentServices.checkMomoBookingCallback(params))
             return ResponseEntity.status(204).body(null);
 
         return ResponseEntity.status(400).body(null);

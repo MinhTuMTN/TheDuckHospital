@@ -2,42 +2,64 @@ package com.theduckhospital.api.services.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.theduckhospital.api.constant.MomoConfig;
-import com.theduckhospital.api.constant.PaymentMethod;
-import com.theduckhospital.api.constant.VNPayConfig;
+import com.theduckhospital.api.constant.*;
+import com.theduckhospital.api.dto.request.BookingRequest;
+import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.response.PaymentResponse;
+import com.theduckhospital.api.entity.Account;
+import com.theduckhospital.api.entity.Booking;
+import com.theduckhospital.api.entity.TimeSlot;
+import com.theduckhospital.api.entity.Transaction;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
+import com.theduckhospital.api.repository.BookingRepository;
+import com.theduckhospital.api.repository.TimeSlotRepository;
+import com.theduckhospital.api.repository.TransactionRepository;
+import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPaymentServices;
 import okhttp3.*;
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.theduckhospital.api.constant.PaymentMethod.*;
 
 @Service
 public class PaymentServicesImpl implements IPaymentServices {
     // Value from application.properties
     @Value("${server.callback.url}")
     private String callbackUrl;
+    private final PasswordEncoder passwordEncoder;
+    private final IAccountServices accountServices;
+    private final TransactionRepository transactionRepository;
+    private final BookingRepository bookingRepository;
+    private final TimeSlotRepository timeSlotRepository;
 
-    private final String vnPayUrl;
-    private final String notifyUrl;
-
-    public PaymentServicesImpl(Environment environment) {
-        this.vnPayUrl = callbackUrl + "/api/booking/callback/vnPay";
-        this.notifyUrl = callbackUrl + "/api/booking/callback/momo";
+    public PaymentServicesImpl(
+            PasswordEncoder passwordEncoder,
+            IAccountServices accountServices,
+            TransactionRepository transactionRepository,
+            BookingRepository bookingRepository,
+            TimeSlotRepository timeSlotRepository
+    ) {
+        this.passwordEncoder = passwordEncoder;
+        this.accountServices = accountServices;
+        this.transactionRepository = transactionRepository;
+        this.bookingRepository = bookingRepository;
+        this.timeSlotRepository = timeSlotRepository;
     }
     @Override
     public PaymentResponse vnPayCreatePaymentUrl(double amount, UUID transactionId)  throws UnsupportedEncodingException {
+        String vnPayUrl = callbackUrl + "/booking/callback/vnPay";
+
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
@@ -98,7 +120,7 @@ public class PaymentServicesImpl implements IPaymentServices {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
 
         return PaymentResponse.builder()
-                .paymentMethod(PaymentMethod.VNPAY)
+                .paymentMethod(VNPAY)
                 .paymentUrl(VNPayConfig.vnp_PayUrl + "?" + queryUrl)
                 .deepLink(null)
                 .build();
@@ -106,6 +128,7 @@ public class PaymentServicesImpl implements IPaymentServices {
 
     @Override
     public PaymentResponse momoCreatePaymentUrl(double amountInput, UUID transactionId, boolean mobile) throws IOException {
+        String notifyUrl = callbackUrl + "/booking/callback/momo";
         OkHttpClient client = new OkHttpClient();
 
         long date = new Date().getTime();
@@ -114,7 +137,6 @@ public class PaymentServicesImpl implements IPaymentServices {
         String amount = String.valueOf((int) amountInput);
 
         String requestType = "captureWallet";
-        String notifyUrl = this.notifyUrl;
         String returnUrl = "https://the-duck-hospital.web.app/payment-success?transactionId=" + transactionId;
         if (mobile)
             returnUrl = "theduck://app/payment/" + transactionId;
@@ -158,7 +180,7 @@ public class PaymentServicesImpl implements IPaymentServices {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                // Print Data response
+                assert response.body() != null;
                 System.out.println(response.body().string());
                 throw new StatusCodeException("Internal server error", 500);
             }
@@ -168,10 +190,252 @@ public class PaymentServicesImpl implements IPaymentServices {
             String payUrl = jsonObject.get("payUrl").getAsString();
             String deeplink = jsonObject.get("deeplink").getAsString();
             return PaymentResponse.builder()
-                    .paymentMethod(PaymentMethod.MOMO)
+                    .paymentMethod(MOMO)
                     .paymentUrl(payUrl)
                     .deepLink(deeplink)
                     .build();
         }
+    }
+
+    @Override
+    public PaymentResponse createBookingPaymentUrl(
+            Transaction transaction,
+            BookingRequest request
+    ) {
+        PaymentMethod paymentMethod = request.getPaymentMethod();
+        String pinCode = request.getPinCode();
+        boolean mobile = request.isMobile();
+
+        return createPaymentResponse(transaction, paymentMethod, pinCode, mobile);
+    }
+
+    @Override
+    public PaymentResponse createMedicalTestPaymentUrl(
+            Transaction transaction,
+            PayMedicalTestRequest request
+    ) {
+        PaymentMethod paymentMethod = request.getPaymentMethod();
+        String pinCode = request.getPinCode();
+
+        return createPaymentResponse(transaction, paymentMethod, pinCode, true);
+    }
+
+    @Override
+    public PaymentResponse createTopUpWalletPaymentUrl(
+            Transaction transaction,
+            PaymentMethod paymentMethod
+    ) {
+        if (paymentMethod != MOMO && paymentMethod != VNPAY)
+            throw new BadRequestException("Invalid payment method", 10032);
+
+        return createPaymentResponse(
+                transaction,
+                paymentMethod,
+                null,
+                true
+        );
+    }
+
+    @Override
+    public String checkVNPayBookingCallback(Map<String, String> vnpParams) {
+        Map<String, String> results = new HashMap<>();
+        List<String> keys = vnpParams.keySet().stream().toList();
+        for (String key : keys) {
+            results.put(
+                    URLEncoder.encode(key, StandardCharsets.US_ASCII),
+                    URLEncoder.encode(vnpParams.get(key), StandardCharsets.US_ASCII)
+            );
+        }
+
+        results.remove("vnp_SecureHashType");
+        results.remove("vnp_SecureHash");
+        String secureHash = VNPayConfig.hashAllFields(results);
+        String vnp_SecureHash = vnpParams.get("vnp_SecureHash");
+
+        UUID transactionId = UUID.fromString(vnpParams.get("vnp_OrderInfo").split(":")[1]);
+
+        if (!secureHash.equals(vnp_SecureHash)
+                || !vnpParams.get("vnp_ResponseCode").equals("00")
+        ) {
+            Transaction transaction = updateTransactionAndBooking(
+                    transactionId,
+                    null,
+                    null,
+                    TransactionStatus.FAILED
+            );
+            if (transaction == null)
+                return null;
+
+            if (transaction.getOrigin() == null)
+                return  "https://the-duck-hospital.web.app/payment-failed";
+            return transaction.getOrigin() + "/payment-failed";
+        }
+
+        Transaction transaction = updateTransactionAndBooking(
+                transactionId,
+                vnpParams.get("vnp_BankCode"),
+                "VNPAY",
+                TransactionStatus.SUCCESS
+        );
+
+        if (transaction == null)
+            return null;
+
+        if (transaction.getOrigin() == null)
+            return "https://the-duck-hospital.web.app/payment-success?transactionId=" + transaction.getTransactionId();
+
+        return transaction.getOrigin() + "/payment-success?transactionId=" + transaction.getTransactionId();
+    }
+
+    @Override
+    public boolean checkMomoBookingCallback(Map<String, String> params) throws Exception {
+        String accessKey = MomoConfig.accessKey;
+        String amount = params.get("amount");
+        String extraData = params.get("extraData");
+        String message = params.get("message");
+        String orderId = params.get("orderId");
+        String orderInfo = params.get("orderInfo");
+        String orderType = params.get("orderType");
+        String partnerCode = params.get("partnerCode");
+        String payType = params.get("payType");
+        String requestId = params.get("requestId");
+        String responseTime = params.get("responseTime");
+        String resultCode = params.get("resultCode");
+        String transId = params.get("transId");
+        String signatureFromMomo = params.get("signature");
+        UUID transactionId = UUID.fromString(orderId.split(":")[1]);
+
+        String signatureRaw = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
+                + "&message=" + message + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&orderType=" + orderType
+                + "&partnerCode=" + partnerCode + "&payType=" + payType + "&requestId=" + requestId
+                + "&responseTime=" + responseTime + "&resultCode=" + resultCode + "&transId=" + transId;
+        String signature = MomoConfig.hashSignature(signatureRaw, MomoConfig.secretKey);
+
+        if (!signature.equals(signatureFromMomo) || !resultCode.equals("0")) {
+            updateTransactionAndBooking(
+                    transactionId,
+                    null,
+                    null,
+                    TransactionStatus.FAILED
+            );
+
+            return false;
+        }
+
+        Transaction transaction = updateTransactionAndBooking(
+                transactionId,
+                transId,
+                "MOMO",
+                TransactionStatus.SUCCESS
+        );
+
+        return transaction != null;
+    }
+
+    private PaymentResponse createPaymentResponse(
+            Transaction transaction,
+            PaymentMethod paymentMethod,
+            String pinCode,
+            boolean mobile
+    ) {
+        try {
+            return switch (paymentMethod) {
+                case VNPAY ->  vnPayCreatePaymentUrl(
+                        transaction.getAmount() + VNPayConfig.fee,
+                        transaction.getTransactionId()
+                );
+                case MOMO -> momoCreatePaymentUrl(
+                        transaction.getAmount() + MomoConfig.fee,
+                        transaction.getTransactionId(),
+                        mobile
+                );
+                case WALLET -> {
+                    if (paymentWithWallet(transaction, pinCode)) {
+                        yield PaymentResponse
+                                .builder().walletSuccess(true).build();
+                    } else {
+                        yield PaymentResponse
+                                .builder().walletSuccess(false).build();
+                    }
+                }
+                default -> throw new BadRequestException("Invalid payment method");
+            };
+        } catch (IOException e) {
+            throw new StatusCodeException("Can't create payment. Internal Server Error", 500);
+        }
+    }
+
+    @Override
+    public boolean paymentWithWallet(Transaction transaction, String pinCode) {
+        if (pinCode == null || pinCode.isEmpty())
+            throw new BadRequestException("Pin code is required", 10031);
+
+        Account account = transaction.getAccount();
+        if (!passwordEncoder.matches(pinCode, account.getWalletPin()))
+            throw new BadRequestException("Invalid pin code", 10014);
+        if (account.getBalance().compareTo(BigDecimal.valueOf(transaction.getAmount())) < 0
+                || account.getWalletLocked()
+        )
+            throw new BadRequestException("Not enough balance", 10030);
+
+        account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
+
+        Transaction transactionResult = updateTransactionAndBooking(
+                transaction.getTransactionId(),
+                "WALLET",
+                "WALLET",
+                TransactionStatus.SUCCESS
+        );
+        accountServices.saveAccount(account);
+
+        return transactionResult != null;
+    }
+
+    private Transaction updateTransactionAndBooking(
+            UUID transactionId,
+            String bankCode,
+            String paymentMethod,
+            TransactionStatus status
+    ) {
+        Transaction transaction = transactionRepository.findById(transactionId).orElse(null);
+        if (transaction == null)
+            return null;
+
+        if (status == TransactionStatus.FAILED) {
+            transaction.setStatus(status);
+            transactionRepository.save(transaction);
+            return transaction;
+        }
+        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
+        transaction.setPaymentMethod(paymentMethod);
+        transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
+        transactionRepository.save(transaction);
+
+        // Update Booking
+        if (transaction.getPaymentType() == PaymentType.BOOKING) {
+            List<Booking> bookings = transaction.getBookings();
+            for (Booking booking : bookings) {
+                TimeSlot timeSlot = booking.getTimeSlot();
+
+                booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
+                booking.setDeleted(false);
+                bookingRepository.save(booking);
+
+                timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
+                timeSlotRepository.save(timeSlot);
+            }
+        }
+        else if (transaction.getPaymentType() == PaymentType.TOP_UP) {
+            Account account = transaction.getAccount();
+            account.setBalance(
+                    account.getBalance()
+                            .add(BigDecimal.valueOf(
+                                    transaction.getAmount() - MomoConfig.medicalTestFee
+                            )));
+            accountServices.saveAccount(account);
+        }
+
+        return transaction;
     }
 }

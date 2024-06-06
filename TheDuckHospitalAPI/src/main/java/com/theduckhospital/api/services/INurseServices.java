@@ -48,5 +48,12 @@ public interface INurseServices {
             int month,
             int year
     );
+    List<NurseSchedule> getInpatientRoomSchedulesByWeek(
+            String authorization,
+            int roomId,
+            Integer week,
+            Integer year
+    );
     List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization);
+    boolean deleteExaminationRoomSchedule(String authorization, UUID scheduleId);
 }
