@@ -317,8 +317,18 @@ public class NurseServicesImpl implements INurseServices {
             String authorization,
             int roomId,
             Integer week,
-            Integer year
+            Integer year,
+            String name,
+            List<ScheduleSession> scheduleSessions
     ) {
+        if (scheduleSessions == null || scheduleSessions.isEmpty()) {
+            scheduleSessions = List.of(
+                    ScheduleSession.MORNING,
+                    ScheduleSession.AFTERNOON,
+                    ScheduleSession.EVENING,
+                    ScheduleSession.NIGHT
+            );
+        }
         Map<String, Date> startAndEndOfWeek = DateCommon.getStartAndEndOfWeek(week, year);
 
         Date startOfWeek = startAndEndOfWeek.get("startOfWeek");
@@ -335,7 +345,9 @@ public class NurseServicesImpl implements INurseServices {
                         room,
                         startOfWeek,
                         endOfWeek,
-                        ScheduleType.INPATIENT_EXAMINATION
+                        ScheduleType.INPATIENT_EXAMINATION,
+                        name,
+                        scheduleSessions
                 );
     }
 
@@ -430,6 +442,7 @@ public class NurseServicesImpl implements INurseServices {
         Optional<NurseSchedule> optional = nurseScheduleRepository
                 .findInpatientAlreadyScheduled(
                         room,
+                        date,
                         nurse,
                         session,
                         ScheduleType.INPATIENT_EXAMINATION
