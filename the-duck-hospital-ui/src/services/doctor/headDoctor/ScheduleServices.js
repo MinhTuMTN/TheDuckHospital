@@ -8,8 +8,12 @@ export const getPaginationActiveDoctors = (params) => {
     return get("/head-doctor/schedules/doctors/filter", params);
 };
 
-export const getRoomsDepartment = () => {
-    return get("/head-doctor/schedules/rooms");
+export const getExaminationRoomsDepartment = () => {
+    return get("/head-doctor/schedules/examination-rooms");
+};
+
+export const getTreatmentRoomsDepartment = () => {
+    return get("/head-doctor/schedules/treatment-rooms");
 };
 
 export const getRoomsDepartmentPagination = (params) => {
@@ -20,8 +24,12 @@ export const getSchedulesHeadDoctor = (params) => {
     return get("/head-doctor/schedules", params);
 };
 
-export const getInvalidDate = (params) => {
-    return get("/head-doctor/schedules/invalid-date", params);
+export const getInvalidExaminationDate = (params) => {
+    return get("/head-doctor/schedules/invalid-examination-date", params);
+};
+
+export const getInvalidTreatmentDate = (params) => {
+    return get("/head-doctor/schedules/invalid-treatment-date", params);
 };
 
 export const getDateHasSchedule = (params) => {

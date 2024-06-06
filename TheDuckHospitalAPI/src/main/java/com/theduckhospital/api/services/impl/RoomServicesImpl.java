@@ -190,6 +190,23 @@ public class RoomServicesImpl implements IRoomServices {
     }
 
     @Override
+    public List<Room> getTreatmentRoomsDepartment(String authorization) {
+        Doctor headDoctor = doctorServices.getDoctorByToken(authorization);
+        if (!headDoctor.isHeadOfDepartment()) {
+            throw new RuntimeException("You are not head of department");
+        }
+
+        Department department = headDoctor.getDepartment();
+
+        return department.getRooms()
+                .stream()
+                .filter(room -> !room.isDeleted()
+                        && (room.getRoomType() == RoomType.TREATMENT_ROOM_STANDARD
+                        || room.getRoomType() == RoomType.TREATMENT_ROOM_VIP)
+                ).toList();
+    }
+
+    @Override
     public PaginationRoomsResponse getPaginationRooms(
             String authorization,
             int page,

@@ -1,5 +1,6 @@
 package com.theduckhospital.api.dto.request.headdoctor;
 
+import com.theduckhospital.api.constant.ScheduleType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -13,12 +14,21 @@ public class CreateDoctorScheduleRequest {
     private UUID doctorId;
     @NotNull(message = "Medical Service ID is required")
     private Integer medicalServiceId;
+
     @NotNull(message = "Room ID is required")
     private Integer roomId;
+
     @NotNull(message = "Slot is required")
     private Integer slotPerTimeSlot;
-    @NotNull(message = "Morning Schedule is required")
+
+    @NotNull(message = "Schedule type is required")
+    private ScheduleType scheduleType;
+
     private List<Date> morningDates;
-    @NotNull(message = "Afternoon Schedule is required")
+
     private List<Date> afternoonDates;
+
+    private List<Date> eveningDates;
+
+    private List<Date> nightDates;
 }

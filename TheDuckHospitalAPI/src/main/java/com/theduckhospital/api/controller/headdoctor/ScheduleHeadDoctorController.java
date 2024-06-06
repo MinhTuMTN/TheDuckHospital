@@ -57,8 +57,8 @@ public class ScheduleHeadDoctorController {
         }
     }
 
-    @GetMapping("/invalid-date")
-    public ResponseEntity<?> getInvalidDate(
+    @GetMapping("/invalid-examination-date")
+    public ResponseEntity<?> getInvalidExaminationDate(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam int roomId,
             @RequestParam UUID doctorId
@@ -68,7 +68,24 @@ public class ScheduleHeadDoctorController {
                         .success(true)
                         .message("Get available day of week successfully")
                         .data(scheduleDoctorServices
-                                .getInvalidDateSchedule(authorizationHeader, roomId, doctorId)
+                                .getInvalidExaminationDateSchedule(authorizationHeader, roomId, doctorId)
+                        )
+                        .build()
+        );
+    }
+
+    @GetMapping("/invalid-treatment-date")
+    public ResponseEntity<?> getInvalidTreatmentDate(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam int roomId,
+            @RequestParam UUID doctorId
+    ){
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get available day of week successfully")
+                        .data(scheduleDoctorServices
+                                .getInvalidTreatmentDateSchedule(authorizationHeader, roomId, doctorId)
                         )
                         .build()
         );
@@ -106,13 +123,24 @@ public class ScheduleHeadDoctorController {
         );
     }
 
-    @GetMapping("/rooms")
+    @GetMapping("/examination-rooms")
     public ResponseEntity<?> getExaminationRoomsDepartment(@RequestHeader("Authorization") String authorizationHeader) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
-                        .message("Get rooms in department successfully")
+                        .message("Get examination rooms in department successfully")
                         .data(roomServices.getExaminationRoomsDepartment(authorizationHeader))
+                        .build()
+        );
+    }
+
+    @GetMapping("/treatment-rooms")
+    public ResponseEntity<?> getTreatmentRoomsDepartment(@RequestHeader("Authorization") String authorizationHeader) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get treatment rooms in department successfully")
+                        .data(roomServices.getTreatmentRoomsDepartment(authorizationHeader))
                         .build()
         );
     }

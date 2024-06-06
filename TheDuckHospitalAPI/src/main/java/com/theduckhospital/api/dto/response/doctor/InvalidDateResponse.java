@@ -9,9 +9,13 @@ import java.util.List;
 public class InvalidDateResponse {
     List<Date> mornings;
     List<Date> afternoons;
+    List<Date> evenings;
+    List<Date> nights;
 
-    public InvalidDateResponse(List<Date> mornings, List<Date> afternoons) {
+    public InvalidDateResponse(List<Date> mornings, List<Date> afternoons, List<Date> evenings, List<Date> nights) {
         this.mornings = mornings;
         this.afternoons = afternoons;
+        this.evenings = evenings;
+        this.nights = nights;
     }
 }

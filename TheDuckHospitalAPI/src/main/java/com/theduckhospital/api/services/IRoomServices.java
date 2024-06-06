@@ -24,6 +24,7 @@ public interface IRoomServices {
     RoomResponse getRoomById(int roomId);
     Room findRoomById(int roomId);
     List<Room> getExaminationRoomsDepartment(String authorization);
+    List<Room> getTreatmentRoomsDepartment(String authorization);
     PaginationRoomsResponse getPaginationRooms(
             String authorization,
             int page,
