@@ -210,7 +210,7 @@ function BookingItem(props, ref) {
               <CustomLi
                 lableName="Buổi khám"
                 value={
-                  medicalBill.scheduleType === "MORNING" ? "Sáng" : "Chiều"
+                  medicalBill.scheduleSession === "MORNING" ? "Sáng" : "Chiều"
                 }
                 color="#1abc9a"
               />

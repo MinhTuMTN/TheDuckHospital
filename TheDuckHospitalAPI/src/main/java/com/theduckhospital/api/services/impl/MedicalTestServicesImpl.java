@@ -247,18 +247,15 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 throw new BadRequestException("This medical test has been paid", 10011);
             }
 
-            int totalAmount = (int) (medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
             Transaction transaction = getTransaction(token, origin, medicalTest);
             transactionRepository.save(transaction);
-
-            UUID oldTransactionId = medicalTest.getTransaction() != null ?
-                    medicalTest.getTransaction().getTransactionId() : null;
             medicalTest.setTransaction(transaction);
             medicalTestRepository.save(medicalTest);
 
-            if (oldTransactionId != null) {
+            UUID oldTransactionId = medicalTest.getTransaction() != null ?
+                    medicalTest.getTransaction().getTransactionId() : null;
+            if (oldTransactionId != null)
                 transactionRepository.deleteById(oldTransactionId);
-            }
 
             transaction.setMedicalTest(medicalTest);
             return paymentServices.createMedicalTestPaymentUrl(transaction, request);
@@ -316,7 +313,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
-        transaction.setAmount(medicalTest.getMedicalService().getPrice() + MomoConfig.medicalTestFee);
+        transaction.setAmount(medicalTest.getMedicalService().getPrice());
+        transaction.setFee((double) MomoConfig.medicalTestFee);
         transaction.setOrigin(origin);
         transaction.setPaymentType(PaymentType.MEDICAL_TEST);
         return transaction;

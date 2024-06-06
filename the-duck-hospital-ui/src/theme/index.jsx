@@ -8,6 +8,9 @@ function CustomThemeProvider(props) {
       primary: {
         main: "#006451",
       },
+      newPrimary: {
+        main: "rgb(11,83,148)",
+      },
       oldPrimary: {
         main: "#42a5f5",
       },

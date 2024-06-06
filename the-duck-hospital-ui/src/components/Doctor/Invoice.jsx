@@ -142,9 +142,12 @@ function Invoice(props, ref) {
             để thanh toán
           </Typography>
           <QRCode
-            value={medicalTest?.medicalTestId.substring(0, 13).toUpperCase()}
+            value={medicalTest?.medicalTestCode?.toUpperCase()}
             size={64}
           />
+          <Typography fontSize={12} fontWeight={500}>
+            {medicalTest?.medicalTestCode?.toUpperCase()}
+          </Typography>
         </Stack>
       </Grid>
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
@@ -163,7 +166,7 @@ function Invoice(props, ref) {
 
         <ContactItem
           title="Mã hóa đơn"
-          content={medicalTest?.medicalTestId}
+          content={medicalTest?.medicalTestCode?.toUpperCase()}
           titleMinWidth={"110px"}
         />
         <ContactItem

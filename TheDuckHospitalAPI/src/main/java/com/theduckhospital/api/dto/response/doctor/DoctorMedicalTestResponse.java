@@ -13,6 +13,7 @@ public class DoctorMedicalTestResponse {
     private String result;
     private int queueNumber;
     private UUID medicalTestId;
+    private String medicalTestCode;
 
     public DoctorMedicalTestResponse(MedicalTest medicalTest) {
         this.serviceName = medicalTest.getMedicalService().getServiceName();
@@ -21,5 +22,6 @@ public class DoctorMedicalTestResponse {
         this.result = medicalTest.getResultFileUrl();
         this.queueNumber = medicalTest.getQueueNumber();
         this.medicalTestId = medicalTest.getMedicalTestId();
+        this.medicalTestCode = medicalTest.getMedicalTestCode();
     }
 }

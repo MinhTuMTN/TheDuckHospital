@@ -8,6 +8,7 @@ import AdminMenuList from "./AdminMenuList";
 import LaboratoryTechnicalList from "./LaboratoryTechnicalList";
 import SupportAgentList from "./SupportAgentList";
 import { useMemo } from "react";
+import CashierMenuList from "./CashierMenuList";
 
 function AccountPopover(props) {
   const { anchorEl, onClose, open } = props;
@@ -31,6 +32,8 @@ function AccountPopover(props) {
         );
       case "SupportAgent":
         return <SupportAgentList onClose={onClose} setToken={setToken} />;
+      case "Cashier":
+        return <CashierMenuList onClose={onClose} setToken={setToken} />;
       default:
         return null;
     }

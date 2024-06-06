@@ -60,7 +60,7 @@ export function DoctorScheduleItem(props) {
             marginRight: 1,
           }}
         />
-        Buổi {schedule.scheduleType === "MORNING" ? "Sáng" : "Chiều"}
+        Buổi {schedule.scheduleSession === "MORNING" ? "Sáng" : "Chiều"}
       </Typography>
 
       <Typography

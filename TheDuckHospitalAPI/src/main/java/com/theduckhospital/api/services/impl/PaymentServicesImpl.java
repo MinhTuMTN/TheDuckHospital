@@ -341,11 +341,11 @@ public class PaymentServicesImpl implements IPaymentServices {
         try {
             return switch (paymentMethod) {
                 case VNPAY ->  vnPayCreatePaymentUrl(
-                        transaction.getAmount() + VNPayConfig.fee,
+                        transaction.getAmount() + transaction.getFee(),
                         transaction.getTransactionId()
                 );
                 case MOMO -> momoCreatePaymentUrl(
-                        transaction.getAmount() + MomoConfig.fee,
+                        transaction.getAmount() + transaction.getFee(),
                         transaction.getTransactionId(),
                         mobile
                 );

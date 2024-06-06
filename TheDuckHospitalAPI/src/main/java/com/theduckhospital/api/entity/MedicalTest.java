@@ -68,6 +68,6 @@ public class MedicalTest {
     @PrePersist
     public void prePersist() {
         this.medicalTestId = UUID.randomUUID();
-        this.medicalTestCode = this.medicalTestId.toString().substring(0, 13);
+        this.medicalTestCode = "MT" + this.medicalTestId.toString().substring(0, 13);
     }
 }
