@@ -176,7 +176,7 @@ function Prescription(props) {
       const response = await getMedicineItems(medicalRecordId);
       if (response.success) {
         setPrescriptionItems(response.data.data);
-        setPrescriptionCode(response.data.data[0].prescriptionCode);
+        setPrescriptionCode(response.data.data[0]?.prescriptionCode);
       }
     };
     handleGetPrescription();

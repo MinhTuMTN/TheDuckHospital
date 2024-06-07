@@ -198,7 +198,7 @@ function InpatientShiftCreateModal(props) {
 
   useEffect(() => {
     const hanleGetInpatientShift = async () => {
-      if (roomId === "") return;
+      if (roomId === "" || !nurse?.staffId) return;
       const response = await getInpatientShift(
         roomId,
         nurse?.staffId,

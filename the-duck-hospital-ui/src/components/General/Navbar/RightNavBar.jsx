@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  AccountBalanceOutlined,
   BiotechOutlined,
   BookmarkBorderOutlined,
   CalendarMonthOutlined,
@@ -139,6 +140,14 @@ const nurseMainItems = [
   },
 ];
 
+const cashierMainItems = [
+  {
+    display: "Quầy thu ngân",
+    icon: <AccountBalanceOutlined />,
+    to: "/cashier",
+  },
+];
+
 const basicItems = [
   {
     display: "Trang chủ",
@@ -243,6 +252,9 @@ function RightNavBar(props) {
         break;
       case "SupportAgent":
         mainItems = supportAgentMainItems;
+        break;
+      case "Cashier":
+        mainItems = cashierMainItems;
         break;
       default:
         break;

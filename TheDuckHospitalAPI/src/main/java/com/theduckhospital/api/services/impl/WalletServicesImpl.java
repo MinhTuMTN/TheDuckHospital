@@ -54,10 +54,10 @@ public class WalletServicesImpl implements IWalletServices {
             if (request.getAmount() <= 0)
                 throw new BadRequestException("Amount must be positive", 10115);
 
-            int totalAmount = (int) (request.getAmount() + MomoConfig.medicalTestFee);
             Transaction transaction = new Transaction();
             transaction.setAccount(account);
             transaction.setAmount(request.getAmount());
+            transaction.setFee((double) MomoConfig.medicalTestFee);
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.TOP_UP);
             transactionRepository.save(transaction);

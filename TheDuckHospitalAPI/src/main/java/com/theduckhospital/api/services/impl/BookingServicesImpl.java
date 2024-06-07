@@ -121,11 +121,11 @@ public class BookingServicesImpl implements IBookingServices {
                 throw new BadRequestException("No doctor schedule available");
 
             Transaction transaction = new Transaction();
-            transaction.setAmount(totalAmount + (
-                    request.getPaymentMethod() == PaymentMethod.WALLET
-                            ? 0
-                            :  MomoConfig.fee
-            ));
+            transaction.setAmount(totalAmount);
+            transaction.setFee(request.getPaymentMethod() == PaymentMethod.WALLET
+                    ? 0D
+                    : MomoConfig.medicalTestFee
+            );
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);
             transaction.setAccount(patientProfile.getAccount());

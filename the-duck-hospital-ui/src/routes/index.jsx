@@ -66,6 +66,7 @@ import NurseScheduleLayout from "../layouts/NurseScheduleLayout";
 import NurseSchedulePage from "../pages/Nurse/NurseSchedulePage";
 import NurseScheduleManagementPage from "../pages/Nurse/HeadNurse/NurseScheduleManagementPage";
 import CreateNurseSchedulePage from "../pages/Nurse/HeadNurse/CreateNurseSchedulePage";
+import CashierPage from "../pages/Cashier/CashierPage";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -213,6 +214,16 @@ function Router(props) {
               element: <ChatPage />,
             },
           ],
+        },
+      ],
+    },
+    {
+      path: "/",
+      element: <ProtectedLayout forRole={["Cashier"]} />,
+      children: [
+        {
+          path: "/cashier",
+          element: <CashierPage />,
         },
       ],
     },

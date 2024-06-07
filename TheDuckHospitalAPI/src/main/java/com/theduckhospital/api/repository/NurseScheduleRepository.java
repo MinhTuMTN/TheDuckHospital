@@ -53,10 +53,12 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
                     "AND ns.nurse = :nurse " +
                     "AND ns.scheduleSession = :scheduleSession " +
                     "AND ns.scheduleType = :scheduleType " +
+                    "AND ns.date = :date " +
                     "AND ns.deleted = false"
     )
     Optional<NurseSchedule> findInpatientAlreadyScheduled(
             Room room,
+            Date date,
             Nurse nurse,
             ScheduleSession scheduleSession,
             ScheduleType scheduleType
@@ -84,6 +86,8 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
     @Query(
             value = "SELECT ns FROM NurseSchedule ns " +
                     "WHERE ns.room = :room " +
+                    "AND ns.nurse.fullName LIKE %:name% " +
+                    "AND ns.scheduleSession IN :scheduleSessions " +
                     "AND ns.date BETWEEN :startDate AND :endDate " +
                     "AND ns.scheduleType = :scheduleType " +
                     "AND ns.deleted = false"
@@ -92,7 +96,9 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
             Room room,
             Date startDate,
             Date endDate,
-            ScheduleType scheduleType
+            ScheduleType scheduleType,
+            String name,
+            List<ScheduleSession> scheduleSessions
     );
 
     @Query(

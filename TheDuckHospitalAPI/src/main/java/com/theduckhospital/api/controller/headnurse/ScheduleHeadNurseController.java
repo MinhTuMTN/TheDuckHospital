@@ -2,6 +2,7 @@ package com.theduckhospital.api.controller.headnurse;
 
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
 import com.theduckhospital.api.dto.request.headnurse.CreateInpatientNurseSchedule;
 import com.theduckhospital.api.dto.response.GeneralResponse;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -158,6 +160,8 @@ public class ScheduleHeadNurseController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(value = "week", required = false) Integer week,
             @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "name", required = false, defaultValue = "") String name,
+            @RequestParam(value = "session", required = false) List<ScheduleSession> session,
             @PathVariable int roomId
     ) {
         return ResponseEntity.ok(
@@ -168,7 +172,9 @@ public class ScheduleHeadNurseController {
                                 authorizationHeader,
                                 roomId,
                                 week,
-                                year
+                                year,
+                                name,
+                                session
                         ))
                         .build()
         );

@@ -23,6 +23,7 @@ public class Transaction {
     private UUID transactionId;
 
     private double amount;
+    private Double fee = 0D;
     private TransactionStatus status;
     private Date createdAt;
     private Date lastModifiedAt;
