@@ -46,8 +46,8 @@ public class Room {
     private Integer beingUsed;
 
     // 2 thuộc tính này reset lại mỗi ngày
-    private Integer queueNumber;
-    private Integer numberOfPatients;
+    private Integer medicalTestQueueNumber;
+    private Integer medicalTestQueueNumberMax;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     @JsonBackReference
@@ -71,6 +71,9 @@ public class Room {
     private void onCreate() {
         this.createdDate = new Date();
         this.updatedDate = new Date();
+        this.medicalTestQueueNumber = 0;
+        this.medicalTestQueueNumberMax = 0;
+        this.beingUsed = 0;
     }
 
     @PreUpdate

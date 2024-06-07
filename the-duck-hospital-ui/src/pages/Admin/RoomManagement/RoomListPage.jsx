@@ -334,7 +334,11 @@ function RoomListPage(props) {
               variant="body1"
               style={{
                 color:
-                  room.departmentId === "" && addButtonClicked ? "red" : "",
+                  room.departmentId === "" &&
+                  addButtonClicked &&
+                  !room.roomType?.startsWith("LAB")
+                    ? "red"
+                    : "",
               }}
             >
               Khoa

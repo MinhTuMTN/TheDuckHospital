@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   Stack,
+  Tab,
   Table,
   TableBody,
   TableCell,
@@ -71,14 +72,16 @@ function Invoice(props, ref) {
           sx={{ width: "70%", objectFit: "contain", margin: "auto 0" }}
         />
       </Grid>
-      <Grid item xs={8.25}>
-        {contacts.map((contact, index) => (
-          <ContactItem
-            key={index}
-            title={contact.title}
-            content={contact.value}
-          />
-        ))}
+      <Grid item xs={8.25} justifyContent={"flex-end"} display={"flex"}>
+        <Box>
+          {contacts.map((contact, index) => (
+            <ContactItem
+              key={index}
+              title={contact.title}
+              content={contact.value}
+            />
+          ))}
+        </Box>
       </Grid>
 
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
@@ -217,35 +220,69 @@ function Invoice(props, ref) {
           Tổng tiền: <FormatCurrency amount={medicalTest?.price} />
         </Typography>
       </Grid>
-
       <Grid item xs={12}>
-        <Stack margin={"0 auto"} width={"5rem"} justifyContent={"center"}>
-          <Typography
-            variant="body1"
-            sx={{ fontWeight: "500" }}
-            component={"span"}
-            align="center"
-          >
-            Số thứ tự
-          </Typography>
-          <Box
-            sx={{
-              border: "1px solid #8492a6",
-              display: "block",
-              width: "5rem",
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "500", margin: "8px auto", fontSize: "2rem" }}
-              align="center"
-            >
-              {medicalTest?.queueNumber}
-            </Typography>
-          </Box>
-        </Stack>
-      </Grid>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "600",
+            color: "#8492a6",
+            fontSize: "1.125rem",
+          }}
+          mt={2}
+          mb={1}
+          textAlign="center"
+          textTransform={"uppercase"}
+        >
+          Hướng dẫn thanh toán và nhận kết quả
+        </Typography>
+        <Typography variant="body1" fontWeight={500}>
+          1. Thanh toán hoá đơn bằng một trong các cách sau:
+        </Typography>
+        <Typography variant="body1">
+          - Quét mã QR hoặc nhập mã hóa đơn để thanh toán trên ứng dụng
+          TheDuckHospital
+        </Typography>
+        <Typography variant="body1">
+          - Đến quầy thu ngân để thực hiện thanh toán
+        </Typography>
 
+        <Typography variant="body1" fontWeight={500}>
+          2. Đến thực hiện xét nghiệm tại phòng xét nghiệm của bệnh viện
+        </Typography>
+        <Table sx={{ margin: "8px 0" }}>
+          <TableHead>
+            <TableRow>
+              <TableCell align="left">Tên dịch vụ</TableCell>
+              <TableCell align="center">Chỉ định thực hiện</TableCell>
+              <TableCell align="center">Số thứ tự thực hiện</TableCell>
+              <TableCell align="center">Phòng xét nghiệm</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell align="left">{medicalTest?.serviceName}</TableCell>
+              <TableCell align="center">{medicalTest?.note}</TableCell>
+              <TableCell align="center">{medicalTest?.queueNumber}</TableCell>
+              <TableCell align="center">
+                Phòng {medicalTest?.roomName}
+                <br />
+                <i>{`(${medicalTest?.roomDescription})`}</i>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+
+        <Typography variant="body1" fontWeight={500}>
+          3. Nhận kết quả xét nghiệm:
+        </Typography>
+        <Typography variant="body1">
+          - Bệnh nhân quay về phòng khám để nhận kết quả xét nghiệm
+        </Typography>
+        <Typography variant="body1">
+          - Kết quả xét nghiệm cũng sẽ được cập nhật trên ứng dụng
+          TheDuckHospital
+        </Typography>
+      </Grid>
       <Divider sx={{ width: "100%", margin: "16px 0" }} />
     </Grid>
   );

@@ -115,7 +115,11 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalExamServices.doctorCreateMedicalTest(authorization, medicalExaminationId, request))
+                        .data(medicalExamServices.doctorCreateMedicalTest(
+                                authorization,
+                                medicalExaminationId,
+                                request
+                        ))
                         .build()
         );
     }

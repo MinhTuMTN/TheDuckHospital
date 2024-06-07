@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.MedicalExamState;
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.ServiceType;
 import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
@@ -26,6 +27,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final PrescriptionItemRepository prescriptionItemRepository;
     private final MedicineRepository medicineRepository;
     private final IAccountServices accountServices;
+    private final RoomRepository roomRepository;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
@@ -60,8 +63,8 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             PrescriptionRepository prescriptionRepository,
             PrescriptionItemRepository prescriptionItemRepository,
             MedicineRepository medicineRepository,
-            IAccountServices accountServices
-    ) {
+            IAccountServices accountServices,
+            RoomRepository roomRepository) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
         this.medicalServiceServices = medicalServiceServices;
@@ -74,6 +77,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.prescriptionItemRepository = prescriptionItemRepository;
         this.medicineRepository = medicineRepository;
         this.accountServices = accountServices;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -227,16 +231,26 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         // Thay đổi
         // B1: Tìm ra phòng có số lượng ít nhất mà xét nghiệm dịch vụ đó
         // B2: Lấy số thứ tự + 1
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Room> roomPage = roomRepository.findLaboratoryRoom(
+                medicalService,
+                RoomType.LABORATORY_ROOM_NORMAL,
+                pageable
+        );
+        if (roomPage.getContent().isEmpty())
+            throw new NotFoundException("Laboratory Room not found");
+        Room laboratoryRoom = roomPage.getContent().get(0);
+        int currentQueueNumber = laboratoryRoom.getMedicalTestQueueNumber();
         medicalTest.setQueueNumber(
-                (int) (medicalTestRepository
-                        .countByMedicalServiceAndDateAndDeletedIsFalse(
-                                medicalService,
-                                today
-                        ) + 1
-                )
+               currentQueueNumber + 1
+        );
+        medicalTest.setRoom(laboratoryRoom);
+        laboratoryRoom.setMedicalTestQueueNumberMax(
+                currentQueueNumber + 1
         );
         medicalTest.setDate(today);
 
+        roomRepository.save(laboratoryRoom);
         medicalTestRepository.save(medicalTest);
 
         List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
