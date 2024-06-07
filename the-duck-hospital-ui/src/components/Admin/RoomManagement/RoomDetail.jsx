@@ -30,6 +30,7 @@ import {
   updateRoom,
 } from "../../../services/admin/RoomServices";
 import { getRoomType } from "../../../utils/roomTypesUtils";
+import { getPaginationServices } from "../../../services/admin/MedicalServiceServices";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -97,9 +98,11 @@ function RoomDetail(props) {
     departmentId: "",
     description: "",
     roomType: "",
+    serviceId: "",
   });
   const [departments, setDepartments] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
+  const [services, setServices] = useState([]);
   const [statusSelected, setStatusSelected] = useState(false);
 
   useEffect(() => {
@@ -158,6 +161,17 @@ function RoomDetail(props) {
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, []);
 
+  const handleGetMedicalServices = useCallback(async () => {
+    const response = await getPaginationServices({
+      page: 0,
+      limit: 100,
+      serviceTypes: "MedicalTest",
+    });
+    if (response.success) {
+      setServices(response.data.data.medicalServices);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }, []);
+
   const handleUpdateRoom = async () => {
     if (roomEdit.roomName?.trim() === "") {
       enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
@@ -169,11 +183,19 @@ function RoomDetail(props) {
       return;
     }
 
+    if (roomEdit.roomType.startsWith("LAB") && roomEdit.serviceId === "") {
+      enqueueSnackbar("Dịch vụ xét nghiệm không được để trống", {
+        variant: "error",
+      });
+      return;
+    }
+
     const response = await updateRoom(room.roomId, {
       roomName: roomEdit.roomName,
       departmentId: roomEdit.departmentId,
       description: roomEdit.description,
       roomType: roomEdit.roomType,
+      medicalServiceId: roomEdit.serviceId,
     });
     if (response.success) {
       enqueueSnackbar("Cập nhật thông tin phòng thành công!", {
@@ -188,12 +210,14 @@ function RoomDetail(props) {
   const handleEditButtonClick = () => {
     handleGetDepartment();
     handleGetRoomTypes();
+    handleGetMedicalServices();
     setOpenPopup(true);
     setRoomEdit({
       roomName: room.roomName,
       departmentId: room.departmentId || "",
       description: room.description,
       roomType: room.roomType || "",
+      serviceId: room.serviceId || "",
     });
   };
 
@@ -267,6 +291,19 @@ function RoomDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
+      {room.roomType?.startsWith("LAB") && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Dịch vụ xét nghiệm</TieuDeCot>
+            </Grid>
+
+            <Grid item xs={8} md={9}>
+              <NoiDung>{room.serviceName}</NoiDung>
+            </Grid>
+          </Grid>
+        </BoxStyle>
+      )}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
@@ -441,6 +478,7 @@ function RoomDetail(props) {
                 </Typography>
                 <FormControl fullWidth error={roomEdit.departmentId === -1}>
                   <Select
+                    disabled={roomEdit.roomType.startsWith("LAB")}
                     value={roomEdit.departmentId}
                     onChange={(e) =>
                       setRoomEdit((prev) => {
@@ -519,6 +557,49 @@ function RoomDetail(props) {
                 )}
               </FormControl>
             </Box>
+            {roomEdit.roomType?.startsWith("LAB") && (
+              <Box>
+                <Typography
+                  variant="body1"
+                  style={{
+                    fontSize: "14px",
+                    marginBottom: "4px",
+                    color: roomEdit.departmentId === -1 ? "red" : "",
+                  }}
+                >
+                  Dịch vụ xét nghiệm
+                </Typography>
+                <FormControl fullWidth error={roomEdit.roomType === -1}>
+                  <Select
+                    value={roomEdit.serviceId || ""}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setRoomEdit((prev) => {
+                        return {
+                          ...prev,
+                          serviceId: e.target.value,
+                        };
+                      });
+                    }}
+                    displayEmpty
+                    required
+                    size="small"
+                    sx={{
+                      fontSize: "14px !important",
+                    }}
+                    inputProps={{ "aria-label": "Without label" }}
+                  >
+                    {services?.map((item, index) => (
+                      <MenuItem value={item.serviceId} key={`service-${index}`}>
+                        <Typography style={{ fontSize: "14px" }}>
+                          {item.serviceName}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            )}
             <Box>
               <Typography
                 variant="body1"

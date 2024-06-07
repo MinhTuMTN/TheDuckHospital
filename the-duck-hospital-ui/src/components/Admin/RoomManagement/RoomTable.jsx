@@ -1,8 +1,8 @@
+import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import CircleIcon from "@mui/icons-material/Circle";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useTheme } from "@emotion/react";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Box,
   Button,
@@ -88,7 +88,8 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {getRoomType(row.roomType)}
+            {getRoomType(row.roomType) +
+              (row.roomType?.startsWith("LAB") ? ` (${row.serviceName})` : "")}
           </CustomText>
         </TableCell>
         <TableCell>

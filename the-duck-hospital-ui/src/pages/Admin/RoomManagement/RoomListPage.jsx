@@ -1,3 +1,5 @@
+import styled from "@emotion/styled";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import {
   Box,
   Button,
@@ -10,20 +12,19 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect, useState } from "react";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import styled from "@emotion/styled";
+import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
 import SearchRoomList from "../../../components/Admin/RoomManagement/SearchRoomList";
 import DialogForm from "../../../components/General/DialogForm";
 import MuiTextFeild from "../../../components/General/MuiTextFeild";
-import RoomTable from "../../../components/Admin/RoomManagement/RoomTable";
+import { getAllDepartments } from "../../../services/admin/DepartmentServices";
+import { getPaginationServices } from "../../../services/admin/MedicalServiceServices";
 import {
   addRoom,
   getPaginationRooms,
   getRoomTypes,
 } from "../../../services/admin/RoomServices";
-import { enqueueSnackbar } from "notistack";
-import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import { getRoomType } from "../../../utils/roomTypesUtils";
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -54,11 +55,13 @@ function RoomListPage(props) {
   const [page, setPage] = useState(1);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
+  const [medicalServices, setMedicalServices] = useState([]);
   const [room, setRoom] = useState({
     roomName: "",
     departmentId: "",
     description: "",
     roomType: "",
+    medicalService: "",
   });
 
   const handlePageChange = (event, newPage) => {
@@ -118,14 +121,37 @@ function RoomListPage(props) {
     handleGetRoomTypes();
   }, []);
 
+  useEffect(() => {
+    const handleGetMedicalServices = async () => {
+      const response = await getPaginationServices({
+        page: 0,
+        limit: 100,
+        serviceTypes: "MedicalTest",
+      });
+      if (response.success) {
+        setMedicalServices(response.data.data.medicalServices);
+      } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    };
+
+    if (
+      room.roomType === "LABORATORY_ROOM_NORMAL" ||
+      room.roomType === "LABORATORY_ROOM_ADMISSION"
+    ) {
+      handleGetMedicalServices();
+    }
+  }, [room.roomType]);
+
   const handleAddRoom = async () => {
     setAddButtonClicked(true);
+    const isLabRoom =
+      room.roomType === "LABORATORY_ROOM_NORMAL" ||
+      room.roomType === "LABORATORY_ROOM_ADMISSION";
     if (room.roomName?.trim() === "") {
       enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
       return;
     }
 
-    if (room.departmentId === "" || room.departmentId === -1) {
+    if ((room.departmentId === "" || room.departmentId === -1) && !isLabRoom) {
       enqueueSnackbar("Khoa không được để trống", { variant: "error" });
       return;
     }
@@ -135,11 +161,19 @@ function RoomListPage(props) {
       return;
     }
 
+    if (isLabRoom && !room.medicalService) {
+      enqueueSnackbar("Dịch vụ xét nghiệm không được để trống", {
+        variant: "error",
+      });
+      return;
+    }
+
     const response = await addRoom({
       roomName: room.roomName,
       description: room.description,
       departmentId: room.departmentId,
       roomType: room.roomType,
+      medicalServiceId: room.medicalService.serviceId,
     });
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
@@ -256,7 +290,7 @@ function RoomListPage(props) {
             value={room.description}
             autoComplete="off"
             multiline
-            rows={4}
+            rows={3}
             onChange={(e) => {
               setRoom((prev) => ({
                 ...prev,
@@ -264,51 +298,6 @@ function RoomListPage(props) {
               }));
             }}
           />
-          <Box>
-            <CustomTypography
-              variant="body1"
-              style={{
-                color:
-                  room.departmentId === "" && addButtonClicked ? "red" : "",
-              }}
-            >
-              Khoa
-            </CustomTypography>
-
-            <FormControl
-              fullWidth
-              error={room.departmentId === "" && addButtonClicked}
-            >
-              <Select
-                value={room.departmentId}
-                onChange={(e) =>
-                  setRoom((prev) => {
-                    return {
-                      ...prev,
-                      departmentId: e.target.value,
-                    };
-                  })
-                }
-                displayEmpty
-                required
-                sx={{
-                  fontSize: "16px !important",
-                }}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                {departments?.map((item, index) => (
-                  <MenuItem key={index} value={item.departmentId}>
-                    <Typography style={{ fontSize: "16px" }}>
-                      {item.departmentName}
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Select>
-              {room.departmentId === "" && addButtonClicked && (
-                <FormHelperText>Khoa không được để trống</FormHelperText>
-              )}
-            </FormControl>
-          </Box>
           <Box>
             <CustomTypography variant="body1">Loại phòng</CustomTypography>
 
@@ -340,6 +329,96 @@ function RoomListPage(props) {
               </Select>
             </FormControl>
           </Box>
+          <Box>
+            <CustomTypography
+              variant="body1"
+              style={{
+                color:
+                  room.departmentId === "" && addButtonClicked ? "red" : "",
+              }}
+            >
+              Khoa
+            </CustomTypography>
+
+            <FormControl
+              fullWidth
+              error={
+                room.departmentId === "" &&
+                addButtonClicked &&
+                !room.roomType?.startsWith("LAB")
+              }
+            >
+              <Select
+                disabled={room.roomType?.startsWith("LAB")}
+                value={room.departmentId}
+                onChange={(e) =>
+                  setRoom((prev) => {
+                    return {
+                      ...prev,
+                      departmentId: e.target.value,
+                    };
+                  })
+                }
+                displayEmpty
+                required
+                sx={{
+                  fontSize: "16px !important",
+                }}
+                inputProps={{ "aria-label": "Without label" }}
+              >
+                {departments?.map((item, index) => (
+                  <MenuItem key={index} value={item.departmentId}>
+                    <Typography style={{ fontSize: "16px" }}>
+                      {item.departmentName}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+              {room.departmentId === "" &&
+                !room.roomType?.startsWith("LAB") &&
+                addButtonClicked && (
+                  <FormHelperText>Khoa không được để trống</FormHelperText>
+                )}
+            </FormControl>
+          </Box>
+          {room.roomType === "LABORATORY_ROOM_NORMAL" ||
+          room.roomType === "LABORATORY_ROOM_ADMISSION" ? (
+            <Box>
+              <CustomTypography variant="body1">
+                Dịch vụ xét nghiệm
+              </CustomTypography>
+
+              <FormControl fullWidth>
+                <Select
+                  value={room.medicalService}
+                  onChange={(e) =>
+                    setRoom((prev) => {
+                      return {
+                        ...prev,
+                        medicalService: e.target.value,
+                      };
+                    })
+                  }
+                  displayEmpty
+                  required
+                  sx={{
+                    fontSize: "16px !important",
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  {medicalServices?.map((item, index) => (
+                    <MenuItem key={`room-type-${index}`} value={item}>
+                      <Typography style={{ fontSize: "16px" }}>
+                        {item.serviceName}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          ) : (
+            <></>
+          )}
         </Stack>
       </DialogForm>
     </>

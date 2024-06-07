@@ -11,4 +11,5 @@ public class CreateRoomRequest {
     private String description;
     private Integer departmentId;
     private RoomType roomType;
+    private Integer medicalServiceId;
 }
