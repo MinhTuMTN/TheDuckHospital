@@ -1,6 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.ScheduleSession;
+import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Room;
@@ -42,6 +43,12 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             ScheduleSession scheduleSession
     );
 
+    List<DoctorSchedule> findByDoctorAndScheduleSessionAndScheduleTypeAndDeletedIsFalse(
+            Doctor doctor,
+            ScheduleSession scheduleSession,
+            ScheduleType scheduleType
+    );
+
     List<DoctorSchedule> findByDoctorAndDateOrderByScheduleSession(
             Doctor doctor,
             Date date
@@ -50,6 +57,12 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     List<DoctorSchedule> findByRoomAndScheduleSessionAndDeletedIsFalse(
             Room room,
             ScheduleSession scheduleSession
+    );
+
+    List<DoctorSchedule> findByRoomAndScheduleSessionAndScheduleTypeAndDeletedIsFalse(
+            Room room,
+            ScheduleSession scheduleSession,
+            ScheduleType scheduleType
     );
 
     List<DoctorSchedule> findByRoomAndDateAndDeletedIsFalse(

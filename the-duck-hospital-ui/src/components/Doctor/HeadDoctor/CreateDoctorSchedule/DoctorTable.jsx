@@ -11,6 +11,8 @@ import {
   MenuItem,
   Select,
   Stack,
+  Radio,
+  RadioGroup,
   TablePagination,
   TextField,
   Typography,
@@ -22,8 +24,10 @@ import DialogForm from "../../../General/DialogForm";
 import { enqueueSnackbar } from "notistack";
 import {
   createDoctorSchedule,
-  getInvalidDate,
-  getRoomsDepartment,
+  getInvalidExaminationDate,
+  getInvalidTreatmentDate,
+  getExaminationRoomsDepartment,
+  getTreatmentRoomsDepartment,
 } from "../../../../services/doctor/headDoctor/ScheduleServices";
 import {
   DateCalendar,
@@ -113,6 +117,22 @@ const ServerAfternoonDay = (props) => {
   return <HighlightedDay {...other} day={day} selected={isSelected} />;
 };
 
+const ServerEveningDay = (props) => {
+  const { highlightedEveningDays, day, ...other } = props;
+
+  const isSelected = highlightedEveningDays.includes(day.format("YYYY/MM/DD"));
+
+  return <HighlightedDay {...other} day={day} selected={isSelected} />;
+};
+
+const ServerNightDay = (props) => {
+  const { highlightedNightDays, day, ...other } = props;
+
+  const isSelected = highlightedNightDays.includes(day.format("YYYY/MM/DD"));
+
+  return <HighlightedDay {...other} day={day} selected={isSelected} />;
+};
+
 function DoctorTable(props) {
   const { count, onPageChange, onRowsPerPageChange, page, items, rowsPerPage } =
     props;
@@ -134,15 +154,29 @@ function DoctorTable(props) {
       checked: false,
       dates: [],
     },
+    evening: {
+      checked: false,
+      dates: [],
+    },
+    night: {
+      checked: false,
+      dates: [],
+    },
   });
   const [rooms, setRooms] = useState([]);
+  const [roomType, setRoomType] = useState("EXAMINATION_ROOM");
+  const [scheduleType, setScheduleType] = useState("EXAMINATION");
   const [highlightedMorningDays, setHighlightedMorningDays] = useState([]);
   const [highlightedAfternoonDays, setHighlightedAfternoonDays] = useState([]);
+  const [highlightedEveningDays, setHighlightedEveningDays] = useState([]);
+  const [highlightedNightDays, setHighlightedNightDays] = useState([]);
   const minDate = dayjs();
   const [valueDate] = useState(dayjs());
   const [invalidDate, setInvalidDate] = useState({
     mornings: [],
     afternoons: [],
+    evenings: [],
+    nights: [],
   });
 
   const theme = useTheme();
@@ -195,9 +229,13 @@ function DoctorTable(props) {
       medicalServiceId: doctorSchedule.medicalServiceId,
       roomId: doctorSchedule.roomId,
       slotPerTimeSlot: doctorSchedule.slot,
+      scheduleType: scheduleType,
       morningDates: highlightedMorningDays.map((date) => dayjs(date)),
       afternoonDates: highlightedAfternoonDays.map((date) => dayjs(date)),
+      eveningDates: highlightedEveningDays.map((date) => dayjs(date)),
+      nightDates: highlightedNightDays.map((date) => dayjs(date)),
     });
+    resetScheduleData();
     if (response.success) {
       enqueueSnackbar("Tạo ca trực thành công!", { variant: "success" });
       setAddButtonClicked(false);
@@ -205,17 +243,63 @@ function DoctorTable(props) {
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 
-  const handleGetRooms = useCallback(async () => {
-    const response = await getRoomsDepartment();
+  const resetScheduleData = () => {
+    setDoctorSchedule((prev) => ({
+      ...prev,
+      roomId: "",
+    }));
+    setHighlightedMorningDays([]);
+    setHighlightedAfternoonDays([]);
+    setHighlightedEveningDays([]);
+    setHighlightedNightDays([]);
+    setScheduleSelected({
+      morning: {
+        checked: true,
+        dates: [],
+      },
+      afternoon: {
+        checked: false,
+        dates: [],
+      },
+      evening: {
+        checked: false,
+        dates: [],
+      },
+      night: {
+        checked: false,
+        dates: [],
+      },
+    });
+  };
+
+  const handleGetExaminationRooms = useCallback(async () => {
+    const response = await getExaminationRoomsDepartment();
     if (response.success) {
       setRooms(response.data.data);
     } else
-      enqueueSnackbar("Lấy danh sách phòng thấy bại", { variant: "error" });
+      enqueueSnackbar("Lấy danh sách phòng khám thấy bại", {
+        variant: "error",
+      });
+  }, []);
+
+  const handleGetTreatmentRooms = useCallback(async () => {
+    const response = await getTreatmentRoomsDepartment();
+    if (response.success) {
+      setRooms(response.data.data);
+    } else
+      enqueueSnackbar("Lấy danh sách phòng nội trú thấy bại", {
+        variant: "error",
+      });
   }, []);
 
   useEffect(() => {
-    handleGetRooms();
-  }, [handleGetRooms]);
+    resetScheduleData();
+    if (roomType === "EXAMINATION_ROOM") {
+      handleGetExaminationRooms();
+    } else {
+      handleGetTreatmentRooms();
+    }
+  }, [handleGetExaminationRooms, handleGetTreatmentRooms, roomType]);
 
   const handleChange = (event) => {
     setScheduleSelected({
@@ -227,8 +311,8 @@ function DoctorTable(props) {
     });
   };
 
-  const handleGetInvalidDate = useCallback(async () => {
-    const response = await getInvalidDate({
+  const handleGetInvalidExaminationDate = useCallback(async () => {
+    const response = await getInvalidExaminationDate({
       roomId: doctorSchedule.roomId,
       doctorId: doctorSchedule.doctorId,
     });
@@ -250,14 +334,81 @@ function DoctorTable(props) {
           ),
         };
       });
+
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          evenings: [],
+        };
+      });
+
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          nights: [],
+        };
+      });
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }, [doctorSchedule.roomId, doctorSchedule.doctorId]);
+
+  const handleGetInvalidTreatmentDate = useCallback(async () => {
+    const response = await getInvalidTreatmentDate({
+      roomId: doctorSchedule.roomId,
+      doctorId: doctorSchedule.doctorId,
+    });
+    if (response.success) {
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          mornings: response.data.data.mornings.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
+      });
+
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          afternoons: response.data.data.afternoons.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
+      });
+
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          evenings: response.data.data.evenings.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
+      });
+
+      setInvalidDate((prev) => {
+        return {
+          ...prev,
+          nights: response.data.data.nights.map((date) =>
+            dayjs(date).format("YYYY/MM/DD")
+          ),
+        };
+      });
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, [doctorSchedule.roomId, doctorSchedule.doctorId]);
 
   useEffect(() => {
     if (doctorSchedule.roomId !== "") {
-      handleGetInvalidDate();
+      if (scheduleType === "EXAMINATION") {
+        handleGetInvalidExaminationDate();
+      } else {
+        handleGetInvalidTreatmentDate();
+      }
     }
-  }, [handleGetInvalidDate, doctorSchedule.roomId]);
+  }, [
+    handleGetInvalidExaminationDate,
+    handleGetInvalidTreatmentDate,
+    doctorSchedule.roomId,
+    scheduleType,
+  ]);
 
   useEffect(() => {
     setHighlightedMorningDays([]);
@@ -267,12 +418,28 @@ function DoctorTable(props) {
     setHighlightedAfternoonDays([]);
   }, [doctorSchedule.roomId, scheduleSelected.afternoon.checked]);
 
+  useEffect(() => {
+    setHighlightedEveningDays([]);
+  }, [doctorSchedule.roomId, scheduleSelected.evening.checked]);
+
+  useEffect(() => {
+    setHighlightedNightDays([]);
+  }, [doctorSchedule.roomId, scheduleSelected.night.checked]);
+
   function disableInvalidMorningDate(date) {
     return invalidDate.mornings?.includes(date.format("YYYY/MM/DD"));
   }
 
   function disableInvalidAfternoonDate(date) {
     return invalidDate.afternoons?.includes(date.format("YYYY/MM/DD"));
+  }
+
+  function disableInvalidEveningDate(date) {
+    return invalidDate.evenings?.includes(date.format("YYYY/MM/DD"));
+  }
+
+  function disableInvalidNightDate(date) {
+    return invalidDate.nights?.includes(date.format("YYYY/MM/DD"));
   }
 
   return (
@@ -297,6 +464,8 @@ function DoctorTable(props) {
                     setOpenPopup(true);
                     setHighlightedMorningDays([]);
                     setHighlightedAfternoonDays([]);
+                    setHighlightedEveningDays([]);
+                    setHighlightedNightDays([]);
                   }}
                 >
                   <Stack
@@ -339,8 +508,9 @@ function DoctorTable(props) {
           onCancel={() => {
             setOpenPopup(false);
             setAddButtonClicked(false);
-            setHighlightedMorningDays([]);
-            setHighlightedAfternoonDays([]);
+            resetScheduleData();
+            setRoomType("EXAMINATION_ROOM");
+            setScheduleType("EXAMINATION");
           }}
           onOk={handleCreateSchedule}
           open={openPopup}
@@ -348,8 +518,9 @@ function DoctorTable(props) {
           onClose={() => {
             setOpenPopup(false);
             setAddButtonClicked(false);
-            setHighlightedMorningDays([]);
-            setHighlightedAfternoonDays([]);
+            resetScheduleData();
+            setRoomType("EXAMINATION_ROOM");
+            setScheduleType("EXAMINATION");
           }}
         >
           <Stack width={"30rem"} mt={3} spacing={4}>
@@ -399,8 +570,84 @@ function DoctorTable(props) {
               người có thể đăng ký online
             </CustomTypography>
 
+            <Stack style={{ width: "50%" }}>
+              <FormControl>
+                <CustomTypography variant="body1">Loại phòng</CustomTypography>
+                <RadioGroup
+                  defaultValue="EXAMINATION_ROOM"
+                  value={roomType}
+                  row
+                >
+                  <FormControlLabel
+                    onChange={(e) => {
+                      setRoomType(e.target.value);
+                      setScheduleType("EXAMINATION");
+                    }}
+                    value="EXAMINATION_ROOM"
+                    control={<Radio />}
+                    label="Khám"
+                  />
+                  <FormControlLabel
+                    onChange={(e) => {
+                      setRoomType(e.target.value);
+                      setScheduleType("INPATIENT_EXAMINATION");
+                    }}
+                    value="TREATMENT_ROOM"
+                    control={<Radio />}
+                    label="Nội trú"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Stack>
+
+            <Box>
+              <CustomTypography
+                variant="body1"
+                style={{
+                  color:
+                    doctorSchedule.roomId === "" && addButtonClicked
+                      ? "red"
+                      : "",
+                }}
+              >
+                Phòng *
+              </CustomTypography>
+              <FormControl
+                fullWidth
+                error={doctorSchedule.roomId === "" && addButtonClicked}
+              >
+                <Select
+                  value={doctorSchedule.roomId}
+                  onChange={(e) => {
+                    setDoctorSchedule((prev) => ({
+                      ...prev,
+                      roomId: e.target.value,
+                    }));
+                  }}
+                  displayEmpty
+                  required
+                  sx={{
+                    fontSize: "16px !important",
+                    width: "100%",
+                  }}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  {rooms?.map((item, index) => (
+                    <MenuItem key={index} value={item.roomId}>
+                      <Typography style={{ fontSize: "16px" }}>
+                        {item.roomName}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+                {doctorSchedule.roomId === "" && addButtonClicked && (
+                  <FormHelperText>Phòng không được để trống</FormHelperText>
+                )}
+              </FormControl>
+            </Box>
+
             <Stack spacing={2} direction="row">
-              <Box width="50%">
+              <Box width="100%">
                 <CustomTypography
                   variant="body1"
                   style={{
@@ -450,51 +697,6 @@ function DoctorTable(props) {
                         Dịch vụ không được để trống
                       </FormHelperText>
                     )}
-                </FormControl>
-              </Box>
-
-              <Box width="50%">
-                <CustomTypography
-                  variant="body1"
-                  style={{
-                    color:
-                      doctorSchedule.roomId === "" && addButtonClicked
-                        ? "red"
-                        : "",
-                  }}
-                >
-                  Phòng *
-                </CustomTypography>
-                <FormControl
-                  fullWidth
-                  error={doctorSchedule.roomId === "" && addButtonClicked}
-                >
-                  <Select
-                    value={doctorSchedule.roomId}
-                    onChange={(e) => {
-                      setDoctorSchedule((prev) => ({
-                        ...prev,
-                        roomId: e.target.value,
-                      }));
-                    }}
-                    displayEmpty
-                    required
-                    sx={{
-                      fontSize: "16px !important",
-                    }}
-                    inputProps={{ "aria-label": "Without label" }}
-                  >
-                    {rooms?.map((item, index) => (
-                      <MenuItem key={index} value={item.roomId}>
-                        <Typography style={{ fontSize: "16px" }}>
-                          {item.roomName}
-                        </Typography>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {doctorSchedule.roomId === "" && addButtonClicked && (
-                    <FormHelperText>Phòng không được để trống</FormHelperText>
-                  )}
                 </FormControl>
               </Box>
             </Stack>
@@ -557,6 +759,7 @@ function DoctorTable(props) {
                       }}
                     />
                   </LocalizationProvider>
+
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -610,6 +813,120 @@ function DoctorTable(props) {
                       }}
                     />
                   </LocalizationProvider>
+
+                  {scheduleType !== "EXAMINATION" && (
+                    <>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={scheduleSelected.evening.checked}
+                            onChange={handleChange}
+                            name="evening"
+                          />
+                        }
+                        label={"Buổi tối"}
+                      />
+                      <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        adapterLocale="en-gb"
+                      >
+                        <DateCalendar
+                          value={valueDate}
+                          minDate={minDate}
+                          disabled={
+                            doctorSchedule.roomId === "" ||
+                            !scheduleSelected.evening.checked
+                          }
+                          shouldDisableDate={disableInvalidEveningDate}
+                          onChange={(newDate) => {
+                            setHighlightedEveningDays((prev) => {
+                              if (prev.includes(newDate.format("YYYY/MM/DD")))
+                                return prev.filter(
+                                  (prevDate) =>
+                                    prevDate !== newDate.format("YYYY/MM/DD")
+                                );
+                              else
+                                return [...prev, newDate.format("YYYY/MM/DD")];
+                            });
+                          }}
+                          slots={{
+                            day: ServerEveningDay,
+                          }}
+                          slotProps={{
+                            day: {
+                              highlightedEveningDays,
+                            },
+                          }}
+                          sx={{
+                            display: scheduleSelected.evening.checked
+                              ? ""
+                              : "none",
+                            margin: "0 auto",
+                            width: "100%",
+                            "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
+                              {
+                                justifyContent: "space-around",
+                              },
+                          }}
+                        />
+                      </LocalizationProvider>
+
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={scheduleSelected.night.checked}
+                            onChange={handleChange}
+                            name="night"
+                          />
+                        }
+                        label={"Đêm khuya"}
+                      />
+                      <LocalizationProvider
+                        dateAdapter={AdapterDayjs}
+                        adapterLocale="en-gb"
+                      >
+                        <DateCalendar
+                          value={valueDate}
+                          minDate={minDate}
+                          disabled={
+                            doctorSchedule.roomId === "" ||
+                            !scheduleSelected.night.checked
+                          }
+                          shouldDisableDate={disableInvalidNightDate}
+                          onChange={(newDate) => {
+                            setHighlightedNightDays((prev) => {
+                              if (prev.includes(newDate.format("YYYY/MM/DD")))
+                                return prev.filter(
+                                  (prevDate) =>
+                                    prevDate !== newDate.format("YYYY/MM/DD")
+                                );
+                              else
+                                return [...prev, newDate.format("YYYY/MM/DD")];
+                            });
+                          }}
+                          slots={{
+                            day: ServerNightDay,
+                          }}
+                          slotProps={{
+                            day: {
+                              highlightedNightDays,
+                            },
+                          }}
+                          sx={{
+                            display: scheduleSelected.night.checked
+                              ? ""
+                              : "none",
+                            margin: "0 auto",
+                            width: "100%",
+                            "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer":
+                              {
+                                justifyContent: "space-around",
+                              },
+                          }}
+                        />
+                      </LocalizationProvider>
+                    </>
+                  )}
                 </FormGroup>
               </FormControl>
             </Box>

@@ -40,7 +40,12 @@ public interface IScheduleDoctorServices {
             Date date
     );
 
-    InvalidDateResponse getInvalidDateSchedule(
+    InvalidDateResponse getInvalidExaminationDateSchedule(
+            String authorization,
+            int roomId,
+            UUID doctorId
+    );
+    InvalidDateResponse getInvalidTreatmentDateSchedule(
             String authorization,
             int roomId,
             UUID doctorId
