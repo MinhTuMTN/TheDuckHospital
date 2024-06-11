@@ -260,4 +260,14 @@ public class RoomServicesImpl implements IRoomServices {
     public List<RoomType> getRoomTypes() {
         return List.of(RoomType.values());
     }
+
+    @Override
+    public List<Room> getRoomsByType(List<RoomType> roomTypes) {
+        return roomRepository.findByRoomTypeInAndDeletedIsFalse(roomTypes);
+    }
+
+    @Override
+    public void saveRoom(Room room) {
+        roomRepository.save(room);
+    }
 }

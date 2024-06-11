@@ -7,5 +7,5 @@ import java.util.UUID;
 
 @Data
 public class AcceptMedicalTestsRequest {
-    List<UUID> medicalTestIds;
+    UUID medicalTestId;
 }

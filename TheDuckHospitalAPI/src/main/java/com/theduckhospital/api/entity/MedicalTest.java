@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Nationalized;
 
 import java.util.Date;
@@ -59,7 +60,7 @@ public class MedicalTest {
     private Date date;
     private boolean deleted;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "transactionId", referencedColumnName = "transactionId")
     @JsonBackReference
     @ToStringExclude

@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { Search } from "@mui/icons-material";
+import { CloseOutlined, Search } from "@mui/icons-material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import {
   Button,
   Grid,
@@ -16,12 +17,16 @@ import {
   TextField,
   tableCellClasses,
 } from "@mui/material";
-import React, { useEffect } from "react";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { getMedicalTestByMedicalServiceAndState } from "../../services/doctor/MedicalTestServices";
+import { useSnackbar } from "notistack";
+import PropTypes from "prop-types";
+import React, { useCallback, useEffect } from "react";
+import useDebounce from "../../hooks/useDebounce";
+import {
+  accpectMedicalTest,
+  getMedicalTestByRoom,
+} from "../../services/doctor/MedicalTestServices";
+import { appColors } from "../../utils/appColorsUtils";
 
 ReceivePatientsTest.propTypes = {
   status: PropTypes.string,
@@ -30,7 +35,7 @@ ReceivePatientsTest.propTypes = {
 };
 
 ReceivePatientsTest.defaultProps = {
-  setMedicalTestIds: () => { },
+  setMedicalTestIds: () => {},
 };
 
 const SearchTextField = styled(TextField)(({ theme }) => ({
@@ -49,40 +54,66 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 function ReceivePatientsTest(props) {
-  const { status, refresh, serviceId, setMedicalTestIds } = props;
+  const { status, roomId } = props;
   const [searchString, setSearchString] = React.useState("");
-  const [patientName, setPatientName] = React.useState("");
+  const patientName = useDebounce(searchString, 500);
   const [page, setPage] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(1);
   const [patients, setPatients] = React.useState([]);
-  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleGetPatients = useCallback(async () => {
+    if (!roomId) return;
+    const response = await getMedicalTestByRoom(
+      roomId,
+      patientName,
+      status,
+      page,
+      5
+    );
+
+    if (response.success) {
+      const data = response.data.data;
+      setPatients(data.items);
+      setTotalPage(data.totalPages);
+      setPage(data.page);
+    }
+  }, [roomId, status, page, patientName]);
+
+  const handleAcceptPatient = useCallback(
+    async (medicalTestId, paid) => {
+      if (!paid) {
+        enqueueSnackbar("Bệnh nhân chưa thanh toán", { variant: "error" });
+        return;
+      }
+
+      const response = await accpectMedicalTest(medicalTestId);
+      if (response.success) {
+        enqueueSnackbar("Đã tiếp nhận bệnh nhân", { variant: "success" });
+        window.open(
+          `${window.location.origin}/doctor/medical-test-record/${medicalTestId}`,
+          "_blank"
+        );
+        handleGetPatients();
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra khi tiếp nhận bệnh nhân", {
+          variant: "error",
+        });
+      }
+    },
+    [enqueueSnackbar, handleGetPatients]
+  );
 
   useEffect(() => {
-    const handleGetPatients = async () => {
-      const response = await getMedicalTestByMedicalServiceAndState({
-        serviceId: serviceId,
-        state: status,
-        page: page,
-        searchString: patientName
-      });
-
-      if (response.success) {
-        const data = response.data.data;
-        setPatients(data.items);
-        setTotalPage(data.totalPages);
-        setPage(data.page);
-        if (status === "WAITING") {
-          const medicalTestIds = data.items.slice(0, 5).map(test => test.medicalTestId);
-          setMedicalTestIds(medicalTestIds);
-        }
-      }
-    };
     handleGetPatients();
-  }, [serviceId, status, page, patientName, refresh, setMedicalTestIds]);
+    const intervalId = setInterval(() => {
+      handleGetPatients();
+    }, 30000);
 
-  const handleSearchButtonClick = () => {
-    setPatientName(searchString);
-  };
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [handleGetPatients]);
 
   return (
     <Grid item xs={12}>
@@ -91,6 +122,7 @@ function ReceivePatientsTest(props) {
           fullWidth
           variant="outlined"
           placeholder="Tìm kiếm theo tên khách hàng"
+          autoComplete="off"
           value={searchString}
           onChange={(e) => setSearchString(e.target.value)}
           InputProps={{
@@ -101,11 +133,7 @@ function ReceivePatientsTest(props) {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Button
-                  variant="text"
-                  color="info"
-                  onClick={handleSearchButtonClick}
-                >
+                <Button variant="text" color="info" onClick={handleGetPatients}>
                   Tìm kiếm
                 </Button>
               </InputAdornment>
@@ -197,8 +225,9 @@ function ReceivePatientsTest(props) {
                   }}
                   onClick={() => {
                     if (row.state === "WAITING") return;
-                    navigate(
-                      `/doctor/medical-test-record/${row.medicalTestId}`
+                    window.open(
+                      `${window.location.origin}/doctor/medical-test-record/${row.medicalTestId}`,
+                      "_blank"
                     );
                   }}
                 >
@@ -217,24 +246,37 @@ function ReceivePatientsTest(props) {
                   <TableCell align="center">
                     {row.state === "WAITING" ? (
                       <IconButton
+                        onClick={() => {
+                          handleAcceptPatient(row.medicalTestId, row.paid);
+                        }}
                         size="small"
                         sx={{
-                          color: "#5387c7",
+                          color: row.paid ? "#5387c7" : appColors.error,
                           backgroundColor: "rgba(50, 128, 200, 0.1)",
                           border: "rgba(83,199,151,.1)",
                           padding: "10px",
                           boxShadow: "0 3px 5px 0 rgba(83,199,151,.3)",
                           "&:hover": {
-                            backgroundColor: "rgba(0, 90, 215, 0.577)",
+                            backgroundColor: row.paid
+                              ? "rgba(0, 90, 215, 0.577)"
+                              : "rgba(238, 73, 73, 0.577)",
                             color: "#ffffff",
                           },
                         }}
                       >
-                        <CheckCircleOutlineIcon
-                          sx={{
-                            fontSize: "15px",
-                          }}
-                        />
+                        {row.paid ? (
+                          <CheckCircleOutlineIcon
+                            sx={{
+                              fontSize: "15px",
+                            }}
+                          />
+                        ) : (
+                          <CloseOutlined
+                            sx={{
+                              fontSize: "15px",
+                            }}
+                          />
+                        )}
                       </IconButton>
                     ) : (
                       <IconButton

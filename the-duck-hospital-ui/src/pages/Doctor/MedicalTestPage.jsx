@@ -1,14 +1,11 @@
 import { useTheme } from "@emotion/react";
+import styled from "@emotion/styled";
 import {
   Badge,
   Box,
   Button,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   Tab,
   Tabs,
@@ -17,9 +14,12 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import React, { useCallback, useEffect } from "react";
-import styled from "@emotion/styled";
-import { acceptMedicalTest, getAllMedicalTests, getCounterMedicalTest, getCurrentQueueNumber } from "../../services/doctor/MedicalTestServices";
 import ReceivePatientsTest from "../../components/Doctor/ReceivePatientsTest";
+import LabTechnicalRoomModal from "../../components/Doctor/LabTechnicalRoomModal";
+import {
+  getNextQueue,
+  getRoomCounter,
+} from "../../services/doctor/MedicalTestServices";
 import { enqueueSnackbar } from "notistack";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -32,11 +32,7 @@ function CustomTabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -58,7 +54,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
     right: -12,
     top: -1,
-    border: `2px solid ${theme.palette.background.paper}`,
+    border: `2px soxd ${theme.palette.background.paper}`,
   },
 }));
 
@@ -66,84 +62,67 @@ function MedicalTestPage(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [value, setValue] = React.useState(0);
-  const [medicalTests, setMedicalTests] = React.useState([]);
-  const [medicalTestIds, setMedicalTestIds] = React.useState([]);
-  const [currentQueueNumber, setCurrentQueueNumber] = React.useState(0);
-  const [serviceId, setServiceId] = React.useState("");
+  const [currentQueueNumber, setCurrentQueueNumber] = React.useState({
+    current: 0,
+    total: 0,
+  });
   const [counter, setCounter] = React.useState({
     waiting: 0,
     processing: 0,
   });
-  const [refresh, setRefresh] = React.useState(false);
-
-  useEffect(() => {
-    const handleGetMedicalTests = async () => {
-      const response = await getAllMedicalTests();
-      if (response.success) {
-        setMedicalTests(response.data.data);
-        if (response.data.data.length > 0) {
-          setServiceId(response.data.data[0].serviceId);
-        }
-      }
-    }
-    handleGetMedicalTests();
+  const [changeRoomModal, setChangeRoomModal] = React.useState(true);
+  const [labRoom, setLabRoom] = React.useState(null);
+  const handleCloseChangeRoomModal = useCallback(() => {
+    setChangeRoomModal(false);
+  }, []);
+  const handleOpenChangeRoomModal = useCallback(() => {
+    setChangeRoomModal(true);
   }, []);
 
-  useEffect(() => {
-    const handleGetCurrentQueueNumber = async () => {
-      const response = await getCurrentQueueNumber({ serviceId });
-      if (response.success) {
-        setCurrentQueueNumber(response.data.data);
-      }
-    }
-    handleGetCurrentQueueNumber();
-  }, [serviceId, counter]);
-
-  const acceptPatients = async () => {
-    if (medicalTestIds.length === 0) {
-      enqueueSnackbar("Không có bệnh nhân", {
-        variant: "error",
-      });
+  const handleNextQueueNumber = useCallback(async () => {
+    if (!labRoom?.roomId) {
+      enqueueSnackbar("Vui lòng chọn phòng xét nghiệm", { variant: "error" });
       return;
     }
-    const response = await acceptMedicalTest({ medicalTestIds: medicalTestIds });
+
+    const response = await getNextQueue(labRoom?.roomId);
     if (response.success) {
-      enqueueSnackbar("Tiếp nhận bệnh nhân thành công", {
-        variant: "success",
-      });
-      handleGetCounterMedicalTest();
-    } else {
-      enqueueSnackbar("Tiếp nhận bệnh nhân thất bại", {
+      const { current, total } = response.data.data;
+      setCurrentQueueNumber({ current, total });
+    } else if (response.errorCode === 10050) {
+      enqueueSnackbar("Không còn bệnh nhân nào để tiếp nhận", {
         variant: "error",
       });
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     }
-  };
+  }, [labRoom?.roomId]);
 
-  const handleGetCounterMedicalTest = useCallback(async () => {
-    const response = await getCounterMedicalTest({ serviceId });
-    if (response.success) {
-      const data = response.data.data;
-      if (
-        data.waiting !== counter.waiting ||
-        data.processing !== counter.processing
-      ) {
-        setRefresh(!refresh);
+  useEffect(() => {
+    if (labRoom) {
+      const { current, total } = labRoom;
+      setCurrentQueueNumber({ current, total });
+    }
+  }, [labRoom]);
+
+  useEffect(() => {
+    const handleGetCounter = async () => {
+      const response = await getRoomCounter(labRoom?.roomId);
+      if (response.success) {
+        const data = response.data.data;
         setCounter(data);
       }
-    }
-  }, [counter, refresh, serviceId]);
+    };
 
-  useEffect(() => {
-    handleGetCounterMedicalTest();
+    handleGetCounter();
     const intervalId = setInterval(() => {
-      handleGetCounterMedicalTest();
-    }, 10000);
-    return () => clearInterval(intervalId);
-  }, [counter, refresh, serviceId, handleGetCounterMedicalTest]);
+      handleGetCounter();
+    }, 30000);
 
-  useEffect(() => {
-    setValue(0);
-  }, [serviceId]);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [labRoom?.roomId]);
 
   return (
     <Grid
@@ -155,10 +134,7 @@ function MedicalTestPage(props) {
       }}
     >
       <Grid item xs={12} mb={2}>
-        <Stack
-          direction={"row"}
-          alignItems={"center"}
-        >
+        <Stack direction={"row"} alignItems={"center"}>
           <Typography
             variant="body1"
             sx={{
@@ -170,45 +146,46 @@ function MedicalTestPage(props) {
           >
             Danh sách bệnh nhân
           </Typography>
-          <Stack width="40%" spacing={1}>
-            <Stack direction="row" justifyContent="space-between">
+          <Stack width="100%" spacing={1}>
+            <Stack
+              direction={"row"}
+              alignItems={"center"}
+              justifyContent={"space-between"}
+              spacing={1}
+            >
               <Typography
                 variant="body1"
                 sx={{
                   fontSize: ["14px", "20px"],
                   color: theme.palette.text.main,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  textAlign: "end",
                 }}
+                flex={1}
                 fontWeight="700"
               >
-                Số tiếp theo: {currentQueueNumber > 0 ?
-                  `${currentQueueNumber} - ${currentQueueNumber + 4}` : 0}
+                Phòng {labRoom?.roomName} - {labRoom?.serviceName} - Số thứ tự:{" "}
+                {currentQueueNumber.current}
               </Typography>
-              <Button
-                variant="outlined"
-                color="info"
-                onClick={acceptPatients}
-              >
-                Tiếp nhận
-              </Button>
+              <Stack direction={"row"} columnGap={1}>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  onClick={handleNextQueueNumber}
+                >
+                  Tiếp nhận
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  onClick={handleOpenChangeRoomModal}
+                >
+                  Đổi phòng
+                </Button>
+              </Stack>
             </Stack>
-            <FormControl fullWidth size="small">
-              <InputLabel>Dịch vụ</InputLabel>
-              <Select
-                value={serviceId}
-                label="Dịch vụ"
-                onChange={(e) => setServiceId(e.target.value)}
-              >
-                {medicalTests?.map((medicalTest, index) => (
-                  <MenuItem
-                    value={medicalTest.serviceId}
-                    style={{ fontSize: "14px" }}
-                    key={index}
-                  >
-                    {medicalTest.serviceName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Stack>
         </Stack>
       </Grid>
@@ -284,22 +261,24 @@ function MedicalTestPage(props) {
             <CustomTabPanel value={value} index={0}>
               <ReceivePatientsTest
                 status={"WAITING"}
-                refresh={refresh}
-                serviceId={serviceId}
-                handleGetCounterMedicalTest={handleGetCounterMedicalTest}
-                setMedicalTestIds={setMedicalTestIds}
+                roomId={labRoom?.roomId}
               />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
               <ReceivePatientsTest
                 status={"PROCESSING"}
-                refresh={refresh}
-                serviceId={serviceId}
+                roomId={labRoom?.roomId}
               />
             </CustomTabPanel>
           </Box>
         </Stack>
       </Grid>
+
+      <LabTechnicalRoomModal
+        open={changeRoomModal}
+        onClose={handleCloseChangeRoomModal}
+        onChange={setLabRoom}
+      />
     </Grid>
   );
 }

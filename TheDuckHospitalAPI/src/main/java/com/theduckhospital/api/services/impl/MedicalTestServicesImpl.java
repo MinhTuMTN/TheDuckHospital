@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
 import com.theduckhospital.api.dto.response.PaymentResponse;
+import com.theduckhospital.api.dto.response.doctor.LabRoomResponse;
 import com.theduckhospital.api.dto.response.doctor.MedicalTestRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.SearchMedicalTestResponse;
 import com.theduckhospital.api.entity.*;
@@ -25,9 +26,8 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
@@ -40,6 +40,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final ICloudinaryServices cloudinaryServices;
     private final IPaymentServices paymentServices;
     private final IPatientServices patientServices;
+    private final IRoomServices roomServices;
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
@@ -49,7 +50,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             ICloudinaryServices cloudinaryServices,
             IAccountServices accountServices,
             IPaymentServices paymentServices,
-            IPatientServices patientServices) {
+            IPatientServices patientServices, IRoomServices roomServices) {
         this.medicalServiceServices = medicalServiceServices;
         this.bookingServices = bookingServices;
         this.accountServices = accountServices;
@@ -59,108 +60,24 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         this.paymentServices = paymentServices;
         this.laboratoryTechnicianServices = laboratoryTechnicianServices;
         this.patientServices = patientServices;
+        this.roomServices = roomServices;
     }
 
     @Override
-    public PaginationResponse getMedicalExaminationTest(
-            String patientName,
-            MedicalTestState state,
-            int serviceId,
-            int page,
-            int size
-    ) {
-        MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
-
-        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
-            throw new BadRequestException("This is not medical test");
+    public MedicalTest acceptMedicalTest(String authorization, UUID medicalTestId) {
+        if (medicalTestId == null) {
+            throw new BadRequestException("Invalid medical test id", 400);
         }
 
-        Pageable pageable = PageRequest.of(page, size);
-
-        // Thêm Room
-        Page<MedicalTest> medicalTests =
-                medicalTestRepository
-                        .findByMedicalServiceAndDeletedIsFalseAndMedicalExaminationRecord_PatientProfile_FullNameContainingIgnoreCaseAndStateOrderByQueueNumber(
-                                medicalService,
-                                patientName,
-                                state,
-                                pageable
-                        );
-        List<SearchMedicalTestResponse> searchMedicalTestResponses = new ArrayList<>();
-        for (MedicalTest medicalTest : medicalTests.getContent()) {
-            SearchMedicalTestResponse medicalTestResponse = new SearchMedicalTestResponse(
-                    medicalTest.getMedicalExaminationRecord(),
-                    medicalTest
-            );
-            searchMedicalTestResponses.add(medicalTestResponse);
-        }
-
-        return PaginationResponse.builder()
-                .items(searchMedicalTestResponses)
-                .totalItems((int) medicalTests.getTotalElements())
-                .totalPages(medicalTests.getTotalPages())
-                .page(page)
-                .limit(size)
-                .build();
-    }
-
-    @Override
-    public Map<String, String> countMedicalExaminationTest(int serviceId) {
-        MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
-
-        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
-            throw new BadRequestException("This is not medical test");
-        }
-
-        long waiting = medicalTestRepository.countByMedicalServiceAndStateAndDeletedIsFalse(
-                medicalService,
-                MedicalTestState.WAITING
-        );
-
-        long processing = medicalTestRepository.countByMedicalServiceAndStateAndDeletedIsFalse(
-                medicalService,
-                MedicalTestState.PROCESSING
-        );
-
-        return Map.of(
-                "waiting", String.valueOf(waiting),
-                "processing", String.valueOf(processing)
-        );
-    }
-
-    @Override
-    public long getCurrentQueueNumber(int serviceId) {
-        MedicalService medicalService = medicalServiceServices.getMedicalServiceById(serviceId);
-
-        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
-            throw new BadRequestException("This is not medical test");
-        }
-
-        List<MedicalTest> medicalTests = medicalTestRepository.findByMedicalServiceAndStateOrderByQueueNumberDesc(
-                medicalService,
-                MedicalTestState.PROCESSING
-        );
-
-        if (medicalTests.isEmpty()) {
-            return 0;
-        }
-
-        return medicalTests.get(0).getQueueNumber();
-    }
-
-    @Override
-    public List<MedicalTest> acceptMedicalTest(String authorization, AcceptMedicalTestsRequest request) {
         LaboratoryTechnician laboratoryTechnician = laboratoryTechnicianServices.getLaboratoryTechnicianByToken(authorization);
-        List<MedicalTest> medicalTests = new ArrayList<>();
-        for (UUID medicalTestId : request.getMedicalTestIds()) {
-            MedicalTest medicalTest = getMedicalTestById(medicalTestId);
-            medicalTest.setLaboratoryTechnician(laboratoryTechnician);
-            medicalTests.add(updateStateMedicalTest(
-                    medicalTest,
-                    MedicalTestState.PROCESSING
-            ));
+        MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+
+        if (medicalTest.getState() != MedicalTestState.WAITING) {
+            throw new BadRequestException("Invalid medical test state", 400);
         }
-        return medicalTests;
+
+        medicalTest.setLaboratoryTechnician(laboratoryTechnician);
+        return updateStateMedicalTest(medicalTest, MedicalTestState.PROCESSING);
     }
 
     private MedicalTest updateStateMedicalTest(
@@ -192,15 +109,25 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     }
 
     @Override
-    public MedicalTest completeMedicalTest(UUID medicalTestId, MultipartFile file) {
+    public boolean completeMedicalTest(UUID medicalTestId, MultipartFile file) throws IOException {
         MedicalTest medicalTest = getMedicalTestById(medicalTestId);
-        String url = cloudinaryServices.uploadFile(file);
-        if (url.isEmpty()) {
-            throw new BadRequestException("Đã có lỗi xảy ra");
-        }
-        medicalTest.setResultFileUrl(url);
+        updateMedicalTestResultAsync(medicalTestId, file.getBytes());
+        return true;
+    }
 
-        return updateStateMedicalTest(medicalTest, MedicalTestState.DONE);
+    private void updateMedicalTestResultAsync(UUID medicalTestId, Object file) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+                String url = cloudinaryServices.uploadFile(file);
+                medicalTest.setResultFileUrl(url);
+                medicalTestRepository.save(medicalTest);
+
+                updateStateMedicalTest(medicalTest, MedicalTestState.DONE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -247,17 +174,18 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 throw new BadRequestException("This medical test has been paid", 10011);
             }
 
-            Transaction transaction = getTransaction(token, origin, medicalTest);
-            transactionRepository.save(transaction);
-            medicalTest.setTransaction(transaction);
-            medicalTestRepository.save(medicalTest);
-
             UUID oldTransactionId = medicalTest.getTransaction() != null ?
                     medicalTest.getTransaction().getTransactionId() : null;
             if (oldTransactionId != null)
                 transactionRepository.deleteById(oldTransactionId);
 
+            Transaction transaction = getTransaction(token, origin, medicalTest);
             transaction.setMedicalTest(medicalTest);
+            transactionRepository.save(transaction);
+
+            medicalTest.setTransaction(transaction);
+            medicalTestRepository.save(medicalTest);
+
             return paymentServices.createMedicalTestPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -305,6 +233,102 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             medicalTestResultList.add(medicalTestResultResponse);
         }
         return medicalTestResultList;
+    }
+
+    @Override
+    public List<LabRoomResponse> getLabRooms(RoomType roomType) {
+        if (roomType != RoomType.LABORATORY_ROOM_NORMAL &&
+                roomType != RoomType.LABORATORY_ROOM_ADMISSION
+        ) {
+            throw new BadRequestException("Invalid room type", 400);
+        }
+
+        return roomServices.getRoomsByType(
+                List.of(roomType)
+        ).stream()
+                .map(LabRoomResponse::new)
+                .toList();
+    }
+
+    @Override
+    public PaginationResponse getMedicalTestsByRoomId(
+            Integer roomId,
+            String search,
+            MedicalTestState state,
+            int page,
+            int size
+    ) {
+        Room room = getLabRoomById(roomId);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<MedicalTest> medicalTests = medicalTestRepository
+                .findByRoomAndStateAndDeletedIsFalseOrderByQueueNumber(
+                        room,
+                        search,
+                        state,
+                        pageable
+                );
+
+        List<SearchMedicalTestResponse> searchMedicalTestResponses = new ArrayList<>();
+        for (MedicalTest medicalTest : medicalTests.getContent()) {
+            SearchMedicalTestResponse medicalTestResponse = new SearchMedicalTestResponse(
+                    medicalTest.getMedicalExaminationRecord(),
+                    medicalTest
+            );
+            searchMedicalTestResponses.add(medicalTestResponse);
+        }
+
+        return PaginationResponse.builder()
+                .items(searchMedicalTestResponses)
+                .totalItems((int) medicalTests.getTotalElements())
+                .totalPages(medicalTests.getTotalPages())
+                .page(page)
+                .limit(size)
+                .build();
+    }
+
+    @Override
+    public Map<String, String> getNextQueueNumber(Integer roomId) {
+        Room room = getLabRoomById(roomId);
+        if (room.getMedicalTestQueueNumber() >= room.getMedicalTestQueueNumberMax()) {
+            throw new BadRequestException("No more patient", 10050);
+        }
+
+        int nextNumber = Math.min(room.getMedicalTestQueueNumber() + 5, room.getMedicalTestQueueNumberMax());
+        room.setMedicalTestQueueNumber(nextNumber);
+        roomServices.saveRoom(room);
+
+        return Map.of("current", String.valueOf(nextNumber),
+                "total", String.valueOf(room.getMedicalTestQueueNumberMax())
+        );
+    }
+
+    @Override
+    public Map<String, String> getRoomCounter(Integer roomId) {
+        Room room = getLabRoomById(roomId);
+        long processing = medicalTestRepository.countByRoomAndStateAndDeletedIsFalse(
+                room,
+                MedicalTestState.PROCESSING
+        );
+        long waiting = room.getMedicalTestQueueNumberMax() - processing;
+
+        return Map.of("processing", String.valueOf(processing),
+                "waiting", String.valueOf(waiting)
+        );
+    }
+
+    private Room getLabRoomById(Integer roomId) {
+        if (roomId == null) {
+            throw new BadRequestException("Invalid room id", 400);
+        }
+        Room room = roomServices.findRoomById(roomId);
+        if (room.getRoomType() != RoomType.LABORATORY_ROOM_NORMAL &&
+                room.getRoomType() != RoomType.LABORATORY_ROOM_ADMISSION
+        ) {
+            throw new BadRequestException("Invalid room type", 400);
+        }
+
+        return room;
     }
 
     @NotNull

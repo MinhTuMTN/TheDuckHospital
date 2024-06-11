@@ -19,7 +19,10 @@ import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DialogConfirm from "../../components/General/DialogConfirm";
 import InfoTestPatient from "../../components/Doctor/InfoTestPatient";
-import { getMedicalTestRecord, updateMedicalTestRecord } from "../../services/doctor/MedicalTestServices";
+import {
+  getMedicalTestRecord,
+  updateMedicalTestRecord,
+} from "../../services/doctor/MedicalTestServices";
 
 const handleBasicsInfo = (medicalTestecord) => {
   return [
@@ -58,11 +61,19 @@ function MedicalTestRecord(props) {
     const handleGetMedicalTestRecord = async () => {
       const response = await getMedicalTestRecord(medicalTestId);
       if (response.success) {
-        setMedicalTestRecord(response.data.data);
-        setBasicsInfo(handleBasicsInfo(response.data.data));
+        const record = response.data.data;
+        // Change tab name
+        document.title = `${record.patientName} - Kết quả xét nghiệm`;
+        setMedicalTestRecord(record);
+        const basicsInfo = handleBasicsInfo(record);
+        setBasicsInfo(basicsInfo);
       }
     };
     handleGetMedicalTestRecord();
+
+    return () => {
+      document.title = "The Duck Hospital";
+    };
   }, [medicalTestId]);
 
   const handleUpdateMedicalTestRecord = async () => {
@@ -74,7 +85,9 @@ function MedicalTestRecord(props) {
       enqueueSnackbar("Cập nhật thành công", { variant: "success" });
       navigate("/doctor/doctor-test");
     } else {
-      enqueueSnackbar("Đã có lỗi xảy ra với file báo cáo", { variant: "error" });
+      enqueueSnackbar("Đã có lỗi xảy ra với file báo cáo", {
+        variant: "error",
+      });
     }
   };
 
@@ -189,11 +202,7 @@ function MedicalTestRecord(props) {
                   endAdornment: (
                     <IconButton component="label">
                       <FileUploadOutlined />
-                      <input
-                        type="file"
-                        hidden
-                        onChange={handleFileChange}
-                      />
+                      <input type="file" hidden onChange={handleFileChange} />
                     </IconButton>
                   ),
                 }}

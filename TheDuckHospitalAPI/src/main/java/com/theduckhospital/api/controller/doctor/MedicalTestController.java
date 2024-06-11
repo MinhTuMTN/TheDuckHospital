@@ -1,6 +1,7 @@
 package com.theduckhospital.api.controller.doctor;
 
 import com.theduckhospital.api.constant.MedicalTestState;
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalServiceServices;
@@ -10,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -37,64 +39,82 @@ public class MedicalTestController {
         );
     }
 
-    @GetMapping("/medical-service")
-    public ResponseEntity<?> searchMedicalTestsByMedicalServiceAndState(
-            @RequestParam(defaultValue = "") String searchString,
-            @RequestParam int serviceId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam MedicalTestState state
+    @GetMapping("/lab-rooms")
+    public ResponseEntity<?> getLabRooms(
+            @RequestParam(required = false, defaultValue = "LABORATORY_ROOM_NORMAL") RoomType roomType
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.getMedicalExaminationTest(
-                                searchString,
+                        .data(medicalTestServices.getLabRooms(roomType))
+                        .build()
+        );
+    }
+
+    @GetMapping("/lab-rooms/{roomId}")
+    public ResponseEntity<?> getMedicalTestsByRoomId(
+            @PathVariable Integer roomId,
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "PENDING") MedicalTestState state,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "5") int size
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .data(medicalTestServices.getMedicalTestsByRoomId(
+                                roomId,
+                                search,
                                 state,
-                                serviceId,
                                 page,
-                                size))
+                                size
+                        ))
                         .build()
         );
     }
 
-    @GetMapping("/count")
-    public ResponseEntity<?> countMedicalExaminationRecord(
-            @RequestParam int serviceId
+    @GetMapping("/lab-rooms/{roomId}/next")
+    public ResponseEntity<?> getNextQueueNumber(
+            @PathVariable Integer roomId
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.countMedicalExaminationTest(serviceId))
+                        .data(medicalTestServices.getNextQueueNumber(
+                                roomId
+                        ))
                         .build()
         );
     }
 
-    @GetMapping("/current-queue-number")
-    public ResponseEntity<?> getCurrentQueueNumber(
-            @RequestParam int serviceId
+    @GetMapping("/lab-rooms/{roomId}/counter")
+    public ResponseEntity<?> getRoomCounter(
+            @PathVariable Integer roomId
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.getCurrentQueueNumber(serviceId))
+                        .data(medicalTestServices.getRoomCounter(
+                                roomId
+                        ))
                         .build()
         );
     }
 
-    @PutMapping("/accept")
+    @PutMapping("/{medicalTestId}/accept")
     public ResponseEntity<?> acceptMedicalTest(
             @RequestHeader("Authorization") String authorization,
-            @RequestBody AcceptMedicalTestsRequest request
+            @PathVariable UUID medicalTestId
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.acceptMedicalTest(authorization, request))
+                        .data(medicalTestServices.acceptMedicalTest(authorization, medicalTestId))
                         .build()
         );
     }
@@ -113,7 +133,10 @@ public class MedicalTestController {
     }
 
     @PutMapping("/{medicalTestId}/complete")
-    public ResponseEntity<?> CompleteMedicalTest(@PathVariable UUID medicalTestId, @RequestParam MultipartFile file) {
+    public ResponseEntity<?> CompleteMedicalTest(
+            @PathVariable UUID medicalTestId,
+            @RequestParam MultipartFile file
+    ) throws IOException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)

@@ -30,4 +30,11 @@ public interface IRoomServices {
             int limit
     );
     List<RoomType> getRoomTypes();
+    /**
+     * Get all rooms by type
+     * @param roomTypes list of room types
+     * @return list of rooms by types
+     */
+    List<Room> getRoomsByType(List<RoomType> roomTypes);
+    void saveRoom(Room room);
 }

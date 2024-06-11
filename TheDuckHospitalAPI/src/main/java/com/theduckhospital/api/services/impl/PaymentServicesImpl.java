@@ -17,10 +17,12 @@ import com.theduckhospital.api.repository.TimeSlotRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPaymentServices;
+import jakarta.transaction.TransactionalException;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -366,6 +368,7 @@ public class PaymentServicesImpl implements IPaymentServices {
     }
 
     @Override
+    @Transactional
     public boolean paymentWithWallet(Transaction transaction, String pinCode) {
         if (pinCode == null || pinCode.isEmpty())
             throw new BadRequestException("Pin code is required", 10031);
@@ -381,14 +384,66 @@ public class PaymentServicesImpl implements IPaymentServices {
         account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())));
 
         Transaction transactionResult = updateTransactionAndBooking(
-                transaction.getTransactionId(),
+                transaction,
                 "WALLET",
                 "WALLET",
                 TransactionStatus.SUCCESS
         );
+        if (transactionResult == null)
+        {
+            throw new StatusCodeException("Internal server error", 500);
+        }
         accountServices.saveAccount(account);
 
-        return transactionResult != null;
+        return true;
+    }
+
+    private Transaction updateTransactionAndBooking(
+            Transaction transaction,
+            String bankCode,
+            String paymentMethod,
+            TransactionStatus status
+    ) {
+        try {
+            if (status == TransactionStatus.FAILED) {
+                transaction.setStatus(status);
+                transactionRepository.save(transaction);
+                return transaction;
+            }
+            transaction.setStatus(TransactionStatus.SUCCESS);
+            transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
+            transaction.setPaymentMethod(paymentMethod);
+            transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
+            transactionRepository.save(transaction);
+
+            // Update Booking
+            if (transaction.getPaymentType() == PaymentType.BOOKING) {
+                List<Booking> bookings = transaction.getBookings();
+                for (Booking booking : bookings) {
+                    TimeSlot timeSlot = booking.getTimeSlot();
+
+                    booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
+                    booking.setDeleted(false);
+                    bookingRepository.save(booking);
+
+                    timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
+                    timeSlotRepository.save(timeSlot);
+                }
+            }
+            else if (transaction.getPaymentType() == PaymentType.TOP_UP) {
+                Account account = transaction.getAccount();
+                account.setBalance(
+                        account.getBalance()
+                                .add(BigDecimal.valueOf(
+                                        transaction.getAmount() - MomoConfig.medicalTestFee
+                                )));
+                accountServices.saveAccount(account);
+            }
+
+            return transaction;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private Transaction updateTransactionAndBooking(
@@ -401,41 +456,6 @@ public class PaymentServicesImpl implements IPaymentServices {
         if (transaction == null)
             return null;
 
-        if (status == TransactionStatus.FAILED) {
-            transaction.setStatus(status);
-            transactionRepository.save(transaction);
-            return transaction;
-        }
-        transaction.setStatus(TransactionStatus.SUCCESS);
-        transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
-        transaction.setPaymentMethod(paymentMethod);
-        transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
-        transactionRepository.save(transaction);
-
-        // Update Booking
-        if (transaction.getPaymentType() == PaymentType.BOOKING) {
-            List<Booking> bookings = transaction.getBookings();
-            for (Booking booking : bookings) {
-                TimeSlot timeSlot = booking.getTimeSlot();
-
-                booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
-                booking.setDeleted(false);
-                bookingRepository.save(booking);
-
-                timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
-                timeSlotRepository.save(timeSlot);
-            }
-        }
-        else if (transaction.getPaymentType() == PaymentType.TOP_UP) {
-            Account account = transaction.getAccount();
-            account.setBalance(
-                    account.getBalance()
-                            .add(BigDecimal.valueOf(
-                                    transaction.getAmount() - MomoConfig.medicalTestFee
-                            )));
-            accountServices.saveAccount(account);
-        }
-
-        return transaction;
+        return updateTransactionAndBooking(transaction, bankCode, paymentMethod, status);
     }
 }
