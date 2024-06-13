@@ -172,7 +172,7 @@ function PrescriptionInvoice(props, ref) {
           </TableHead>
           <TableBody>
             {prescriptionItems?.map((item, index) => (
-              <TableRow key={item.prescirptionItemId}>
+              <TableRow key={`prescription-item-${index}`}>
                 <StyledTableCell align="left">{index + 1}</StyledTableCell>
                 <StyledTableCell align="left">
                   {item?.medicine?.medicineName} <br />

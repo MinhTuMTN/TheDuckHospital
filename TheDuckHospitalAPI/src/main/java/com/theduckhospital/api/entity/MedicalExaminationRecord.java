@@ -58,6 +58,11 @@ public class MedicalExaminationRecord {
     private String diagnosis; // chẩn đoán
     private Date reExaminationDate; // ngày tái khám (nếu có)
 
+    @OneToOne(mappedBy = "medicalExaminationRecord", fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private HospitalAdmission hospitalAdmission;
+
     private MedicalExamState state = MedicalExamState.WAITING;
 
     private boolean deleted;

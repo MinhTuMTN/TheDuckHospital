@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 InfoPatient.propTypes = {
   mainInfo: PropTypes.object,
   info: PropTypes.array,
-  history: PropTypes.object,
+  history: PropTypes.any,
 };
 
 const getInitials = (name) => {
@@ -236,6 +236,13 @@ function InfoPatient(props) {
                     </Stack>
                   </Stack>
                   <IconButton
+                    onClick={() => {
+                      nagivate(`/doctor/history/${row?.medicalRecordId}`, {
+                        state: {
+                          medicalRecordId,
+                        },
+                      });
+                    }}
                     variant="text"
                     sx={{
                       alignItems: "center",
@@ -260,13 +267,6 @@ function InfoPatient(props) {
                         fontSize: "18px",
                         color: "#474747",
                         transition: "all 0.4s ease-in",
-                      }}
-                      onClick={() => {
-                        nagivate(`/doctor/history/${row?.medicalRecordId}`, {
-                          state: {
-                            medicalRecordId,
-                          },
-                        });
                       }}
                     />
                   </IconButton>

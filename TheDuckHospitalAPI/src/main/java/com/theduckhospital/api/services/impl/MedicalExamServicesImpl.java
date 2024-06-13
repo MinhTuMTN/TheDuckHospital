@@ -1,11 +1,9 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.DateCommon;
-import com.theduckhospital.api.constant.MedicalExamState;
-import com.theduckhospital.api.constant.RoomType;
-import com.theduckhospital.api.constant.ServiceType;
+import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.doctor.HospitalAdmissionRequest;
 import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
@@ -50,6 +48,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final MedicineRepository medicineRepository;
     private final IAccountServices accountServices;
     private final RoomRepository roomRepository;
+    private final HospitalAdmissionRepository hospitalAdmissionRepository;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
@@ -64,7 +63,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             PrescriptionItemRepository prescriptionItemRepository,
             MedicineRepository medicineRepository,
             IAccountServices accountServices,
-            RoomRepository roomRepository) {
+            RoomRepository roomRepository, HospitalAdmissionRepository hospitalAdmissionRepository) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
         this.medicalServiceServices = medicalServiceServices;
@@ -78,6 +77,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.medicineRepository = medicineRepository;
         this.accountServices = accountServices;
         this.roomRepository = roomRepository;
+        this.hospitalAdmissionRepository = hospitalAdmissionRepository;
     }
 
     @Override
@@ -533,6 +533,46 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             throw new BadRequestException("Medical Examination Record is deleted or not belong to this patient");
 
         return new PatientHistoryRecordDetails(medicalExaminationRecord);
+    }
+
+    @Override
+    public HospitalAdmission doctorHospitalAdmission(
+            String authorization,
+            UUID medicalExaminationId,
+            HospitalAdmissionRequest request
+    ) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
+                authorization,
+                medicalExaminationId
+        );
+
+        HospitalAdmission hospitalAdmission;
+        HospitalAdmission oldHospitalAdmission = medicalExaminationRecord.getHospitalAdmission();
+        if (oldHospitalAdmission != null) {
+            if (oldHospitalAdmission.getState() == HospitalAdmissionState.WAITING_FOR_PAYMENT)
+                hospitalAdmission = oldHospitalAdmission;
+            else
+                throw new BadRequestException(("Hospital Admission cannot be updated"));
+        } else {
+            hospitalAdmission = new HospitalAdmission();
+            hospitalAdmission.setMedicalExaminationRecord(medicalExaminationRecord);
+        }
+
+        hospitalAdmission.setDoctor(doctor);
+        hospitalAdmission.setDoctorName(doctor.getFullName());
+        hospitalAdmission.setPatientProfile(medicalExaminationRecord.getPatientProfile());
+        hospitalAdmission.setDepartment(doctor.getDepartment());
+        hospitalAdmission.setAdmissionDate(request.getAdmissionDate());
+        hospitalAdmission.setSymptom(request.getSymptom());
+        hospitalAdmission.setDiagnosis(request.getDiagnosis());
+        hospitalAdmissionRepository.save(hospitalAdmission);
+
+        medicalExaminationRecord.setSymptom(request.getSymptom());
+        medicalExaminationRecord.setDiagnosis(request.getDiagnosis());
+        medicalExaminationRepository.save(medicalExaminationRecord);
+
+        return hospitalAdmission;
     }
 
     private PrescriptionItem createPrescriptionItem(

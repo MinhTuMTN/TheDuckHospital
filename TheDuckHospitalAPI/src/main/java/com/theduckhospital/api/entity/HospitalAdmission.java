@@ -20,6 +20,7 @@ import java.util.UUID;
 public class HospitalAdmission {
     @Id
     private UUID hospitalAdmissionId;
+    private String hospitalAdmissionCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
@@ -30,6 +31,8 @@ public class HospitalAdmission {
     @ToStringExclude
     @JsonBackReference
     private Doctor doctor;
+    @Nationalized
+    private String doctorName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude
@@ -44,6 +47,9 @@ public class HospitalAdmission {
     private Date admissionDate;
     @Nationalized
     private String diagnosis;
+    @Nationalized
+    private String symptom;
+
 
     private double roomFee;
 
@@ -77,4 +83,35 @@ public class HospitalAdmission {
     @JsonBackReference
     @ToStringExclude
     private Discharge discharge;
+
+    @OneToOne
+    @JoinColumn(name = "medicalExaminationRecordId", referencedColumnName = "medicalExaminationRecordId")
+    @JsonBackReference
+    @ToStringExclude
+    private  MedicalExaminationRecord medicalExaminationRecord;
+
+    private Date createdAt;
+    private Date updatedAt;
+    private boolean deleted;
+
+    @PrePersist
+    public void prePersist() {
+        this.hospitalAdmissionId = UUID.randomUUID();
+        this.hospitalAdmissionCode = "HA" + this.hospitalAdmissionId
+                .toString()
+                .substring(0, 13)
+                .toUpperCase();
+        this.debtFee = 0;
+        this.paidFee = 0;
+        this.totalFee = 0;
+        this.state = HospitalAdmissionState.WAITING_FOR_PAYMENT;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+        this.deleted = false;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date();
+    }
 }

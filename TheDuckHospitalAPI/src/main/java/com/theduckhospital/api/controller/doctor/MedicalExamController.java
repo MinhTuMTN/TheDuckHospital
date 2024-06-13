@@ -2,6 +2,7 @@ package com.theduckhospital.api.controller.doctor;
 
 import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.doctor.HospitalAdmissionRequest;
 import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalExamServices;
@@ -31,6 +32,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.acceptMedicalExamination(authorization, medicalExaminationId))
                         .build()
         );
@@ -45,6 +47,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.completeMedicalExamination(authorization, medicalExaminationId))
                         .build()
         );
@@ -59,6 +62,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.doctorGetMedicalExamination(authorization, medicalExaminationId))
                         .build()
         );
@@ -74,6 +78,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices
                                 .doctorGetHistoryMedicalExamination(
                                         authorization,
@@ -94,6 +99,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices
                                 .doctorUpdateMedicalRecord(
                                         authorization,
@@ -115,6 +121,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.doctorCreateMedicalTest(
                                 authorization,
                                 medicalExaminationId,
@@ -123,6 +130,27 @@ public class MedicalExamController {
                         .build()
         );
     }
+
+    @PostMapping("/{medicalExaminationId}/hospital-admission")
+    public ResponseEntity<?> hospitalAdmission(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId,
+            @RequestBody HospitalAdmissionRequest request
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Success")
+                        .statusCode(200)
+                        .data(medicalExamServices.doctorHospitalAdmission(
+                                authorization,
+                                medicalExaminationId,
+                                request
+                        ))
+                        .build()
+        );
+    }
+
 
     @GetMapping("/{medicalExaminationId}/medical-test")
     public ResponseEntity<?> getMedicalTests(
@@ -133,12 +161,13 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.doctorGetMedicalTests(authorization, medicalExaminationId))
                         .build()
         );
     }
 
-    @DeleteMapping ("/{medicalExaminationId}/medical-test/{medicalTestId}")
+    @DeleteMapping("/{medicalExaminationId}/medical-test/{medicalTestId}")
     public ResponseEntity<?> getMedicalTests(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("medicalExaminationId") UUID medicalExaminationId,
@@ -148,6 +177,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices
                                 .doctorDeleteMedicalTest(
                                         authorization,
@@ -169,6 +199,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.doctorAddMedicine(authorization, medicalExaminationId, request))
                         .build()
         );
@@ -183,6 +214,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices.doctorGetMedicines(authorization, medicalExaminationId))
                         .build()
         );
@@ -198,6 +230,7 @@ public class MedicalExamController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
+                        .statusCode(200)
                         .data(medicalExamServices
                                 .doctorDeleteMedicine(
                                         authorization,

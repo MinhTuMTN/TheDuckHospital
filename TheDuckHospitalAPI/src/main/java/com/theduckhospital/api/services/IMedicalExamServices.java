@@ -2,6 +2,7 @@ package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.doctor.HospitalAdmissionRequest;
 import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
@@ -13,6 +14,7 @@ import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalRecordResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.dto.response.doctor.HistoryMedicalRecord;
+import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.PrescriptionItem;
 
@@ -63,4 +65,9 @@ public interface IMedicalExamServices {
     List<PatientHistoryMedicalRecord> patientGetMedicalRecords(String authorization);
 
     PatientHistoryRecordDetails patientGetMedicalRecordDetails(String authorization, UUID medicalRecordId);
+    HospitalAdmission doctorHospitalAdmission(
+            String authorization,
+            UUID medicalExaminationId,
+            HospitalAdmissionRequest request
+    );
 }

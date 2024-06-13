@@ -310,7 +310,10 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 room,
                 MedicalTestState.PROCESSING
         );
-        long waiting = room.getMedicalTestQueueNumberMax() - processing;
+        long waiting = medicalTestRepository.countByRoomAndStateAndDeletedIsFalse(
+                room,
+                MedicalTestState.WAITING
+        );
 
         return Map.of("processing", String.valueOf(processing),
                 "waiting", String.valueOf(waiting)

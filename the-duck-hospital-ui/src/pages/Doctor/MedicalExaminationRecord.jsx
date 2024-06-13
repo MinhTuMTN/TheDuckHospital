@@ -35,6 +35,8 @@ import {
 } from "../../services/doctor/MedicalExamServices";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { appColors } from "../../utils/appColorsUtils";
+import HospitalAdmissionModal from "../../components/Doctor/HospitalAdmissionModal";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -117,6 +119,8 @@ function MedicalExaminationRecord(props) {
   const [openComplete, setOpenComplete] = React.useState(false);
   const [isCheck, setIsCheck] = React.useState(false);
   const [dateOfReExamination, setDateOfReExamination] = React.useState(dayjs());
+  const [openHospitalAdmission, setOpenHospitalAdmission] =
+    React.useState(false);
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
   };
@@ -138,10 +142,6 @@ function MedicalExaminationRecord(props) {
   }, [medicalRecordId]);
 
   const handleUpdateMedicalRecord = async () => {
-    console.log(
-      isCheck &&
-        (!dateOfReExamination || dayjs(dateOfReExamination).isBefore(dayjs()))
-    );
     if (
       isCheck &&
       (!dateOfReExamination || dayjs(dateOfReExamination).isBefore(dayjs()))
@@ -403,39 +403,65 @@ function MedicalExaminationRecord(props) {
               </div>
               <Stack
                 direction={"row"}
-                justifyContent={"flex-end"}
+                justifyContent={"space-between"}
                 alignItems={"center"}
-                spacing={1}
               >
                 <Button
                   variant="outlined"
                   sx={{
-                    borderColor: "#00a9dd",
-                    color: "#00a9dd",
+                    borderColor: appColors.error,
+                    color: appColors.error,
                     textTransform: "none",
                     "&:hover": {
-                      backgroundColor: "none",
+                      backgroundColor: appColors.error,
+                      borderColor: appColors.error,
+                      color: "#fff",
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                  onClick={() => setOpenHospitalAdmission(true)}
+                >
+                  Nhập viện
+                </Button>
+                <Stack
+                  direction={"row"}
+                  justifyContent={"flex-end"}
+                  alignItems={"center"}
+                  spacing={1}
+                >
+                  <Button
+                    variant="outlined"
+                    sx={{
                       borderColor: "#00a9dd",
-                    },
-                  }}
-                  onClick={handleUpdateMedicalRecord}
-                >
-                  Lưu
-                </Button>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#4caf50",
-                    color: "#fff",
-                    textTransform: "none",
-                    "&:hover": {
+                      color: "#00a9dd",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#00a9dd",
+                        borderColor: "#00a9dd",
+                        color: "#fff",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
+                    onClick={handleUpdateMedicalRecord}
+                  >
+                    Lưu
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{
                       backgroundColor: "#4caf50",
-                    },
-                  }}
-                  onClick={() => setOpenComplete(true)}
-                >
-                  Hoàn thành
-                </Button>
+                      color: "#fff",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#4caf50",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
+                    onClick={() => setOpenComplete(true)}
+                  >
+                    Hoàn thành
+                  </Button>
+                </Stack>
               </Stack>
             </Stack>
           </Grid>
@@ -451,6 +477,14 @@ function MedicalExaminationRecord(props) {
         content={"Bạn có chắc chắn muốn hoàn thành khám bệnh này?"}
         onOk={() => handleCompleteMedicalRecord()}
         onCancel={() => setOpenComplete(false)}
+      />
+
+      <HospitalAdmissionModal
+        open={openHospitalAdmission}
+        onClose={() => setOpenHospitalAdmission(false)}
+        diagnostic={diagnostic}
+        symptoms={symptom}
+        info={info}
       />
     </>
   );
