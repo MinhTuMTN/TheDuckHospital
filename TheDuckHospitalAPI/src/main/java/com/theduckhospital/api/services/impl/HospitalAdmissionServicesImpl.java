@@ -1,6 +1,8 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.Fee;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.nurse.HospitalAdmissionDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateRoomHospitalAdmission;
 import com.theduckhospital.api.entity.HospitalAdmission;
@@ -51,8 +53,12 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
             throw new BadRequestException("Nurse does not have permission to update this hospital admission");
         }
 
+        if (hospitalAdmission.getState() == HospitalAdmissionState.WAITING_FOR_PAYMENT) {
+            throw new BadRequestException("Hospital admission is not payment yet", 10060);
+        }
+
         if (hospitalAdmission.getState() != HospitalAdmissionState.WAITING_FOR_TREATMENT) {
-            throw new BadRequestException("Hospital admission is not payment yet");
+            throw new BadRequestException("Hospital admission is not waiting for treatment", 10061);
         }
 
         Room room = roomServices.findRoomById(request.getRoomId());
@@ -60,10 +66,15 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
             throw new BadRequestException("Nurse does not have permission to update this room");
         }
         if (room.getBeingUsed() != null && room.getBeingUsed() >= room.getCapacity()) {
-            throw new BadRequestException("Room is full");
+            throw new BadRequestException("Room is full", 10062);
         }
 
         hospitalAdmission.setRoom(room);
+        hospitalAdmission.setRoomFee(
+                room.getRoomType() == RoomType.TREATMENT_ROOM_STANDARD
+                ? Fee.STANDARD_ROOM_FEE
+                : Fee.VIP_ROOM_FEE
+        );
         hospitalAdmission.setNurse(nurse);
         hospitalAdmission.setState(HospitalAdmissionState.BEING_TREATED);
         hospitalAdmissionRepository.save(hospitalAdmission);

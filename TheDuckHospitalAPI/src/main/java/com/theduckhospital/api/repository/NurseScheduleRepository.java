@@ -2,18 +2,12 @@ package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.ScheduleType;
-import com.theduckhospital.api.entity.DoctorSchedule;
-import com.theduckhospital.api.entity.Nurse;
-import com.theduckhospital.api.entity.NurseSchedule;
-import com.theduckhospital.api.entity.Room;
+import com.theduckhospital.api.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UUID> {
@@ -134,4 +128,10 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
     );
 
     Optional<NurseSchedule> findByNurseScheduleId(UUID nurseScheduleId);
+    List<NurseSchedule> findByNurseScheduleIdInAndNurse_DepartmentAndScheduleTypeAndDateGreaterThanEqual(
+            Collection<UUID> nurseScheduleId,
+            Department nurse_department,
+            ScheduleType scheduleType,
+            Date date
+    );
 }

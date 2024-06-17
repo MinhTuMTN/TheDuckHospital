@@ -434,9 +434,12 @@ public class PaymentServicesImpl implements IPaymentServices {
                 Account account = transaction.getAccount();
                 account.setBalance(
                         account.getBalance()
-                                .add(BigDecimal.valueOf(
-                                        transaction.getAmount() - MomoConfig.medicalTestFee
-                                )));
+                                .add(
+                                        BigDecimal.valueOf(
+                                                transaction.getAmount()
+                                        )
+                                )
+                );
                 accountServices.saveAccount(account);
             }
 

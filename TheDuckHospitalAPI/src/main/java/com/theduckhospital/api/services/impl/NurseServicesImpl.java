@@ -486,6 +486,21 @@ public class NurseServicesImpl implements INurseServices {
         return nurse;
     }
 
+    @Override
+    public boolean deleteAllNurseSchedule(String authorization, List<UUID> scheduleIds) {
+        Nurse headNurse = getNurseByToken(authorization);
+        List<NurseSchedule> nurseSchedules = nurseScheduleRepository
+                .findByNurseScheduleIdInAndNurse_DepartmentAndScheduleTypeAndDateGreaterThanEqual(
+                        scheduleIds,
+                        headNurse.getDepartment(),
+                        ScheduleType.INPATIENT_EXAMINATION,
+                        DateCommon.getStarOfDay(new Date())
+                );
+
+        nurseScheduleRepository.deleteAll(nurseSchedules);
+        return true;
+    }
+
     private Room getRoomById(int roomId, Department department) {
         Optional<Room> optional = roomRepository
                 .findRoomByRoomIdAndDepartmentAndDeletedIsFalse(

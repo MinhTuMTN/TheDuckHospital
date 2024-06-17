@@ -124,7 +124,9 @@ public class BookingServicesImpl implements IBookingServices {
             transaction.setAmount(totalAmount);
             transaction.setFee(request.getPaymentMethod() == PaymentMethod.WALLET
                     ? 0D
-                    : MomoConfig.medicalTestFee
+                    : request.getPaymentMethod() == PaymentMethod.VNPAY
+                    ? Fee.VNPAY_BOOKING_FEE
+                    : Fee.MOMO_BOOKING_FEE
             );
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.BOOKING);

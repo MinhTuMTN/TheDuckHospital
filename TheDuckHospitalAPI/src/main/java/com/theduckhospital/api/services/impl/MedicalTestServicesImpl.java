@@ -179,7 +179,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             if (oldTransactionId != null)
                 transactionRepository.deleteById(oldTransactionId);
 
-            Transaction transaction = getTransaction(token, origin, medicalTest);
+            Transaction transaction = getTransaction(token, origin, medicalTest, request.getPaymentMethod());
             transaction.setMedicalTest(medicalTest);
             transactionRepository.save(transaction);
 
@@ -335,13 +335,19 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     }
 
     @NotNull
-    private Transaction getTransaction(String token, String origin, MedicalTest medicalTest) {
+    private Transaction getTransaction(String token, String origin, MedicalTest medicalTest, PaymentMethod paymentMethod) {
         Account account = accountServices.findAccountByToken(token);
 
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(medicalTest.getMedicalService().getPrice());
-        transaction.setFee((double) MomoConfig.medicalTestFee);
+
+        double fee = paymentMethod == PaymentMethod.WALLET
+                ? 0D
+                : paymentMethod == PaymentMethod.VNPAY
+                ? Fee.VNPAY_MEDICAL_TEST_FEE
+                : Fee.MOMO_MEDICAL_TEST_FEE;
+        transaction.setFee(fee);
         transaction.setOrigin(origin);
         transaction.setPaymentType(PaymentType.MEDICAL_TEST);
         return transaction;

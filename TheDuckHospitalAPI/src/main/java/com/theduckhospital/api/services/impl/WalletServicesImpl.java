@@ -1,9 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.DateCommon;
-import com.theduckhospital.api.constant.MomoConfig;
-import com.theduckhospital.api.constant.PaymentType;
-import com.theduckhospital.api.constant.TransactionStatus;
+import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.OpenWalletRequest;
 import com.theduckhospital.api.dto.request.TopUpWalletRequest;
 import com.theduckhospital.api.dto.response.*;
@@ -57,7 +54,10 @@ public class WalletServicesImpl implements IWalletServices {
             Transaction transaction = new Transaction();
             transaction.setAccount(account);
             transaction.setAmount(request.getAmount());
-            transaction.setFee((double) MomoConfig.medicalTestFee);
+            transaction.setFee(request.getPaymentMethod() == PaymentMethod.MOMO
+                    ? Fee.MOMO_TOP_UP_WALLET_FEE
+                    : Fee.VNPAY_TOP_UP_WALLET_FEE
+            );
             transaction.setOrigin(origin);
             transaction.setPaymentType(PaymentType.TOP_UP);
             transactionRepository.save(transaction);
