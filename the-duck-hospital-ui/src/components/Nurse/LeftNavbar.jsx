@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import Filter9PlusIcon from "@mui/icons-material/Filter9Plus";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
+import KingBedIcon from "@mui/icons-material/KingBed";
 import {
   Box,
   Button,
@@ -22,7 +23,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
-const sidebarItems = [
+const sidebarManageItems = [
   {
     display: "Tiếp nhận bệnh nhân",
     icon: <PersonIcon />,
@@ -31,8 +32,16 @@ const sidebarItems = [
 
   {
     display: "Số thứ tự",
-    icon: <Filter9PlusIcon />,
+    icon: <Filter9PlusIcon fontSize="small" />,
     to: "/nurse-room/queue-number",
+  },
+];
+
+const hospitalizationManageItems = [
+  {
+    display: "Tiếp nhận nhập viện",
+    icon: <KingBedIcon />,
+    to: "/nurse-room/hospitalization-choose-room",
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
@@ -44,11 +53,10 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   paddingX: "16px",
 }));
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
-  marginRight: theme.spacing(0.5),
+  //marginLeft: theme.spacing("16px"),
   width: "100%",
   color: "#797575",
-  fontWeight: "450",
-  fontSize: "16px",
+  fontSize: "13px",
 
   "&:hover": {
     backgroundColor: active === "true" ? "#333860da" : "#ebebeb6c",
@@ -56,7 +64,8 @@ const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
 }));
 
 const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-  padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
+  padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(3)}`,
+  fontSize: "10px",
 }));
 
 function LeftNavbar(props) {
@@ -101,15 +110,15 @@ function LeftNavbar(props) {
               textAlign: "left",
               textTransform: "uppercase",
               fontWeight: "bold",
-              color: "#020222",
-              fontSize: "18px",
+              color: "#466f92",
+              fontSize: "14px",
             }}
           >
             Quản lý
           </Typography>
         </Box>
         <List>
-          {sidebarItems.map((item, index) => (
+          {sidebarManageItems.map((item, index) => (
             <NavLink
               key={`nav-bar-store-${index}`}
               style={{ textDecoration: "none" }}
@@ -120,7 +129,55 @@ function LeftNavbar(props) {
                   <CustomListItemIcon>{item.icon}</CustomListItemIcon>
                   <ListItemText
                     disableTypography
-                    style={{ fontSize: "16px" }}
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#5a5c61",
+                    }}
+                    primary={item.display}
+                  />
+                </CustomListItemButton>
+              </ListItem>
+            </NavLink>
+          ))}
+        </List>
+        <Box
+          sx={{
+            justifyContent: "flex-start",
+            width: "100%",
+            paddingX: 2,
+            marginTop: 0,
+          }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              textTransform: "uppercase",
+              fontWeight: "600",
+              color: "#466f92",
+              fontSize: "14px",
+            }}
+          >
+            Nhập viện
+          </Typography>
+        </Box>
+        <List>
+          {hospitalizationManageItems.map((item, index) => (
+            <NavLink
+              key={`nav-bar-store-${index}`}
+              style={{ textDecoration: "none" }}
+              to={item.to}
+            >
+              <ListItem disablePadding key={item.section}>
+                <CustomListItemButton>
+                  <CustomListItemIcon>{item.icon}</CustomListItemIcon>
+                  <ListItemText
+                    disableTypography
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#5a5c61",
+                    }}
                     primary={item.display}
                   />
                 </CustomListItemButton>
