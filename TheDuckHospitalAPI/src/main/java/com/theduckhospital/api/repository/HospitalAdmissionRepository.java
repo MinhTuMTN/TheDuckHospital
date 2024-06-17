@@ -9,4 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface HospitalAdmissionRepository extends JpaRepository<HospitalAdmission, UUID> {
+    Optional<HospitalAdmission> findByHospitalAdmissionCodeAndDeletedIsFalse(String hospitalAdmissionCode);
 }

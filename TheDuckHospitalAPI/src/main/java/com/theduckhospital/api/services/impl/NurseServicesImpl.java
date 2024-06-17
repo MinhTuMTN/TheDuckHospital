@@ -464,6 +464,7 @@ public class NurseServicesImpl implements INurseServices {
         return nurseSchedule;
     }
 
+    @Override
     public Nurse getNurseByToken(String token) {
         token = token.substring(7);
 

@@ -6,70 +6,66 @@ import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.admin.FilteredRoomsResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.PaginationRoomsResponse;
-import com.theduckhospital.api.entity.Department;
-import com.theduckhospital.api.entity.Doctor;
-import com.theduckhospital.api.entity.MedicalService;
-import com.theduckhospital.api.entity.Room;
+import com.theduckhospital.api.dto.response.nurse.RoomStatisticResponse;
+import com.theduckhospital.api.dto.response.nurse.TreatmentRoomDetailsResponse;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.DepartmentRepository;
-import com.theduckhospital.api.repository.DoctorScheduleRepository;
 import com.theduckhospital.api.repository.MedicalServiceRepository;
 import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
+import com.theduckhospital.api.services.INurseServices;
 import com.theduckhospital.api.services.IRoomServices;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoomServicesImpl implements IRoomServices {
     private final RoomRepository roomRepository;
-    private final DoctorScheduleRepository doctorScheduleRepository;
     private final MedicalServiceRepository medicalServiceRepository;
-    private final DepartmentRepository departmentRepository;
     private final IDepartmentServices departmentServices;
     private final IDoctorServices doctorServices;
+    private final INurseServices nurseServices;
 
     public RoomServicesImpl(RoomRepository roomRepository,
                             IDepartmentServices departmentServices,
-                            DoctorScheduleRepository doctorScheduleRepository,
-                            MedicalServiceRepository medicalServiceRepository, IDoctorServices doctorServices,
-                            DepartmentRepository departmentRepository
+                            MedicalServiceRepository medicalServiceRepository,
+                            IDoctorServices doctorServices,
+                            INurseServices nurseServices
     ) {
         this.roomRepository = roomRepository;
-        this.doctorScheduleRepository = doctorScheduleRepository;
         this.departmentServices = departmentServices;
         this.medicalServiceRepository = medicalServiceRepository;
         this.doctorServices = doctorServices;
-        this.departmentRepository = departmentRepository;
+        this.nurseServices = nurseServices;
     }
     @Override
     public RoomResponse createRoom(CreateRoomRequest request) {
         boolean isLaboratoryRoom = request.getRoomType() == RoomType.LABORATORY_ROOM_ADMISSION
                 || request.getRoomType() == RoomType.LABORATORY_ROOM_NORMAL;
+
+        boolean isTreatmentRoom = request.getRoomType() == RoomType.TREATMENT_ROOM_STANDARD
+                || request.getRoomType() == RoomType.TREATMENT_ROOM_VIP;
         Department department = null;
         if (request.getDepartmentId() != null && !isLaboratoryRoom)
             department = departmentServices.getDepartmentById(request.getDepartmentId());
 
-        MedicalService medicalService = null;
-        if (request.getMedicalServiceId() != null && isLaboratoryRoom) {
-            Optional<MedicalService> optional = medicalServiceRepository.findById(request.getMedicalServiceId());
+        MedicalService medicalService = isLaboratoryRoom
+                ? getMedicalTestService(request.getMedicalServiceId())
+                : null;
 
-            if (optional.isEmpty() || optional.get().isDeleted()) {
-                throw new NotFoundException("Medical service not found");
+        int capacity = 0;
+        if (isTreatmentRoom) {
+            if (request.getCapacity() < 1) {
+                throw new BadRequestException("Capacity must be greater than 0");
             }
 
-            medicalService = optional.get();
-            if (medicalService.getServiceType() != ServiceType.MedicalTest) {
-                throw new BadRequestException("Medical service is not medical test");
-            }
+            capacity = request.getCapacity();
         }
 
 
@@ -79,6 +75,7 @@ public class RoomServicesImpl implements IRoomServices {
         room.setDepartment(department);
         room.setRoomType(request.getRoomType());
         room.setMedicalService(medicalService);
+        room.setCapacity(capacity);
         room.setDeleted(false);
 
         return new RoomResponse(roomRepository.save(room));
@@ -93,24 +90,23 @@ public class RoomServicesImpl implements IRoomServices {
         RoomType roomType = request.getRoomType() == null ? optional.get().getRoomType() : request.getRoomType();
         boolean isLabRoom = roomType == RoomType.LABORATORY_ROOM_ADMISSION
                 || request.getRoomType() == RoomType.LABORATORY_ROOM_NORMAL;
+        boolean isTreatmentRoom = roomType == RoomType.TREATMENT_ROOM_STANDARD
+                || request.getRoomType() == RoomType.TREATMENT_ROOM_VIP;
+
         Department department = null;
         if (request.getDepartmentId() != null && !isLabRoom)
             department = departmentServices.getDepartmentById(request.getDepartmentId());
 
-        MedicalService medicalService = null;
-        if (request.getMedicalServiceId() != null && isLabRoom) {
-            Optional<MedicalService> optionalMedicalService = medicalServiceRepository.findById(request.getMedicalServiceId());
+        MedicalService medicalService = isLabRoom && request.getMedicalServiceId() != null
+                ? getMedicalTestService(request.getMedicalServiceId())
+                : null;
 
-            if (optionalMedicalService.isEmpty() || optionalMedicalService.get().isDeleted()) {
-                throw new NotFoundException("Medical service not found");
-            }
-
-            medicalService = optionalMedicalService.get();
-            if (medicalService.getServiceType() != ServiceType.MedicalTest) {
-                throw new BadRequestException("Medical service is not medical test");
-            }
+        if (request.getCapacity() != null && request.getCapacity() < 1 && isTreatmentRoom) {
+            throw new BadRequestException("Capacity must be greater than 0");
         }
-
+        Integer capacity = isTreatmentRoom && request.getCapacity() != null
+                ? request.getCapacity()
+                : null;
         Room room = optional.get();
         room.setRoomName(request.getRoomName() == null ?
                 room.getRoomName() :
@@ -122,6 +118,10 @@ public class RoomServicesImpl implements IRoomServices {
                 room.getDepartment() :
                 department
         );
+        room.setCapacity(capacity == null && isTreatmentRoom ?
+                room.getCapacity() :
+                capacity
+        );
         room.setRoomType(roomType);
         room.setMedicalService(medicalService == null && isLabRoom ?
                 room.getMedicalService() :
@@ -129,6 +129,23 @@ public class RoomServicesImpl implements IRoomServices {
         );
 
         return new RoomResponse(roomRepository.save(room));
+    }
+
+    private MedicalService getMedicalTestService(Integer medicalServiceId) {
+        if (medicalServiceId == null) {
+            throw new BadRequestException("Medical service id is required");
+        }
+        Optional<MedicalService> optional = medicalServiceRepository.findById(medicalServiceId);
+        if (optional.isEmpty() || optional.get().isDeleted()) {
+            throw new NotFoundException("Medical service not found");
+        }
+
+        MedicalService medicalService = optional.get();
+        if (medicalService.getServiceType() != ServiceType.MedicalTest) {
+            throw new BadRequestException("Medical service is not medical test");
+        }
+
+        return medicalService;
     }
 
     @Override
@@ -163,24 +180,33 @@ public class RoomServicesImpl implements IRoomServices {
     public FilteredRoomsResponse getPaginationFilteredRooms(
             String search,
             int page,
-            int limit
+            int limit,
+            List<RoomType> roomTypes,
+            List<Boolean> statuses
     ) {
-        List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
+        if (roomTypes == null || roomTypes.isEmpty()) {
+            roomTypes = List.of(RoomType.values());
+        }
+        if (statuses == null || statuses.isEmpty()) {
+            statuses = List.of(true, false);
+        }
+//        List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
 
-        List<Room> rooms = roomRepository.findByRoomNameContainingOrDepartmentInOrderByRoomName(search, departments);
 
         Pageable pageable = PageRequest.of(page, limit);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), rooms.size());
-        List<Room> pageContent = rooms.subList(start, end);
-
+        Page<Room> roomPage = roomRepository
+                .findByRoomNameContainingAndRoomTypeInAndDeletedInOrderByRoomName(
+                        search,
+                        roomTypes,
+                        statuses,
+                        pageable
+                );
         List<RoomResponse> response = new ArrayList<>();
-        for (Room room : pageContent) {
+        for (Room room : roomPage.getContent()) {
             response.add(new RoomResponse(room));
         }
 
-        return new FilteredRoomsResponse(response, rooms.size(), page, limit);
+        return new FilteredRoomsResponse(response, (int) roomPage.getTotalElements(), page, limit);
     }
 
     @Override
@@ -286,5 +312,66 @@ public class RoomServicesImpl implements IRoomServices {
     @Override
     public void saveRoom(Room room) {
         roomRepository.save(room);
+    }
+
+    @Override
+    public Map<String, RoomStatisticResponse> getRoomStatistic(String authorization) {
+        Nurse nurse = nurseServices.getNurseByToken(authorization);
+        Department department = nurse.getDepartment();
+        if (department == null) {
+            throw new RuntimeException("Nurse does not belong to any department");
+        }
+
+        List<RoomType> roomTypes = List.of(
+                RoomType.TREATMENT_ROOM_STANDARD,
+                RoomType.TREATMENT_ROOM_VIP
+        );
+
+        List<Object[]> roomStatistics = roomRepository.getRoomStatistic(department, roomTypes);
+        Map<String, RoomStatisticResponse> responses = new HashMap<>();
+        for (Object[] statistic : roomStatistics) {
+            RoomStatisticResponse response = new RoomStatisticResponse();
+            response.setRoomType((RoomType) statistic[0]);
+            response.setTotalRooms((long) statistic[1]);
+            response.setTotalBed((long) statistic[2]);
+            response.setTotalBedUsed((long) statistic[3]);
+
+            responses.put(response
+                    .getRoomType()
+                    .name()
+                    .split("_")[2]
+                    .toLowerCase(),
+                    response
+            );
+        }
+
+        return responses;
+    }
+
+    @Override
+    public List<TreatmentRoomDetailsResponse> getTreatmentRoomDetails(
+            String authorization,
+            RoomType roomType
+    ) {
+        if (roomType != RoomType.TREATMENT_ROOM_STANDARD
+                && roomType != RoomType.TREATMENT_ROOM_VIP
+        ) {
+            throw new BadRequestException("Room type is not treatment room");
+        }
+
+        Nurse nurse = nurseServices.getNurseByToken(authorization);
+        Department department = nurse.getDepartment();
+        if (department == null) {
+            throw new RuntimeException("Nurse does not belong to any department");
+        }
+
+        List<Room> rooms = roomRepository
+                .findByDepartmentAndRoomTypeAndDeletedIsFalse(
+                        department,
+                        roomType
+                );
+        return rooms.stream()
+                .map(TreatmentRoomDetailsResponse::new)
+                .toList();
     }
 }
