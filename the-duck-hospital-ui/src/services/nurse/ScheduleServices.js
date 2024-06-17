@@ -70,3 +70,12 @@ export const getInpatientShift = (roomId, nurseId, month, year) => {
     }
   );
 };
+
+export const getShift = (roomId, session, name, week, year) => {
+  return get(`/head-nurse/schedules/rooms/${roomId}/inpatient-room-schedules`, {
+    session,
+    name,
+    week,
+    year,
+  });
+};

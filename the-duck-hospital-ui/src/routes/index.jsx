@@ -67,6 +67,7 @@ import NurseSchedulePage from "../pages/Nurse/NurseSchedulePage";
 import NurseScheduleManagementPage from "../pages/Nurse/HeadNurse/NurseScheduleManagementPage";
 import CreateNurseSchedulePage from "../pages/Nurse/HeadNurse/CreateNurseSchedulePage";
 import CashierPage from "../pages/Cashier/CashierPage";
+import ChooseRoomForPatient from "../pages/Nurse/Hospitalization/ChooseRoomForPatient";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -247,6 +248,10 @@ function Router(props) {
             {
               path: "queue-number",
               element: <QueueNumberPage />,
+            },
+            {
+              path: "hospitalization-choose-room",
+              element: <ChooseRoomForPatient />,
             },
           ],
         },

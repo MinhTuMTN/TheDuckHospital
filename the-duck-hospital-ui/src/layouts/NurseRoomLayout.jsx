@@ -5,23 +5,18 @@ import LeftNavbar from "../components/Nurse/LeftNavbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import { NurseContext } from "../auth/NurseProvider";
 import { enqueueSnackbar } from "notistack";
+import { Box } from "@mui/material";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",
-  flex: "1 1 auto",
+  flex: "1",
   maxWidth: "100%",
   [theme.breakpoints.up("lg")]: {
     paddingLeft: SIDE_NAV_WIDTH,
   },
 }));
 
-const LayoutContainer = styled("div")({
-  display: "flex",
-  flex: "1 1 auto",
-  flexDirection: "column",
-  width: "100%",
-});
 function NurseLayout(props) {
   const [open, setOpen] = React.useState(false);
   const { roomId, roomName, doctorScheduleId, departmentName } =
@@ -36,7 +31,7 @@ function NurseLayout(props) {
     }
   }, [roomId, roomName, doctorScheduleId, departmentName, navigate]);
   return (
-    <>
+    <Box display={"flex"} flexDirection={"column"} minHeight={"100vh"}>
       <TopNavBar
         onDrawerClick={setOpen}
         roomName={roomName}
@@ -44,11 +39,9 @@ function NurseLayout(props) {
       />
       <LeftNavbar open={open} onOpenClose={setOpen} />
       <LayoutRoot>
-        <LayoutContainer>
-          <Outlet />
-        </LayoutContainer>
+        <Outlet />
       </LayoutRoot>
-    </>
+    </Box>
   );
 }
 
