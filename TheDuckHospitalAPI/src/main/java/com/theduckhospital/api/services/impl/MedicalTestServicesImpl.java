@@ -2,7 +2,6 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
-import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
@@ -32,11 +31,8 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
-    private final IBookingServices bookingServices;
-    private final IAccountServices accountServices;
     private final MedicalTestRepository medicalTestRepository;
     private final ILaboratoryTechnicianServices laboratoryTechnicianServices;
-    private final TransactionRepository transactionRepository;
     private final ICloudinaryServices cloudinaryServices;
     private final IPaymentServices paymentServices;
     private final IPatientServices patientServices;
@@ -44,18 +40,15 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
-            IBookingServices bookingServices, MedicalTestRepository medicalTestRepository,
-            TransactionRepository transactionRepository,
+            MedicalTestRepository medicalTestRepository,
             ILaboratoryTechnicianServices laboratoryTechnicianServices,
             ICloudinaryServices cloudinaryServices,
-            IAccountServices accountServices,
             IPaymentServices paymentServices,
-            IPatientServices patientServices, IRoomServices roomServices) {
+            IPatientServices patientServices,
+            IRoomServices roomServices
+    ) {
         this.medicalServiceServices = medicalServiceServices;
-        this.bookingServices = bookingServices;
-        this.accountServices = accountServices;
         this.medicalTestRepository = medicalTestRepository;
-        this.transactionRepository = transactionRepository;
         this.cloudinaryServices = cloudinaryServices;
         this.paymentServices = paymentServices;
         this.laboratoryTechnicianServices = laboratoryTechnicianServices;
@@ -157,34 +150,14 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
     @Override
     @Transactional
-    public PaymentResponse patientPayMedicalTest(String token, PayMedicalTestRequest request, String origin) {
+    public PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin) {
         try {
-            Optional<MedicalTest> optional = medicalTestRepository
-                    .findByMedicalTestCodeAndDeletedIsFalse(
-                            request.getMedicalTestCode()
+            Transaction transaction = paymentServices
+                    .createMedicalTestTransaction(
+                            request,
+                            origin,
+                            null
                     );
-
-            if (optional.isEmpty()) {
-                throw new BadRequestException("Not found medical test", 10010);
-            }
-            MedicalTest medicalTest = optional.get();
-            if (medicalTest.getTransaction() != null &&
-                    medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
-            ) {
-                throw new BadRequestException("This medical test has been paid", 10011);
-            }
-
-            UUID oldTransactionId = medicalTest.getTransaction() != null ?
-                    medicalTest.getTransaction().getTransactionId() : null;
-            if (oldTransactionId != null)
-                transactionRepository.deleteById(oldTransactionId);
-
-            Transaction transaction = getTransaction(token, origin, medicalTest, request.getPaymentMethod());
-            transaction.setMedicalTest(medicalTest);
-            transactionRepository.save(transaction);
-
-            medicalTest.setTransaction(transaction);
-            medicalTestRepository.save(medicalTest);
 
             return paymentServices.createMedicalTestPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
@@ -223,6 +196,11 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                         Comparator.comparing(MedicalTest::getDate).reversed())
                 .toList();
 
+        return getMedicalTestResultResponses(medicalTests);
+    }
+
+    @NotNull
+    private static List<MedicalTestResultResponse> getMedicalTestResultResponses(List<MedicalTest> medicalTests) {
         List<MedicalTestResultResponse> medicalTestResultList = new ArrayList<>();
         for (MedicalTest test : medicalTests) {
             MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
@@ -332,24 +310,5 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
 
         return room;
-    }
-
-    @NotNull
-    private Transaction getTransaction(String token, String origin, MedicalTest medicalTest, PaymentMethod paymentMethod) {
-        Account account = accountServices.findAccountByToken(token);
-
-        Transaction transaction = new Transaction();
-        transaction.setAccount(account);
-        transaction.setAmount(medicalTest.getMedicalService().getPrice());
-
-        double fee = paymentMethod == PaymentMethod.WALLET
-                ? 0D
-                : paymentMethod == PaymentMethod.VNPAY
-                ? Fee.VNPAY_MEDICAL_TEST_FEE
-                : Fee.MOMO_MEDICAL_TEST_FEE;
-        transaction.setFee(fee);
-        transaction.setOrigin(origin);
-        transaction.setPaymentType(PaymentType.MEDICAL_TEST);
-        return transaction;
     }
 }

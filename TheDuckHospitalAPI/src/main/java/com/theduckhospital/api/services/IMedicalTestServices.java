@@ -23,7 +23,7 @@ public interface IMedicalTestServices {
     MedicalTestRecordResponse getMedicalTestRecordById(UUID medicalTestId);
     boolean completeMedicalTest(UUID medicalTestId, MultipartFile file) throws IOException;
     PatientMedicalTestDetailsResponse patientGetMedicalTestDetails(String medicalTestCode);
-    PaymentResponse patientPayMedicalTest(String token, PayMedicalTestRequest request, String origin);
+    PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin);
     List<MedicalService> patientGetMedicalTests();
     List<MedicalTestResultResponse> patientGetMedicalTestResults(
             String patientCode,

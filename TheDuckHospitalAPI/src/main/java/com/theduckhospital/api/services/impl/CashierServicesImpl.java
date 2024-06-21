@@ -1,16 +1,18 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.Fee;
-import com.theduckhospital.api.constant.HospitalAdmissionState;
-import com.theduckhospital.api.constant.PaymentType;
-import com.theduckhospital.api.constant.TransactionStatus;
+import com.theduckhospital.api.constant.*;
+import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
+import com.theduckhospital.api.dto.request.cashier.CashierPaymentRequest;
+import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.cashier.BillDetailsResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.HospitalAdmissionRepository;
 import com.theduckhospital.api.repository.MedicalTestRepository;
+import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.ICashierServices;
+import com.theduckhospital.api.services.IPaymentServices;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -22,13 +24,19 @@ import java.util.UUID;
 public class CashierServicesImpl implements ICashierServices {
     private final MedicalTestRepository medicalTestRepository;
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
+    private final IPaymentServices paymentServices;
+    private final IAccountServices accountServices;
 
     public CashierServicesImpl(
             MedicalTestRepository medicalTestRepository,
-            HospitalAdmissionRepository hospitalAdmissionRepository
+            HospitalAdmissionRepository hospitalAdmissionRepository,
+            IPaymentServices paymentServices,
+            IAccountServices accountServices
     ) {
         this.medicalTestRepository = medicalTestRepository;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
+        this.paymentServices = paymentServices;
+        this.accountServices = accountServices;
     }
 
     @Override
@@ -37,9 +45,10 @@ public class CashierServicesImpl implements ICashierServices {
         String code;
         UUID id;
         double amount = 0;
-        Date date = new Date();
+        Date date;
         PaymentType paymentType;
         String note = "";
+
         if (paymentCode.startsWith("MT")) {
             Optional<MedicalTest> optional = medicalTestRepository
                     .findByMedicalTestCodeAndDeletedIsFalse(paymentCode);
@@ -96,5 +105,61 @@ public class CashierServicesImpl implements ICashierServices {
                 .paymentType(paymentType)
                 .note(note)
                 .build();
+    }
+
+    @Override
+    public PaymentResponse createPayment(String token, CashierPaymentRequest request, String origin) {
+        if (request.getPaymentMethod() == PaymentMethod.WALLET) {
+            throw new BadRequestException("Payment method not supported", 10013);
+        }
+
+        Cashier cashier = findCashierByToken(token);
+        String paymentCode = request.getPaymentCode();
+        PayMedicalTestRequest payMedicalTestRequest = PayMedicalTestRequest
+                .builder()
+                .medicalTestCode(paymentCode)
+                .paymentMethod(request.getPaymentMethod())
+                .build();
+        if (paymentCode.startsWith("MT")) {
+            Transaction transaction = paymentServices
+                    .createMedicalTestTransaction(
+                            payMedicalTestRequest,
+                            origin,
+                            cashier
+                    );
+
+            return paymentServices
+                    .createMedicalTestPaymentUrl(
+                            transaction,
+                            payMedicalTestRequest
+                    );
+        } else if (paymentCode.startsWith("HA")) {
+            Transaction transaction = paymentServices
+                    .createHospitalAdmissionTransaction(
+                            payMedicalTestRequest,
+                            origin,
+                            cashier
+                    );
+
+            return paymentServices
+                    .createHospitalAdmissionPaymentUrl(
+                            transaction,
+                            payMedicalTestRequest
+                    );
+        }
+        return null;
+    }
+
+    @Override
+    public Cashier findCashierByToken(String token) {
+        Account account = accountServices.findAccountByToken(token);
+        if (account.getStaff() == null)
+            throw new NotFoundException("Cashier not found");
+
+        Staff staff = account.getStaff();
+        if (!(staff instanceof Cashier))
+            throw new NotFoundException("Cashier not found");
+
+        return (Cashier) staff;
     }
 }

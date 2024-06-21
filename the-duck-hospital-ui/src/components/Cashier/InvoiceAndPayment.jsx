@@ -8,11 +8,13 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { appColors } from "../../utils/appColorsUtils";
 import dayjs from "dayjs";
 import { getPaymentType } from "../../utils/paymentTypeUtils";
 import FormatCurrency from "../General/FormatCurrency";
+import { createPayment } from "../../services/cashier/CashierServices";
+import { useSnackbar } from "notistack";
 
 const Container = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -43,6 +45,28 @@ function InvoiceAndPayment(props) {
     () => (paymentDetails ? dayjs(paymentDetails?.date) : dayjs()),
     [paymentDetails]
   );
+  const { enqueueSnackbar } = useSnackbar();
+  const handlePayment = useCallback(async () => {
+    const response = await createPayment({
+      paymentCode: paymentDetails?.code,
+      paymentMethod,
+    });
+
+    if (response.success) {
+      if (paymentMethod === "CASH") {
+        enqueueSnackbar("Thanh toán thành công", {
+          variant: "success",
+        });
+        return;
+      } else {
+        window.open(response.data.data.paymentUrl, "_blank");
+      }
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra, vui lòng thử lại sau", {
+        variant: "error",
+      });
+    }
+  }, [paymentMethod, paymentDetails, enqueueSnackbar]);
   return (
     <Container>
       <Stack mb={1}>
@@ -77,7 +101,7 @@ function InvoiceAndPayment(props) {
           fontWeight={600}
           textTransform={"uppercase"}
         >
-          {paymentDetails?.paymentCode}
+          {paymentDetails?.code}
         </Typography>
       </Box>
       <Box
@@ -238,6 +262,7 @@ function InvoiceAndPayment(props) {
       <Box mt={1} justifyContent={"flex-end"} display={"flex"}>
         <Button
           variant="outlined"
+          onClick={handlePayment}
           sx={{
             color: appColors.primary,
             borderColor: appColors.primary,

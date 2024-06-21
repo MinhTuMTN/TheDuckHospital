@@ -53,6 +53,11 @@ public class Transaction {
     @ToStringExclude
     private Account account;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ToStringExclude
+    private Cashier cashier;
+
     private PaymentType paymentType;
 
     @PrePersist
