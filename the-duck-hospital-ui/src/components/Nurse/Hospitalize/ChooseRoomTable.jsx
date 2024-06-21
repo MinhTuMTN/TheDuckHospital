@@ -14,10 +14,12 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
 import CustomLine from "../../General/CustomLine";
 import HeaderModal from "../../General/HeaderModal";
 import dayjs from "dayjs";
+import { chooseTreatmentRoom } from "../../../services/nurse/HospitalizeServices";
+import { useSnackbar } from "notistack";
 
 const style = {
   position: "absolute",
@@ -46,9 +48,10 @@ const BodyModal = styled(Stack)({
 });
 
 function ChooseRoomTable(props) {
-  const { rooms, admissionRecords } = props;
+  const { rooms, admissionRecords, hospitalAdmissionCode, onRefresh } = props;
   const [selectedRoom, setSelectedRoom] = React.useState({});
   const [open, setOpen] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
   const hanldeOpen = (room) => {
     setOpen(true);
     setSelectedRoom(room);
@@ -56,6 +59,34 @@ function ChooseRoomTable(props) {
   const handleCLose = () => {
     setOpen(false);
   };
+
+  const handleAccepted = useCallback(async () => {
+    const respone = await chooseTreatmentRoom(
+      hospitalAdmissionCode,
+      selectedRoom.roomId
+    );
+    if (respone.success) {
+      enqueueSnackbar("Tiếp nhận thành công", { variant: "success" });
+      await onRefresh();
+      setOpen(false);
+    } else {
+      if (respone.errorCode === 10061) {
+        enqueueSnackbar("Bệnh nhân đã được tiếp nhận trước đó", {
+          variant: "error",
+        });
+        return;
+      }
+
+      if (respone.errorCode === 10062) {
+        enqueueSnackbar("Phòng đã đầy", { variant: "error" });
+        return;
+      }
+
+      enqueueSnackbar("Có lỗi xảy ra, vui lòng thử lại sau", {
+        variant: "error",
+      });
+    }
+  }, [hospitalAdmissionCode, selectedRoom.roomId, enqueueSnackbar, onRefresh]);
 
   return (
     <>
@@ -174,6 +205,7 @@ function ChooseRoomTable(props) {
             />
             <Stack width={"100%"} justifyContent={"flex-end"} direction={"row"}>
               <Button
+                onClick={() => handleAccepted()}
                 variant="text"
                 style={{
                   textTransform: "none",

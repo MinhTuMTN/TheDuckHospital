@@ -123,8 +123,8 @@ function NurseScheduleManagementPage() {
         room?.roomId,
         selectedShift,
         name,
-        weekOfYear.isoWeek(),
-        weekOfYear.get("year")
+        weekOfYear?.isoWeek(),
+        weekOfYear?.get("year")
       );
       if (respone.success) {
         setListShift(respone.data.data);
@@ -164,10 +164,14 @@ function NurseScheduleManagementPage() {
     handleGetShifts(room, selectedShift, name, weekOfYear);
   }, [handleGetShifts, room, selectedShift, name, weekOfYear]);
 
+  const onRefresh = useCallback(() => {
+    handleGetShifts(room, selectedShift, name, weekOfYear);
+  }, [handleGetShifts, room, selectedShift, name, weekOfYear]);
+
   useEffect(() => {
     setName("");
     setIsSearch(false);
-    // handleGetShifts(room, selectedShift, "", weekOfYear);
+    handleGetShifts(room, selectedShift, "", weekOfYear);
   }, [handleGetShifts, room, selectedShift, weekOfYear]);
 
   return (
@@ -364,6 +368,7 @@ function NurseScheduleManagementPage() {
             listShift={listShift}
             weekOfYear={weekOfYear}
             selectedShift={selectedShift}
+            onRefresh={onRefresh}
           />
         </Grid>
       </LayoutComponent>

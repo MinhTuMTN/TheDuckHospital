@@ -1,8 +1,8 @@
-import styled from "@emotion/styled";
+import { styled } from "@mui/material";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
-import LeftNavBarCounter from "../components/Nurse/LeftBar/LeftNavBarCounter";
+import LeftNavbarNurseInpatient from "../components/Nurse/LeftBar/LeftNavbarNurseInpatient";
+import TopNavBarInpatient from "../components/Nurse/TopBar/TopNavBarInpatient";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
@@ -20,13 +20,13 @@ const LayoutContainer = styled("div")({
   flexDirection: "column",
   width: "100%",
 });
-function NurseCounterLayout(props) {
+
+function NurseInpatientLayout() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <TopNavBar onDrawerClick={setOpen} roomName={"counter"} />
-      <LeftNavBarCounter open={open} onOpenClose={setOpen} />
-
+      <TopNavBarInpatient onDrawerClick={setOpen} roomName={"counter"} />
+      <LeftNavbarNurseInpatient open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>
           <Outlet />
@@ -36,4 +36,4 @@ function NurseCounterLayout(props) {
   );
 }
 
-export default NurseCounterLayout;
+export default NurseInpatientLayout;
