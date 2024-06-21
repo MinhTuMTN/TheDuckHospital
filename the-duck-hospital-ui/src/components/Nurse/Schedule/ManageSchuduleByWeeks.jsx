@@ -23,13 +23,14 @@ import {
   useTheme,
 } from "@mui/material";
 import dayjs from "dayjs";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { appColors } from "../../../utils/appColorsUtils";
 import {
   getDayOfWeekString,
   getScheduleSession,
   getScheduleSessionColor,
 } from "../../../utils/scheduleSessionUtils";
+import { deteleListNurseSchedule } from "../../../services/nurse/NurseScheduleServices";
 
 const TextDateStyled = styled(Typography)({
   fontWeight: 500,
@@ -93,7 +94,7 @@ const InfoLine = styled(Stack)({
   alignItems: "center",
 });
 
-const ShiftRow = ({ shift, color, names, italic, nurseList }) => {
+const ShiftRow = ({ shift, color, names, italic, nurseList, onRefresh }) => {
   const theme = useTheme();
   const isLg = useMediaQuery(theme.breakpoints.up("lg"));
   const [open, setOpen] = React.useState(false);
@@ -127,15 +128,21 @@ const ShiftRow = ({ shift, color, names, italic, nurseList }) => {
     });
   };
 
-  const handleDeleteSchedule = () => {
+  const handleDeleteSchedules = useCallback(async () => {
     const deleteList = [];
     checked.forEach((value, index) => {
       if (value) {
         deleteList.push(nurseList[index].nurseScheduleId);
       }
     });
-    console.log(deleteList);
-  };
+
+    const respone = await deteleListNurseSchedule(deleteList);
+
+    if (respone.success) {
+      onRefresh();
+      handleClose();
+    }
+  }, [checked, nurseList, onRefresh]);
 
   return (
     <>
@@ -258,7 +265,10 @@ const ShiftRow = ({ shift, color, names, italic, nurseList }) => {
             </MainLayout>
 
             <Stack width={"100%"} justifyContent={"flex-end"} direction={"row"}>
-              <button onClick={handleDeleteSchedule} className="buttonDelete">
+              <button
+                onClick={() => handleDeleteSchedules()}
+                className="buttonDelete"
+              >
                 <span className="text">Xoá</span>
                 <span className="icon">
                   <svg
@@ -280,7 +290,7 @@ const ShiftRow = ({ shift, color, names, italic, nurseList }) => {
 };
 
 function ManageScheduleByWeeks(props) {
-  const { listShift, weekOfYear, selectedShift, isSearch } = props;
+  const { listShift, weekOfYear, selectedShift, isSearch, onRefresh } = props;
 
   const shiftsData = useMemo(() => {
     const monday = weekOfYear;
@@ -373,6 +383,7 @@ function ManageScheduleByWeeks(props) {
                     names={names}
                     italic={italic}
                     nurseList={nurseList}
+                    onRefresh={onRefresh}
                   />
                 ))}
               </React.Fragment>

@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
+import Filter9PlusIcon from "@mui/icons-material/Filter9Plus";
 import LogoutIcon from "@mui/icons-material/Logout";
-import TodayIcon from "@mui/icons-material/Today";
+import PersonIcon from "@mui/icons-material/Person";
+import KingBedIcon from "@mui/icons-material/KingBed";
 import {
   Box,
   Button,
@@ -23,30 +23,27 @@ import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
-
-const sidebarItems = [
+const sidebarManageItems = [
   {
-    display: "Lịch trực",
-    icon: <TodayIcon />,
-    to: "/nurse-schedule",
+    display: "Tiếp nhận bệnh nhân",
+    icon: <PersonIcon />,
+    to: "/nurse-room/receiving-patients",
+  },
+
+  {
+    display: "Số thứ tự",
+    icon: <Filter9PlusIcon fontSize="small" />,
+    to: "/nurse-room/queue-number",
   },
 ];
 
-const headNurseSidebarItems = [
+const hospitalizationManageItems = [
   {
-    display: "Danh sách ca trực",
-    icon: <CalendarMonthOutlinedIcon />,
-    to: "/nurse-schedule/head-nurse/schedule-management",
-    label: "Quản lý ca trực",
-  },
-  {
-    display: "Tạo ca trực",
-    icon: <EditCalendarOutlinedIcon />,
-    to: "/nurse-schedule/head-nurse/schedule-management/create",
-    label: "Quản lý ca trực",
+    display: "Tiếp nhận nhập viện",
+    icon: <KingBedIcon />,
+    to: "/nurse-room/hospitalization-choose-room",
   },
 ];
-
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
   display: "flex",
   width: "220px",
@@ -55,13 +52,11 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   height: theme.spacing(8),
   paddingX: "16px",
 }));
-
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
-  marginRight: theme.spacing(0.5),
+  //marginLeft: theme.spacing("16px"),
   width: "100%",
   color: "#797575",
-  fontWeight: "450",
-  fontSize: "16px",
+  fontSize: "13px",
 
   "&:hover": {
     backgroundColor: active === "true" ? "#333860da" : "#ebebeb6c",
@@ -69,18 +64,16 @@ const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
 }));
 
 const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-  padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
+  padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(3)}`,
+  fontSize: "10px",
 }));
 
-function LeftNavbarNurseSchedule(props) {
+function LeftNavbar(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const { fullName, setToken } = useAuth();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { role } = useAuth();
-
-  const mainItems = sidebarItems;
   const content = (
     <Box
       sx={{
@@ -104,7 +97,6 @@ function LeftNavbarNurseSchedule(props) {
         >
           <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
         </Box>
-
         <Box
           sx={{
             justifyContent: "flex-start",
@@ -118,15 +110,15 @@ function LeftNavbarNurseSchedule(props) {
               textAlign: "left",
               textTransform: "uppercase",
               fontWeight: "bold",
-              color: "#020222",
-              fontSize: "18px",
+              color: "#466f92",
+              fontSize: "14px",
             }}
           >
-            Điều dưỡng
+            Quản lý
           </Typography>
         </Box>
         <List>
-          {mainItems.map((item, index) => (
+          {sidebarManageItems.map((item, index) => (
             <NavLink
               key={`nav-bar-store-${index}`}
               style={{ textDecoration: "none" }}
@@ -137,7 +129,11 @@ function LeftNavbarNurseSchedule(props) {
                   <CustomListItemIcon>{item.icon}</CustomListItemIcon>
                   <ListItemText
                     disableTypography
-                    style={{ fontSize: "16px" }}
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#5a5c61",
+                    }}
                     primary={item.display}
                   />
                 </CustomListItemButton>
@@ -145,52 +141,50 @@ function LeftNavbarNurseSchedule(props) {
             </NavLink>
           ))}
         </List>
-
-        {role === "HeadNurse" && (
-          <>
-            <Box
-              sx={{
-                justifyContent: "flex-start",
-                width: "100%",
-                paddingX: 2,
-                marginTop: 2,
-              }}
+        <Box
+          sx={{
+            justifyContent: "flex-start",
+            width: "100%",
+            paddingX: 2,
+            marginTop: 0,
+          }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              textTransform: "uppercase",
+              fontWeight: "600",
+              color: "#466f92",
+              fontSize: "14px",
+            }}
+          >
+            Nhập viện
+          </Typography>
+        </Box>
+        <List>
+          {hospitalizationManageItems.map((item, index) => (
+            <NavLink
+              key={`nav-bar-store-${index}`}
+              style={{ textDecoration: "none" }}
+              to={item.to}
             >
-              <Typography
-                sx={{
-                  textAlign: "left",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                  color: "#020222",
-                  fontSize: "18px",
-                }}
-              >
-                Điều dưỡng trưởng
-              </Typography>
-            </Box>
-            <List>
-              {headNurseSidebarItems.map((item, index) => (
-                <NavLink
-                  key={`nav-bar-store-${index}`}
-                  style={{ textDecoration: "none" }}
-                  to={item.to}
-                  state={{ label: item.label }}
-                >
-                  <ListItem disablePadding key={item.section}>
-                    <CustomListItemButton>
-                      <CustomListItemIcon>{item.icon}</CustomListItemIcon>
-                      <ListItemText
-                        disableTypography
-                        style={{ fontSize: "16px" }}
-                        primary={item.display}
-                      />
-                    </CustomListItemButton>
-                  </ListItem>
-                </NavLink>
-              ))}
-            </List>
-          </>
-        )}
+              <ListItem disablePadding key={item.section}>
+                <CustomListItemButton>
+                  <CustomListItemIcon>{item.icon}</CustomListItemIcon>
+                  <ListItemText
+                    disableTypography
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#5a5c61",
+                    }}
+                    primary={item.display}
+                  />
+                </CustomListItemButton>
+              </ListItem>
+            </NavLink>
+          ))}
+        </List>
       </Box>
 
       <Stack
@@ -213,7 +207,7 @@ function LeftNavbarNurseSchedule(props) {
         >
           <CardMedia
             component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702377250/camel_ckn4py.png"
+            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702286975/kitty_qrtjrw.png"
             sx={{
               width: "50px",
               height: "50px",
@@ -305,6 +299,7 @@ function LeftNavbarNurseSchedule(props) {
       </Drawer>
     );
   }
+
   return (
     <SwipeableDrawer
       anchor="left"
@@ -325,9 +320,8 @@ function LeftNavbarNurseSchedule(props) {
     </SwipeableDrawer>
   );
 }
-LeftNavbarNurseSchedule.propTypes = {
+LeftNavbar.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
 };
-
-export default LeftNavbarNurseSchedule;
+export default LeftNavbar;

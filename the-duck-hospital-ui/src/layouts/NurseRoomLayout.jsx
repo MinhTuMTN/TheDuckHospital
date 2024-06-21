@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
 import React, { useContext, useEffect } from "react";
-import TopNavBar from "../components/Nurse/TopNavBar";
-import LeftNavbar from "../components/Nurse/LeftNavbar";
+import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
 import { Outlet, useNavigate } from "react-router-dom";
 import { NurseContext } from "../auth/NurseProvider";
 import { enqueueSnackbar } from "notistack";
 import { Box } from "@mui/material";
+import LeftNavbar from "../components/Nurse/LeftBar/LeftNavbar";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({

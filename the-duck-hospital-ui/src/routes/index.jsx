@@ -68,6 +68,9 @@ import NurseScheduleManagementPage from "../pages/Nurse/HeadNurse/NurseScheduleM
 import CreateNurseSchedulePage from "../pages/Nurse/HeadNurse/CreateNurseSchedulePage";
 import CashierPage from "../pages/Cashier/CashierPage";
 import ChooseRoomForPatient from "../pages/Nurse/Hospitalization/ChooseRoomForPatient";
+import NurseInpatientLayout from "../layouts/NurseInpatientLayout";
+import ChoosePatient from "../pages/Nurse/Hospitalization/ChoosePatient";
+import HospitalizationDetails from "../pages/Nurse/Hospitalization/HospitalizationDetails";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -294,6 +297,24 @@ function Router(props) {
                   element: <CreateNurseSchedulePage />,
                 },
               ],
+            },
+          ],
+        },
+        {
+          path: "/nurse-inpatient",
+          element: <NurseInpatientLayout />,
+          children: [
+            {
+              index: true,
+              element: <ChoosePatient />,
+            },
+            {
+              path: "choose-patient",
+              element: <ChoosePatient />,
+            },
+            {
+              path: "patient-hospitalization-details",
+              element: <HospitalizationDetails />,
             },
           ],
         },

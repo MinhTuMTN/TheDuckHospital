@@ -174,20 +174,17 @@ function ChooseRoomForPatient() {
     [statistic]
   );
 
-  useEffect(() => {
-    const getStatistic = async () => {
-      const response = await getRoomStatistic();
-      if (response.success) {
-        const data = response.data.data;
-        const result = {
-          totalRoom: data.standard.totalRooms + data.vip.totalRooms,
-          totalRoomStandard: `${data.standard.totalBedUsed}/${data.standard.totalBed}`,
-          totalRoomVip: `${data.vip.totalBedUsed}/${data.vip.totalBed}`,
-        };
-        setStatistic(result);
-      }
-    };
-    getStatistic();
+  const getStatistic = useCallback(async () => {
+    const response = await getRoomStatistic();
+    if (response.success) {
+      const data = response.data.data;
+      const result = {
+        totalRoom: data.standard.totalRooms + data.vip.totalRooms,
+        totalRoomStandard: `${data.standard.totalBedUsed}/${data.standard.totalBed}`,
+        totalRoomVip: `${data.vip.totalBedUsed}/${data.vip.totalBed}`,
+      };
+      setStatistic(result);
+    }
   }, []);
 
   const handleGetAdmissionRecords = useCallback(async (admissionCode) => {
@@ -211,15 +208,25 @@ function ChooseRoomForPatient() {
     }
   };
 
-  useEffect(() => {
-    const handleGetRooms = async () => {
-      const response = await getTreatmentRooms(typeOfRoom);
-      if (response.success) {
-        setListRooms(response.data.data);
-      }
-    };
-    handleGetRooms();
+  const handleGetRooms = useCallback(async () => {
+    const response = await getTreatmentRooms(typeOfRoom);
+    if (response.success) {
+      setListRooms(response.data.data);
+    }
   }, [typeOfRoom]);
+
+  const onRefresh = useCallback(async () => {
+    await handleGetRooms();
+    await getStatistic();
+  }, [handleGetRooms, getStatistic]);
+
+  useEffect(() => {
+    handleGetRooms();
+  }, [handleGetRooms]);
+
+  useEffect(() => {
+    getStatistic();
+  }, [getStatistic]);
 
   return (
     <Box
@@ -463,8 +470,10 @@ function ChooseRoomForPatient() {
                     marginTop={2}
                   >
                     <ChooseRoomTable
+                      onRefresh={onRefresh}
                       rooms={listRooms}
                       admissionRecords={admissionRecords}
+                      hospitalAdmissionCode={admissionCode}
                     />
                   </MainStyle>
                 )}
