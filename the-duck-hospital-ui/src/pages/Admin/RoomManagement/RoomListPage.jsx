@@ -173,7 +173,7 @@ function RoomListPage(props) {
       description: room.description,
       departmentId: room.departmentId,
       roomType: room.roomType,
-      medicalServiceId: room.medicalService.serviceId,
+      medicalServiceId: room.medicalService?.serviceId,
     });
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });

@@ -29,6 +29,17 @@ public class StatisticsAdminController {
         );
     }
 
+    @GetMapping("/{departmentId}")
+    public ResponseEntity<?> getStatisticsByDepartment(@PathVariable int departmentId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get statistics by department successfully")
+                        .data(statisticsServices.getStatisticsByDepartment(departmentId))
+                        .build()
+        );
+    }
+
     @GetMapping("/revenue")
     public ResponseEntity<?> getRevenueStatistics(
             @RequestParam Date startDate,
@@ -42,6 +53,22 @@ public class StatisticsAdminController {
                         .build()
         );
     }
+
+    @GetMapping("/revenue/{departmentId}")
+    public ResponseEntity<?> getRevenueStatisticsByDepartment(
+            @PathVariable int departmentId,
+            @RequestParam Date startDate,
+            @RequestParam Date endDate
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get revenue statistics by department successfully")
+                        .data(statisticsServices.getRevenueStatisticsByDepartment(departmentId, startDate, endDate))
+                        .build()
+        );
+    }
+
     @GetMapping("/booking")
     public ResponseEntity<?> getBookingStatistics(
             @RequestParam Date startDate,
@@ -56,4 +83,18 @@ public class StatisticsAdminController {
         );
     }
 
+    @GetMapping("/booking/{departmentId}")
+    public ResponseEntity<?> getBookingStatisticsByDepartment(
+            @PathVariable int departmentId,
+            @RequestParam Date startDate,
+            @RequestParam Date endDate
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get booking statistics successfully")
+                        .data(statisticsServices.getBookingStatisticsByDepartment(departmentId, startDate, endDate))
+                        .build()
+        );
+    }
 }

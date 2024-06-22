@@ -134,6 +134,7 @@ public class BookingServicesImpl implements IBookingServices {
             List<Booking> bookings = new ArrayList<>();
             for (TimeSlot timeSlot : timeSlots) {
                 Booking booking = new Booking();
+                booking.setServicePrice(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
                 booking.setPatientProfile(patientProfile);
                 booking.setTimeSlot(timeSlot);
                 booking.setTransaction(transaction);
@@ -147,6 +148,7 @@ public class BookingServicesImpl implements IBookingServices {
             }
 
             transaction.setBookings(bookings);
+            transaction.setPaymentMethod(request.getPaymentMethod() == null ? "CASH" : request.getPaymentMethod().name());
             return paymentServices.createBookingPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -278,6 +280,7 @@ public class BookingServicesImpl implements IBookingServices {
 
         Booking booking = new Booking();
         booking.setPatientProfile(patientProfile);
+        booking.setServicePrice(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
         booking.setTimeSlot(timeSlot);
         booking.setTransaction(transaction);
         booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());

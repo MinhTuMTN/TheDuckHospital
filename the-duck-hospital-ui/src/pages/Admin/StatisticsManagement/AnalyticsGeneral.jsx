@@ -10,19 +10,19 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect, useState } from "react";
-import BookingChart from "../../components/Admin/Analytics/BookingChart";
-import PaymentMethodsPieChart from "../../components/Admin/Analytics/PaymentMethodsPieChart";
-import RevenueChart from "../../components/Admin/Analytics/RevenueChart";
-import TopDepartment from "../../components/Admin/Analytics/TopDepartment";
-import TotalPatients from "../../components/Admin/Analytics/TotalPatients";
-import { getAllStatistics } from "../../services/admin/StatisticsServices";
+import BookingChart from "../../../components/Admin/Analytics/General/BookingChart";
+import PaymentMethodsPieChart from "../../../components/Admin/Analytics/General/PaymentMethodsPieChart";
+import RevenueChart from "../../../components/Admin/Analytics/General/RevenueChart";
+import TopDepartment from "../../../components/Admin/Analytics/General/TopDepartment";
+import TotalPatients from "../../../components/Admin/Analytics/General/TotalPatients";
+import { getAllStatistics } from "../../../services/admin/StatisticsServices";
 
 const paperStyle = {
   marginTop: 4,
   borderRadius: "8px",
 };
 
-function Analytics(props) {
+function AnalyticsGeneral(props) {
   const theme = useTheme();
   const isFullWidth = useMediaQuery(theme.breakpoints.up("md"));
   const spacingValue = isFullWidth ? 4 : 0;
@@ -55,7 +55,7 @@ function Analytics(props) {
                 fontSize: "2rem",
               }}
             >
-              Thống kê
+              Thống kê tổng quát
             </Typography>
 
             <Grid container spacing={spacingValue}>
@@ -82,7 +82,9 @@ function Analytics(props) {
                 </Stack>
               </Grid>
               <Grid item xs={12} md={4}>
-                <TopDepartment topDepartments={statistics.topDepartments?.slice(0, 5)} />
+                <TopDepartment
+                  topDepartments={statistics.topDepartments?.slice(0, 5)}
+                />
                 <TotalPatients statisticData={statistics} />
                 <PaymentMethodsPieChart
                   pieChartData={statistics.paymentMethodStatistics}
@@ -96,4 +98,4 @@ function Analytics(props) {
   );
 }
 
-export default Analytics;
+export default AnalyticsGeneral;

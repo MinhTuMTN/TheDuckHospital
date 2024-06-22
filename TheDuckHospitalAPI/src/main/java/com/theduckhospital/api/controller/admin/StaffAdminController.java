@@ -88,7 +88,7 @@ public class StaffAdminController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "DOCTOR, NURSE, PHARMACIST, CASHIER, LABORATORY_TECHNICIAN") List<Role> staffRole,
+            @RequestParam(required = false) List<Role> staffRole,
             @RequestParam(defaultValue = "false, true") List<Boolean> staffStatus
     ) {
         return ResponseEntity.ok(

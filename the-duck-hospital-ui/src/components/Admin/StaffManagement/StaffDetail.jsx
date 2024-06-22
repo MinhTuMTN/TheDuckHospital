@@ -449,7 +449,7 @@ function StaffDetail(props) {
                   ? URL.createObjectURL(selectedFile)
                   : staff?.avatar
                   ? staff?.avatar
-                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"
+                  : "https://www.shareicon.net/data/512x512/2016/08/18/813844_people_512x512.png"
               }
               alt="top-product"
               style={{

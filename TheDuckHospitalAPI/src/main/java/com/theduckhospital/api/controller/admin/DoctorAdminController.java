@@ -4,12 +4,9 @@ import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IDoctorServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -40,6 +37,33 @@ public class DoctorAdminController {
                         .success(true)
                         .message("Get all doctor not in department successfully")
                         .data(doctorServices.getDoctorNotInDepartment())
+                        .build()
+        );
+    }
+
+
+    @GetMapping("/patient-statistics")
+    public ResponseEntity<?> getPatientStatistics(
+            @RequestParam Date startDate,
+            @RequestParam Date endDate,
+            @RequestParam UUID staffId
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get patient statistics successfully")
+                        .data(doctorServices.getPatientStatistics(startDate, endDate, staffId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{staffId}/reviews")
+    public ResponseEntity<?> getReviews(@PathVariable UUID staffId) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get reviews successfully")
+                        .data(doctorServices.getReviews(staffId))
                         .build()
         );
     }

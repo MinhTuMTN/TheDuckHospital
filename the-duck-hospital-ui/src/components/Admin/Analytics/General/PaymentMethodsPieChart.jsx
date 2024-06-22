@@ -65,11 +65,11 @@ function PaymentMethodsPieChart(props) {
         />
         <TieuDe>Phương thức thanh toán</TieuDe>
       </BoxStyle>
-      <BoxStyle2 className="Hello">
+      <BoxStyle2>
         <Stack direction={"row"} spacing={1} alignItems={"center"}>
           {pieChartData &&
             <PieChart
-              colors={["#00bbff", "#00ff80", "#ff00a6"]}
+              colors={["#00bbff", "#00ff80", "#ff00a6", "#9ee2ff"]}
               series={[
                 {
                   data: pieChartData,

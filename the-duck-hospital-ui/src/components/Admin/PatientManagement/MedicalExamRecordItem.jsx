@@ -12,7 +12,7 @@ import BorderTextBox from "./BorderTextBox";
 import dayjs from "dayjs";
 import FormatCurrency from "../../General/FormatCurrency";
 
-const scheduleTypes = [
+const scheduleSessions = [
   {
     value: "MORNING",
     label: "Buổi sáng"
@@ -125,8 +125,8 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{ fontSize: "16px", }}
                 >
-                  {`: ${scheduleTypes.find(type =>
-                    type.value === item.doctorSchedule?.scheduleType)?.label}`}
+                  {`: ${scheduleSessions.find(session =>
+                    session.value === item.doctorSchedule?.scheduleSession)?.label}`}
                 </Typography>
                 <Typography
                   style={{ fontSize: "16px", }}

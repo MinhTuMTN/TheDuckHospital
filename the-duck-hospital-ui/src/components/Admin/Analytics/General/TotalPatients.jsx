@@ -3,14 +3,14 @@ import EastIcon from "@mui/icons-material/East";
 import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import PatientPic from "../../../assets/patient.png";
+import PatientPic from "../../../../assets/patient.png";
 
 const BoxStyle = styled(Paper)(({ theme }) => ({
   padding: "8px !important",
   borderRadius: "16px",
   marginTop: theme.spacing(2),
 
-  boxShadow: `0px 2px 5px ${theme.palette.template.normal3}`,
+  boxShadow: `0px 2px 5px #676a6f`,
 }));
 
 const TieuDe = styled(Typography)(({ theme }) => ({

@@ -412,7 +412,7 @@ public class PaymentServicesImpl implements IPaymentServices {
             }
             transaction.setStatus(TransactionStatus.SUCCESS);
             transaction.setBankCode(paymentMethod.equals("MOMO") ? "MOMO" : bankCode);
-            transaction.setPaymentMethod(paymentMethod);
+            transaction.setPaymentMethod(paymentMethod == null ? "CASH" : paymentMethod);
             transaction.setMomoTransactionId(paymentMethod.equals("MOMO") ? bankCode : null);
             transactionRepository.save(transaction);
 

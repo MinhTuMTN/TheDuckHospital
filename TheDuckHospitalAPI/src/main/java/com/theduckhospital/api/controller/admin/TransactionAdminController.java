@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.PaymentMethod;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.ITransactionServices;
@@ -24,8 +25,8 @@ public class TransactionAdminController {
     public ResponseEntity<?> getAllTransactionsPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "VNPay, Cash, Momo") List<String> transactionPayment,
-            @RequestParam(defaultValue = "PENDING, SUCCESS, FAILED") List<TransactionStatus> transactionStatus
+            @RequestParam(required = false) List<String> transactionPayment,
+            @RequestParam(required = false) List<TransactionStatus> transactionStatus
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()

@@ -449,7 +449,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                         date,
                         scheduleSession
                 );
-        if (optional.isPresent()) {
+        if (optional.isPresent() && request.getScheduleType() == ScheduleType.EXAMINATION) {
             throw new BadRequestException("Doctor is not available");
         }
 

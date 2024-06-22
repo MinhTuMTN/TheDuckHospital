@@ -206,6 +206,11 @@ public class DepartmentServicesImpl implements IDepartmentServices {
     }
 
     @Override
+    public List<Department> getAllActiveDepartments() {
+        return departmentRepository.findAllByDeletedIsFalseOrderByDepartmentNameAsc();
+    }
+
+    @Override
     public DepartmentResponse getDepartmentResponseById(int departmentId) {
         Optional<Department> optional = departmentRepository.findById(departmentId);
         if (optional.isEmpty()) {

@@ -24,6 +24,8 @@ public class Booking {
 
     private int queueNumber;
 
+    private double servicePrice;
+
     private boolean rated = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

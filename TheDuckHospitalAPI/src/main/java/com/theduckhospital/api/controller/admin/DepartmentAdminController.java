@@ -43,6 +43,17 @@ public class DepartmentAdminController {
         );
     }
 
+    @GetMapping("/active-departments")
+    public ResponseEntity<?> getAllActiveDepartments() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get all active departments successfully")
+                        .data(departmentServices.getAllActiveDepartments())
+                        .build()
+        );
+    }
+
     @GetMapping("/filtered")
     public ResponseEntity<?> getFilteredDepartmentsPagination(
             @RequestParam(name = "search", required = false, defaultValue = "") String search,

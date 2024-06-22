@@ -50,7 +50,7 @@ import PaymentHistoryPage from "../pages/customer/PaymentHistoryPage";
 import PaymentOrders from "../pages/customer/PaymentOrders";
 import TransactionDetailPage from "../pages/Admin/TransactionManagament/TransactionDetailPage";
 import MedicalExaminationRecord from "../pages/Doctor/MedicalExaminationRecord";
-import Analytics from "../pages/Admin/Analytics";
+import AnalyticsGeneral from "../pages/Admin/StatisticsManagement/AnalyticsGeneral";
 import MedicalTestPage from "../pages/Doctor/MedicalTestPage";
 import MedicalTestRecord from "../pages/Doctor/MedicalTestRecord";
 import History from "../pages/Doctor/History";
@@ -67,6 +67,7 @@ import NurseSchedulePage from "../pages/Nurse/NurseSchedulePage";
 import NurseScheduleManagementPage from "../pages/Nurse/HeadNurse/NurseScheduleManagementPage";
 import CreateNurseSchedulePage from "../pages/Nurse/HeadNurse/CreateNurseSchedulePage";
 import CashierPage from "../pages/Cashier/CashierPage";
+import AnalyticsDepartmentBased from "../pages/Admin/StatisticsManagement/AnalyticsDepartmentBased";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -350,20 +351,24 @@ function Router(props) {
         },
       ],
     },
-    {
-      path: "/",
-      element: <ProtectedLayout forRole={["Admin"]} />,
-      children: [
+    // {
+    //   path: "/",
+    //   element: <ProtectedLayout forRole={["Admin"]} />,
+    //   children: [
         {
           path: "/admin",
           element: <AdminLayout />,
           children: [
             {
-              path: "analytics",
-              element: <Analytics />,
+              path: "analytics/general",
+              element: <AnalyticsGeneral />,
             },
             {
-              element: <Analytics />,
+              path: "analytics/department-based",
+              element: <AnalyticsDepartmentBased />,
+            },
+            {
+              element: <AnalyticsGeneral />,
               index: true,
             },
             {
@@ -444,8 +449,8 @@ function Router(props) {
             },
           ],
         },
-      ],
-    },
+    //   ],
+    // },
   ]);
 }
 
