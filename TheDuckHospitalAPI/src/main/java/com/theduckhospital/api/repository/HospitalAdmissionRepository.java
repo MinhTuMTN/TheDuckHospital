@@ -14,4 +14,5 @@ import java.util.UUID;
 public interface HospitalAdmissionRepository extends JpaRepository<HospitalAdmission, UUID> {
     List<HospitalAdmission> findByRoomAndStateAndDeletedIsFalse(Room room, HospitalAdmissionState state);
     Optional<HospitalAdmission> findByHospitalAdmissionCodeAndDeletedIsFalse(String hospitalAdmissionCode);
+    Optional<HospitalAdmission> findByHospitalAdmissionIdAndDeletedIsFalse(UUID hospitalAdmissionId);
 }
