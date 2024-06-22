@@ -28,6 +28,7 @@ pipeline {
                 script {
                     bat '''
                     docker container stop hospitalapi || echo "this container does not exist"
+                    timeout /t 10
                     docker run -d -p 8080:8080 --rm --name hospitalapi minhtumtn/theduckhospitalapi
                     '''
                 }
