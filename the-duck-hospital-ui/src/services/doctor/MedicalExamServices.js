@@ -1,4 +1,4 @@
-import { get, put } from "../AxiosInstance";
+import { get, post, put } from "../AxiosInstance";
 
 export const acceptMedicalRecord = (medicalRecordId) => {
   return put(`/doctor/medical-records/${medicalRecordId}/accept`);
@@ -27,4 +27,11 @@ export const updateMedicalRecord = (
 
 export const getHistoryMedicalRecord = (medicalRecordId, historyId) => {
   return get(`/doctor/medical-records/${medicalRecordId}/history/${historyId}`);
+};
+
+export const createHospitalAdmissionLetter = (medicalRecordId, data) => {
+  return post(
+    `/doctor/medical-records/${medicalRecordId}/hospital-admission`,
+    data
+  );
 };

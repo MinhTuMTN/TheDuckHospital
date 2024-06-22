@@ -30,12 +30,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.patientProfile.patientProfileId = :patientProfileId " +
-            "AND b.timeSlot.timeSlotId = :timeSlotId " +
-            "AND b.deleted = false"
+            "AND b.timeSlot.doctorSchedule.doctorScheduleId = :doctorScheduleId " +
+            "AND b.deleted = false "
     )
     Optional<Booking> nurseFindBooking(
             UUID patientProfileId,
-            String timeSlotId
+            UUID doctorScheduleId
     );
 
 //    @Query("SELECT ds.date, COUNT(b.bookingId) " +
@@ -51,7 +51,20 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             "WHERE b.createdAt BETWEEN :startDate AND :endDate AND b.deleted = false " +
             "GROUP BY CAST(b.createdAt AS DATE) " +
             "ORDER BY CAST(b.createdAt AS DATE) ASC")
-    List<Object[]> countBookingsByCreatedAtBetweenAndDeletedIsFalse(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<Object[]> countBookingsByCreatedAtBetweenAndDeletedIsFalse(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
+
+    @Query("SELECT CAST(b.createdAt AS DATE), COUNT(b) " +
+            "FROM Booking b " +
+            "WHERE b.createdAt BETWEEN :startDate AND :endDate AND b.deleted = false " +
+            "AND b.timeSlot.doctorSchedule.doctor.department.departmentId = :departmentId " +
+            "GROUP BY CAST(b.createdAt AS DATE) " +
+            "ORDER BY CAST(b.createdAt AS DATE) ASC")
+    List<Object[]> countBookingsByCreatedAtBetweenAndDepartmentAndDeletedIsFalse(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("departmentId") int departmentId);
 
     Optional<Booking> findByPatientProfileAndTimeSlot_DoctorScheduleAndDeletedIsFalse(
             PatientProfile patientProfile,
@@ -64,4 +77,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             "AND b.medicalExaminationRecord IS NULL "
     )
     List<Booking> findExpiredBookings(Date date);
+
+    List<Booking> findByCancelledIsFalseAndDeletedIsFalseAndRefundedTransactionIdIsNull();
 }

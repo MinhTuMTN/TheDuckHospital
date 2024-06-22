@@ -30,7 +30,7 @@ public class MedicineReminder {
     private float amount;
     private float remainingAmount;
 
-    @OneToMany(mappedBy = "medicineReminder")
+    @OneToMany(mappedBy = "medicineReminder", cascade = CascadeType.ALL)
     @ToStringExclude
     @JsonBackReference
     private List<MedicineReminderDetail> listMedicineReminderDetail;

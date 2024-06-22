@@ -17,7 +17,7 @@ import React from "react";
 import QRCode from "react-qr-code";
 import FormatCurrency from "../General/FormatCurrency";
 
-function ContactItem(props) {
+export function ContactItem(props) {
   const { title, content, titleMinWidth = 0 } = props;
   return (
     <Box>

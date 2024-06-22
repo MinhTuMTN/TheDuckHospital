@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import { Box, Stack, Typography } from "@mui/material";
-import { LineChart } from "@mui/x-charts";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import React, { useCallback, useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
-import { getRevenueStatistics } from "../../../services/admin/StatisticsServices";
+import { getRevenueStatistics } from "../../../../services/admin/StatisticsServices";
+import { MixedChart } from "../MixedChartComponent";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -34,12 +34,14 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
 
 function RevenueChart(props) {
   const [labels, setLabels] = useState([""]);
-  const [data, setData] = useState([1]);
+  const [totalData, setTotalData] = useState([0]);
+  const [testData, setTestData] = useState([0]);
+  const [bookingData, setBookingData] = useState([0]);
   const [statisticRequest, setStatisticRequest] = useState({
     startDate: dayjs().add(-30, "day"),
     endDate: dayjs(),
   });
-  
+
   const [maxStartDate, setMaxStartDate] = useState(statisticRequest.endDate);
   const [minEndDate, setMinEndDate] = useState(statisticRequest.startDate);
 
@@ -51,13 +53,14 @@ function RevenueChart(props) {
 
     if (response.success) {
       setLabels(response.data.data.labels);
-      setData(response.data.data.values);
+      setTotalData(response.data.data.values);
+      setBookingData(response.data.data.bookingValues);
+      setTestData(response.data.data.testValues);
     } else {
       enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     }
   }, [statisticRequest]);
 
-  
   useEffect(() => {
     handleStatistics();
   }, [handleStatistics]);
@@ -133,14 +136,17 @@ function RevenueChart(props) {
       </BoxStyle>
       <BoxStyle>
         {labels && labels.length > 0 && (
-          <LineChart
-            xAxis={[{ scaleType: "point", data: labels }]}
-            series={[{ data: data, label: "Doanh thu" }]}
-            height={350}
-            sx={{
-              padding: "1.6rem",
-            }}
-          />
+          <>
+            <MixedChart labels={labels} total={totalData} booking={bookingData} test = {testData} />
+          </>
+          // <LineChart
+          //   xAxis={[{ scaleType: "point", data: labels }]}
+          //   series={[{ data: data, label: "Doanh thu" }]}
+          //   height={350}
+          //   sx={{
+          //     padding: "1.6rem",
+          //   }}
+          // />
         )}
       </BoxStyle>
     </>

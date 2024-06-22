@@ -6,7 +6,7 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AlreadyPaid from "../../components/Cashier/AlreadyPaid";
 import CashierAvatar from "../../components/Cashier/CashierAvatar";
@@ -48,7 +48,7 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
 
 function CashierPage() {
   const navigate = useNavigate();
-  const [paymentCode, setPaymentCode] = React.useState("");
+  const [paymentCode, setPaymentCode] = React.useState("HAD80187D4-4FB0");
   const [loading, setLoading] = React.useState(false);
   const [paymentDetails, setPaymentDetails] = React.useState(null);
 
@@ -73,6 +73,9 @@ function CashierPage() {
       setPaymentDetails(null);
     }
   }, [paymentCode]);
+  const resetPaymentCode = useCallback(() => {
+    setPaymentCode("");
+  }, []);
 
   return (
     <StyledContainer>
@@ -106,7 +109,10 @@ function CashierPage() {
         ) : paymentDetails === undefined ? (
           <AlreadyPaid />
         ) : (
-          <InvoiceAndPayment paymentDetails={paymentDetails} />
+          <InvoiceAndPayment
+            paymentDetails={paymentDetails}
+            onSuccess={resetPaymentCode}
+          />
         )}
       </StyledContent>
     </StyledContainer>

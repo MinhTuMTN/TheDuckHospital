@@ -1,13 +1,12 @@
 package com.theduckhospital.api.controller.cashier;
 
+import com.theduckhospital.api.dto.request.cashier.CashierPaymentRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.ICashierServices;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cashiers/payments")
@@ -28,6 +27,20 @@ public class CashierPaymentController {
                 .statusCode(200)
                 .message("Get payment details successfully")
                 .data(cashierServices.getPaymentDetails(paymentCode))
+                .build());
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createPayment(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody @Valid CashierPaymentRequest cashierPaymentRequest,
+            @RequestHeader("origin") String origin
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Create payment successfully")
+                .data(cashierServices.createPayment(authorization, cashierPaymentRequest, origin))
                 .build());
     }
 }

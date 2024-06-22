@@ -14,7 +14,6 @@ import { getPaginationTransactions } from "../../../services/admin/TransactionSe
 import { enqueueSnackbar } from "notistack";
 import TransactionFilter from "../../../components/Admin/TransactionManagement/TransactionFilter";
 
-
 const statusOptions = [
   {
     value: "PENDING",
@@ -32,12 +31,20 @@ const statusOptions = [
 
 const paymentOptions = [
   {
-    value: "VNPay",
-    name: "Online",
+    value: "VNPAY",
+    name: "VNPay",
+  },
+  {
+    value: "MOMO",
+    name: "Momo",
+  },
+  {
+    value: "WALLET",
+    name: "Ví điện tử",
   },
   {
     value: "CASH",
-    name: "Tại quầy",
+    name: "Tiền mặt",
   },
 ];
 
@@ -84,11 +91,18 @@ function TransactionListPage(props) {
 
   const handleGetTransactions = useCallback(async () => {
     if (!filterButtonClicked) return;
+    let allPaymentMethod = [];
+    let allStatus = [];
+    if (selectedPayment.length === 0)
+      allPaymentMethod = ["VNPAY", "MOMO", "WALLET", "CASH"];
+    if (selectedStatus.length === 0)
+      allStatus = ["PENDING", "SUCCESS", "FAILED"];
     const response = await getPaginationTransactions({
       page: pageChange ? page - 1 : 0,
       limit: limit,
-      transactionPayment: selectedPayment,
-      transactionStatus: selectedStatus,
+      transactionPayment:
+        allPaymentMethod.length === 0 ? selectedPayment : allPaymentMethod,
+      transactionStatus: allStatus.length === 0 ? selectedStatus : allStatus,
     });
     if (response.success) {
       setTransactions(response.data.data.transactions);
@@ -137,11 +151,7 @@ function TransactionListPage(props) {
               spacing={"2px"}
             >
               <Stack direction="row" spacing={1}>
-                <Box
-                  py={2}
-                  px={3}
-                  width="90%"
-                >
+                <Box py={2} px={3} width="90%">
                   {selectedPayment.length === 0 &&
                     selectedStatus.length === 0 && (
                       <TextField
@@ -174,7 +184,9 @@ function TransactionListPage(props) {
                     {selectedStatus.map((item, index) => (
                       <Chip
                         color="warning"
-                        label={statusOptions.find((i) => i.value === item)?.name}
+                        label={
+                          statusOptions.find((i) => i.value === item)?.name
+                        }
                         key={index}
                         onDelete={() =>
                           setSelectedStatus((prev) =>
@@ -191,7 +203,7 @@ function TransactionListPage(props) {
                   }}
                   sx={{
                     flexBasis: "15%",
-                    width:"10%",
+                    width: "10%",
                   }}
                 >
                   Áp dụng

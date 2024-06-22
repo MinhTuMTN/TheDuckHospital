@@ -20,5 +20,5 @@ public interface IBookingServices {
     NurseBookingItemResponse checkBooking(String bookingCode, int roomId) throws ParseException;
     Booking bookingIsValid(String bookingCode, int roomId) throws ParseException;
     Map<String, String> checkPatientCode(String identityNumber);
-    Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException;
+    Booking counterNurseCreateBooking(NurseCreateBookingRequest request) throws ParseException;
 }

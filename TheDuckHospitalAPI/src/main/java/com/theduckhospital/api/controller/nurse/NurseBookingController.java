@@ -62,7 +62,7 @@ public class NurseBookingController {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .message("Create booking and payment successfully")
-                .data(medicalExamServices.nurseCreateMedicalExamRecord(request))
+                .data(medicalExamServices.counterNurseCreateBookingAndMedicalRecord(request))
                 .build()
         );
     }

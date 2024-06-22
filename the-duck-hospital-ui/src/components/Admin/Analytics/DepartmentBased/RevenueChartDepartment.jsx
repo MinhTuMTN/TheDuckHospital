@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import { Box, Stack, Typography } from "@mui/material";
-import { LineChart } from "@mui/x-charts";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import React, { useCallback, useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
-import { getBookingStatistics } from "../../../services/admin/StatisticsServices";
+import { getRevenueStatisticsByDepartment } from "../../../../services/admin/StatisticsServices";
+import { MixedChart } from "../MixedChartComponent";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -32,9 +32,12 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
   },
 }));
 
-function BookingChart(props) {
+function RevenueChartDepartment(props) {
+  const { departmentId } = props;
   const [labels, setLabels] = useState([""]);
-  const [data, setData] = useState([1]);
+  const [totalData, setTotalData] = useState([0]);
+  const [adminssionData, setAdmissionData] = useState([0]);
+  const [examinationData, setExaminationData] = useState([0]);
   const [statisticRequest, setStatisticRequest] = useState({
     startDate: dayjs().add(-30, "day"),
     endDate: dayjs(),
@@ -44,23 +47,24 @@ function BookingChart(props) {
   const [minEndDate, setMinEndDate] = useState(statisticRequest.startDate);
 
   const handleStatistics = useCallback(async () => {
-    const response = await getBookingStatistics({
+    const response = await getRevenueStatisticsByDepartment(departmentId, {
       startDate: statisticRequest.startDate.format("YYYY/MM/DD"),
-      endDate: statisticRequest.endDate.format("YYYY/MM/DD"),
+      endDate: statisticRequest.endDate.add(1, "day").format("YYYY/MM/DD"),
     });
 
     if (response.success) {
       setLabels(response.data.data.labels);
-      setData(response.data.data.values);
+      setTotalData(response.data.data.totalValues);
+      setExaminationData(response.data.data.examinationValues);
+      setAdmissionData(response.data.data.admissionValues);
     } else {
       enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
     }
-  }, [statisticRequest]);
+  }, [departmentId, statisticRequest]);
 
-  
   useEffect(() => {
-    handleStatistics();
-  }, [handleStatistics]);
+    if (departmentId !== null && departmentId !== undefined) handleStatistics();
+  }, [departmentId, handleStatistics]);
 
   return (
     <>
@@ -129,22 +133,22 @@ function BookingChart(props) {
             objectFit: "contain",
           }}
         />
-        <TieuDe>Biểu đồ lượt đặt khám theo ngày</TieuDe>
+        <TieuDe>Biểu đồ doanh thu theo ngày</TieuDe>
       </BoxStyle>
       <BoxStyle>
         {labels && labels.length > 0 && (
-          <LineChart
-            xAxis={[{ scaleType: "point", data: labels }]}
-            series={[{ data: data, label: "Đặt khám" }]}
-            height={350}
-            sx={{
-              padding: "1.6rem",
-            }}
-          />
+          <>
+            <MixedChart
+              labels={labels}
+              total={totalData}
+              booking={examinationData}
+              test={adminssionData}
+            />
+          </>
         )}
       </BoxStyle>
     </>
   );
 }
 
-export default BookingChart;
+export default RevenueChartDepartment;

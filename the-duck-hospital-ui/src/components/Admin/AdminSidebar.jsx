@@ -8,6 +8,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import DnsIcon from "@mui/icons-material/Dns";
 import VaccinesIcon from "@mui/icons-material/Vaccines";
+import MultilineChartIcon from '@mui/icons-material/MultilineChart';
 
 import {
   Box,
@@ -103,10 +104,17 @@ const sidebarItems = [
     section: "transaction-management",
   },
   {
-    display: "Thống Kê",
+    display: "Tổng Quát",
+    icon: <MultilineChartIcon />,
+    to: "/admin/analytics/general",
+    section: "general",
+    analytics: true,
+  },
+  {
+    display: "Theo Khoa",
     icon: <AnalyticsIcon />,
-    to: "/admin/analytics",
-    section: "analytics",
+    to: "/admin/analytics/department-based",
+    section: "department-based",
     analytics: true,
   },
 ];
@@ -117,11 +125,13 @@ function AdminSidebar(props) {
   const navigate = useNavigate();
 
   const location = useLocation();
-  let currentSection = location.pathname
-    .split("/")
-    .filter((part) => part !== "")[1];
+  let currentSection =
+    location.pathname.split("/").filter((part) => part !== "")[1] ===
+    "analytics"
+      ? location.pathname.split("/").filter((part) => part !== "")[2]
+      : location.pathname.split("/").filter((part) => part !== "")[1];
 
-  if (currentSection === undefined) currentSection = "analytics";
+  if (currentSection === undefined) currentSection = "general";
   const activeSection = sidebarItems.find(
     (item) => item.section === currentSection
   )?.section;
@@ -172,33 +182,63 @@ function AdminSidebar(props) {
             {" "}
             THỐNG KÊ{" "}
           </Typography>
-          <ListItem
-            disablePadding
-            key={sidebarItems[sidebarItems.length - 1].section}
-          >
-            <CustomLink
-              to={sidebarItems[sidebarItems.length - 1].to}
-              width={"100%"}
+          <List>
+            <ListItem
+              disablePadding
+              key={sidebarItems[sidebarItems.length - 2].section}
             >
-              <CustomListItemButton
-                active={
-                  activeSection ===
-                  sidebarItems[sidebarItems.length - 1].section
-                    ? "true"
-                    : "false"
-                }
+              <CustomLink
+                to={sidebarItems[sidebarItems.length - 2].to}
+                width={"100%"}
               >
-                <CustomListItemIcon>
-                  {sidebarItems[sidebarItems.length - 1].icon}
-                </CustomListItemIcon>
-                <ListItemText
-                  disableTypography
-                  style={{ color: "#b5bac0 !important", fontSize: "14px" }}
-                  primary={sidebarItems[sidebarItems.length - 1].display}
-                />
-              </CustomListItemButton>
-            </CustomLink>
-          </ListItem>
+                <CustomListItemButton
+                  active={
+                    activeSection ===
+                    sidebarItems[sidebarItems.length - 2].section
+                      ? "true"
+                      : "false"
+                  }
+                >
+                  <CustomListItemIcon>
+                    {sidebarItems[sidebarItems.length - 2].icon}
+                  </CustomListItemIcon>
+                  <ListItemText
+                    disableTypography
+                    style={{ color: "#b5bac0 !important", fontSize: "14px" }}
+                    primary={sidebarItems[sidebarItems.length - 2].display}
+                  />
+                </CustomListItemButton>
+              </CustomLink>
+            </ListItem>
+
+            <ListItem
+              disablePadding
+              key={sidebarItems[sidebarItems.length - 1].section}
+            >
+              <CustomLink
+                to={sidebarItems[sidebarItems.length - 1].to}
+                width={"100%"}
+              >
+                <CustomListItemButton
+                  active={
+                    activeSection ===
+                    sidebarItems[sidebarItems.length - 1].section
+                      ? "true"
+                      : "false"
+                  }
+                >
+                  <CustomListItemIcon>
+                    {sidebarItems[sidebarItems.length - 1].icon}
+                  </CustomListItemIcon>
+                  <ListItemText
+                    disableTypography
+                    style={{ color: "#b5bac0 !important", fontSize: "14px" }}
+                    primary={sidebarItems[sidebarItems.length - 1].display}
+                  />
+                </CustomListItemButton>
+              </CustomLink>
+            </ListItem>
+          </List>
           <Typography
             variant="h6"
             paddingX={3}

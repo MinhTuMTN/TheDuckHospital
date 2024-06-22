@@ -2,7 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
-import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
+import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
@@ -14,7 +14,7 @@ import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.MedicalTestRepository;
-import com.theduckhospital.api.repository.TransactionRepository;
+import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -32,35 +32,31 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IMedicalServiceServices medicalServiceServices;
-    private final IBookingServices bookingServices;
-    private final IAccountServices accountServices;
     private final MedicalTestRepository medicalTestRepository;
     private final ILaboratoryTechnicianServices laboratoryTechnicianServices;
-    private final TransactionRepository transactionRepository;
     private final ICloudinaryServices cloudinaryServices;
     private final IPaymentServices paymentServices;
     private final IPatientServices patientServices;
     private final IRoomServices roomServices;
+    private final RoomRepository roomRepository;
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
-            IBookingServices bookingServices, MedicalTestRepository medicalTestRepository,
-            TransactionRepository transactionRepository,
+            MedicalTestRepository medicalTestRepository,
             ILaboratoryTechnicianServices laboratoryTechnicianServices,
             ICloudinaryServices cloudinaryServices,
-            IAccountServices accountServices,
             IPaymentServices paymentServices,
-            IPatientServices patientServices, IRoomServices roomServices) {
+            IPatientServices patientServices,
+            IRoomServices roomServices,
+            RoomRepository roomRepository) {
         this.medicalServiceServices = medicalServiceServices;
-        this.bookingServices = bookingServices;
-        this.accountServices = accountServices;
         this.medicalTestRepository = medicalTestRepository;
-        this.transactionRepository = transactionRepository;
         this.cloudinaryServices = cloudinaryServices;
         this.paymentServices = paymentServices;
         this.laboratoryTechnicianServices = laboratoryTechnicianServices;
         this.patientServices = patientServices;
         this.roomServices = roomServices;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -157,34 +153,14 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
 
     @Override
     @Transactional
-    public PaymentResponse patientPayMedicalTest(String token, PayMedicalTestRequest request, String origin) {
+    public PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin) {
         try {
-            Optional<MedicalTest> optional = medicalTestRepository
-                    .findByMedicalTestCodeAndDeletedIsFalse(
-                            request.getMedicalTestCode()
+            Transaction transaction = paymentServices
+                    .createMedicalTestTransaction(
+                            request,
+                            origin,
+                            null
                     );
-
-            if (optional.isEmpty()) {
-                throw new BadRequestException("Not found medical test", 10010);
-            }
-            MedicalTest medicalTest = optional.get();
-            if (medicalTest.getTransaction() != null &&
-                    medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
-            ) {
-                throw new BadRequestException("This medical test has been paid", 10011);
-            }
-
-            UUID oldTransactionId = medicalTest.getTransaction() != null ?
-                    medicalTest.getTransaction().getTransactionId() : null;
-            if (oldTransactionId != null)
-                transactionRepository.deleteById(oldTransactionId);
-
-            Transaction transaction = getTransaction(token, origin, medicalTest);
-            transaction.setMedicalTest(medicalTest);
-            transactionRepository.save(transaction);
-
-            medicalTest.setTransaction(transaction);
-            medicalTestRepository.save(medicalTest);
 
             return paymentServices.createMedicalTestPaymentUrl(transaction, request);
         } catch (BadRequestException e) {
@@ -223,6 +199,11 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                         Comparator.comparing(MedicalTest::getDate).reversed())
                 .toList();
 
+        return getMedicalTestResultResponses(medicalTests);
+    }
+
+    @NotNull
+    private static List<MedicalTestResultResponse> getMedicalTestResultResponses(List<MedicalTest> medicalTests) {
         List<MedicalTestResultResponse> medicalTestResultList = new ArrayList<>();
         for (MedicalTest test : medicalTests) {
             MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
@@ -310,11 +291,97 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                 room,
                 MedicalTestState.PROCESSING
         );
-        long waiting = room.getMedicalTestQueueNumberMax() - processing;
+        long waiting = medicalTestRepository.countByRoomAndStateAndDeletedIsFalse(
+                room,
+                MedicalTestState.WAITING
+        );
 
         return Map.of("processing", String.valueOf(processing),
                 "waiting", String.valueOf(waiting)
         );
+    }
+
+    @Override
+    public MedicalTest createMedicalTest(
+            CreateMedicalTest request,
+            MedicalExaminationRecord examinationRecord,
+            HospitalAdmission hospitalAdmission
+    ) {
+        Date today = DateCommon.getToday();
+        MedicalService medicalService = medicalServiceServices
+                .getMedicalServiceByIdAndServiceType(
+                        request.getServiceId(),
+                        ServiceType.MedicalTest
+                );
+
+        MedicalTest medicalTest = new MedicalTest();
+        medicalTest.setMedicalService(medicalService);
+        medicalTest.setMedicalExaminationRecord(examinationRecord);
+        medicalTest.setHospitalAdmission(hospitalAdmission);
+        medicalTest.setNote(
+                request.getNote()
+        );
+        medicalTest.setPrice(
+                medicalService.getPrice()
+        );
+
+        // Thay đổi
+        // B1: Tìm ra phòng có số lượng ít nhất mà xét nghiệm dịch vụ đó
+        // B2: Lấy số thứ tự + 1
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Room> roomPage = roomRepository.findLaboratoryRoom(
+                medicalService,
+                hospitalAdmission != null
+                        ? RoomType.LABORATORY_ROOM_ADMISSION
+                        : RoomType.LABORATORY_ROOM_NORMAL,
+                pageable
+        );
+        if (roomPage.getContent().isEmpty())
+            throw new NotFoundException("Laboratory Room not found");
+        Room laboratoryRoom = roomPage.getContent().get(0);
+        int currentQueueNumber = laboratoryRoom.getMedicalTestQueueNumber();
+        medicalTest.setQueueNumber(
+                currentQueueNumber + 1
+        );
+        medicalTest.setRoom(laboratoryRoom);
+        laboratoryRoom.setMedicalTestQueueNumberMax(
+                currentQueueNumber + 1
+        );
+        medicalTest.setDate(today);
+
+        roomRepository.save(laboratoryRoom);
+        medicalTestRepository.save(medicalTest);
+
+        return medicalTest;
+    }
+
+    @Override
+    public Page<MedicalTest> getMedicalTestsByHospitalAdmission(
+            HospitalAdmission hospitalAdmission,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return medicalTestRepository.findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
+                hospitalAdmission,
+                pageable
+        );
+    }
+
+    @Override
+    public void deleteHospitalAdmissionMedicalTest(
+            HospitalAdmission hospitalAdmission,
+            UUID medicalTestId
+    ) {
+        MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+        if (medicalTest.getHospitalAdmission() == null ||
+                !medicalTest.getHospitalAdmission().equals(hospitalAdmission)
+        ) {
+            throw new BadRequestException("Invalid hospital admission", 400);
+        }
+
+        medicalTest.setDeleted(true);
+        medicalTestRepository.save(medicalTest);
     }
 
     private Room getLabRoomById(Integer roomId) {
@@ -329,18 +396,5 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
 
         return room;
-    }
-
-    @NotNull
-    private Transaction getTransaction(String token, String origin, MedicalTest medicalTest) {
-        Account account = accountServices.findAccountByToken(token);
-
-        Transaction transaction = new Transaction();
-        transaction.setAccount(account);
-        transaction.setAmount(medicalTest.getMedicalService().getPrice());
-        transaction.setFee((double) MomoConfig.medicalTestFee);
-        transaction.setOrigin(origin);
-        transaction.setPaymentType(PaymentType.MEDICAL_TEST);
-        return transaction;
     }
 }

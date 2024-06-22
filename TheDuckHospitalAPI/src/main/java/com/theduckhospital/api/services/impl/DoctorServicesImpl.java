@@ -2,18 +2,21 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
+import com.theduckhospital.api.dto.response.RatingStatisticsResponse;
 import com.theduckhospital.api.dto.response.admin.ActiveDoctorResponse;
+import com.theduckhospital.api.dto.response.admin.BookingStatisticsResponse;
 import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
+import com.theduckhospital.api.dto.response.admin.PatientStatisticsResponse;
 import com.theduckhospital.api.dto.response.doctor.HeadDoctorResponse;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Department;
-import com.theduckhospital.api.entity.Doctor;
-import com.theduckhospital.api.entity.DoctorSchedule;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.AccountRepository;
 import com.theduckhospital.api.repository.DoctorRepository;
+import com.theduckhospital.api.repository.MedicalExaminationRepository;
+import com.theduckhospital.api.repository.RatingRepository;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
@@ -22,30 +25,34 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
 public class DoctorServicesImpl implements IDoctorServices {
     private final DoctorRepository doctorRepository;
+    private final MedicalExaminationRepository medicalExaminationRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
+    private final RatingRepository ratingRepository;
     private final IDepartmentServices departmentServices;
 
     public DoctorServicesImpl(
             DoctorRepository doctorRepository,
             JwtTokenProvider jwtTokenProvider,
             AccountRepository accountRepository,
-            IDepartmentServices departmentServices
+            RatingRepository ratingRepository,
+            IDepartmentServices departmentServices,
+            MedicalExaminationRepository medicalExaminationRepository
     ) {
         this.doctorRepository = doctorRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
         this.departmentServices = departmentServices;
+        this.medicalExaminationRepository = medicalExaminationRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @Override
@@ -199,5 +206,64 @@ public class DoctorServicesImpl implements IDoctorServices {
         return doctorRepository.findAllByHeadOfDepartmentIsTrue().stream()
                 .map(doctor -> new HeadDoctorResponse(doctor, doctor.getDepartment()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PatientStatisticsResponse getPatientStatistics(Date startDate, Date endDate, UUID staffId) {
+        Calendar startDateCalendar = DateCommon.getCalendar(startDate);
+        Calendar endDateCalendar = DateCommon.getCalendar(endDate);
+
+        endDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endDateCalendar.set(Calendar.MINUTE, 59);
+        endDateCalendar.set(Calendar.SECOND, 59);
+        endDateCalendar.set(Calendar.MILLISECOND, 99);
+
+        List<Object[]> patients = medicalExaminationRepository.countPatientsByCreatedAtBetweenAndDeletedIsFalse(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime(),
+                staffId
+        );
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM");
+
+        List<Long> values = patients.stream()
+                .map(entry -> (Long) entry[1])
+                .collect(Collectors.toList());
+
+        List<String> labels = patients.stream()
+                .map(entry -> dateFormat.format((Date) entry[0]))
+                .collect(Collectors.toList());
+
+
+        return new PatientStatisticsResponse(values, labels);
+    }
+
+    @Override
+    public RatingStatisticsResponse getReviews(UUID staffId) {
+        Doctor doctor = getDoctorById(staffId);
+        List<Rating> ratings = ratingRepository.findByDoctorAndDeletedIsFalse(doctor);
+
+        Map<Integer, Long> defaultRatingStatistics = new TreeMap<>(Comparator.reverseOrder());
+        for (int i = 1; i <= 5; i++) {
+            defaultRatingStatistics.put(i, 0L);
+        }
+
+        Map<Integer, Long> ratingStatistics = ratings.stream()
+                .collect(Collectors.groupingBy(
+                        Rating::getRatingPoint,
+                        () -> new TreeMap<>(Comparator.reverseOrder()),
+                        Collectors.counting()
+                ));
+
+        defaultRatingStatistics.forEach((ratingPoint, count) ->
+                ratingStatistics.merge(ratingPoint, count, Long::sum));
+//        Map<Integer, Long> ratingStatistics = ratings.stream()
+//                .sorted(Comparator.comparing(Rating::getRatingPoint))
+//                .collect(Collectors.groupingBy(
+//                        Rating::getRatingPoint,
+//                        LinkedHashMap::new,
+//                        Collectors.counting()
+//                ));
+        return new RatingStatisticsResponse(doctor.getRatings(), doctor.getRatings().size(), doctor.getRating(), ratingStatistics);
     }
 }

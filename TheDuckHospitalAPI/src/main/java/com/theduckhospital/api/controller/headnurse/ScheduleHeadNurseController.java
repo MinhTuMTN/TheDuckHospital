@@ -5,6 +5,7 @@ import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.dto.request.headnurse.CreateExamNurseScheduleRequest;
 import com.theduckhospital.api.dto.request.headnurse.CreateInpatientNurseSchedule;
+import com.theduckhospital.api.dto.request.headnurse.DeleteAllNurseScheduleRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.INurseServices;
 import org.springframework.http.ResponseEntity;
@@ -194,6 +195,28 @@ public class ScheduleHeadNurseController {
                             .data(nurseServices.deleteExaminationRoomSchedule(
                                     authorizationHeader,
                                     scheduleId
+                            ))
+                            .build()
+            );
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @PostMapping("/delete-all")
+    public ResponseEntity<?> deleteAllNurseSchedules(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody DeleteAllNurseScheduleRequest request
+    ) {
+        lock.lock();
+        try {
+            return ResponseEntity.ok(
+                    GeneralResponse.builder()
+                            .success(true)
+                            .message("Delete all nurse schedules successfully")
+                            .data(nurseServices.deleteAllNurseSchedule(
+                                    authorizationHeader,
+                                    request.getScheduleIds()
                             ))
                             .build()
             );

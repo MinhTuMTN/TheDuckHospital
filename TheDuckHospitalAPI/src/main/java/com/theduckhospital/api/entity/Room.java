@@ -44,6 +44,7 @@ public class Room {
 
     private RoomType roomType;
     private Integer beingUsed;
+    private Integer capacity;
 
     // 2 thuộc tính này reset lại mỗi ngày
     private Integer medicalTestQueueNumber;

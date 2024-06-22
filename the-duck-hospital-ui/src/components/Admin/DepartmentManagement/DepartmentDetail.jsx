@@ -349,6 +349,19 @@ function DepartmentDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
+
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
+            <TieuDeCot>Số lượng điều dưỡng</TieuDeCot>
+          </Grid>
+
+          <Grid item xs={8} md={9}>
+            <NoiDung>{department.nurses?.length}</NoiDung>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+
       <BoxStyle
         sx={{
           borderBottom: "none !important",

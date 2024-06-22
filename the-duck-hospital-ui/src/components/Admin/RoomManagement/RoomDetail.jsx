@@ -99,6 +99,7 @@ function RoomDetail(props) {
     description: "",
     roomType: "",
     serviceId: "",
+    capacity: 8,
   });
   const [departments, setDepartments] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -190,12 +191,18 @@ function RoomDetail(props) {
       return;
     }
 
+    if (roomEdit.roomType.startsWith("TREATMENT") && roomEdit.capacity <= 0) {
+      enqueueSnackbar("Sức chứa phải lớn hơn 0", { variant: "error" });
+      return;
+    }
+
     const response = await updateRoom(room.roomId, {
       roomName: roomEdit.roomName,
       departmentId: roomEdit.departmentId,
       description: roomEdit.description,
       roomType: roomEdit.roomType,
       medicalServiceId: roomEdit.serviceId,
+      capacity: roomEdit.capacity,
     });
     if (response.success) {
       enqueueSnackbar("Cập nhật thông tin phòng thành công!", {
@@ -218,6 +225,7 @@ function RoomDetail(props) {
       description: room.description,
       roomType: room.roomType || "",
       serviceId: room.serviceId || "",
+      capacity: room.capacity || 8,
     });
   };
 
@@ -300,6 +308,19 @@ function RoomDetail(props) {
 
             <Grid item xs={8} md={9}>
               <NoiDung>{room.serviceName}</NoiDung>
+            </Grid>
+          </Grid>
+        </BoxStyle>
+      )}
+      {room.roomType?.startsWith("TREATMENT") && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Sức chứa</TieuDeCot>
+            </Grid>
+
+            <Grid item xs={8} md={9}>
+              <NoiDung>{room.capacity}</NoiDung>
             </Grid>
           </Grid>
         </BoxStyle>
@@ -598,6 +619,41 @@ function RoomDetail(props) {
                     ))}
                   </Select>
                 </FormControl>
+              </Box>
+            )}
+            {roomEdit.roomType?.startsWith("TREATMENT") && (
+              <Box>
+                <Typography
+                  variant="body1"
+                  style={{
+                    fontSize: "14px",
+                    marginBottom: "4px",
+                    color: roomEdit.roomName?.trim() === "" ? "red" : "",
+                  }}
+                >
+                  Sức chứa
+                </Typography>
+                <InputText
+                  sx={{
+                    size: "small",
+                    padding: "0 !important",
+                    fontSize: "14px !important",
+                  }}
+                  autoComplete="off"
+                  autoFocus
+                  required
+                  fullWidth
+                  type="number"
+                  value={roomEdit.capacity}
+                  onChange={(e) =>
+                    setRoomEdit((prev) => {
+                      return {
+                        ...prev,
+                        capacity: parseInt(e.target.value),
+                      };
+                    })
+                  }
+                />
               </Box>
             )}
             <Box>

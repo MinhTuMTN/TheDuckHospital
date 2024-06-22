@@ -46,6 +46,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
 
     List<Doctor> findAllByHeadOfDepartmentIsTrue();
 
+    List<Doctor> findByDepartmentOrderByRatingDesc(Department department);
+
     @Query("SELECT d " +
             "FROM Doctor d " +
             "WHERE d.deleted = false " +
@@ -59,4 +61,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Date today,
             Pageable pageable
     );
+    long countByDepartmentAndDeletedIsFalse(Department department);
 }

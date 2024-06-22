@@ -8,6 +8,10 @@ export const getAllDepartments = () => {
   return get("/admin/departments");
 };
 
+export const getAllActiveDepartments = () => {
+  return get("/admin/departments/active-departments");
+};
+
 export const getDepartmentsWithoutServices = () => {
   return get("/admin/departments/without-services");
 };

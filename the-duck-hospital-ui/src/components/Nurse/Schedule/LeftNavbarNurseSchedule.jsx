@@ -238,9 +238,7 @@ function LeftNavbarNurseSchedule(props) {
                 textAlign: "left",
               }}
             >
-              {role === "Doctor" || role === "HeadDoctor"
-                ? "Bác sĩ"
-                : "Bác sĩ xét nghiệm"}
+              Điều dưỡng
             </Typography>
             <Typography
               sx={{

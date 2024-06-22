@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
   styled,
+  Rating,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -21,6 +22,12 @@ import {
   getDateHasDoctorSchedule,
   getSchedulesByStaffIdAndDate,
 } from "../../../services/admin/DoctorScheduleServices";
+import PatientChart from "../../../components/Admin/StaffManagement/PatientChart";
+
+const paperStyle = {
+  marginTop: 4,
+  borderRadius: "8px",
+};
 
 const StaffId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -161,7 +168,7 @@ function StaffDetailPage() {
               <Stack direction={"row"} alignItems={"center"} spacing={1}>
                 <img
                   src={staff?.avatar}
-                  alt="top-product"
+                  alt="doctor-avatar"
                   style={{
                     width: 100,
                     height: 100,
@@ -192,6 +199,28 @@ function StaffDetailPage() {
                     </Typography>
                     <StaffId>{staff.staffId}</StaffId>
                   </Stack>
+                  {isDoctor && (
+                    <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                      <Typography
+                        variant="body1"
+                        fontWeight={450}
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
+                        {"Đánh giá: "}
+                      </Typography>
+                      <Rating value={staff.rating} readOnly />
+                      <Typography
+                        variant="body1"
+                        style={{
+                          fontSize: "14px",
+                        }}
+                      >
+                        {"(" + staff.numberOfRating + ")"}
+                      </Typography>
+                    </Stack>
+                  )}
                 </Stack>
               </Stack>
             </Grid>
@@ -213,46 +242,59 @@ function StaffDetailPage() {
           </Grid>
 
           {isDoctor && (
-            <Grid container>
-              <Grid item xs={12}>
-                <Stack
-                  component={Paper}
-                  elevation={3}
-                  sx={{
-                    marginTop: 4,
-                    borderRadius: "15px",
-                  }}
-                  spacing={"2px"}
-                >
+            <>
+              <Grid container>
+                <Grid item xs={12}>
                   <Stack
+                    component={Paper}
+                    elevation={3}
                     sx={{
+                      marginTop: 4,
                       borderRadius: "15px",
-                      paddingTop: 1,
                     }}
+                    spacing={"2px"}
                   >
-                    <BoxStyle>
-                      <Stack direction={"row"}>
-                        <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
-                        <LocalizationProvider
-                          dateAdapter={AdapterDayjs}
-                          adapterLocale="en-gb"
-                        >
-                          <CustomDatePicker
-                            label="Ngày làm việc"
-                            value={dayjs(dateSelected)}
-                            shouldDisableDate={disableDateNotHasSchedule}
-                            onChange={(newDate) => {
-                              setDateSelected(newDate);
-                            }}
-                          />
-                        </LocalizationProvider>
-                      </Stack>
-                    </BoxStyle>
-                    {schedules && <ScheduleTable items={schedules} />}
+                    <Stack
+                      sx={{
+                        borderRadius: "15px",
+                        paddingTop: 1,
+                      }}
+                    >
+                      <BoxStyle>
+                        <Stack direction={"row"}>
+                          <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
+                          <LocalizationProvider
+                            dateAdapter={AdapterDayjs}
+                            adapterLocale="en-gb"
+                          >
+                            <CustomDatePicker
+                              label="Ngày làm việc"
+                              value={dayjs(dateSelected)}
+                              shouldDisableDate={disableDateNotHasSchedule}
+                              onChange={(newDate) => {
+                                setDateSelected(newDate);
+                              }}
+                            />
+                          </LocalizationProvider>
+                        </Stack>
+                      </BoxStyle>
+                      {schedules && <ScheduleTable items={schedules} />}
+                    </Stack>
                   </Stack>
-                </Stack>
+                </Grid>
               </Grid>
-            </Grid>
+
+              <Stack component={Paper} elevation={3} sx={paperStyle}>
+                <Stack
+                  sx={{
+                    borderRadius: "10px",
+                    paddingTop: 0,
+                  }}
+                >
+                  <PatientChart staffId={staff.staffId} />
+                </Stack>
+              </Stack>
+            </>
           )}
         </Stack>
       </Stack>

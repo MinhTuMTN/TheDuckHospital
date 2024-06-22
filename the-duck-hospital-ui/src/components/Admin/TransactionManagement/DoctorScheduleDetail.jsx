@@ -60,7 +60,7 @@ function DoctorScheduleDetail(props) {
             <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
               <Stack direction="row" spacing={0.5}>
                 <TieuDeCot>
-                  {doctorSchedule.scheduleType === "MORNING" ?
+                  {doctorSchedule.scheduleSession === "MORNING" ?
                     "Buổi sáng - " : "Buổi chiều - "}
                 </TieuDeCot>
                 <TieuDeCot>

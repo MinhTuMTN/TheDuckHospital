@@ -274,3 +274,65 @@
 #outline-input fieldset.MuiOutlinedInput-notchedOutline {
   border-color: red !important;
 }
+
+.buttonDelete {
+  width: 120px;
+  height: 35px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background: red;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  background: #e62222;
+}
+
+.buttonDelete .text,
+.buttonDelete .icon {
+  transition: 200ms;
+}
+
+.buttonDelete .text {
+  transform: translateX(30px);
+  color: white;
+  font-weight: bold;
+}
+
+.buttonDelete .icon {
+  position: absolute;
+  border-left: 1px solid #c41b1b;
+  transform: translateX(85px);
+  height: 30px;
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonDelete svg {
+  width: 15px;
+  fill: #eee;
+}
+
+.buttonDelete:hover {
+  background: #ff3636;
+}
+
+.buttonDelete:hover .text {
+  color: transparent;
+}
+
+.buttonDelete:hover .icon {
+  width: 120px;
+  border-left: none;
+  transform: translateX(0);
+}
+
+.buttonDelete:focus {
+  outline: none;
+}
+
+.buttonDelete:active .icon svg {
+  transform: scale(0.8);
+}

@@ -3,6 +3,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import {
   Box,
   Button,
+  Chip,
   Container,
   FormControl,
   FormHelperText,
@@ -10,6 +11,7 @@ import {
   Paper,
   Select,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
@@ -26,6 +28,8 @@ import {
   getRoomTypes,
 } from "../../../services/admin/RoomServices";
 import { getRoomType } from "../../../utils/roomTypesUtils";
+import AccountFilter from "../../../components/Admin/AccountManagement/AccountFilter";
+import useDebounce from "../../../hooks/useDebounce";
 
 const CustomButton = styled(Button)(({ theme }) => ({
   color: "white",
@@ -43,16 +47,53 @@ const CustomTypography = styled(Typography)(({ theme }) => ({
   marginBottom: "2px !important",
 }));
 
+const statusOptions = [
+  {
+    value: false,
+    name: "Còn hoạt động",
+  },
+  {
+    value: true,
+    name: "Ngưng hoạt động",
+  },
+];
+
+const roomTypeOptions = [
+  {
+    value: "EXAMINATION_ROOM",
+    name: "Phòng khám",
+  },
+  {
+    value: "TREATMENT_ROOM_STANDARD",
+    name: "Phòng điều trị thường",
+  },
+  {
+    value: "TREATMENT_ROOM_VIP",
+    name: "Phòng điều trị VIP",
+  },
+  {
+    value: "LABORATORY_ROOM_NORMAL",
+    name: "Phòng xét nghiệm thường",
+  },
+  {
+    value: "LABORATORY_ROOM_ADMISSION",
+    name: "Phòng xét nghiệm nội trú",
+  },
+  {
+    value: "MEETING_ROOM",
+    name: "Phòng họp",
+  },
+];
+
 function RoomListPage(props) {
   const [search, setSearch] = useState("");
-  const [enterPressed, setEnterPressed] = useState(true);
-  const [pageChange, setPageChange] = useState(false);
+  const searchDebounce = useDebounce(search, 500);
   const [rooms, setRooms] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [limit, setLimit] = useState(5);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
   const [medicalServices, setMedicalServices] = useState([]);
@@ -62,45 +103,57 @@ function RoomListPage(props) {
     description: "",
     roomType: "",
     medicalService: "",
+    capacity: parseInt(4),
   });
 
+  const [selectedRoomTypes, setSelectedRoomTypes] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState([]);
+  const handleChangeRoomTypeFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedRoomTypes((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedRoomTypes((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
+    setPage(0);
+  };
+  const handleChangeStatusFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedStatus((prev) => [...prev, event.target.value === "true"]);
+    } else {
+      setSelectedStatus((prev) =>
+        prev.filter((item) => item !== (event.target.value === "true"))
+      );
+    }
+    setPage(0);
+  };
+
   const handlePageChange = (event, newPage) => {
-    setPage(newPage + 1);
-    setPageChange(true);
-    setEnterPressed(true);
+    setPage(newPage);
   };
   const handleRowsPerPageChange = (event) => {
     setLimit(event.target.value);
-    setPage(1);
-    setEnterPressed(true);
+    setPage(0);
   };
 
   const handleGetRooms = useCallback(async () => {
-    if (!enterPressed) return;
     const response = await getPaginationRooms({
-      search: search.trim(),
-      page: pageChange ? page - 1 : 0,
+      roomType: selectedRoomTypes,
+      status: selectedStatus,
+      search: searchDebounce,
+      page: page,
       limit: limit,
     });
     if (response.success) {
       setRooms(response.data.data.rooms);
       setTotalItems(response.data.data.total);
-      setPage(response.data.data.page + 1);
-      setLimit(response.data.data.limit);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-    setEnterPressed(false);
-    setPageChange(false);
-  }, [search, page, limit, enterPressed, pageChange]);
+  }, [searchDebounce, page, limit, selectedRoomTypes, selectedStatus]);
 
   useEffect(() => {
     handleGetRooms();
   }, [handleGetRooms]);
-
-  const handleEnterKeyPressed = (event) => {
-    if (event.key === "Enter" && event.target === document.activeElement) {
-      setEnterPressed(true);
-    }
-  };
 
   useEffect(() => {
     const handleGetDepartment = async () => {
@@ -146,6 +199,11 @@ function RoomListPage(props) {
     const isLabRoom =
       room.roomType === "LABORATORY_ROOM_NORMAL" ||
       room.roomType === "LABORATORY_ROOM_ADMISSION";
+
+    const isTreatmentRoom =
+      room.roomType === "TREATMENT_ROOM_STANDARD" ||
+      room.roomType === "TREATMENT_ROOM_VIP";
+
     if (room.roomName?.trim() === "") {
       enqueueSnackbar("Tên phòng không được để trống", { variant: "error" });
       return;
@@ -168,17 +226,23 @@ function RoomListPage(props) {
       return;
     }
 
+    if (isTreatmentRoom && room.capacity < 1) {
+      enqueueSnackbar("Sức chứa phòng phải lớn hơn 0", { variant: "error" });
+      return;
+    }
+
     const response = await addRoom({
       roomName: room.roomName,
       description: room.description,
       departmentId: room.departmentId,
       roomType: room.roomType,
-      medicalServiceId: room.medicalService.serviceId,
+      medicalServiceId: room.medicalService?.serviceId,
+      capacity: room.capacity,
     });
     if (response.success) {
       enqueueSnackbar("Thêm phòng thành công!", { variant: "success" });
       setOpenDialogForm(false);
-      setEnterPressed(true);
+      handleGetRooms();
     } else enqueueSnackbar("Đã có lỗi xảy ra!", { variant: "error" });
   };
 
@@ -206,6 +270,7 @@ function RoomListPage(props) {
                     roomName: "",
                     departmentId: "",
                     description: "",
+                    capacity: 8,
                   });
                   setOpenDialogForm(true);
                   setAddButtonClicked(false);
@@ -223,11 +288,76 @@ function RoomListPage(props) {
               }}
               spacing={"2px"}
             >
-              <SearchRoomList
-                value={search}
-                onChange={setSearch}
-                handleEnterKeyPressed={handleEnterKeyPressed}
-              />
+              <SearchRoomList value={search} onChange={setSearch} />
+              <Box py={2} px={3}>
+                {selectedRoomTypes.length === 0 &&
+                  selectedStatus.length === 0 && (
+                    <TextField
+                      disabled
+                      variant="standard"
+                      fullWidth
+                      size="medium"
+                      InputProps={{
+                        disableUnderline: true,
+                        fontSize: "14px",
+                      }}
+                      placeholder="Không có bộ lọc nào được chọn"
+                    />
+                  )}
+                <Stack direction="row" spacing={1} overflow={"scroll"}>
+                  {selectedRoomTypes.map((item, index) => (
+                    <Chip
+                      color="info"
+                      label={
+                        roomTypeOptions.find((i) => i.value === item)?.name
+                      }
+                      key={index}
+                      onDelete={() =>
+                        setSelectedRoomTypes((prev) =>
+                          prev.filter((i) => i !== item)
+                        )
+                      }
+                      sx={{
+                        marginBottom: "5px",
+                      }}
+                    />
+                  ))}
+                  {selectedStatus.map((item, index) => (
+                    <Chip
+                      color="warning"
+                      label={statusOptions.find((i) => i.value === item)?.name}
+                      key={index}
+                      onDelete={() =>
+                        setSelectedStatus((prev) =>
+                          prev.filter((i) => i !== item)
+                        )
+                      }
+                    />
+                  ))}
+                </Stack>
+              </Box>
+              <Stack
+                direction={"row"}
+                spacing={1}
+                paddingLeft={2}
+                paddingBottom={1}
+                sx={{
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                <AccountFilter
+                  label={"Loại phòng"}
+                  options={roomTypeOptions}
+                  selectedValues={selectedRoomTypes}
+                  onChange={handleChangeRoomTypeFilter}
+                />
+                <AccountFilter
+                  label={"Trạng thái"}
+                  options={statusOptions}
+                  selectedValues={selectedStatus}
+                  onChange={handleChangeStatusFilter}
+                />
+              </Stack>
               <RoomTable
                 count={totalItems ? totalItems : 0}
                 items={rooms}
@@ -248,6 +378,7 @@ function RoomListPage(props) {
             roomName: "",
             departmentId: "",
             description: "",
+            capacity: 8,
           });
           setOpenDialogForm(false);
           setAddButtonClicked(false);
@@ -260,6 +391,7 @@ function RoomListPage(props) {
             roomName: "",
             departmentId: "",
             description: "",
+            capacity: 8,
           });
           setOpenDialogForm(false);
           setAddButtonClicked(false);
@@ -418,6 +550,25 @@ function RoomListPage(props) {
                     </MenuItem>
                   ))}
                 </Select>
+              </FormControl>
+            </Box>
+          ) : room.roomType === "TREATMENT_ROOM_STANDARD" ||
+            room.roomType === "TREATMENT_ROOM_VIP" ? (
+            <Box>
+              <FormControl fullWidth>
+                <MuiTextFeild
+                  label={"Sức chứa"}
+                  autoComplete="off"
+                  value={room.capacity}
+                  onChange={(e) => {
+                    setRoom((prev) => ({
+                      ...prev,
+                      capacity: parseInt(e.target.value),
+                    }));
+                  }}
+                  required
+                  type="number"
+                />
               </FormControl>
             </Box>
           ) : (

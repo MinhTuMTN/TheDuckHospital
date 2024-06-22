@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.PaymentMethod;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.Account;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionServicesImpl implements ITransactionServices {
@@ -45,7 +47,22 @@ public class TransactionServicesImpl implements ITransactionServices {
 
         return transactionRepository.findById(transactionId).orElse(null);
     }
-
+    public static PaymentMethod toPaymentMethod(String name) {
+        try {
+            return PaymentMethod.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            // Log error or handle exception
+            return null;
+        }
+    }
+    public static TransactionStatus toTransactionStatus(String name) {
+        try {
+            return TransactionStatus.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            // Log error or handle exception
+            return null;
+        }
+    }
     @Override
     public FilteredTransactionsResponse getFilteredTransactionsPagination(
             int page,
@@ -53,13 +70,43 @@ public class TransactionServicesImpl implements ITransactionServices {
             List<String> transactionPayment,
             List<TransactionStatus> transactionStatus
     ) {
+//        String cashMethod = "";
+//        boolean hasCashMethod = false;
+//        for (String method: transactionPayment
+//             ) {
+//            if(method.equals("CASH")){
+//                cashMethod = method;
+//                hasCashMethod = true;
+//                break;
+//            }
+//        }
+//        if (hasCashMethod) {
+//            transactionPayment.remove(cashMethod);
+//        }
+//        List<String> transactionPaymentStr = transactionPayment.isEmpty() ? null : transactionPayment.stream()
+//                .map(Enum::name)
+//                .toList();
+//
+//        List<String> transactionStatusStr = transactionStatus.isEmpty() ? null : transactionStatus.stream()
+//                .map(Enum::name)
+//                .toList();
+
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Transaction> transactionPage = transactionRepository
-                .findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
-                        transactionPayment,
-                        transactionStatus,
-                        pageable
-                );
+        Page<Transaction> transactionPage =
+//                hasCashMethod ? transactionRepository.findFilteredTransactionsHasCashMethod(
+//                transactionPayment,
+//                transactionStatus,
+//                transactionPayment != null ? transactionPayment.stream().map(p -> toPaymentMethod(p.name())).collect(Collectors.toList()) : null,
+//                transactionStatus != null ? transactionStatus.stream().map(s -> toTransactionStatus(s.name())).collect(Collectors.toList()) : null,
+//                pageable
+//        ) :
+                transactionRepository
+                        .findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
+                                transactionPayment,
+                                transactionStatus,
+                                pageable
+                        );
+//                null;
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
         for (Transaction transaction : transactionPage.getContent()) {
@@ -77,7 +124,7 @@ public class TransactionServicesImpl implements ITransactionServices {
 
     private List<BookingResponse> getBookingResponseList(List<Booking> bookings) {
         List<BookingResponse> bookingResponses = new ArrayList<>();
-        if(!bookings.isEmpty()) {
+        if (!bookings.isEmpty()) {
             for (Booking booking : bookings) {
                 PatientProfileResponse patientProfileResponse = new PatientProfileResponse(booking.getPatientProfile());
                 long numberOfBooking = bookingRepository.

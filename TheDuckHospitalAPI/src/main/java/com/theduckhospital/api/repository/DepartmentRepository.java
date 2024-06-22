@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Integer> {
-    List<Department> findAllByDeletedIsFalseOrderByDepartmentNameDesc();
+    List<Department> findAllByDeletedIsFalseOrderByDepartmentNameAsc();
     List<Department> findAllByOrderByDepartmentNameDesc();
     Page<Department> findPaginationByOrderByDeleted(Pageable pageable);
     List<Department> findDepartmentByMedicalServicesEmpty();

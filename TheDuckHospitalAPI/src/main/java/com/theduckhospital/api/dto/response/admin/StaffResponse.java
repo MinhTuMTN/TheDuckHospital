@@ -25,6 +25,8 @@ public class StaffResponse {
     private String avatar;
     private NurseType nurseType;
     private boolean deleted;
+    private double rating;
+    private int numberOfRating;
 
     public StaffResponse(Staff staff) {
         this.staffId = staff.getStaffId();
@@ -45,6 +47,8 @@ public class StaffResponse {
             this.department = department;
             this.headOfDepartment = ((Doctor) staff).isHeadOfDepartment();
             this.degree = ((Doctor) staff).getDegree();
+            this.rating = ((Doctor) staff).getRating();
+            this.numberOfRating = ((Doctor) staff).getRatings().size();
         } else if (staff instanceof Nurse) {
             department = ((Nurse) staff).getDepartment();
             this.role = "Điều dưỡng";

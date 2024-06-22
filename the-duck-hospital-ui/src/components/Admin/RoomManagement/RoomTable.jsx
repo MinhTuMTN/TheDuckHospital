@@ -243,7 +243,7 @@ function RoomTable(props) {
         count={count}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
-        page={page - 1}
+        page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[1, 5, 10, 25]}
       />
