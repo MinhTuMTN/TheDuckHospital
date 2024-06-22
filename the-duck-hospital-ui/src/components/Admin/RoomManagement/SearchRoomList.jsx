@@ -18,7 +18,6 @@ function SearchRoomList(props) {
     borderTopRightRadius,
     value,
     onChange,
-    handleEnterKeyPressed,
   } = props;
   return (
     <Box
@@ -51,9 +50,6 @@ function SearchRoomList(props) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Tìm kiếm phòng"
-        onKeyDown={(e) => {
-          handleEnterKeyPressed(e);
-        }}
       />
     </Box>
   );

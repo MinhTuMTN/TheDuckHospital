@@ -6,23 +6,16 @@ import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.response.PaymentResponse;
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Booking;
-import com.theduckhospital.api.entity.TimeSlot;
-import com.theduckhospital.api.entity.Transaction;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
-import com.theduckhospital.api.repository.BookingRepository;
-import com.theduckhospital.api.repository.TimeSlotRepository;
-import com.theduckhospital.api.repository.TransactionRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.IAccountServices;
 import com.theduckhospital.api.services.IPaymentServices;
-import jakarta.transaction.TransactionalException;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -44,19 +37,24 @@ public class PaymentServicesImpl implements IPaymentServices {
     private final TransactionRepository transactionRepository;
     private final BookingRepository bookingRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final MedicalTestRepository medicalTestRepository;
+    private final HospitalAdmissionRepository hospitalAdmissionRepository;
 
     public PaymentServicesImpl(
             PasswordEncoder passwordEncoder,
             IAccountServices accountServices,
             TransactionRepository transactionRepository,
             BookingRepository bookingRepository,
-            TimeSlotRepository timeSlotRepository
-    ) {
+            TimeSlotRepository timeSlotRepository,
+            MedicalTestRepository medicalTestRepository,
+            HospitalAdmissionRepository hospitalAdmissionRepository) {
         this.passwordEncoder = passwordEncoder;
         this.accountServices = accountServices;
         this.transactionRepository = transactionRepository;
         this.bookingRepository = bookingRepository;
         this.timeSlotRepository = timeSlotRepository;
+        this.medicalTestRepository = medicalTestRepository;
+        this.hospitalAdmissionRepository = hospitalAdmissionRepository;
     }
     @Override
     public PaymentResponse vnPayCreatePaymentUrl(double amount, UUID transactionId)  throws UnsupportedEncodingException {
@@ -219,7 +217,15 @@ public class PaymentServicesImpl implements IPaymentServices {
         PaymentMethod paymentMethod = request.getPaymentMethod();
         String pinCode = request.getPinCode();
 
-        return createPaymentResponse(transaction, paymentMethod, pinCode, true);
+        return createPaymentResponse(transaction, paymentMethod, pinCode, request.isMobile());
+    }
+
+    @Override
+    public PaymentResponse createHospitalAdmissionPaymentUrl(Transaction transaction, PayMedicalTestRequest request) {
+        PaymentMethod paymentMethod = request.getPaymentMethod();
+        String pinCode = request.getPinCode();
+
+        return createPaymentResponse(transaction, paymentMethod, pinCode, request.isMobile());
     }
 
     @Override
@@ -360,6 +366,15 @@ public class PaymentServicesImpl implements IPaymentServices {
                                 .builder().walletSuccess(false).build();
                     }
                 }
+                case CASH -> {
+                    if (paymentWithCash(transaction)) {
+                        yield PaymentResponse
+                                .builder().cashSuccess(true).build();
+                    } else {
+                        yield PaymentResponse
+                                .builder().cashSuccess(false).build();
+                    }
+                }
                 default -> throw new BadRequestException("Invalid payment method");
             };
         } catch (IOException e) {
@@ -368,7 +383,6 @@ public class PaymentServicesImpl implements IPaymentServices {
     }
 
     @Override
-    @Transactional
     public boolean paymentWithWallet(Transaction transaction, String pinCode) {
         if (pinCode == null || pinCode.isEmpty())
             throw new BadRequestException("Pin code is required", 10031);
@@ -396,6 +410,171 @@ public class PaymentServicesImpl implements IPaymentServices {
         accountServices.saveAccount(account);
 
         return true;
+    }
+
+    @Override
+    public boolean paymentWithCash(Transaction transaction) {
+        Transaction transactionResult = updateTransactionAndBooking(
+                transaction,
+                "CASH",
+                "CASH",
+                TransactionStatus.SUCCESS
+        );
+
+        if (transactionResult == null)
+        {
+            throw new StatusCodeException("Internal server error", 500);
+        }
+
+        return true;
+    }
+
+    @Override
+    public Transaction createMedicalTestTransaction(
+            PayMedicalTestRequest request,
+            String origin,
+            Cashier cashier
+    ) {
+        try {
+            Optional<MedicalTest> optional = medicalTestRepository
+                    .findByMedicalTestCodeAndDeletedIsFalse(
+                            request.getMedicalTestCode()
+                    );
+
+            if (optional.isEmpty()) {
+                throw new BadRequestException("Not found medical test", 10010);
+            }
+            MedicalTest medicalTest = optional.get();
+            if (medicalTest.getTransaction() != null &&
+                    medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
+            ) {
+                throw new BadRequestException("This medical test has been paid", 10011);
+            }
+
+            UUID oldTransactionId = medicalTest.getTransaction() != null ?
+                    medicalTest.getTransaction().getTransactionId() : null;
+            if (oldTransactionId != null)
+                transactionRepository.deleteById(oldTransactionId);
+
+            Transaction transaction = getMedicalTestTransaction(
+                    medicalTest,
+                    origin,
+                    request.getPaymentMethod(),
+                    cashier
+            );
+            transaction.setMedicalTest(medicalTest);
+            transactionRepository.save(transaction);
+
+            medicalTest.setTransaction(transaction);
+            medicalTestRepository.save(medicalTest);
+
+            return transaction;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new BadRequestException("Error when create transaction", 400);
+        }
+    }
+
+    @Override
+    public Transaction createHospitalAdmissionTransaction(PayMedicalTestRequest request, String origin, Cashier cashier) {
+        try {
+            Optional<HospitalAdmission> optional = hospitalAdmissionRepository
+                    .findByHospitalAdmissionCodeAndDeletedIsFalse(
+                            request.getMedicalTestCode()
+                    );
+            if (optional.isEmpty()) {
+                throw new BadRequestException("Not found hospital admission", 10010);
+            }
+            HospitalAdmission hospitalAdmission = optional.get();
+            List<Transaction> transactionList = hospitalAdmission.getTransactions()
+                    .stream()
+                    .filter(transaction -> transaction.getPaymentType() == PaymentType.ADVANCE_FEE)
+                    .toList();
+            Transaction oldTransaction = transactionList.isEmpty() ? null : transactionList.get(0);
+
+            if (oldTransaction != null && oldTransaction.getStatus() == TransactionStatus.SUCCESS) {
+                throw new BadRequestException("This hospital admission has been paid", 10011);
+            } else if (oldTransaction != null) {
+                transactionRepository.deleteById(oldTransaction.getTransactionId());
+            }
+
+            Transaction transaction = getHospitalAdmissionTransaction(
+                    hospitalAdmission,
+                    origin,
+                    request.getPaymentMethod(),
+                    cashier
+            );
+            transaction.setHospitalAdmission(hospitalAdmission);
+            transactionRepository.save(transaction);
+
+            return transaction;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new BadRequestException("Error when create transaction", 400);
+        }
+    }
+
+    private Transaction getHospitalAdmissionTransaction(
+            HospitalAdmission hospitalAdmission,
+            String origin,
+            PaymentMethod paymentMethod,
+            Cashier cashier
+    ) {
+        Account account = null;
+        try {
+            account = hospitalAdmission
+                    .getPatientProfile()
+                    .getAccount();
+        } catch (Exception e) {
+            System.out.println(hospitalAdmission.getHospitalAdmissionId() + ": " + "Not found account");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setCashier(cashier);
+        transaction.setAccount(account);
+        transaction.setAmount(Fee.HOSPITAL_ADMISSION_FEE);
+        double fee = paymentMethod == PaymentMethod.WALLET
+                ? 0D
+                : paymentMethod == PaymentMethod.VNPAY
+                ? Fee.VNPAY_HOSPITAL_ADMISSION_FEE
+                : Fee.MOMO_HOSPITAL_ADMISSION_FEE;
+        transaction.setFee(fee);
+        transaction.setOrigin(origin);
+        transaction.setPaymentType(PaymentType.ADVANCE_FEE);
+
+        return transaction;
+    }
+
+    private Transaction getMedicalTestTransaction(
+            MedicalTest medicalTest,
+            String origin,
+            PaymentMethod paymentMethod,
+            Cashier cashier
+    ) {
+        Account account = null;
+        try {
+            account = medicalTest
+                    .getMedicalExaminationRecord()
+                    .getPatientProfile()
+                    .getAccount();
+        } catch (Exception e) {
+            System.out.println(medicalTest.getMedicalTestId() + ": " + "Not found account");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setCashier(cashier);
+        transaction.setAccount(account);
+        transaction.setAmount(medicalTest.getMedicalService().getPrice());
+        double fee = paymentMethod == PaymentMethod.WALLET
+                ? 0D
+                : paymentMethod == PaymentMethod.VNPAY
+                ? Fee.VNPAY_MEDICAL_TEST_FEE
+                : Fee.MOMO_MEDICAL_TEST_FEE;
+        transaction.setFee(fee);
+        transaction.setOrigin(origin);
+        transaction.setPaymentType(PaymentType.MEDICAL_TEST);
+
+        return transaction;
     }
 
     private Transaction updateTransactionAndBooking(
@@ -434,10 +613,18 @@ public class PaymentServicesImpl implements IPaymentServices {
                 Account account = transaction.getAccount();
                 account.setBalance(
                         account.getBalance()
-                                .add(BigDecimal.valueOf(
-                                        transaction.getAmount() - MomoConfig.medicalTestFee
-                                )));
+                                .add(
+                                        BigDecimal.valueOf(
+                                                transaction.getAmount()
+                                        )
+                                )
+                );
                 accountServices.saveAccount(account);
+            } else if (transaction.getPaymentType() == PaymentType.ADVANCE_FEE) {
+                HospitalAdmission hospitalAdmission = transaction.getHospitalAdmission();
+                hospitalAdmission.setState(HospitalAdmissionState.WAITING_FOR_TREATMENT);
+                hospitalAdmission.setPaidFee(hospitalAdmission.getPaidFee() + transaction.getAmount());
+                hospitalAdmissionRepository.save(hospitalAdmission);
             }
 
             return transaction;

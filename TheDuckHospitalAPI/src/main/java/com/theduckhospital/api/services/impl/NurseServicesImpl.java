@@ -464,6 +464,7 @@ public class NurseServicesImpl implements INurseServices {
         return nurseSchedule;
     }
 
+    @Override
     public Nurse getNurseByToken(String token) {
         token = token.substring(7);
 
@@ -483,6 +484,21 @@ public class NurseServicesImpl implements INurseServices {
             throw new NotFoundException("Nurse not found");
 
         return nurse;
+    }
+
+    @Override
+    public boolean deleteAllNurseSchedule(String authorization, List<UUID> scheduleIds) {
+        Nurse headNurse = getNurseByToken(authorization);
+        List<NurseSchedule> nurseSchedules = nurseScheduleRepository
+                .findByNurseScheduleIdInAndNurse_DepartmentAndScheduleTypeAndDateGreaterThanEqual(
+                        scheduleIds,
+                        headNurse.getDepartment(),
+                        ScheduleType.INPATIENT_EXAMINATION,
+                        DateCommon.getStarOfDay(new Date())
+                );
+
+        nurseScheduleRepository.deleteAll(nurseSchedules);
+        return true;
     }
 
     private Room getRoomById(int roomId, Department department) {

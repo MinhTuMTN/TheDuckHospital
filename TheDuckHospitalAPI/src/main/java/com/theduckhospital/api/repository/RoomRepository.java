@@ -27,8 +27,23 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     Optional<Room> findRoomByRoomIdAndDepartmentAndDeletedIsFalse(int roomId, Department department);
     Page<Room> findPaginationByOrderByDeleted(Pageable pageable);
     Page<Room> findByDepartmentAndDeletedIsFalse(Department department, Pageable pageable);
+    List<Room> findByDepartmentAndRoomTypeAndDeletedIsFalse(Department department, RoomType roomType);
     long countByDepartmentAndDeletedIsFalse(Department department);
     List<Room> findAllByOrderByDeletedAscRoomNameAsc();
-    List<Room> findByRoomNameContainingOrDepartmentInOrderByRoomName(String roomName, List<Department> departments);
+    Page<Room> findByRoomNameContainingAndRoomTypeInAndDeletedInOrderByRoomName(
+            String roomName,
+            Collection<RoomType> roomType,
+            Collection<Boolean> deleted,
+            Pageable pageable
+    );
     List<Room> findByRoomTypeInAndDeletedIsFalse(List<RoomType> roomType);
+
+    @Query("SELECT r.roomType, COUNT(r), SUM(r.capacity), SUM(r.beingUsed) " +
+            "FROM Room r " +
+            "WHERE r.department = :department " +
+            "AND r.deleted = false " +
+            "AND r.roomType IN :roomTypes " +
+            "GROUP BY r.roomType"
+    )
+    List<Object[]> getRoomStatistic(Department department, Collection<RoomType> roomTypes);
 }

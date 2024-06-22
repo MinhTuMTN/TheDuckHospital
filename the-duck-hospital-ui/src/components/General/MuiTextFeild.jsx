@@ -16,6 +16,7 @@ function MuiTextFeild(props) {
     onChange,
     error = null,
     children,
+    type = "text",
     ...others
   } = props;
 
@@ -26,6 +27,7 @@ function MuiTextFeild(props) {
       name={name}
       value={value}
       onChange={onChange}
+      type={type}
       {...(error && { error: true, helperText: error })}
       {...others}
     >

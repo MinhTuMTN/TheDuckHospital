@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.annotations.Nationalized;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +73,7 @@ public class HospitalAdmission {
     @OneToMany(mappedBy = "hospitalAdmission")
     @ToStringExclude
     @JsonBackReference
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToStringExclude

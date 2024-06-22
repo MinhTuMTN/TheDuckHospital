@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.admin;
 
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.admin.CreateRoomRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IRoomServices;
@@ -7,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/rooms")
@@ -44,13 +47,21 @@ public class RoomAdminController {
     public ResponseEntity<?> getFilteredRoomsPagination(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(value = "roomType", required = false) List<RoomType> roomTypes,
+            @RequestParam(value = "status", required = false) List<Boolean> statuses
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get filtered rooms pagination successfully")
-                        .data(roomServices.getPaginationFilteredRooms(search, page, limit))
+                        .data(roomServices.getPaginationFilteredRooms(
+                                search,
+                                page,
+                                limit,
+                                roomTypes,
+                                statuses
+                        ))
                         .build()
         );
     }

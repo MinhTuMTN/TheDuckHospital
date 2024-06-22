@@ -1,17 +1,16 @@
 import { Avatar, Divider, Popover, Stack, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-import { useAuth } from "../../../auth/AuthProvider";
-import PatientMenuList from "./PatientMenuList";
-import NurseMenuList from "./NurseMenuList";
-import DoctorMenuList from "./DoctorMenuList";
-import AdminMenuList from "./AdminMenuList";
-import LaboratoryTechnicalList from "./LaboratoryTechnicalList";
-import SupportAgentList from "./SupportAgentList";
 import { useMemo } from "react";
+import { useAuth } from "../../../auth/AuthProvider";
+import AdminMenuList from "./AdminMenuList";
 import CashierMenuList from "./CashierMenuList";
-
+import DoctorMenuList from "./DoctorMenuList";
+import LaboratoryTechnicalList from "./LaboratoryTechnicalList";
+import NurseMenuList from "./NurseMenuList";
+import PatientMenuList from "./PatientMenuList";
+import SupportAgentList from "./SupportAgentList";
 function AccountPopover(props) {
-  const { anchorEl, onClose, open } = props;
+  const { anchorEl, onClose, open, width } = props;
   const { setToken, fullName, role } = useAuth();
 
   const MenuList = useMemo(() => {
@@ -52,7 +51,7 @@ function AccountPopover(props) {
         spacing={1}
         direction={"column"}
         sx={{
-          width: "235px",
+          width: width ? width : "235px",
           px: "8px",
           paddingY: "16px",
         }}
@@ -86,6 +85,7 @@ AccountPopover.propTypes = {
   anchorEl: PropTypes.object,
   onClose: PropTypes.func,
   open: PropTypes.bool,
+  width: PropTypes.string,
 };
 
 export default AccountPopover;

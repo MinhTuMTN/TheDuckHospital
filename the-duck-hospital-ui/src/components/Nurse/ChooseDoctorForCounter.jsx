@@ -28,6 +28,7 @@ function ChooseDocterForCounter(props) {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
   const handleCreateBookingAndMedicalExam = async () => {
     const response = await createBookingAndMedicalRecord(
       patientProfile.patientProfileId,
@@ -99,7 +100,7 @@ function ChooseDocterForCounter(props) {
               }}
             >
               {doctorSchedule?.doctorDegree} {doctorSchedule?.doctorName} - Buổi{" "}
-              {doctorSchedule?.scheduleType === "MORNING" ? "sáng" : "chiều"}
+              {doctorSchedule?.scheduleSession === "MORNING" ? "sáng" : "chiều"}
             </Typography>
           </Stack>
           <Stack

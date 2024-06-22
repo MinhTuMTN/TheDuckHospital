@@ -1,8 +1,3 @@
-import { useTheme } from "@emotion/react";
-import styled from "@emotion/styled";
-import Filter9PlusIcon from "@mui/icons-material/Filter9Plus";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Button,
@@ -11,28 +6,31 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   Stack,
   SwipeableDrawer,
+  Tooltip,
   Typography,
+  styled,
   useMediaQuery,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../../auth/AuthProvider";
+
+import LogoutIcon from "@mui/icons-material/Logout";
 const sidebarItems = [
   {
-    display: "Tiếp nhận bệnh nhân",
-    icon: <PersonIcon />,
-    to: "/nurse-room/receiving-patients",
+    display: "Phòng D202",
+    numberOfPatients: 3,
   },
-
   {
-    display: "Số thứ tự",
-    icon: <Filter9PlusIcon />,
-    to: "/nurse-room/queue-number",
+    display: "Phòng D203",
+    numberOfPatients: 5,
+  },
+  {
+    display: "Phòng D204",
+    numberOfPatients: 7,
   },
 ];
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
@@ -44,27 +42,23 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   paddingX: "16px",
 }));
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
-  marginRight: theme.spacing(0.5),
   width: "100%",
   color: "#797575",
-  fontWeight: "450",
-  fontSize: "16px",
-
+  fontSize: "13px",
+  padding: `${theme.spacing(0.5)} 0 ${theme.spacing(0.5)} ${theme.spacing(5)}`,
+  transition: "transform 0.3s ease, background-color 0.3s ease",
   "&:hover": {
     backgroundColor: active === "true" ? "#333860da" : "#ebebeb6c",
+    transform: "translateX(4px) scale(1.005) ",
   },
 }));
 
-const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-  padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
-}));
-
-function LeftNavbar(props) {
+function LeftNavbarNurseInpatient(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { fullName, setToken } = useAuth();
-  const theme = useTheme();
+  const { setToken } = useAuth();
   const navigate = useNavigate();
+
   const content = (
     <Box
       sx={{
@@ -76,18 +70,20 @@ function LeftNavbar(props) {
       }}
     >
       <Box>
-        <Box
-          sx={{
-            paddingY: 2,
-            display: "flex",
-            width: "100%",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-          onClick={() => navigate("/")}
-        >
-          <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
-        </Box>
+        <Tooltip title="Trang chủ">
+          <Box
+            sx={{
+              paddingY: 1,
+              display: "flex",
+              width: "100%",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/")}
+          >
+            <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
+          </Box>
+        </Tooltip>
         <Box
           sx={{
             justifyContent: "flex-start",
@@ -99,13 +95,13 @@ function LeftNavbar(props) {
           <Typography
             sx={{
               textAlign: "left",
-              textTransform: "uppercase",
+              textTransform: "none",
               fontWeight: "bold",
-              color: "#020222",
-              fontSize: "18px",
+              color: "#466f92",
+              fontSize: "14px",
             }}
           >
-            Quản lý
+            Danh sách phòng
           </Typography>
         </Box>
         <List>
@@ -117,11 +113,16 @@ function LeftNavbar(props) {
             >
               <ListItem disablePadding key={item.section}>
                 <CustomListItemButton>
-                  <CustomListItemIcon>{item.icon}</CustomListItemIcon>
                   <ListItemText
                     disableTypography
-                    style={{ fontSize: "16px" }}
-                    primary={item.display}
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#5a5c61",
+                    }}
+                    primary={
+                      item.display + " (" + item.numberOfPatients + " giường)"
+                    }
                   />
                 </CustomListItemButton>
               </ListItem>
@@ -134,62 +135,13 @@ function LeftNavbar(props) {
         direction={"column"}
         spacing={2}
         sx={{
+          position: "sticky",
           borderTop: "1px solid #e0e0e0",
           paddingX: 2,
           paddingY: 2.5,
           width: "100%",
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <CardMedia
-            component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702286975/kitty_qrtjrw.png"
-            sx={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              padding: "5px",
-              border: "1px solid #c8c8c8",
-              boxShadow: "0px 0px 5px 0px #c8c8c8",
-            }}
-          />
-          <Stack
-            direction={"column"}
-            spacing={0}
-            sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "12px",
-                color: "#8c8c8c",
-                textAlign: "left",
-              }}
-            >
-              Điều dưỡng
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                color: theme.palette.text.main,
-                textAlign: "left",
-                fontWeight: "500",
-              }}
-            >
-              {fullName}
-            </Typography>
-          </Stack>
-        </Stack>
-
         <Button
           variant="contained"
           sx={{
@@ -242,7 +194,6 @@ function LeftNavbar(props) {
       </Drawer>
     );
   }
-
   return (
     <SwipeableDrawer
       anchor="left"
@@ -263,8 +214,5 @@ function LeftNavbar(props) {
     </SwipeableDrawer>
   );
 }
-LeftNavbar.propTypes = {
-  onClose: PropTypes.func,
-  open: PropTypes.bool,
-};
-export default LeftNavbar;
+
+export default LeftNavbarNurseInpatient;

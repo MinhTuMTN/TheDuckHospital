@@ -20,7 +20,7 @@ import {
 import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../../auth/AuthProvider";
 const sidebarItems = [
   {
     display: "Tiếp nhận bệnh nhân",

@@ -11,4 +11,5 @@ public class PaymentResponse {
     private PaymentMethod paymentMethod;
     private String deepLink;
     private boolean walletSuccess;
+    private boolean cashSuccess;
 }

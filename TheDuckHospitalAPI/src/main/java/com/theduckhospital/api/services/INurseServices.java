@@ -59,4 +59,6 @@ public interface INurseServices {
     );
     List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization);
     boolean deleteExaminationRoomSchedule(String authorization, UUID scheduleId);
+    Nurse getNurseByToken(String token);
+    boolean deleteAllNurseSchedule(String authorization, List<UUID> scheduleIds);
 }
