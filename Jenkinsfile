@@ -1,29 +1,35 @@
 pipeline {
     agent any
-    environment {
-        SPRING_PID_FILE = 'spring-boot-app.pid'
-    }
+
     stages {
-        stage('Build') {
+        stage('Build with Maven') {
             steps {
                 script {
-                    // Dừng quá trình cũ (nếu có)
-                    try {
-                        bat "if [ -f $SPRING_PID_FILE ]; then kill \$(cat $SPRING_PID_FILE); fi"
-                    } catch (Exception e) {
-                        echo "No existing Spring Boot process to kill"
-                    }
-                }
-                dir('C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\TheDuckHospital\\TheDuckHospitalAPI') {
-                    bat 'mvn clean install' // Dùng 'bat' nếu trên Windows: bat 'mvn clean install'
+                    bat '''
+                    cd TheDuckHospitalAPI
+                    mvn clean package
+                    '''
                 }
             }
         }
-        stage('Deploy') {
+
+        stage('Build Docker Image') {
             steps {
-                dir('C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\TheDuckHospital\\TheDuckHospitalAPI') {
-                    // Chạy ứng dụng Spring Boot và lưu PID
-                    bat 'start mvn spring-boot:run && echo %! > spring-boot-app.pid' // Dùng 'start' nếu trên Windows: bat 'start mvn spring-boot:run && echo %! > spring-boot-app.pid'
+                script {
+                    bat '''
+                    docker build -t minhtumtn/theduckhospitalapi .
+                    '''
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    bat '''
+                    docker container stop hospitalapi || echo "this container does not exist"
+                    docker run -d -p 8080:8080 --rm --name hospitalapi minhtumtn/theduckhospitalapi
+                    '''
                 }
             }
         }
