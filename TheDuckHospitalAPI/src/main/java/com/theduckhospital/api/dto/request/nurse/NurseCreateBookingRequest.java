@@ -7,5 +7,5 @@ import java.util.UUID;
 @Data
 public class NurseCreateBookingRequest {
     private UUID patientProfileId;
-    private String timeSlotId;
+    private UUID doctorScheduleId;
 }

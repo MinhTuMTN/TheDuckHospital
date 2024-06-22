@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Divider,
+  Modal,
   Radio,
   RadioGroup,
   Stack,
@@ -15,6 +16,8 @@ import { getPaymentType } from "../../utils/paymentTypeUtils";
 import FormatCurrency from "../General/FormatCurrency";
 import { createPayment } from "../../services/cashier/CashierServices";
 import { useSnackbar } from "notistack";
+import { globalStyles } from "../../theme/globalStyles";
+import { ReportGmailerrorredOutlined } from "@mui/icons-material";
 
 const Container = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -39,7 +42,8 @@ const StyledLogo = styled("img")(({ theme }) => ({
 }));
 
 function InvoiceAndPayment(props) {
-  const { paymentDetails = {} } = props;
+  const { paymentDetails = {}, onSuccess = () => {} } = props;
+  const [showModal, setShowModal] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState("VNPAY");
   const date = useMemo(
     () => (paymentDetails ? dayjs(paymentDetails?.date) : dayjs()),
@@ -61,12 +65,14 @@ function InvoiceAndPayment(props) {
       } else {
         window.open(response.data.data.paymentUrl, "_blank");
       }
+      onSuccess();
+      setShowModal(false);
     } else {
       enqueueSnackbar("Đã có lỗi xảy ra, vui lòng thử lại sau", {
         variant: "error",
       });
     }
-  }, [paymentMethod, paymentDetails, enqueueSnackbar]);
+  }, [paymentMethod, paymentDetails, enqueueSnackbar, onSuccess]);
   return (
     <Container>
       <Stack mb={1}>
@@ -262,7 +268,13 @@ function InvoiceAndPayment(props) {
       <Box mt={1} justifyContent={"flex-end"} display={"flex"}>
         <Button
           variant="outlined"
-          onClick={handlePayment}
+          onClick={() => {
+            if (paymentMethod === "CASH") {
+              setShowModal(true);
+            } else {
+              handlePayment();
+            }
+          }}
           sx={{
             color: appColors.primary,
             borderColor: appColors.primary,
@@ -276,6 +288,90 @@ function InvoiceAndPayment(props) {
           Thanh toán
         </Button>
       </Box>
+
+      <Modal
+        open={showModal}
+        onClose={() => {
+          setShowModal(false);
+        }}
+        sx={globalStyles.center}
+      >
+        <Box
+          sx={{
+            backgroundColor: appColors.white,
+            position: "relative",
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: appColors.warning,
+              height: "7px",
+            }}
+          />
+
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            maxWidth={"600px"}
+            columnGap={"12px"}
+            p={2}
+          >
+            <ReportGmailerrorredOutlined
+              sx={{
+                color: appColors.warning,
+                fontSize: "70px",
+              }}
+            />
+            <Box>
+              <Typography fontWeight={500} fontSize={"24px"}>
+                Xác nhận thanh toán
+              </Typography>
+              <Typography>
+                Bạn có chắc chắn muốn thanh toán cho hóa đơn này không? Vui lòng
+                nhấn nút xác nhận khi bạn đã chắc chắn.
+              </Typography>
+            </Box>
+          </Stack>
+          <Divider />
+          <Box
+            display={"flex"}
+            justifyContent={"flex-end"}
+            columnGap={"8px"}
+            p={1}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                color: appColors.primary,
+                borderColor: appColors.primary,
+                "&:hover": {
+                  backgroundColor: appColors.primary,
+                  color: "#ffffff",
+                },
+              }}
+              onClick={handlePayment}
+            >
+              Xác nhận
+            </Button>
+            <Button
+              variant="outlined"
+              sx={{
+                color: appColors.error,
+                borderColor: appColors.error,
+                "&:hover": {
+                  backgroundColor: appColors.error,
+                  color: "#ffffff",
+                },
+              }}
+              onClick={() => {
+                setShowModal(false);
+              }}
+            >
+              Hủy
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Container>
   );
 }

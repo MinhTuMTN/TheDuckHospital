@@ -16,4 +16,5 @@ export const appColors = {
   errorBackground: "#ffe2e3",
   blueText: "#0000CD",
   blueBackground: "#002fa7",
+  warning: "#ffc800",
 };

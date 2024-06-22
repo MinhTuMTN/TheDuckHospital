@@ -136,16 +136,20 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     }
 
     @Override
-    public MedicalRecordItemResponse nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException {
+    public MedicalRecordItemResponse counterNurseCreateBookingAndMedicalRecord(
+            NurseCreateBookingRequest request
+    ) throws ParseException {
+        // Find already exist booking
         Optional<Booking> bookingOptional = bookingRepository
                 .nurseFindBooking(
                         request.getPatientProfileId(),
-                        request.getTimeSlotId()
+                        request.getDoctorScheduleId()
                 );
         if (bookingOptional.isPresent())
             return new MedicalRecordItemResponse(bookingOptional.get());
 
-        Booking booking = bookingServices.nurseCreateMedicalExamRecord(
+        // Create booking if not exist
+        Booking booking = bookingServices.counterNurseCreateBooking(
                 request
         );
         if (booking == null)

@@ -32,7 +32,7 @@ public interface IMedicalExamServices {
     ) throws ParseException;
 
     List<MedicalRecordResponse> getMedicalRecordsByPatientProfile(UUID patientProfileId);
-    MedicalRecordItemResponse nurseCreateMedicalExamRecord(
+    MedicalRecordItemResponse counterNurseCreateBookingAndMedicalRecord(
             NurseCreateBookingRequest request
     ) throws ParseException;
 

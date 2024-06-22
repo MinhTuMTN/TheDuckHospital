@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 
@@ -158,6 +156,7 @@ public class BookingServicesImpl implements IBookingServices {
             throw new BadRequestException(e.getMessage(), 400);
         }
     }
+
     @Override
     public List<AccountBookingResponse> getBookings(String token) {
         List<AccountBookingResponse> responses = new ArrayList<>();
@@ -254,7 +253,7 @@ public class BookingServicesImpl implements IBookingServices {
     }
 
     @Override
-    public Booking nurseCreateMedicalExamRecord(NurseCreateBookingRequest request) throws ParseException {
+    public Booking counterNurseCreateBooking(NurseCreateBookingRequest request) throws ParseException {
         PatientProfile patientProfile = patientProfileRepository.findById(
                 request.getPatientProfileId()
         ).orElseThrow(() -> new NotFoundException("Patient profile not found"));
@@ -262,33 +261,48 @@ public class BookingServicesImpl implements IBookingServices {
         if (patientProfile.isDeleted() || patientProfile.getPatient() == null)
             throw new BadRequestException("Patient profile not valid");
 
-        TimeSlot timeSlot = timeSlotServices
-                .findTimeSlotByTimeSlotId(request.getTimeSlotId());
+        DoctorSchedule doctorSchedule = doctorScheduleServices
+                .getDoctorScheduleByIdForBooking(request.getDoctorScheduleId());
+        List<TimeSlot> timeSlots = doctorSchedule.getTimeSlots()
+                .stream()
+                .sorted(Comparator.comparingInt(TimeSlot::getTimeId))
+                .toList();
+        TimeSlot selectedTimeSlot = null;
+        for (TimeSlot timeSlot : timeSlots) {
+            if (timeSlot.getCurrentSlot() < timeSlot.getMaxSlot()
+                    || timeSlot.getTimeId() == 3
+                    || timeSlot.getTimeId() == 7
+            ) {
+                selectedTimeSlot = timeSlot;
+                break;
+            }
+        }
+
+        if (selectedTimeSlot == null)
+            throw new BadRequestException("Doctor schedule is full");
 
         Transaction transaction = new Transaction();
-        transaction.setAmount(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
-        transaction.setStatus(TransactionStatus.SUCCESS);
+        transaction.setAmount(selectedTimeSlot.getDoctorSchedule().getMedicalService().getPrice());
         transaction.setPaymentType(PaymentType.BOOKING);
         transaction.setAccount(patientProfile.getAccount());
         transaction.setBankCode(null);
         transaction.setPaymentMethod("CASH");
         transactionRepository.save(transaction);
-
         transaction.setStatus(TransactionStatus.SUCCESS);
         transactionRepository.save(transaction);
 
 
         Booking booking = new Booking();
         booking.setPatientProfile(patientProfile);
-        booking.setTimeSlot(timeSlot);
+        booking.setTimeSlot(selectedTimeSlot);
         booking.setTransaction(transaction);
-        booking.setQueueNumber(timeSlot.getStartNumber() + timeSlot.getCurrentSlot());
+        booking.setQueueNumber(selectedTimeSlot.getStartNumber() + selectedTimeSlot.getCurrentSlot());
         booking.setDeleted(false);
         booking.setCancelled(false);
         bookingRepository.save(booking);
 
-        timeSlot.setCurrentSlot(timeSlot.getCurrentSlot() + 1);
-        timeSlotRepository.save(timeSlot);
+        selectedTimeSlot.setCurrentSlot(selectedTimeSlot.getCurrentSlot() + 1);
+        timeSlotRepository.save(selectedTimeSlot);
 
         return booking;
     }

@@ -493,7 +493,7 @@ public class PaymentServicesImpl implements IPaymentServices {
             Transaction oldTransaction = transactionList.isEmpty() ? null : transactionList.get(0);
 
             if (oldTransaction != null && oldTransaction.getStatus() == TransactionStatus.SUCCESS) {
-                throw new BadRequestException("This medical test has been paid", 10011);
+                throw new BadRequestException("This hospital admission has been paid", 10011);
             } else if (oldTransaction != null) {
                 transactionRepository.deleteById(oldTransaction.getTransactionId());
             }

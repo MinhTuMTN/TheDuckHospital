@@ -30,12 +30,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.patientProfile.patientProfileId = :patientProfileId " +
-            "AND b.timeSlot.timeSlotId = :timeSlotId " +
-            "AND b.deleted = false"
+            "AND b.timeSlot.doctorSchedule.doctorScheduleId = :doctorScheduleId " +
+            "AND b.deleted = false "
     )
     Optional<Booking> nurseFindBooking(
             UUID patientProfileId,
-            String timeSlotId
+            UUID doctorScheduleId
     );
 
 //    @Query("SELECT ds.date, COUNT(b.bookingId) " +
