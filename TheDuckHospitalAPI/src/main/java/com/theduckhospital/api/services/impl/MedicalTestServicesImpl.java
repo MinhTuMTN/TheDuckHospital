@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.request.doctor.CompleteMedicalTest;
+import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientMedicalTestDetailsResponse;
@@ -14,7 +15,7 @@ import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.MedicalTestRepository;
-import com.theduckhospital.api.repository.TransactionRepository;
+import com.theduckhospital.api.repository.RoomRepository;
 import com.theduckhospital.api.services.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     private final IPaymentServices paymentServices;
     private final IPatientServices patientServices;
     private final IRoomServices roomServices;
+    private final RoomRepository roomRepository;
 
     public MedicalTestServicesImpl(
             IMedicalServiceServices medicalServiceServices,
@@ -46,8 +48,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             ICloudinaryServices cloudinaryServices,
             IPaymentServices paymentServices,
             IPatientServices patientServices,
-            IRoomServices roomServices
-    ) {
+            IRoomServices roomServices,
+            RoomRepository roomRepository) {
         this.medicalServiceServices = medicalServiceServices;
         this.medicalTestRepository = medicalTestRepository;
         this.cloudinaryServices = cloudinaryServices;
@@ -55,6 +57,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         this.laboratoryTechnicianServices = laboratoryTechnicianServices;
         this.patientServices = patientServices;
         this.roomServices = roomServices;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -299,6 +302,89 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         return Map.of("processing", String.valueOf(processing),
                 "waiting", String.valueOf(waiting)
         );
+    }
+
+    @Override
+    public MedicalTest createMedicalTest(
+            CreateMedicalTest request,
+            MedicalExaminationRecord examinationRecord,
+            HospitalAdmission hospitalAdmission
+    ) {
+        Date today = DateCommon.getToday();
+        MedicalService medicalService = medicalServiceServices
+                .getMedicalServiceByIdAndServiceType(
+                        request.getServiceId(),
+                        ServiceType.MedicalTest
+                );
+
+        MedicalTest medicalTest = new MedicalTest();
+        medicalTest.setMedicalService(medicalService);
+        medicalTest.setMedicalExaminationRecord(examinationRecord);
+        medicalTest.setHospitalAdmission(hospitalAdmission);
+        medicalTest.setNote(
+                request.getNote()
+        );
+        medicalTest.setPrice(
+                medicalService.getPrice()
+        );
+
+        // Thay đổi
+        // B1: Tìm ra phòng có số lượng ít nhất mà xét nghiệm dịch vụ đó
+        // B2: Lấy số thứ tự + 1
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<Room> roomPage = roomRepository.findLaboratoryRoom(
+                medicalService,
+                hospitalAdmission != null
+                        ? RoomType.LABORATORY_ROOM_ADMISSION
+                        : RoomType.LABORATORY_ROOM_NORMAL,
+                pageable
+        );
+        if (roomPage.getContent().isEmpty())
+            throw new NotFoundException("Laboratory Room not found");
+        Room laboratoryRoom = roomPage.getContent().get(0);
+        int currentQueueNumber = laboratoryRoom.getMedicalTestQueueNumber();
+        medicalTest.setQueueNumber(
+                currentQueueNumber + 1
+        );
+        medicalTest.setRoom(laboratoryRoom);
+        laboratoryRoom.setMedicalTestQueueNumberMax(
+                currentQueueNumber + 1
+        );
+        medicalTest.setDate(today);
+
+        roomRepository.save(laboratoryRoom);
+        medicalTestRepository.save(medicalTest);
+
+        return medicalTest;
+    }
+
+    @Override
+    public Page<MedicalTest> getMedicalTestsByHospitalAdmission(
+            HospitalAdmission hospitalAdmission,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return medicalTestRepository.findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
+                hospitalAdmission,
+                pageable
+        );
+    }
+
+    @Override
+    public void deleteHospitalAdmissionMedicalTest(
+            HospitalAdmission hospitalAdmission,
+            UUID medicalTestId
+    ) {
+        MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+        if (medicalTest.getHospitalAdmission() == null ||
+                !medicalTest.getHospitalAdmission().equals(hospitalAdmission)
+        ) {
+            throw new BadRequestException("Invalid hospital admission", 400);
+        }
+
+        medicalTest.setDeleted(true);
+        medicalTestRepository.save(medicalTest);
     }
 
     private Room getLabRoomById(Integer roomId) {
