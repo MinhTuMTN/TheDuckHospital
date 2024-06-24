@@ -50,7 +50,8 @@ public class HospitalAdmission {
     private String diagnosis;
     @Nationalized
     private String symptom;
-
+    @Nationalized
+    private String historyOfAllergy;
 
     private double roomFee;
 

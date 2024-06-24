@@ -9,4 +9,5 @@ public class HospitalAdmissionRequest {
     private Date admissionDate;
     private String diagnosis;
     private String symptom;
+    private String historyOfAllergy;
 }

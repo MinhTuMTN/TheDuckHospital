@@ -17,7 +17,7 @@ public class TreatmentRoomDetailsResponse {
         this.roomId = room.getRoomId();
         this.roomName = room.getRoomName();
         this.roomDescription = room.getDescription();
-        this.capacity = room.getCapacity();
+        this.capacity = room.getCapacity() != null ? room.getCapacity() : 0;
         this.beingUsed = room.getBeingUsed();
         this.roomType = room.getRoomType();
     }
