@@ -2,6 +2,7 @@ package com.theduckhospital.api.controller.doctor;
 
 import com.theduckhospital.api.constant.MedicalTestState;
 import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.dto.request.doctor.CompleteMedicalTest;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IMedicalServiceServices;
@@ -135,13 +136,13 @@ public class MedicalTestController {
     @PutMapping("/{medicalTestId}/complete")
     public ResponseEntity<?> CompleteMedicalTest(
             @PathVariable UUID medicalTestId,
-            @RequestParam MultipartFile file
-    ) throws IOException {
+            @ModelAttribute("data") CompleteMedicalTest request
+            ) throws IOException {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
-                        .data(medicalTestServices.completeMedicalTest(medicalTestId, file))
+                        .data(medicalTestServices.completeMedicalTest(medicalTestId, request))
                         .build()
         );
     }

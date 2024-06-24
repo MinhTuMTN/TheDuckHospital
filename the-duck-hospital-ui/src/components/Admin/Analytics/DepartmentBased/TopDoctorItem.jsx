@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import {
   Box,
   Grid,
+  Paper,
   Rating,
   Stack,
   Typography,
@@ -12,6 +13,9 @@ import DialogForm from "../../../General/DialogForm";
 import { getReviews } from "../../../../services/admin/DoctorServices";
 import { enqueueSnackbar } from "notistack";
 import RatingBar from "./RatingBar";
+import { getInitialName } from "../../../../utils/nameUtils";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import FormatDate from "../../../General/FormatDate";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -191,7 +195,7 @@ function TopDoctorItem(props) {
           setOpenDialogForm(false);
         }}
       >
-        <Stack width={"30rem"} mt={3} spacing={1}>
+        <Stack width={"35rem"} mt={3} spacing={1}>
           <Grid container>
             <Grid item xs={12} md={3}>
               <Stack justifyContent="center" alignItems="center">
@@ -207,7 +211,7 @@ function TopDoctorItem(props) {
 
                 <Rating
                   readOnly
-                  defaultValue={reviews?.ratingPoint}
+                  value={reviews?.ratingPoint ? reviews?.ratingPoint : 0}
                   size="12px"
                   sx={{
                     "& .MuiRating-iconFilled": {
@@ -234,6 +238,7 @@ function TopDoctorItem(props) {
                     ?.sort((a, b) => b[0] - a[0])
                     .map(([ratingPoint, count]) => (
                       <RatingBar
+                        key={`rating-${ratingPoint}`}
                         title={ratingPoint}
                         count={count}
                         maxCount={reviews?.totalRatings}
@@ -241,6 +246,108 @@ function TopDoctorItem(props) {
                     ))}
               </Stack>
             </Grid>
+          </Grid>
+
+          <Box style={{ border: "1px solid #E0E0E0" }} />
+
+          <Grid container>
+            {reviews?.ratings &&
+              reviews?.ratings?.map((rating, index) => (
+                <Grid
+                  item
+                  key={`reviews-${index}`}
+                  xs={12}
+                  style={{ padding: "10px" }}
+                >
+                  <Paper style={{ padding: "20px", borderRadius: "15px" }}>
+                    <Stack spacing={1}>
+                      <Grid item xs={12}>
+                        <Stack
+                          direction={"row"}
+                          spacing={1}
+                          alignItems={"center"}
+                        >
+                          <div
+                            style={{
+                              backgroundColor: "#1da1f2",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: "30px",
+                              width: "50px",
+                              height: "50px",
+                            }}
+                          >
+                            <Typography
+                              style={{
+                                color: "white",
+                                fontSize: "20px",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {getInitialName(
+                                rating?.patientName ? rating?.patientName : ""
+                              )}
+                            </Typography>
+                          </div>
+
+                          <Typography
+                            style={{
+                              color: "black",
+                              fontSize: "16px",
+                              fontWeight: "400",
+                            }}
+                          >
+                            {rating?.patientName}
+                          </Typography>
+                        </Stack>
+                      </Grid>
+
+                      <Stack
+                        direction={"row"}
+                        spacing={1}
+                        alignItems={"center"}
+                      >
+                        <Rating
+                          readOnly
+                          value={rating?.rating ? rating?.rating : 0}
+                          icon={
+                            <StarRoundedIcon style={{ fontSize: "16px" }} />
+                          }
+                          emptyIcon={
+                            <StarRoundedIcon style={{ fontSize: "16px" }} />
+                          }
+                          sx={{
+                            "& .MuiRating-iconFilled": {
+                              color: "#1a90ff",
+                            },
+                          }}
+                        />
+
+                        <Typography
+                          style={{
+                            color: "black",
+                            fontSize: "14px",
+                            fontWeight: "400",
+                          }}
+                        >
+                          <FormatDate dateTime={rating?.ratedAt} />
+                        </Typography>
+                      </Stack>
+
+                      <Typography
+                        style={{
+                          color: "black",
+                          fontSize: "17px",
+                          fontWeight: "400",
+                        }}
+                      >
+                        {rating?.review}
+                      </Typography>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              ))}
           </Grid>
         </Stack>
       </DialogForm>

@@ -113,11 +113,11 @@ public class NurseServicesImpl implements INurseServices {
     public List<Room> getRoomsDepartment(String authorization, RoomType roomType) {
         Nurse headNurse = getNurseByToken(authorization);
         Department department = headNurse.getDepartment();
-
-        return department.getRooms()
-                .stream()
-                .filter(room -> room.getRoomType() == roomType)
-                .toList();
+        return roomRepository.findByDepartmentAndRoomTypeAndDeletedIsFalse(department, roomType);
+//        return department.getRooms()
+//                .stream()
+//                .filter(room -> room.getRoomType() == roomType)
+//                .toList();
     }
 
     @Override
@@ -128,10 +128,14 @@ public class NurseServicesImpl implements INurseServices {
             throw new BadRequestException("Room is not examination room");
         }
 
-        List<NurseSchedule> nurseSchedules = room.getNurseSchedules()
-                .stream().filter(nurseSchedule -> !nurseSchedule.isDeleted()
-                        && nurseSchedule.getScheduleType() == ScheduleType.EXAMINATION
-                ).toList();
+        List<NurseSchedule> nurseSchedules = nurseScheduleRepository.findByRoomAndScheduleTypeAndDeletedIsFalse(
+                room,
+                ScheduleType.EXAMINATION
+        );
+//        List<NurseSchedule> nurseSchedules = room.getNurseSchedules()
+//                .stream().filter(nurseSchedule -> !nurseSchedule.isDeleted()
+//                        && nurseSchedule.getScheduleType() == ScheduleType.EXAMINATION
+//                ).toList();
 
         List<ExaminationNurseScheduleResponse> responses = new ArrayList<>();
         for (NurseSchedule nurseSchedule : nurseSchedules) {

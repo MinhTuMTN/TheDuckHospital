@@ -23,6 +23,7 @@ import {
   getMedicalTestRecord,
   updateMedicalTestRecord,
 } from "../../services/doctor/MedicalTestServices";
+import MuiTextFeild from "../../components/General/MuiTextFeild";
 
 const handleBasicsInfo = (medicalTestecord) => {
   return [
@@ -51,7 +52,10 @@ function MedicalTestRecord(props) {
   const [basicsInfo, setBasicsInfo] = React.useState([]);
   const [medicalTestRecord, setMedicalTestRecord] = React.useState({});
   const [openComplete, setOpenComplete] = React.useState(false);
+  const [completeButtonClicked, setCompleteButtonClicked] =
+    React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState(null);
+  const [testResult, setTestResult] = React.useState("");
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -77,8 +81,14 @@ function MedicalTestRecord(props) {
   }, [medicalTestId]);
 
   const handleUpdateMedicalTestRecord = async () => {
+    setCompleteButtonClicked(true);
+    if (selectedFile === null || testResult.trim() === "") {
+      enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
+      return;
+    }
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("testResult", testResult);
 
     const response = await updateMedicalTestRecord(medicalTestId, formData);
     if (response.success) {
@@ -193,20 +203,41 @@ function MedicalTestRecord(props) {
                 Báo cáo kết quả xét nghiệm
               </Typography>
 
-              <TextField
-                variant="outlined"
-                type="text"
-                value={selectedFile ? selectedFile.name : ""}
-                disabled
-                InputProps={{
-                  endAdornment: (
-                    <IconButton component="label">
-                      <FileUploadOutlined />
-                      <input type="file" hidden onChange={handleFileChange} />
-                    </IconButton>
-                  ),
-                }}
-              />
+              <Stack>
+                <Typography>Tập tin kết quả xét nghiệm*</Typography>
+                <TextField
+                  variant="outlined"
+                  type="text"
+                  value={selectedFile ? selectedFile.name : ""}
+                  disabled
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton component="label">
+                        <FileUploadOutlined />
+                        <input type="file" hidden onChange={handleFileChange} />
+                      </IconButton>
+                    ),
+                  }}
+                />
+              </Stack>
+              <Stack>
+                <Typography>Kết luận của bác sĩ xét nghiệm*</Typography>
+                <MuiTextFeild
+                  autoFocus
+                  autoComplete="off"
+                  value={testResult}
+                  onChange={(e) => {
+                    setTestResult(e.target.value);
+                  }}
+                  required
+                  error={testResult.trim() === "" && completeButtonClicked}
+                  helperText={
+                    testResult?.trim() === "" &&
+                    completeButtonClicked &&
+                    "Vui lòng nhập kết quả xét nghiệm"
+                  }
+                />
+              </Stack>
               <Stack
                 direction={"row"}
                 justifyContent={"flex-end"}

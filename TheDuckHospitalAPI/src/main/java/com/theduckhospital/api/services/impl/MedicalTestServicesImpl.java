@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
+import com.theduckhospital.api.dto.request.doctor.CompleteMedicalTest;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.response.MedicalTestResultResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
@@ -105,18 +106,20 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     }
 
     @Override
-    public boolean completeMedicalTest(UUID medicalTestId, MultipartFile file) throws IOException {
-        MedicalTest medicalTest = getMedicalTestById(medicalTestId);
-        updateMedicalTestResultAsync(medicalTestId, file.getBytes());
+    public boolean completeMedicalTest(UUID medicalTestId, CompleteMedicalTest request) throws IOException {
+//        MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+        updateMedicalTestResultAsync(medicalTestId, request.getFile().getBytes(), request.getTestResult());
         return true;
     }
 
-    private void updateMedicalTestResultAsync(UUID medicalTestId, Object file) {
+    private void updateMedicalTestResultAsync(UUID medicalTestId, Object file, String testResult) {
         CompletableFuture.runAsync(() -> {
             try {
                 MedicalTest medicalTest = getMedicalTestById(medicalTestId);
                 String url = cloudinaryServices.uploadFile(file);
                 medicalTest.setResultFileUrl(url);
+                medicalTest.setTestResult(testResult);
+
                 medicalTestRepository.save(medicalTest);
 
                 updateStateMedicalTest(medicalTest, MedicalTestState.DONE);

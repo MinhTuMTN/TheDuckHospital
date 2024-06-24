@@ -2,14 +2,10 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.Degree;
-import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
-import com.theduckhospital.api.dto.response.RatingStatisticsResponse;
-import com.theduckhospital.api.dto.response.admin.ActiveDoctorResponse;
-import com.theduckhospital.api.dto.response.admin.BookingStatisticsResponse;
-import com.theduckhospital.api.dto.response.admin.FilteredActiveDoctorsResponse;
-import com.theduckhospital.api.dto.response.admin.PatientStatisticsResponse;
+import com.theduckhospital.api.dto.response.RatingItemResponse;
+import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.dto.response.doctor.HeadDoctorResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
@@ -192,13 +188,15 @@ public class DoctorServicesImpl implements IDoctorServices {
 
     @Override
     public Doctor findHeadDoctor(Department department) {
-        if (department.getDoctors() != null) {
-            return department.getDoctors().stream()
-                    .filter(Doctor::isHeadOfDepartment)
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
+        Optional<Doctor> optional = doctorRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+        return optional.orElse(null);
+        //        if (department.getDoctors() != null) {
+//            return department.getDoctors().stream()
+//                    .filter(Doctor::isHeadOfDepartment)
+//                    .findFirst()
+//                    .orElse(null);
+//        }
+//        return null;
     }
 
     @Override
@@ -241,7 +239,7 @@ public class DoctorServicesImpl implements IDoctorServices {
     @Override
     public RatingStatisticsResponse getReviews(UUID staffId) {
         Doctor doctor = getDoctorById(staffId);
-        List<Rating> ratings = ratingRepository.findByDoctorAndDeletedIsFalse(doctor);
+        List<Rating> ratings = ratingRepository.findByDoctorAndDeletedIsFalseOrderByRatingPointDescCreatedAtDesc(doctor);
 
         Map<Integer, Long> defaultRatingStatistics = new TreeMap<>(Comparator.reverseOrder());
         for (int i = 1; i <= 5; i++) {
@@ -257,14 +255,13 @@ public class DoctorServicesImpl implements IDoctorServices {
 
         defaultRatingStatistics.forEach((ratingPoint, count) ->
                 ratingStatistics.merge(ratingPoint, count, Long::sum));
-//        Map<Integer, Long> ratingStatistics = ratings.stream()
-//                .sorted(Comparator.comparing(Rating::getRatingPoint))
-//                .collect(Collectors.groupingBy(
-//                        Rating::getRatingPoint,
-//                        LinkedHashMap::new,
-//                        Collectors.counting()
-//                ));
-        return new RatingStatisticsResponse(doctor.getRatings(), doctor.getRatings().size(), doctor.getRating(), ratingStatistics);
+
+        List<RatingItemResponse> ratingResponse = new ArrayList<>();
+        for (Rating rating: ratings) {
+            ratingResponse.add(new RatingItemResponse(rating));
+        }
+
+        return new RatingStatisticsResponse(ratingResponse, ratings.size(), doctor.getRating(), ratingStatistics);
     }
 
     @Override

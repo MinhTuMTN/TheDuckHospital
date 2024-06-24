@@ -3,6 +3,7 @@ package com.theduckhospital.api.repository;
 import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Nurse;
+import com.theduckhospital.api.entity.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,5 @@ public interface NurseRepository extends JpaRepository<Nurse, UUID> {
     );
     List<Nurse> findByDepartmentIsNullAndNurseTypeIsNotNull();
     long countByDepartmentAndDeletedIsFalse(Department department);
+    Optional<Nurse> findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
 }

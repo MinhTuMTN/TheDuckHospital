@@ -34,8 +34,7 @@ const CustomText = styled(Typography)(({ theme }) => ({
 
 function RatingBar(props) {
   const { title, count, maxCount } = props;
-  const widthPercent = (count / maxCount) * 100;
-  console.log(widthPercent);
+  const widthPercent = maxCount === 0 ? 0 : (count / maxCount) * 100;
 
   return (
     <RatingBarContainer>

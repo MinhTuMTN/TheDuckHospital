@@ -1,6 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.MedicalTestState;
+import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.MedicalTest;
 import com.theduckhospital.api.entity.Room;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 @Repository
 public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> {
@@ -31,8 +33,9 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             MedicalTestState state,
             Pageable pageable
     );
+    List<MedicalTest> findByMedicalExaminationRecordAndDeletedIsFalse(MedicalExaminationRecord medicalExaminationRecord);
     Page<MedicalTest> findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
-            HospitalAdmission hospitalAdmission, 
+            HospitalAdmission hospitalAdmission,
             Pageable pageable
     );
 }

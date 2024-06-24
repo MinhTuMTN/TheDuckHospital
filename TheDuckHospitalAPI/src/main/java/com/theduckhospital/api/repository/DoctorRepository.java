@@ -59,4 +59,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
     List<Doctor> findDoctorsByDepartmentAndDeletedIsFalse(Department department);
+    Optional<Doctor>  findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
 }

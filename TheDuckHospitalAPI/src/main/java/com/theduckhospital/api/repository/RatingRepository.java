@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, UUID> {
-    List<Rating> findByDoctorAndDeletedIsFalse(Doctor doctor);
+    List<Rating> findByDoctorAndDeletedIsFalseOrderByRatingPointDescCreatedAtDesc(Doctor doctor);
 }
