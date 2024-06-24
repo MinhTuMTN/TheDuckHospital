@@ -2,48 +2,51 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
-import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
+import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
-import com.theduckhospital.api.repository.HospitalAdmissionRepository;
 import com.theduckhospital.api.repository.NurseScheduleRepository;
 import com.theduckhospital.api.services.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class InpatientServicesImpl implements IInpatientServices {
     private final NurseScheduleRepository nurseScheduleRepository;
-    private final IRoomServices roomServices;
-    private final HospitalAdmissionRepository hospitalAdmissionRepository;
+    private final IHospitalAdmissionServices hospitalAdmissionServices;
     private final INurseServices nurseServices;
     private final IMedicalTestServices medicalTestServices;
     private final IMedicalServiceServices medicalServiceServices;
+    private final IHospitalizationDetailServices hospitalizationDetailServices;
+    private final IDoctorServices doctorServices;
 
     public InpatientServicesImpl(
             NurseScheduleRepository nurseScheduleRepository,
-            IRoomServices roomServices,
-            HospitalAdmissionRepository hospitalAdmissionRepository,
+            IHospitalAdmissionServices hospitalAdmissionServices,
             INurseServices nurseServices,
             IMedicalTestServices medicalTestServices,
-            IMedicalServiceServices medicalServiceServices
+            IMedicalServiceServices medicalServiceServices,
+            IHospitalizationDetailServices hospitalizationDetailServices,
+            IDoctorServices doctorServices
     ) {
         this.nurseScheduleRepository = nurseScheduleRepository;
-        this.roomServices = roomServices;
-        this.hospitalAdmissionRepository = hospitalAdmissionRepository;
+        this.hospitalAdmissionServices = hospitalAdmissionServices;
         this.nurseServices = nurseServices;
         this.medicalTestServices = medicalTestServices;
         this.medicalServiceServices = medicalServiceServices;
+        this.hospitalizationDetailServices = hospitalizationDetailServices;
+        this.doctorServices = doctorServices;
     }
 
     @Override
@@ -67,10 +70,9 @@ public class InpatientServicesImpl implements IInpatientServices {
 
     @Override
     public List<InpatientPatientResponse> getPatientsByRoom(int roomId) {
-        Room room = roomServices.findRoomById(roomId);
-        List<HospitalAdmission> hospitalAdmissions = hospitalAdmissionRepository
+        List<HospitalAdmission> hospitalAdmissions = hospitalAdmissionServices
                 .findByRoomAndStateAndDeletedIsFalse(
-                        room,
+                        roomId,
                         HospitalAdmissionState.BEING_TREATED
                 );
         return hospitalAdmissions.stream()
@@ -84,10 +86,11 @@ public class InpatientServicesImpl implements IInpatientServices {
             UUID hospitalizationId,
             CreateMedicalTest request
     ) {
-        HospitalAdmission hospitalAdmission = findHospitalAdmissionById(hospitalizationId);
-        if (noPermission(inpatientNurseAuthorization, hospitalAdmission)) {
-            throw new BadRequestException("Permission denied", 10090);
-        }
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
 
         MedicalTest medicalTest = medicalTestServices
                 .createMedicalTest(
@@ -109,10 +112,11 @@ public class InpatientServicesImpl implements IInpatientServices {
             int page,
             int size
     ) {
-        HospitalAdmission hospitalAdmission = findHospitalAdmissionById(hospitalizationId);
-        if (noPermission(inpatientNurseAuthorization, hospitalAdmission)) {
-            throw new BadRequestException("Permission denied", 10090);
-        }
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
 
         Page<MedicalTest> medicalTests = medicalTestServices
                 .getMedicalTestsByHospitalAdmission(
@@ -130,38 +134,18 @@ public class InpatientServicesImpl implements IInpatientServices {
                 .build();
     }
 
-    private boolean noPermission(
-            String inpatientNurseAuthorization,
-            HospitalAdmission hospitalAdmission
-    ) {
-        Nurse nurse = nurseServices.getNurseByToken(inpatientNurseAuthorization);
-        if (nurse.getNurseType() != NurseType.INPATIENT_NURSE)
-            return true;
-
-        return hospitalAdmission.getDepartment() != nurse.getDepartment();
-    }
-
-    @Override
-    public HospitalAdmission findHospitalAdmissionById(UUID hospitalAdmissionId) {
-        Optional<HospitalAdmission> hospitalAdmission = hospitalAdmissionRepository
-                .findByHospitalAdmissionIdAndDeletedIsFalse(hospitalAdmissionId);
-        if (hospitalAdmission.isEmpty()) {
-            throw new BadRequestException("Hospitalization not found", 404);
-        }
-
-        return hospitalAdmission.get();
-    }
-
     @Override
     public boolean deleteInpatientMedicalTest(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             UUID medicalTestId
     ) {
-        HospitalAdmission hospitalAdmission = findHospitalAdmissionById(hospitalizationId);
-        if (noPermission(inpatientNurseAuthorization, hospitalAdmission)) {
-            throw new BadRequestException("Permission denied", 10090);
-        }
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
         medicalTestServices.deleteHospitalAdmissionMedicalTest(
                 hospitalAdmission,
                 medicalTestId
@@ -172,5 +156,43 @@ public class InpatientServicesImpl implements IInpatientServices {
     @Override
     public List<MedicalService> getAllMedicalTestServices() {
         return medicalServiceServices.doctorGetAllMedicalTests();
+    }
+
+    @Override
+    public boolean updateDailyHospitalAdmissionDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UpdateDailyHospitalAdmissionDetails request
+    ) {
+        Nurse nurse = nurseServices.getNurseByToken(inpatientNurseAuthorization);
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        nurse,
+                        hospitalizationId
+                );
+
+        hospitalizationDetailServices.updateDailyHospitalAdmissionDetails(
+                nurse,
+                hospitalAdmission,
+                request
+        );
+        return true;
+    }
+
+    @Override
+    public List<DoctorDetails> getDoctorsInDepartment(
+            String inpatientNurseAuthorization
+    ) {
+        Nurse nurse = nurseServices.getNurseByToken(inpatientNurseAuthorization);
+        Department department = nurse.getDepartment();
+        if (department == null) {
+            throw new BadRequestException("Nurse does not have department", 400);
+        }
+
+        List<Doctor> doctors = doctorServices
+                .getDoctorsByDepartment(department);
+        return doctors.stream()
+                .map(DoctorDetails::new)
+                .toList();
     }
 }

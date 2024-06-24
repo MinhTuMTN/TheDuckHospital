@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.Fee;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
+import com.theduckhospital.api.constant.NurseType;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.nurse.HospitalAdmissionDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateRoomHospitalAdmission;
@@ -15,7 +16,9 @@ import com.theduckhospital.api.services.INurseServices;
 import com.theduckhospital.api.services.IRoomServices;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices {
@@ -103,5 +106,51 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
         }
 
         return new HospitalAdmissionDetails(hospitalAdmission);
+    }
+
+    @Override
+    public List<HospitalAdmission> findByRoomAndStateAndDeletedIsFalse(
+            int roomId,
+            HospitalAdmissionState state
+    ) {
+        Room room = roomServices.findRoomById(roomId);
+
+        return hospitalAdmissionRepository
+                .findByRoomAndStateAndDeletedIsFalse(
+                        room,
+                        state
+                );
+    }
+
+    @Override
+    public HospitalAdmission findHospitalAdmissionById(UUID hospitalAdmissionId) {
+        Optional<HospitalAdmission> hospitalAdmission = hospitalAdmissionRepository
+                .findByHospitalAdmissionIdAndDeletedIsFalse(hospitalAdmissionId);
+        if (hospitalAdmission.isEmpty()) {
+            throw new BadRequestException("Hospitalization not found", 404);
+        }
+
+        return hospitalAdmission.get();
+    }
+
+    @Override
+    public HospitalAdmission checkNursePermissionForHospitalAdmission(
+            String nurseAuthorization,
+            UUID hospitalAdmissionId
+    ) {
+        Nurse nurse = nurseServices.getNurseByToken(nurseAuthorization);
+        return checkNursePermissionForHospitalAdmission(nurse, hospitalAdmissionId);
+    }
+
+    @Override
+    public HospitalAdmission checkNursePermissionForHospitalAdmission(Nurse nurse, UUID hospitalAdmissionId) {
+        if (nurse.getNurseType() != NurseType.INPATIENT_NURSE)
+            throw new BadRequestException("Permission denied", 403);
+
+        HospitalAdmission hospitalAdmission = findHospitalAdmissionById(hospitalAdmissionId);
+        if (hospitalAdmission.getDepartment() != nurse.getDepartment())
+            throw new BadRequestException("Permission denied", 403);
+
+        return hospitalAdmission;
     }
 }

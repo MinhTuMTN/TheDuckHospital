@@ -29,6 +29,14 @@ public class HospitalizationDetail {
 
     @Nationalized
     private String diagnosis;
+    @Nationalized
+    private String symptom;
+    @Nationalized
+    private String temperature;
+    @Nationalized
+    private String bloodPressure;
+    @Nationalized
+    private String heartRate;
 
     @OneToMany(mappedBy = "hospitalizationDetail")
     @ToStringExclude
@@ -46,4 +54,17 @@ public class HospitalizationDetail {
     private Nurse nurse;
 
     private double totalFee;
+
+    private Date updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.hospitalizationDetailId = UUID.randomUUID();
+        this.updatedAt = new Date();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = new Date();
+    }
 }

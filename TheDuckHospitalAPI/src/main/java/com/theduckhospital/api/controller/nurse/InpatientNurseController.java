@@ -1,6 +1,7 @@
 package com.theduckhospital.api.controller.nurse;
 
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IInpatientServices;
 import org.springframework.http.ResponseEntity;
@@ -111,6 +112,27 @@ public class InpatientNurseController {
         );
     }
 
+    @PostMapping("/hospitalization/{hospitalizationId}/details")
+    public ResponseEntity<?> updateDailyHospitalAdmissionDetails(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestBody UpdateDailyHospitalAdmissionDetails updateDailyHospitalAdmissionDetails
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Update daily hospital admission details successfully")
+                .data(inpatientServices
+                        .updateDailyHospitalAdmissionDetails(
+                                authorization,
+                                hospitalizationId,
+                                updateDailyHospitalAdmissionDetails
+                        )
+                )
+                .build()
+        );
+    }
+
     @GetMapping("/medical-test-services")
     public ResponseEntity<?> getAllMedicalTestServices() {
         return ResponseEntity.ok(GeneralResponse.builder()
@@ -118,6 +140,19 @@ public class InpatientNurseController {
                 .statusCode(200)
                 .message("Get all medical test services successfully")
                 .data(inpatientServices.getAllMedicalTestServices())
+                .build()
+        );
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<?> getAllDoctorInDepartment(
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get all doctor in department successfully")
+                .data(inpatientServices.getDoctorsInDepartment(authorization))
                 .build()
         );
     }

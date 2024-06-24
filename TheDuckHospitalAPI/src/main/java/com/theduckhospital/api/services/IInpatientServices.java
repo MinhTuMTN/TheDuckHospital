@@ -1,6 +1,8 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
+import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
@@ -24,11 +26,19 @@ public interface IInpatientServices {
             int page,
             int size
     );
-    HospitalAdmission findHospitalAdmissionById(UUID hospitalAdmissionId);
     boolean deleteInpatientMedicalTest(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             UUID medicalTestId
     );
     List<MedicalService> getAllMedicalTestServices();
+    boolean updateDailyHospitalAdmissionDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UpdateDailyHospitalAdmissionDetails request
+    );
+
+    List<DoctorDetails> getDoctorsInDepartment(
+            String inpatientNurseAuthorization
+    );
 }

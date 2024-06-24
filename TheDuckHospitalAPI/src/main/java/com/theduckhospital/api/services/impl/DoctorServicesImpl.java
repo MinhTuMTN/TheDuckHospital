@@ -266,4 +266,9 @@ public class DoctorServicesImpl implements IDoctorServices {
 //                ));
         return new RatingStatisticsResponse(doctor.getRatings(), doctor.getRatings().size(), doctor.getRating(), ratingStatistics);
     }
+
+    @Override
+    public List<Doctor> getDoctorsByDepartment(Department department) {
+        return doctorRepository.findDoctorsByDepartmentAndDeletedIsFalse(department);
+    }
 }
