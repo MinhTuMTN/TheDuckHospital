@@ -62,4 +62,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Pageable pageable
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
+    Optional<Doctor>  findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
 }

@@ -275,36 +275,48 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 medicalExaminationId
         );
 
-        return medicalExaminationRecord.getMedicalTest()
-                .stream()
-                .filter(medicalTest -> !medicalTest.isDeleted())
+        return medicalExaminationRecord.getMedicalTest().stream()
                 .map(DoctorMedicalTestResponse::new)
                 .toList();
     }
 
     @Override
-    public List<DoctorMedicalTestResponse> doctorDeleteMedicalTest(String authorization, UUID medicalExaminationId, UUID medicalTestId) {
+    public List<DoctorMedicalTestResponse> doctorDeleteMedicalTest(
+            String authorization,
+            UUID medicalExaminationId,
+            UUID medicalTestId
+    ) {
         MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
                 authorization,
                 medicalExaminationId
         );
 
-        List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
-        MedicalTest medicalTest = medicalTests
-                .stream()
-                .filter(medicalTest1 -> medicalTest1
-                        .getMedicalTestId()
-                        .equals(medicalTestId)
-                )
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Medical Test not found"));
+        List<MedicalTest> medicalTests = medicalTestRepository.findByMedicalExaminationRecordAndDeletedIsFalse(
+                medicalExaminationRecord
+        );
+//        List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
+        Optional<MedicalTest> optional = medicalTestRepository.findById(medicalTestId);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("Medical Test not found");
+        } else {
+            MedicalTest medicalTest = optional.get();
+            medicalTest.setDeleted(true);
+            medicalTestRepository.save(medicalTest);
+        }
+//        MedicalTest medicalTest = medicalTests
+//                .stream()
+//                .filter(medicalTest1 -> medicalTest1
+//                        .getMedicalTestId()
+//                        .equals(medicalTestId)
+//                )
+//                .findFirst()
+//                .orElseThrow(() -> new NotFoundException("Medical Test not found"));
+//
+//        medicalTest.setDeleted(true);
+//        medicalTestRepository.save(medicalTest);
 
-        medicalTest.setDeleted(true);
-        medicalTestRepository.save(medicalTest);
-
-        return medicalTests
-                .stream()
-                .filter(medicalTest1 -> !medicalTest1.isDeleted())
+        return medicalTests.stream()
+//                .filter(medicalTest1 -> !medicalTest1.isDeleted())
                 .map(DoctorMedicalTestResponse::new)
                 .toList();
     }

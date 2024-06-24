@@ -257,17 +257,24 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         endDateCalendar.set(Calendar.SECOND, 59);
         endDateCalendar.set(Calendar.MILLISECOND, 99);
 
-        List<Booking> bookings = bookingRepository
-                .findByCancelledIsFalseAndDeletedIsFalseAndRefundedTransactionIdIsNull();
+        List<Booking> successExaminations = bookingRepository.
+                findSuccessfulBookingsWithinDateRangeAndByDepartment(
+                        startDateCalendar.getTime(),
+                        endDateCalendar.getTime(),
+                        TransactionStatus.SUCCESS,
+                        departmentId
+                );
+//        List<Booking> bookings = bookingRepository.
+//                .findByCancelledIsFalseAndDeletedIsFalseAndRefundedTransactionIdIsNull();
 
-        List<Booking> successExaminations = bookings.stream()
-                .filter(booking ->
-                        !DateCommon.getCalendar(booking.getTransaction().getCreatedAt()).before(startDateCalendar)
-                                && !DateCommon.getCalendar(booking.getTransaction().getCreatedAt()).after(endDateCalendar)
-                                && booking.getTransaction().getStatus() == TransactionStatus.SUCCESS
-                                && booking.getTimeSlot().getDoctorSchedule().getDoctor()
-                                .getDepartment().getDepartmentId() == departmentId)
-                .toList();
+//        List<Booking> successExaminations = bookings.stream()
+//                .filter(booking ->
+//                        !DateCommon.getCalendar(booking.getTransaction().getCreatedAt()).before(startDateCalendar)
+//                                && !DateCommon.getCalendar(booking.getTransaction().getCreatedAt()).after(endDateCalendar)
+//                                && booking.getTransaction().getStatus() == TransactionStatus.SUCCESS
+//                                && booking.getTimeSlot().getDoctorSchedule().getDoctor()
+//                                .getDepartment().getDepartmentId() == departmentId)
+//                .toList();
 
 
 
@@ -280,16 +287,23 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         Collectors.summingDouble(Booking::getServicePrice)
                 ));
 
+//        List<Transaction> admissionTransactions = transactionRepository
+//                .findByStatusAndHospitalAdmissionIsNotNullAndCreatedAtBetween(
+//                        TransactionStatus.SUCCESS,
+//                        startDateCalendar.getTime(),
+//                        endDateCalendar.getTime()
+//                );
         List<Transaction> admissionTransactions = transactionRepository
-                .findByStatusAndHospitalAdmissionIsNotNullAndCreatedAtBetween(
+                .findByStatusAndHospitalAdmissionIsNotNullAndHospitalAdmission_Department_DepartmentIdAndCreatedAtBetweenOrderByCreatedAtAsc(
                         TransactionStatus.SUCCESS,
+                        departmentId,
                         startDateCalendar.getTime(),
                         endDateCalendar.getTime()
                 );
 
         Map<String, Double> totalAmountAdmissionByDateAndDepartment = admissionTransactions.stream()
-                .filter(t -> t.getHospitalAdmission().getDepartment().getDepartmentId() == departmentId)
-                .sorted(Comparator.comparing(Transaction::getCreatedAt))
+//                .filter(t -> t.getHospitalAdmission().getDepartment().getDepartmentId() == departmentId)
+//                .sorted(Comparator.comparing(Transaction::getCreatedAt))
                 .collect(Collectors.groupingBy(
                         transaction -> dateFormat.format(transaction.getCreatedAt()),
                         LinkedHashMap::new,

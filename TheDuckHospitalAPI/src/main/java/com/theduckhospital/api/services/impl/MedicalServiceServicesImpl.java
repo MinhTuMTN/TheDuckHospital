@@ -41,10 +41,8 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
             department = departmentServices.getDepartmentById(request.getDepartmentId());
         }
 
-        if (request.getServiceType() == ServiceType.MedicalExamination
-                && department.getMedicalServices().stream().anyMatch(
-                medicalService -> medicalService.getServiceType() == ServiceType.MedicalExamination
-        )) {
+        List<MedicalService> medicalServices = medicalServiceRepository.findByDepartmentAndServiceType(department, ServiceType.MedicalExamination);
+        if (request.getServiceType() == ServiceType.MedicalExamination && !medicalServices.isEmpty()) {
             throw new StatusCodeException("Department already has a medical examination service", 409);
         };
 
@@ -87,19 +85,23 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     ) {
         List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
 
-        List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingOrDepartmentIn(search, departments);
+        List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingOrDepartmentInAndServiceTypeIn(
+                search,
+                departments,
+                serviceTypes
+        );
 
-        List<MedicalService> filteredServices = services.stream()
-                .filter(service -> serviceTypes.contains(service.getServiceType()))
-                .toList();
+//        List<MedicalService> filteredServices = services.stream()
+//                .filter(service -> serviceTypes.contains(service.getServiceType()))
+//                .toList();
 
         Pageable pageable = PageRequest.of(page, limit);
 
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), filteredServices.size());
-        List<MedicalService> medicalServices = filteredServices.subList(start, end);
+        int end = Math.min((start + pageable.getPageSize()), services.size());
+        List<MedicalService> medicalServices = services.subList(start, end);
 
-        return new FilteredMedicalServicesResponse(medicalServices, filteredServices.size(), page, limit);
+        return new FilteredMedicalServicesResponse(medicalServices, services.size(), page, limit);
     }
 
     @NotNull

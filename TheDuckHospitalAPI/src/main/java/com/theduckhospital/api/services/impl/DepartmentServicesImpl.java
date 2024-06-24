@@ -58,10 +58,16 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         }
 
         if (request.getStaffId() != null) {
-            department.getDoctors().stream()
-                    .filter(Doctor::isHeadOfDepartment)
-                    .findFirst()
-                    .ifPresent(headDoctor -> headDoctor.setHeadOfDepartment(false));
+//            department.getDoctors().stream()
+//                    .filter(Doctor::isHeadOfDepartment)
+//                    .findFirst()
+//                    .ifPresent(headDoctor -> headDoctor.setHeadOfDepartment(false));
+            Doctor headDoctor = getHeadDoctor(department);
+//            Optional<Doctor> doctorOptional = doctorRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+            if (headDoctor != null) {
+                headDoctor.setHeadOfDepartment(false);
+                doctorRepository.save(headDoctor);
+            }
             Optional<Doctor> optional = doctorRepository.findById(request.getStaffId());
             if (optional.isEmpty() || optional.get().isDeleted()) {
                 throw new NotFoundException("Doctor not found");
@@ -71,10 +77,17 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         }
 
         if (request.getHeadNurseId() != null) {
-            department.getNurses().stream()
-                    .filter(Nurse::isHeadOfDepartment)
-                    .findFirst()
-                    .ifPresent(headNurse -> headNurse.setHeadOfDepartment(false));
+            Nurse headNurse = getHeadNurse(department);
+//            Optional<Nurse> nurseOptional = nurseRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+            if(headNurse != null){
+//                Nurse nurse = nurseOptional.get();
+                headNurse.setHeadOfDepartment(false);
+                nurseRepository.save(headNurse);
+            }
+//            department.getNurses().stream()
+//                    .filter(Nurse::isHeadOfDepartment)
+//                    .findFirst()
+//                    .ifPresent(headNurse -> headNurse.setHeadOfDepartment(false));
             Optional<Nurse> optional = nurseRepository.findById(request.getHeadNurseId());
             if (optional.isEmpty() || optional.get().isDeleted()) {
                 throw new NotFoundException("Nurse not found");
@@ -186,15 +199,17 @@ public class DepartmentServicesImpl implements IDepartmentServices {
 
         List<DepartmentResponse> response = new ArrayList<>();
         for (Department department : pageContent) {
-            Doctor headDoctor = department.getDoctors().stream()
-                    .filter(Doctor::isHeadOfDepartment)
-                    .findFirst()
-                    .orElse(null);
-            Nurse headNurse = department.getNurses().stream()
-                    .filter(Nurse::isHeadOfDepartment)
-                    .findFirst()
-                    .orElse(null);
-            response.add(new DepartmentResponse(department, headDoctor, headNurse));
+//            Doctor headDoctor = department.getDoctors().stream()
+//                    .filter(Doctor::isHeadOfDepartment)
+//                    .findFirst()
+//                    .orElse(null);
+
+
+//            Nurse headNurse = department.getNurses().stream()
+//                    .filter(Nurse::isHeadOfDepartment)
+//                    .findFirst()
+//                    .orElse(null);
+            response.add(new DepartmentResponse(department, getHeadDoctor(department), getHeadNurse(department)));
         }
 
         return new FilteredDepartmentsResponse(response, departments.size(), page, limit);
@@ -210,6 +225,16 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         return departmentRepository.findAllByDeletedIsFalseOrderByDepartmentNameAsc();
     }
 
+    public Doctor getHeadDoctor(Department department) {
+        Optional<Doctor> doctorOptional = doctorRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+        return doctorOptional.orElse(null);
+    }
+
+    public Nurse getHeadNurse(Department department) {
+        Optional<Nurse> nurseOptional = nurseRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+        return nurseOptional.orElse(null);
+    }
+
     @Override
     public DepartmentResponse getDepartmentResponseById(int departmentId) {
         Optional<Department> optional = departmentRepository.findById(departmentId);
@@ -218,15 +243,9 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         }
 
         Department department = optional.get();
-        Doctor headDoctor = department.getDoctors().stream()
-                .filter(Doctor::isHeadOfDepartment)
-                .findFirst()
-                .orElse(null);
+        Doctor headDoctor = getHeadDoctor(department);
 
-        Nurse headNurse = department.getNurses().stream()
-                .filter(Nurse::isHeadOfDepartment)
-                .findFirst()
-                .orElse(null);
+        Nurse headNurse = getHeadNurse(department);
 
         return new DepartmentResponse(department, headDoctor, headNurse);
     }

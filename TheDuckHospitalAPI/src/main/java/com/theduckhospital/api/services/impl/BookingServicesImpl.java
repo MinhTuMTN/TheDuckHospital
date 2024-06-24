@@ -296,7 +296,7 @@ public class BookingServicesImpl implements IBookingServices {
 
         Booking booking = new Booking();
         booking.setPatientProfile(patientProfile);
-        booking.setServicePrice(timeSlot.getDoctorSchedule().getMedicalService().getPrice());
+        booking.setServicePrice(selectedTimeSlot.getDoctorSchedule().getMedicalService().getPrice());
         booking.setTimeSlot(selectedTimeSlot);
         booking.setTransaction(transaction);
         booking.setQueueNumber(selectedTimeSlot.getStartNumber() + selectedTimeSlot.getCurrentSlot());

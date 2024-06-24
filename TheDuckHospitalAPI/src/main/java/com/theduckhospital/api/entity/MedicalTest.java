@@ -26,6 +26,8 @@ public class MedicalTest {
     private int queueNumber;
     @Nationalized
     private String note;
+    @Nationalized
+    private String testResult;
     private double price;
 
     private String resultFileUrl; // Bên lab (xét nghiệm) sẽ upload file kết quả lên đây

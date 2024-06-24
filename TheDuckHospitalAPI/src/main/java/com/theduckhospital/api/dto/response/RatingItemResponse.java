@@ -18,6 +18,7 @@ public class RatingItemResponse {
         this.rating = rating.getRatingPoint();
         this.review = rating.getReview();
         this.ratedAt = rating.getCreatedAt();
-        this.patientName = rating.getPatient().getFullName();
+        Patient patient = rating.getPatient();
+        this.patientName = patient != null ? rating.getPatient().getFullName() : "";
     }
 }

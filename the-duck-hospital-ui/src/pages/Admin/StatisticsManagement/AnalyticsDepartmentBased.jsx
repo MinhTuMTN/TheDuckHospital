@@ -31,7 +31,7 @@ function AnalyticsDepartmentBased(props) {
   const spacingValue = isFullWidth ? 4 : 0;
   const [statistics, setStatistics] = useState({});
   const [departments, setDepartments] = useState([]);
-  const [department, setDepartment] = useState({});
+  const [department, setDepartment] = useState("");
 
   const handleGetStatistics = useCallback(async () => {
     const response = await getStatisticsByDepartment(department.departmentId);

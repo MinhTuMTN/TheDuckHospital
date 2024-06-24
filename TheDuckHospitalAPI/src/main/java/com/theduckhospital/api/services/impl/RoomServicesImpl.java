@@ -246,11 +246,14 @@ public class RoomServicesImpl implements IRoomServices {
 
         Department department = headDoctor.getDepartment();
 
-        return department.getRooms()
-                .stream()
-                .filter(room -> !room.isDeleted()
-                        && room.getRoomType() == RoomType.EXAMINATION_ROOM
-                ).toList();
+        List<Room> rooms = roomRepository.findByDepartmentAndRoomTypeAndDeletedIsFalse(department, RoomType.EXAMINATION_ROOM);
+
+//        return department.getRooms()
+//                .stream()
+//                .filter(room -> !room.isDeleted()
+//                        && room.getRoomType() == RoomType.EXAMINATION_ROOM
+//                ).toList();
+        return rooms;
     }
 
     @Override
@@ -262,12 +265,19 @@ public class RoomServicesImpl implements IRoomServices {
 
         Department department = headDoctor.getDepartment();
 
-        return department.getRooms()
-                .stream()
-                .filter(room -> !room.isDeleted()
-                        && (room.getRoomType() == RoomType.TREATMENT_ROOM_STANDARD
-                        || room.getRoomType() == RoomType.TREATMENT_ROOM_VIP)
-                ).toList();
+        List<RoomType> roomTypes = Arrays.asList(RoomType.TREATMENT_ROOM_STANDARD, RoomType.TREATMENT_ROOM_VIP);
+        List<Room> rooms = roomRepository.findByDepartmentAndRoomTypeInAndDeletedIsFalse(
+                department,
+                roomTypes
+        );
+
+//        return department.getRooms()
+//                .stream()
+//                .filter(room -> !room.isDeleted()
+//                        && (room.getRoomType() == RoomType.TREATMENT_ROOM_STANDARD
+//                        || room.getRoomType() == RoomType.TREATMENT_ROOM_VIP)
+//                ).toList();
+        return rooms;
     }
 
     @Override

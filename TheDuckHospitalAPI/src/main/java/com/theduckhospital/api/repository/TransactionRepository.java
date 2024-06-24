@@ -82,8 +82,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             TransactionStatus status
     );
 
-    List<Transaction> findByStatusAndHospitalAdmissionIsNotNullAndCreatedAtBetween(
+//    List<Transaction> findByStatusAndHospitalAdmissionIsNotNullAndCreatedAtBetween(
+//            TransactionStatus status,
+//            Date startDate,
+//            Date endDate
+//    );
+
+    List<Transaction> findByStatusAndHospitalAdmissionIsNotNullAndHospitalAdmission_Department_DepartmentIdAndCreatedAtBetweenOrderByCreatedAtAsc(
             TransactionStatus status,
+            int departmentId,
             Date startDate,
             Date endDate
     );

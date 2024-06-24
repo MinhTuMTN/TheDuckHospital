@@ -1,5 +1,6 @@
 package com.theduckhospital.api.repository;
 
+import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.entity.Booking;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.PatientProfile;
@@ -78,5 +79,15 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     )
     List<Booking> findExpiredBookings(Date date);
 
-    List<Booking> findByCancelledIsFalseAndDeletedIsFalseAndRefundedTransactionIdIsNull();
+//    List<Booking> findByCancelledIsFalseAndDeletedIsFalseAndRefundedTransactionIdIsNull();
+
+    @Query("SELECT b FROM Booking b WHERE b.cancelled = false AND b.deleted = false AND b.refundedTransactionId IS NULL"
+            + " AND b.transaction.createdAt BETWEEN :startDate AND :endDate"
+            + " AND b.transaction.status = :transactionStatus"
+            + " AND b.timeSlot.doctorSchedule.doctor.department.departmentId = :departmentId")
+    List<Booking> findSuccessfulBookingsWithinDateRangeAndByDepartment(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("transactionStatus") TransactionStatus transactionStatus,
+            @Param("departmentId") int departmentId);
 }

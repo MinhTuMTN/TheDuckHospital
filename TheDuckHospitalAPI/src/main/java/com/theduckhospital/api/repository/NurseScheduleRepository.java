@@ -140,4 +140,6 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
             Date date,
             ScheduleType scheduleType
     );
+
+    List<NurseSchedule> findByRoomAndScheduleTypeAndDeletedIsFalse(Room room, ScheduleType scheduleType);
 }

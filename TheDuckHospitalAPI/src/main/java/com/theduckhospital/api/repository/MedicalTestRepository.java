@@ -1,6 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.MedicalTestState;
+import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.entity.MedicalTest;
 import com.theduckhospital.api.entity.Room;
@@ -33,4 +34,5 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             MedicalTestState state,
             Pageable pageable
     );
+    List<MedicalTest> findByMedicalExaminationRecordAndDeletedIsFalse(MedicalExaminationRecord medicalExaminationRecord);
 }

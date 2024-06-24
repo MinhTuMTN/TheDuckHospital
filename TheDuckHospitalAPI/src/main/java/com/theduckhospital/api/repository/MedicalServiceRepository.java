@@ -13,6 +13,15 @@ import java.util.List;
 @Repository
 public interface MedicalServiceRepository extends JpaRepository<MedicalService, Integer> {
     Page<MedicalService> findPaginationByOrderByDeleted(Pageable pageable);
+
     List<MedicalService> getByServiceTypeAndDeletedIsFalse(ServiceType serviceType);
-    List<MedicalService> findByServiceNameContainingOrDepartmentIn(String serviceName, List<Department> departmentList);
+
+    //    List<MedicalService> findByServiceNameContainingOrDepartmentIn(String serviceName, List<Department> departmentList);
+    List<MedicalService> findByServiceNameContainingOrDepartmentInAndServiceTypeIn(
+            String serviceName,
+            List<Department> departments,
+            List<ServiceType> serviceTypes
+    );
+
+    List<MedicalService> findByDepartmentAndServiceType(Department department, ServiceType serviceType);
 }

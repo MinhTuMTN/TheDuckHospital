@@ -3,6 +3,7 @@ package com.theduckhospital.api.services;
 import com.theduckhospital.api.constant.MedicalTestState;
 import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
+import com.theduckhospital.api.dto.request.doctor.CompleteMedicalTest;
 import com.theduckhospital.api.dto.request.headdoctor.AcceptMedicalTestsRequest;
 import com.theduckhospital.api.dto.response.*;
 import com.theduckhospital.api.dto.response.doctor.LabRoomResponse;
@@ -21,7 +22,7 @@ import java.util.UUID;
 public interface IMedicalTestServices {
     MedicalTest acceptMedicalTest(String authorization, UUID medicalTestId);
     MedicalTestRecordResponse getMedicalTestRecordById(UUID medicalTestId);
-    boolean completeMedicalTest(UUID medicalTestId, MultipartFile file) throws IOException;
+    boolean completeMedicalTest(UUID medicalTestId, CompleteMedicalTest request) throws IOException;
     PatientMedicalTestDetailsResponse patientGetMedicalTestDetails(String medicalTestCode);
     PaymentResponse patientPayMedicalTest(PayMedicalTestRequest request, String origin);
     List<MedicalService> patientGetMedicalTests();
