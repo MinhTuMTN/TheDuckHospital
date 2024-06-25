@@ -23,6 +23,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { getGender } from "../../../utils/genderUtils";
 import { getAge } from "../../../utils/getAgeUtils";
+
 const Layout = styled(Grid)(({ theme }) => ({
   padding: theme.spacing("16px"),
   marginTop: theme.spacing(3),

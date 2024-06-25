@@ -1,24 +1,26 @@
+import Dns from "@mui/icons-material/Dns";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import FolderSharedIcon from "@mui/icons-material/FolderShared";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import {
   Box,
+  Breadcrumbs,
   CardMedia,
   Grid,
   Link,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Stack,
   Typography,
+  styled,
 } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import LayoutComponent from "../../../components/General/LayoutComponent";
 import { appColors } from "../../../utils/appColorsUtils";
-import InboxIcon from "@mui/icons-material/Inbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
+import AdmissionDetailsByDate from "../../../components/Nurse/Hospitalize/AdmissionDetailsByDate";
 const patientCardStyle = {
-  paddingX: "12px",
   flex: "0 0 auto",
   marginTop: "16px",
   backgroundColor: appColors.white,
@@ -28,8 +30,42 @@ const patientCardStyle = {
   boxShadow: "0px 10px 40px 10px rgba(0, 0, 0, 0.0784313725)",
 };
 
+const FireNav = styled(List)({
+  "& .MuiListItemButton-root": {
+    paddingLeft: 12,
+    paddingRight: 24,
+  },
+  "& .MuiListItemIcon-root": {
+    minWidth: 0,
+    marginRight: 16,
+  },
+  "& .MuiSvgIcon-root": {
+    fontSize: 20,
+  },
+});
+
+const data = [
+  { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án" },
+  { icon: <Dns />, label: "Xest nghiệm" },
+  { icon: <ExitToAppIcon />, label: "Xuất viện" },
+];
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  paddingLeft: 20,
+  paddingRight: 20,
+  paddingTop: 15,
+  paddingBottom: 25,
+  flex: 1,
+  backgroundColor: appColors.backgroundColorMain,
+  width: "100%",
+  [theme.breakpoints.up("lg")]: {},
+}));
+
 function HospitalizationDetails() {
+  const [selectedTab, setSelectedTab] = React.useState("");
+
   const navigate = useNavigate();
+
   const breadcrumbs = [
     <Link
       underline="hover"
@@ -57,19 +93,9 @@ function HospitalizationDetails() {
     >
       Nội trú
     </Typography>,
+    
     <Typography
       key="3"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Phòng A202
-    </Typography>,
-    <Typography
-      key="4"
       color={"#5a5a5a"}
       style={{
         fontWeight: "560",
@@ -77,7 +103,7 @@ function HospitalizationDetails() {
         letterSpacing: "0.5px",
       }}
     >
-      Bệnh nhận Mạnh Hùng
+      Phòng A202
     </Typography>,
   ];
   return (
@@ -87,21 +113,22 @@ function HospitalizationDetails() {
         backgroundColor: appColors.backgroundColorMain,
       }}
     >
-      <Box flex={1} display={"flex"}>
-        <LayoutComponent container>
-          <Grid
-            item
-            xs={12}
-            md={6}
-            component={Stack}
-            direction={"column"}
-            style={patientCardStyle}
-          >
+      <StyledGrid container>
+        <Grid
+          item
+          xs={12}
+          sm={4}
+          md={3.95}
+          lg={3}
+          sx={{ paddingX: "12px" }}
+          width={"100%"}
+          minWidth={"290px"}
+        >
+          <Stack direction={"column"} style={patientCardStyle}>
             <Box
-              padding={"50px 24px 24px 24px"}
+              padding={"50px 24px 12px 24px"}
               position={"relative"}
               sx={{ zIndex: 1 }}
-              minWidth={"270px"}
             >
               <Stack
                 display={"block"}
@@ -170,6 +197,63 @@ function HospitalizationDetails() {
                 >
                   Nữ - 25 tuổi
                 </Typography>
+                <Stack
+                  marginTop={2}
+                  paddingY={1.5}
+                  direction={"column"}
+                  textAlign={"left"}
+                  spacing={1}
+                  style={{
+                    borderTop: "1px solid #d3d3d3",
+                    borderBottom: "1px solid #d3d3d3",
+                  }}
+                >
+                  <Stack
+                    direction={"row"}
+                    alignItems={"center"}
+                    spacing={"4px"}
+                    marginBottom={1}
+                  >
+                    <NewReleasesIcon
+                      style={{
+                        fontSize: "16px",
+                        color: "#02119d",
+                      }}
+                    />
+                    <Typography
+                      color={"#02119d"}
+                      fontSize={"16px"}
+                      fontWeight={500}
+                      marginTop={"4px"}
+                    >
+                      Tiền sử bệnh và dị ứng
+                    </Typography>
+                  </Stack>
+                  <Typography
+                    color={appColors.textDarkGreen}
+                    fontSize={"14px"}
+                    fontWeight={"bold"}
+                  >
+                    - Tiền sử bệnh:{" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      Tiểu đường tuýt 2, cao huyết áp, máu đông
+                    </span>
+                  </Typography>
+                  <Typography
+                    color={appColors.textDarkGreen}
+                    fontSize={"14px"}
+                    fontWeight={"bold"}
+                  >
+                    - Dị ứng:{" "}
+                    <span
+                      style={{
+                        fontWeight: "400",
+                      }}
+                    >
+                      Không có
+                    </span>
+                  </Typography>
+                </Stack>
               </Stack>
               <CardMedia
                 component="img"
@@ -182,39 +266,79 @@ function HospitalizationDetails() {
                   zIndex: -1,
                   borderRadius: "10px 10px 0 0",
                   height: "125px",
-                  width: "100%",
                 }}
               />
             </Box>
             <Stack
               sx={{
-                padding: "15px",
+                padding: "0 15px 15px 15px",
               }}
             >
-              <nav aria-label="main mailbox folders">
-                <List>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <InboxIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Inbox" />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <DraftsIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Drafts" />
-                    </ListItemButton>
-                  </ListItem>
-                </List>
-              </nav>
+              <FireNav component="nav" disablePadding>
+                {data.map((item, index) => (
+                  <ListItemButton
+                    key={item.label}
+                    onClick={() => setSelectedTab(index)}
+                    sx={{
+                      py: 0,
+                      minHeight: 40,
+                      color:
+                        selectedTab === index
+                          ? "white"
+                          : "rgba(84, 84, 84, 0.8)",
+                      backgroundColor:
+                        selectedTab === index ? "#0e82fd" : "inherit",
+                      "&:hover": {
+                        backgroundColor:
+                          selectedTab === index
+                            ? "#0e82fd"
+                            : "rgba(0, 0, 0, 0.04)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color:
+                          selectedTab === index ? appColors.white : "inherit",
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        fontSize: 14,
+                        fontWeight: "medium",
+                        color:
+                          selectedTab === index ? appColors.white : "inherit",
+                      }}
+                    />
+                  </ListItemButton>
+                ))}
+              </FireNav>
             </Stack>
-          </Grid>
-        </LayoutComponent>
-      </Box>
+          </Stack>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={8.05}
+          lg={9}
+          marginTop={2}
+          sx={{
+            paddingX: "12px",
+          }}
+        >
+          <Typography variant="h5" fontWeight={600} letterSpacing={1}>
+            Phòng A202
+          </Typography>
+          <Breadcrumbs separator="›" aria-label="breadcrumb">
+            {breadcrumbs}
+          </Breadcrumbs>
+          <AdmissionDetailsByDate />
+        </Grid>
+      </StyledGrid>
     </Box>
   );
 }
