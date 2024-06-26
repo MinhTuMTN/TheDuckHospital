@@ -73,7 +73,7 @@ function DialogForm(props) {
       aria-describedby="alert-dialog-slide-description"
       maxWidth="md"
     >
-      <DialogTitle>
+      <DialogTitle style={{ borderBottom: "1px solid #c2c1c1", paddingBottom: "5px" }}>
         <span style={{ fontSize: "1.5rem" }}>{props.title}</span>
       </DialogTitle>
       <DialogContent>{props.children || props.content}</DialogContent>

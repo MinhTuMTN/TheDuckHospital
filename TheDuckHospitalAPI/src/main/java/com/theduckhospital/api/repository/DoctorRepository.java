@@ -3,10 +3,12 @@ package com.theduckhospital.api.repository;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.entity.Doctor;
+import com.theduckhospital.api.entity.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -63,4 +65,15 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
     Optional<Doctor>  findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
+
+    @Query(value = "SELECT d FROM Doctor d " +
+            "WHERE d.deleted IN :deleted " +
+            "AND d.department.departmentId IN :departmentIds " +
+            "AND d.fullName LIKE %:fullName%"
+    )
+    Page<Doctor> findDoctor(@Param("fullName") String fullName,
+                            @Param("deleted") List<Boolean> deleted,
+                            @Param("departmentIds") List<Integer> departmentIds,
+                            Pageable pageable
+    );
 }

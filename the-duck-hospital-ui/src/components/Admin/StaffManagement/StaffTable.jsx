@@ -100,6 +100,19 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
+            {row.departmentName ? row.departmentName : "Không thuộc trong khoa"}
+          </CustomText>
+        </TableCell>
+        <TableCell>
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
             {row.role}
           </CustomText>
         </TableCell>
@@ -111,7 +124,9 @@ function Row(props) {
                 color: row.deleted ? "#c52700" : "#00C58D",
               }}
             />
-            <CustomText>{row.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}</CustomText>
+            <CustomText>
+              {row.deleted ? "Ngưng hoạt động" : "Còn hoạt động"}
+            </CustomText>
           </Stack>
         </TableCell>
         <TableCell align="center">
@@ -214,43 +229,33 @@ function StaffTable(props) {
               }}
             >
               <TableRow>
-                <TableCell style={{ width: "30%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell style={{ width: "25%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Họ tên
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Số điện thoại
                   </CustomText>
                 </TableCell>
                 <TableCell style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Khoa
+                  </CustomText>
+                </TableCell>
+                <TableCell style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Vai trò
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Trạng thái
                   </CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "10%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Tùy chọn
                   </CustomText>
                 </TableCell>

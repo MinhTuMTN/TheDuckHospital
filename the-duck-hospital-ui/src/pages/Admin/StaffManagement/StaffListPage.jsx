@@ -37,28 +37,28 @@ import { getAllDepartments } from "../../../services/admin/DepartmentServices";
 import DialogConfirm from "../../../components/General/DialogConfirm";
 import StaffFilter from "../../../components/Admin/StaffManagement/StaffFilter";
 
-const roles = [
-  {
-    value: "DOCTOR",
-    label: "Bác sĩ",
-  },
-  {
-    value: "NURSE",
-    label: "Điều dưỡng",
-  },
-  {
-    value: "PHARMACIST",
-    label: "Dược sĩ",
-  },
-  {
-    value: "CASHIER",
-    label: "Thu ngân",
-  },
-  {
-    value: "LABORATORY_TECHNICIAN",
-    label: "Bác sĩ xét nghiệm",
-  },
-];
+// const roles = [
+//   {
+//     value: "DOCTOR",
+//     label: "Bác sĩ",
+//   },
+//   {
+//     value: "NURSE",
+//     label: "Điều dưỡng",
+//   },
+//   {
+//     value: "PHARMACIST",
+//     label: "Dược sĩ",
+//   },
+//   {
+//     value: "CASHIER",
+//     label: "Thu ngân",
+//   },
+//   {
+//     value: "LABORATORY_TECHNICIAN",
+//     label: "Bác sĩ xét nghiệm",
+//   },
+// ];
 
 const degrees = ["BS", "ThS", "TS", "PGS", "GS"];
 
@@ -129,6 +129,7 @@ function StaffListPage(props) {
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [departmentsFilter, setDepartmentsFilter] = useState([]);
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -173,6 +174,17 @@ function StaffListPage(props) {
     }
   };
 
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const handleChangeDepartmentsFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedDepartments((prev) => [...prev, parseInt(event.target.value)]);
+    } else {
+      setSelectedDepartments((prev) =>
+        prev.filter((item) => item !== parseInt(event.target.value))
+      );
+    }
+  };
+
   const [selectedStatus, setSelectedStatus] = useState([]);
   const handleChangeStatusFilter = (event) => {
     if (event.target.checked) {
@@ -184,6 +196,16 @@ function StaffListPage(props) {
     }
   };
 
+  const handleGetDepartments = useCallback(async () => {
+    const response = await getAllDepartments();
+    if (response.success) {
+      setDepartmentsFilter(response.data.data);
+    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  }, []);
+  useEffect(() => {
+    handleGetDepartments();
+  }, [handleGetDepartments]);
+
   const handleGetStaffs = useCallback(async () => {
     if (!buttonClicked) return;
     const response = await getPaginationStaffs({
@@ -192,6 +214,7 @@ function StaffListPage(props) {
       limit: limit,
       staffRole: selectedRole,
       staffStatus: selectedStatus,
+      departmentIds: selectedDepartments
     });
 
     if (filterButtonClicked) {
@@ -211,6 +234,7 @@ function StaffListPage(props) {
     limit,
     selectedStatus,
     selectedRole,
+    selectedDepartments,
     buttonClicked,
     filterButtonClicked,
   ]);
@@ -252,12 +276,6 @@ function StaffListPage(props) {
       }
     }
 
-    // if (staff.role?.trim() === "NURSE") {
-    //   if(nurseType === "")
-    // }
-
-    // let dateOfBirth = dayjs(staff.dateOfBirth).format("YYYY-MM-DD");
-
     const formData = new FormData();
     formData.append("fullName", staff.fullName);
     formData.append("phoneNumber", staff.phoneNumber);
@@ -277,20 +295,6 @@ function StaffListPage(props) {
     );
     formData.append("avatar", selectedFile);
 
-    // const response = await createStaff({
-    //   fullName: staff.fullName,
-    //   phoneNumber: staff.phoneNumber,
-    //   identityNumber: staff.identityNumber,
-    //   dateOfBirth: dateOfBirth,
-    //   degree: staff.degree,
-    //   role: staff.role,
-    //   gender: staff.gender,
-    //   email: staff.email,
-    //   departmentId:
-    //     staff.role === "NURSE" && staff.departmentId === ""
-    //       ? null
-    //       : staff.departmentId,
-    // });
     const response = await createStaff(formData);
     setIsLoading(false);
     if (response.success) {
@@ -372,19 +376,21 @@ function StaffListPage(props) {
                 }}
               />
               <Box py={2} px={3}>
-                {selectedRole.length === 0 && selectedStatus.length === 0 && (
-                  <TextField
-                    disabled
-                    variant="standard"
-                    fullWidth
-                    size="medium"
-                    InputProps={{
-                      disableUnderline: true,
-                      fontSize: "14px",
-                    }}
-                    placeholder="Không có bộ lọc nào được chọn"
-                  />
-                )}
+                {selectedRole.length === 0 &&
+                  selectedStatus.length === 0 &&
+                  selectedDepartments.length === 0 && (
+                    <TextField
+                      disabled
+                      variant="standard"
+                      fullWidth
+                      size="medium"
+                      InputProps={{
+                        disableUnderline: true,
+                        fontSize: "14px",
+                      }}
+                      placeholder="Không có bộ lọc nào được chọn"
+                    />
+                  )}
                 <Stack direction="row" spacing={1}>
                   {selectedRole.map((item, index) => (
                     <Chip
@@ -393,6 +399,22 @@ function StaffListPage(props) {
                       key={index}
                       onDelete={() =>
                         setSelectedRole((prev) =>
+                          prev.filter((i) => i !== item)
+                        )
+                      }
+                    />
+                  ))}
+                  {selectedDepartments.map((item, index) => (
+                    <Chip
+                      color="primary"
+                      label={
+                        departmentsFilter.find(
+                          (i) => i.departmentId === item
+                        )?.departmentName
+                      }
+                      key={index}
+                      onDelete={() =>
+                        setSelectedDepartments((prev) =>
                           prev.filter((i) => i !== item)
                         )
                       }
@@ -426,6 +448,13 @@ function StaffListPage(props) {
                   options={roleOptions}
                   selectedValues={selectedRole}
                   onChange={handleChangeRoleFilter}
+                />
+                <StaffFilter
+                  label={"Khoa"}
+                  isDepartmentFilter={true}
+                  options={departmentsFilter}
+                  selectedValues={selectedDepartments}
+                  onChange={handleChangeDepartmentsFilter}
                 />
                 <StaffFilter
                   label={"Trạng thái"}
@@ -700,10 +729,10 @@ function StaffListPage(props) {
                 }}
                 inputProps={{ "aria-label": "Without label" }}
               >
-                {roles?.map((item, index) => (
+                {roleOptions?.map((item, index) => (
                   <MenuItem key={index} value={item.value}>
                     <Typography style={{ fontSize: "16px" }}>
-                      {item.label}
+                      {item.name}
                     </Typography>
                   </MenuItem>
                 ))}
