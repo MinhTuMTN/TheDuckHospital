@@ -61,6 +61,8 @@ HospitalAdmissionModal.propTypes = {
 function HospitalAdmissionModal(props) {
   const [symptoms, setSymptoms] = useState("");
   const [diagnostic, setDiagnostic] = useState("");
+  const [underlyingDisease, setUnderlyingDisease] = useState("");
+  const [historyOfAllergy, setHistoryOfAllergy] = useState("");
   const { medicalRecordId } = useParams();
   const [hospitalAdmissionDate, setHospitalAdmissionDate] = useState(dayjs());
   const [admissionLeter, setAdmissionLetter] = useState(null);
@@ -79,6 +81,8 @@ function HospitalAdmissionModal(props) {
       symptom: symptoms,
       diagnosis: diagnostic,
       admissionDate: hospitalAdmissionDate.startOf("day").toISOString(),
+      underlyingDisease: underlyingDisease,
+      historyOfAllergy: historyOfAllergy,
     });
 
     if (response.success) {
@@ -140,6 +144,26 @@ function HospitalAdmissionModal(props) {
               required
               value={diagnostic}
               onChange={(e) => setDiagnostic(e.target.value)}
+            />
+            <CustomTextField
+              size="medium"
+              variant="outlined"
+              id="outlined-basic"
+              label="Bệnh nền"
+              fullWidth
+              required
+              value={underlyingDisease}
+              onChange={(e) => setUnderlyingDisease(e.target.value)}
+            />
+            <CustomTextField
+              size="medium"
+              variant="outlined"
+              id="outlined-basic"
+              label="Tiền sử dị ứng"
+              fullWidth
+              required
+              value={historyOfAllergy}
+              onChange={(e) => setHistoryOfAllergy(e.target.value)}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <CustomDatePicker

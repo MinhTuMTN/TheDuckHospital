@@ -9,7 +9,7 @@ const StyledGrid = styled(Grid)(({ theme }) => ({
   paddingBottom: 25,
   flex: 1,
   backgroundColor: appColors.backgroundColorMain,
-  height: "100%",
+  width: "100%",
   [theme.breakpoints.up("lg")]: {},
 }));
 

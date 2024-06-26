@@ -1,85 +1,123 @@
+import Dns from "@mui/icons-material/Dns";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import FolderSharedIcon from "@mui/icons-material/FolderShared";
 import {
   Box,
-  CardMedia,
+  Breadcrumbs,
   Grid,
   Link,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
   Typography,
+  styled,
 } from "@mui/material";
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import LayoutComponent from "../../../components/General/LayoutComponent";
+import React, { useEffect, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import AdmissionDetailsByDate from "../../../components/Nurse/Hospitalize/AdmissionDetailsByDate";
+import PatientInfoTab from "../../../components/Nurse/Hospitalize/PatientInfoTab";
 import { appColors } from "../../../utils/appColorsUtils";
-import InboxIcon from "@mui/icons-material/Inbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-const patientCardStyle = {
-  paddingX: "12px",
-  flex: "0 0 auto",
-  marginTop: "16px",
-  backgroundColor: appColors.white,
-  borderRadius: "10px",
-  border: "1px solid #f0f0f0",
-  display: "flex",
-  boxShadow: "0px 10px 40px 10px rgba(0, 0, 0, 0.0784313725)",
-};
+import InpatientMedicalTest from "../../../components/Nurse/Hospitalize/InpatientMedicalTest";
+import {
+  getAllMedicalTestServices,
+  getGeneralInfoOfHospitalization,
+} from "../../../services/nurse/HospitalizeServices";
+import { enqueueSnackbar } from "notistack";
+
+const data = [
+  { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án" },
+  { icon: <Dns />, label: "Xét nghiệm" },
+  { icon: <ExitToAppIcon />, label: "Xuất viện" },
+];
+
+const StyledGrid = styled(Grid)(({ theme }) => ({
+  paddingLeft: 20,
+  paddingRight: 20,
+  paddingTop: 15,
+  paddingBottom: 25,
+  flex: 1,
+  backgroundColor: appColors.backgroundColorMain,
+  width: "100%",
+  [theme.breakpoints.up("lg")]: {},
+}));
 
 function HospitalizationDetails() {
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const [generalInfo, setGeneralInfo] = React.useState({});
+  const [medicalTestServices, setMedicalTestServices] = React.useState([]);
+  const { hospitalizationId, roomId } = useParams();
+  const roomName = useMemo(() => {
+    try {
+      const strArr = roomId.split("-");
+      return strArr[1];
+    } catch (error) {
+      return "";
+    }
+  }, [roomId]);
   const navigate = useNavigate();
-  const breadcrumbs = [
-    <Link
-      underline="hover"
-      key="1"
-      color="inherit"
-      href=">"
-      onClick={() => navigate("/")}
-      style={{
-        cursor: "pointer",
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Trang chủ
-    </Link>,
-    <Typography
-      key="2"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Nội trú
-    </Typography>,
-    <Typography
-      key="3"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Phòng A202
-    </Typography>,
-    <Typography
-      key="4"
-      color={"#5a5a5a"}
-      style={{
-        fontWeight: "560",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Bệnh nhận Mạnh Hùng
-    </Typography>,
-  ];
+  const breadcrumbs = useMemo(() => {
+    return [
+      <Link
+        underline="hover"
+        key="1"
+        color="inherit"
+        href=">"
+        onClick={() => navigate("/")}
+        style={{
+          cursor: "pointer",
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Trang chủ
+      </Link>,
+      <Typography
+        key="2"
+        color={"inherit"}
+        style={{
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Nội trú
+      </Typography>,
+
+      <Typography
+        key="3"
+        color={"#5a5a5a"}
+        style={{
+          fontWeight: "560",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Phòng {roomName}
+      </Typography>,
+    ];
+  }, [roomName, navigate]);
+
+  useEffect(() => {
+    const handleGetGeneralInfoOfHospitalization = async () => {
+      const response = await getGeneralInfoOfHospitalization(hospitalizationId);
+      if (response.success) setGeneralInfo(response.data.data);
+      else
+        enqueueSnackbar("Không thể lấy thông tin bệnh nhân", {
+          variant: "error",
+        });
+    };
+    const handleGetAllMedicalTests = async () => {
+      const response = await getAllMedicalTestServices();
+      if (response.success) setMedicalTestServices(response.data.data);
+      else
+        enqueueSnackbar("Không thể lấy thông tin xét nghiệm", {
+          variant: "error",
+        });
+    };
+
+    if (hospitalizationId) {
+      handleGetGeneralInfoOfHospitalization();
+      handleGetAllMedicalTests();
+    }
+  }, [hospitalizationId]);
   return (
     <Box
       flex={1}
@@ -87,134 +125,37 @@ function HospitalizationDetails() {
         backgroundColor: appColors.backgroundColorMain,
       }}
     >
-      <Box flex={1} display={"flex"}>
-        <LayoutComponent container>
-          <Grid
-            item
-            xs={12}
-            md={6}
-            component={Stack}
-            direction={"column"}
-            style={patientCardStyle}
-          >
-            <Box
-              padding={"50px 24px 24px 24px"}
-              position={"relative"}
-              sx={{ zIndex: 1 }}
-              minWidth={"270px"}
-            >
-              <Stack
-                display={"block"}
-                sx={{
-                  textAlign: "center",
-                }}
-              >
-                <CardMedia
-                  style={{
-                    padding: "3px",
-                    marginBottom: "10px",
-                    display: "inline-block",
-                    width: "auto",
-                    backgroundColor: "#f7f7f7",
-
-                    borderRadius: "50%",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      backgroundColor: "#c80000",
-                      height: "120px",
-                      width: "120px",
-                      borderRadius: "50%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Typography
-                      color={appColors.white}
-                      fontSize={"35px"}
-                      fontWeight={500}
-                    >
-                      MH
-                    </Typography>
-                  </Box>
-                </CardMedia>
-                <Typography
-                  color={appColors.black}
-                  fontSize={"20px"}
-                  fontWeight={600}
-                  style={{
-                    marginBottom: "4px",
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Ân Mạnh Hùng
-                </Typography>
-                <Typography
-                  color={appColors.textDarkGreen}
-                  fontSize={"14px"}
-                  fontWeight={"normal"}
-                >
-                  Mã bệnh nhân:{" "}
-                  <span style={{ letterSpacing: 0.5 }}>BN920W2343</span>
-                </Typography>
-                <Typography
-                  color={appColors.textDarkGreen}
-                  fontSize={"14px"}
-                  fontWeight={500}
-                  letterSpacing={"0.5px"}
-                  marginTop={"4px"}
-                >
-                  Nữ - 25 tuổi
-                </Typography>
-              </Stack>
-              <CardMedia
-                component="img"
-                image="https://doccure.dreamstechnologies.com/html/template/assets/img/doctors-dashboard/doctor-sidebar-bg.jpg"
-                alt="Doctor Sidebar Background"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  zIndex: -1,
-                  borderRadius: "10px 10px 0 0",
-                  height: "125px",
-                  width: "100%",
-                }}
-              />
-            </Box>
-            <Stack
-              sx={{
-                padding: "15px",
-              }}
-            >
-              <nav aria-label="main mailbox folders">
-                <List>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <InboxIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Inbox" />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <DraftsIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Drafts" />
-                    </ListItemButton>
-                  </ListItem>
-                </List>
-              </nav>
-            </Stack>
-          </Grid>
-        </LayoutComponent>
-      </Box>
+      <StyledGrid container>
+        <PatientInfoTab
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          data={data}
+          generalInfo={generalInfo}
+        />
+        <Grid
+          item
+          xs={12}
+          md={8.8}
+          lg={9}
+          xl={9}
+          marginTop={2}
+          sx={{
+            paddingX: "12px",
+          }}
+        >
+          <Typography variant="h5" fontWeight={600} letterSpacing={1}>
+            Phòng {roomName}
+          </Typography>
+          <Breadcrumbs separator="›" aria-label="breadcrumb">
+            {breadcrumbs}
+          </Breadcrumbs>
+          {selectedTab === 0 ? (
+            <AdmissionDetailsByDate generalInfo={generalInfo} />
+          ) : (
+            <InpatientMedicalTest medicalTestServices={medicalTestServices} />
+          )}
+        </Grid>
+      </StyledGrid>
     </Box>
   );
 }

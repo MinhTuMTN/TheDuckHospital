@@ -68,7 +68,7 @@ function NurseMenuList(props) {
         {nurseType === "INPATIENT_NURSE" && (
           <CustomMenuItem
             onClick={() => {
-              setOpen(true);
+              navigate("/nurse-inpatient");
             }}
           >
             <LocalHospitalOutlined

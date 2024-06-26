@@ -1,7 +1,6 @@
 package com.theduckhospital.api.dto.response.nurse;
 
-import com.theduckhospital.api.entity.Account;
-import com.theduckhospital.api.entity.Booking;
+import com.theduckhospital.api.entity.*;
 import lombok.Data;
 
 import java.util.UUID;
@@ -15,8 +14,13 @@ public class QueueBookingItem {
 
     public QueueBookingItem(Booking booking) {
         this.queueNumber = booking.getQueueNumber();
-        this.fullName = booking.getPatientProfile().getFullName();
-        this.userId = booking.getPatientProfile().getAccount().getUserId();
-        this.roomName = booking.getTimeSlot().getDoctorSchedule().getRoom().getRoomName();
+        PatientProfile patientProfile = booking.getPatientProfile();
+        this.fullName = patientProfile != null ? patientProfile.getFullName() : "";
+        Account account = patientProfile != null ? patientProfile.getAccount() : null;
+        this.userId = account != null ? account.getUserId() : null;
+        TimeSlot timeSlot = booking.getTimeSlot();
+        DoctorSchedule doctorSchedule = timeSlot != null ? timeSlot.getDoctorSchedule() : null;
+        Room room = doctorSchedule != null ? doctorSchedule.getRoom() : null;
+        this.roomName = room != null ? room.getRoomName() : "";
     }
 }

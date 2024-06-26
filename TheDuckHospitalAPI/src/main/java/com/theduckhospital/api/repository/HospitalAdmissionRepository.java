@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Repository
 public interface HospitalAdmissionRepository extends JpaRepository<HospitalAdmission, UUID> {
-    List<HospitalAdmission> findByRoomAndStateAndDeletedIsFalse(Room room, HospitalAdmissionState state);
+    List<HospitalAdmission> findByRoomAndStateAndPatientProfile_FullNameContainingAndDeletedIsFalse(Room room, HospitalAdmissionState state, String patientProfile_fullName);
     Optional<HospitalAdmission> findByHospitalAdmissionCodeAndDeletedIsFalse(String hospitalAdmissionCode);
     Optional<HospitalAdmission> findByHospitalAdmissionIdAndDeletedIsFalse(UUID hospitalAdmissionId);
 }

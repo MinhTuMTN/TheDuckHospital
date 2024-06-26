@@ -18,6 +18,7 @@ public class RoomResponse {
     private String serviceName;
     private Integer serviceId;
     private Integer capacity;
+    private Integer beingUsed;
     private boolean deleted;
 
     public RoomResponse(Room room) {
@@ -42,6 +43,7 @@ public class RoomResponse {
                 || room.getRoomType() == RoomType.TREATMENT_ROOM_VIP;
         if (isTreatmentRoom) {
             this.capacity = room.getCapacity() == null ? 0 : room.getCapacity();
+            this.beingUsed = room.getBeingUsed() == null ? 0 : room.getBeingUsed();
         }
     }
 }

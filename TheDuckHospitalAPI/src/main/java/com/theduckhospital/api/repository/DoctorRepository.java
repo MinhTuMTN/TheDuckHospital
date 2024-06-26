@@ -29,7 +29,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     Page<Doctor> findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, String department_departmentName, Pageable pageable
     );
-
     @Query("SELECT d " +
             "FROM Doctor d " +
             "WHERE d.deleted = false " +
@@ -45,11 +44,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Date today,
             Pageable pageable
     );
-
     List<Doctor> findAllByHeadOfDepartmentIsTrue();
-
     List<Doctor> findByDepartmentOrderByRatingDesc(Department department);
-
     @Query("SELECT d " +
             "FROM Doctor d " +
             "WHERE d.deleted = false " +
@@ -64,6 +60,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Pageable pageable
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
+    List<Doctor> findDoctorsByDepartmentAndDeletedIsFalse(Department department);
     Optional<Doctor>  findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
 
     @Query(value = "SELECT d FROM Doctor d " +

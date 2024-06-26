@@ -11,6 +11,6 @@ export const getDoctorsMedicalExaminations = (
     departmentId,
     degree,
     page,
-    limit: 10,
+    limit: 5,
   });
 };

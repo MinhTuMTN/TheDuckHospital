@@ -1,12 +1,15 @@
 package com.theduckhospital.api.controller.nurse;
 
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IInpatientServices;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -35,21 +38,22 @@ public class InpatientNurseController {
     @GetMapping("/treatment-room/{roomId}/patients")
     public ResponseEntity<?> getPatientsByRoom(
             @RequestHeader("Authorization") String authorization,
+            @RequestParam(value = "patientName", defaultValue = "") String patientName,
             @PathVariable("roomId") int roomId
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .statusCode(200)
                 .message("Get patients by room successfully")
-                .data(inpatientServices.getPatientsByRoom(roomId))
+                .data(inpatientServices.getPatientsByRoom(roomId, patientName))
                 .build()
         );
     }
 
-    @PostMapping("/hospitalization/{hospitalizationId}/medical-test")
+    @PostMapping("/hospitalization/{hospitalizationId}/medical-tests")
     public ResponseEntity<?> createInpatientMedicalTest(
             @RequestHeader("Authorization") String authorization,
-            @PathVariable("hospitalizationId")UUID hospitalizationId,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
             @RequestBody CreateMedicalTest createMedicalTest
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
@@ -71,8 +75,9 @@ public class InpatientNurseController {
     public ResponseEntity<?> getInpatientMedicalTests(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("hospitalizationId") UUID hospitalizationId,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+            @RequestParam(value = "serviceId", defaultValue = "0") int serviceId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size
     ) {
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
@@ -82,6 +87,7 @@ public class InpatientNurseController {
                         .getInpatientMedicalTests(
                                 authorization,
                                 hospitalizationId,
+                                serviceId,
                                 page,
                                 size
                         )
@@ -111,6 +117,46 @@ public class InpatientNurseController {
         );
     }
 
+    @PostMapping("/hospitalization/{hospitalizationId}/details")
+    public ResponseEntity<?> updateDailyHospitalAdmissionDetails(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestBody UpdateDailyHospitalAdmissionDetails updateDailyHospitalAdmissionDetails
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Update daily hospital admission details successfully")
+                .data(inpatientServices
+                        .updateDailyHospitalAdmissionDetails(
+                                authorization,
+                                hospitalizationId,
+                                updateDailyHospitalAdmissionDetails
+                        )
+                )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/general-info")
+    public ResponseEntity<?> getGeneralInfoOfHospitalAdmission(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Update daily hospital admission details successfully")
+                .data(inpatientServices
+                        .getGeneralInfoOfHospitalAdmission(
+                                authorization,
+                                hospitalizationId
+                        )
+                )
+                .build()
+        );
+    }
+
     @GetMapping("/medical-test-services")
     public ResponseEntity<?> getAllMedicalTestServices() {
         return ResponseEntity.ok(GeneralResponse.builder()
@@ -118,6 +164,19 @@ public class InpatientNurseController {
                 .statusCode(200)
                 .message("Get all medical test services successfully")
                 .data(inpatientServices.getAllMedicalTestServices())
+                .build()
+        );
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<?> getAllDoctorInDepartment(
+            @RequestHeader("Authorization") String authorization
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get all doctor in department successfully")
+                .data(inpatientServices.getDoctorsInDepartment(authorization))
                 .build()
         );
     }

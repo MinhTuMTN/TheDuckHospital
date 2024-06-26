@@ -7,19 +7,14 @@ const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",
-  flex: "1 1 auto",
+  flex: "1",
   maxWidth: "100%",
+  backgroundColor: "#f5f7fb",
+  minHeight: "100vh",
   [theme.breakpoints.up("lg")]: {
     paddingLeft: SIDE_NAV_WIDTH,
   },
 }));
-
-const LayoutContainer = styled("div")({
-  display: "flex",
-  flex: "1 1 auto",
-  flexDirection: "column",
-  width: "100%",
-});
 
 function NurseInpatientLayout() {
   const [open, setOpen] = React.useState(false);
@@ -28,9 +23,7 @@ function NurseInpatientLayout() {
       <TopNavBarInpatient onDrawerClick={setOpen} roomName={"counter"} />
       <LeftNavbarNurseInpatient open={open} onOpenClose={setOpen} />
       <LayoutRoot>
-        <LayoutContainer>
-          <Outlet />
-        </LayoutContainer>
+        <Outlet />
       </LayoutRoot>
     </>
   );
