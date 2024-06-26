@@ -1,17 +1,15 @@
-import { Divider, Grid, Stack, Typography, styled } from "@mui/material";
-import React, { memo } from "react";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import { appColors } from "../../../utils/appColorsUtils";
 import {
   BiotechOutlined,
   CalendarMonthOutlined,
-  ContentPasteGoOutlined,
   ContentPasteOutlined,
   DeleteOutlineOutlined,
   DownloadOutlined,
   EditNoteOutlined,
   PrintOutlined,
 } from "@mui/icons-material";
+import { Divider, Grid, Typography, styled } from "@mui/material";
+import React, { memo } from "react";
+import { appColors } from "../../../utils/appColorsUtils";
 
 const LineInfo = memo((props) => {
   return (
