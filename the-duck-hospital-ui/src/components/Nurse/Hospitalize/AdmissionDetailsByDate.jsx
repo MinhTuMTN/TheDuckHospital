@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
 import useDebounce from "../../../hooks/useDebounce";
+import MedicalTestItem from "./MedicalTestItem";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   padding: "16px 16px",
@@ -121,7 +122,7 @@ function AdmissionDetailsByDate() {
         </Grid>
       </ViewStyle>
       <Grid container>
-        <Grid item xs={10} md={3.5}>
+        <Grid item xs={10} md={3.5} minHeight={"100px"}>
           <LayoutStyle direction={"column"}>
             <Box
               sx={{
@@ -219,7 +220,13 @@ function AdmissionDetailsByDate() {
             </Stack>
           </LayoutStyle>
         </Grid>
-        <Grid item xs={12} md={8.25} marginLeft={isDownLg ? 0 : 2.2}>
+        <Grid
+          item
+          xs={12}
+          md={8.25}
+          marginLeft={isDownLg ? 0 : 2.2}
+          maxHeight={"100%"}
+        >
           <LayoutStyle direction={"column"}>
             <Box
               sx={{
@@ -233,13 +240,9 @@ function AdmissionDetailsByDate() {
               </Typography>
             </Box>
             <Stack direction={"column"} marginTop={"10px"} width={"100%"}>
-              <TextField
-                fullWidth
-                label="Kết luận xét nghiệm"
-                multiline
-                rows={8}
-                placeholder="Nhập kết luận xét nghiệm của bệnh nhân"
-              />
+              <MedicalTestItem mode="small" />
+              <MedicalTestItem mode="small" />
+              <MedicalTestItem mode="small" />
             </Stack>
           </LayoutStyle>
         </Grid>

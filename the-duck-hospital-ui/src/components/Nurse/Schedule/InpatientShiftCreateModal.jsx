@@ -5,11 +5,15 @@ import {
   Button,
   CardMedia,
   FormControl,
+  FormControlLabel,
+  FormLabel,
   IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
   Modal,
+  Radio,
+  RadioGroup,
   Select,
   Stack,
   TextField,
@@ -126,6 +130,7 @@ function InpatientShiftCreateModal(props) {
       date.format("YYYY/MM/DD")
     );
   }
+  const [selectMode, setSelectMode] = useState("custom");
 
   useEffect(() => {
     const handleGetRooms = async () => {
@@ -307,6 +312,22 @@ function InpatientShiftCreateModal(props) {
               </FormControl>
             </Box>
 
+            <Box width={'100%'}>
+            <FormControl>
+              <FormLabel id="demo-radio-buttons-group-label">Chọn ngày theo dạng</FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="female"
+                name="radio-buttons-group"
+                onChange={(e) => setSelectMode(e.target.value)}
+                value={selectMode}
+              >
+                <FormControlLabel value="range" control={<Radio />} label="Chọn khoảng ngày" />
+                <FormControlLabel value="custom" control={<Radio />} label="Tuỳ chỉnh" />
+              </RadioGroup>
+            </FormControl>
+            </Box>
+
             <Box width="100%">
               <Stack direction={"row"} spacing={2}>
                 {shifts?.map((shift) => (
@@ -336,7 +357,8 @@ function InpatientShiftCreateModal(props) {
                   </Button>
                 ))}
               </Stack>
-              <LocalizationProvider
+              {selectMode === "custom" ? (
+                <LocalizationProvider
                 dateAdapter={AdapterDayjs}
                 adapterLocale="en-gb"
               >
@@ -372,6 +394,9 @@ function InpatientShiftCreateModal(props) {
                   }}
                 />
               </LocalizationProvider>
+              ) : (
+                <></>
+              )}
             </Box>
           </Stack>
           <Stack justifyContent={"flex-end"} width={"100%"} direction={"row"}>
