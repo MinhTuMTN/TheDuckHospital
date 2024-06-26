@@ -7,14 +7,19 @@ import {
   Grid,
   Link,
   Typography,
-  styled
+  styled,
 } from "@mui/material";
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import AdmissionDetailsByDate from "../../../components/Nurse/Hospitalize/AdmissionDetailsByDate";
 import PatientInfoTab from "../../../components/Nurse/Hospitalize/PatientInfoTab";
 import { appColors } from "../../../utils/appColorsUtils";
 import InpatientMedicalTest from "../../../components/Nurse/Hospitalize/InpatientMedicalTest";
+import {
+  getAllMedicalTestServices,
+  getGeneralInfoOfHospitalization,
+} from "../../../services/nurse/HospitalizeServices";
+import { enqueueSnackbar } from "notistack";
 
 const data = [
   { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án" },
@@ -35,49 +40,84 @@ const StyledGrid = styled(Grid)(({ theme }) => ({
 
 function HospitalizationDetails() {
   const [selectedTab, setSelectedTab] = React.useState(0);
-
+  const [generalInfo, setGeneralInfo] = React.useState({});
+  const [medicalTestServices, setMedicalTestServices] = React.useState([]);
+  const { hospitalizationId, roomId } = useParams();
+  const roomName = useMemo(() => {
+    try {
+      const strArr = roomId.split("-");
+      return strArr[1];
+    } catch (error) {
+      return "";
+    }
+  }, [roomId]);
   const navigate = useNavigate();
+  const breadcrumbs = useMemo(() => {
+    return [
+      <Link
+        underline="hover"
+        key="1"
+        color="inherit"
+        href=">"
+        onClick={() => navigate("/")}
+        style={{
+          cursor: "pointer",
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Trang chủ
+      </Link>,
+      <Typography
+        key="2"
+        color={"inherit"}
+        style={{
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Nội trú
+      </Typography>,
 
-  const breadcrumbs = [
-    <Link
-      underline="hover"
-      key="1"
-      color="inherit"
-      href=">"
-      onClick={() => navigate("/")}
-      style={{
-        cursor: "pointer",
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Trang chủ
-    </Link>,
-    <Typography
-      key="2"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Nội trú
-    </Typography>,
+      <Typography
+        key="3"
+        color={"#5a5a5a"}
+        style={{
+          fontWeight: "560",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Phòng {roomName}
+      </Typography>,
+    ];
+  }, [roomName, navigate]);
 
-    <Typography
-      key="3"
-      color={"#5a5a5a"}
-      style={{
-        fontWeight: "560",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Phòng A202
-    </Typography>,
-  ];
+  useEffect(() => {
+    const handleGetGeneralInfoOfHospitalization = async () => {
+      const response = await getGeneralInfoOfHospitalization(hospitalizationId);
+      if (response.success) setGeneralInfo(response.data.data);
+      else
+        enqueueSnackbar("Không thể lấy thông tin bệnh nhân", {
+          variant: "error",
+        });
+    };
+    const handleGetAllMedicalTests = async () => {
+      const response = await getAllMedicalTestServices();
+      if (response.success) setMedicalTestServices(response.data.data);
+      else
+        enqueueSnackbar("Không thể lấy thông tin xét nghiệm", {
+          variant: "error",
+        });
+    };
+
+    if (hospitalizationId) {
+      handleGetGeneralInfoOfHospitalization();
+      handleGetAllMedicalTests();
+    }
+  }, [hospitalizationId]);
   return (
     <Box
       flex={1}
@@ -90,31 +130,30 @@ function HospitalizationDetails() {
           selectedTab={selectedTab}
           setSelectedTab={setSelectedTab}
           data={data}
+          generalInfo={generalInfo}
         />
         <Grid
           item
           xs={12}
-          sm={8}
-          md={8.05}
+          md={8.8}
           lg={9}
+          xl={9}
           marginTop={2}
           sx={{
             paddingX: "12px",
           }}
         >
           <Typography variant="h5" fontWeight={600} letterSpacing={1}>
-            Phòng A202
+            Phòng {roomName}
           </Typography>
           <Breadcrumbs separator="›" aria-label="breadcrumb">
             {breadcrumbs}
           </Breadcrumbs>
-          {
-            selectedTab === 0 ? (
-              <AdmissionDetailsByDate />
-            ) : (
-              <InpatientMedicalTest />
-            )
-          }
+          {selectedTab === 0 ? (
+            <AdmissionDetailsByDate generalInfo={generalInfo} />
+          ) : (
+            <InpatientMedicalTest medicalTestServices={medicalTestServices} />
+          )}
         </Grid>
       </StyledGrid>
     </Box>

@@ -361,10 +361,21 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     @Override
     public Page<MedicalTest> getMedicalTestsByHospitalAdmission(
             HospitalAdmission hospitalAdmission,
+            int serviceId,
             int page,
             int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
+
+        if (serviceId > 0) {
+            MedicalService medicalService = medicalServiceServices
+                    .getMedicalServiceById(serviceId);
+            return medicalTestRepository.findByHospitalAdmissionAndMedicalServiceAndDeletedIsFalseOrderByDateDesc(
+                    hospitalAdmission,
+                    medicalService,
+                    pageable
+            );
+        }
         return medicalTestRepository.findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
                 hospitalAdmission,
                 pageable

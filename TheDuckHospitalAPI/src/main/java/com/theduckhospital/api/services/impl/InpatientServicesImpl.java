@@ -8,6 +8,8 @@ import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
+import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
@@ -62,18 +64,18 @@ public class InpatientServicesImpl implements IInpatientServices {
 
         return nurseSchedules.stream()
                 .map(NurseSchedule::getRoom)
-                .toList()
-                .stream()
+                .distinct()
                 .map(RoomResponse::new)
                 .toList();
     }
 
     @Override
-    public List<InpatientPatientResponse> getPatientsByRoom(int roomId) {
+    public List<InpatientPatientResponse> getPatientsByRoom(int roomId, String patientName) {
         List<HospitalAdmission> hospitalAdmissions = hospitalAdmissionServices
                 .findByRoomAndStateAndDeletedIsFalse(
                         roomId,
-                        HospitalAdmissionState.BEING_TREATED
+                        HospitalAdmissionState.BEING_TREATED,
+                        patientName
                 );
         return hospitalAdmissions.stream()
                 .map(InpatientPatientResponse::new)
@@ -109,6 +111,7 @@ public class InpatientServicesImpl implements IInpatientServices {
     public PaginationResponse getInpatientMedicalTests(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
+            int serviceId,
             int page,
             int size
     ) {
@@ -121,6 +124,7 @@ public class InpatientServicesImpl implements IInpatientServices {
         Page<MedicalTest> medicalTests = medicalTestServices
                 .getMedicalTestsByHospitalAdmission(
                         hospitalAdmission,
+                        serviceId,
                         page,
                         size
                 );
@@ -130,7 +134,10 @@ public class InpatientServicesImpl implements IInpatientServices {
                 .totalPages(medicalTests.getTotalPages())
                 .page(page)
                 .limit(size)
-                .items(medicalTests.getContent())
+                .items(medicalTests.getContent().stream()
+                        .map(DoctorMedicalTestResponse::new)
+                        .toList()
+                )
                 .build();
     }
 
@@ -194,5 +201,19 @@ public class InpatientServicesImpl implements IInpatientServices {
         return doctors.stream()
                 .map(DoctorDetails::new)
                 .toList();
+    }
+
+    @Override
+    public HospitalAdmissionResponse getGeneralInfoOfHospitalAdmission(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        return new HospitalAdmissionResponse(hospitalAdmission);
     }
 }

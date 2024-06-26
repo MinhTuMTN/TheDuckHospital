@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
+import { getGender } from "../../../utils/genderUtils";
+import { getAge } from "../../../utils/getAgeUtils";
 const patientCardStyle = {
   flex: "0 0 auto",
   marginTop: "16px",
@@ -38,14 +40,14 @@ const FireNav = styled(List)({
 });
 
 function PatientInfoTab(props) {
-  const { selectedTab, setSelectedTab, data } = props;
+  const { selectedTab, setSelectedTab, data, generalInfo } = props;
   return (
     <Grid
       item
       xs={12}
-      sm={4}
-      md={3.95}
+      md={3}
       lg={3}
+      xl={3}
       sx={{ paddingX: "12px" }}
       width={"100%"}
       minWidth={"290px"}
@@ -104,7 +106,7 @@ function PatientInfoTab(props) {
                 whiteSpace: "nowrap",
               }}
             >
-              Ân Mạnh Hùng
+              {generalInfo?.patientName || "Nguyễn Thị Hồng"}
             </Typography>
             <Typography
               color={appColors.textDarkGreen}
@@ -112,7 +114,9 @@ function PatientInfoTab(props) {
               fontWeight={"normal"}
             >
               Mã bệnh nhân:{" "}
-              <span style={{ letterSpacing: 0.5 }}>BN920W2343</span>
+              <span style={{ letterSpacing: 0.5 }}>
+                {generalInfo?.patientCode || "BN001"}
+              </span>
             </Typography>
             <Typography
               color={appColors.textDarkGreen}
@@ -121,7 +125,9 @@ function PatientInfoTab(props) {
               letterSpacing={"0.5px"}
               marginTop={"4px"}
             >
-              Nữ - 25 tuổi
+              {`${getGender(generalInfo?.patientGender) || "Nữ"} - ${getAge(
+                generalInfo?.patientBirthDate
+              )} tuổi`}
             </Typography>
             <Stack
               marginTop={2}
@@ -162,7 +168,7 @@ function PatientInfoTab(props) {
               >
                 - Tiền sử bệnh:{" "}
                 <span style={{ fontWeight: "normal" }}>
-                  Tiểu đường tuýt 2, cao huyết áp, máu đông
+                  {generalInfo?.underlyingDisease || "Không có"}
                 </span>
               </Typography>
               <Typography
@@ -176,7 +182,7 @@ function PatientInfoTab(props) {
                     fontWeight: "400",
                   }}
                 >
-                  Không có
+                  {generalInfo?.allergy || "Không có"}
                 </span>
               </Typography>
             </Stack>

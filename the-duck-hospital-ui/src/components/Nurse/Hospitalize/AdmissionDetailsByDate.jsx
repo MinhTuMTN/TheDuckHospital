@@ -38,8 +38,9 @@ const LayoutStyle = styled(Stack)(({ theme }) => ({
   alignItems: "center",
 }));
 
-function AdmissionDetailsByDate() {
-  const [date, setDate] = useState(dayjs().format("DD/MM/YYYY"));
+function AdmissionDetailsByDate(props) {
+  const { generalInfo } = props;
+  const [date, setDate] = useState(dayjs());
   const [info, setInfo] = useState({
     bloodPressure: 100,
     heartRate: 140,
@@ -55,8 +56,6 @@ function AdmissionDetailsByDate() {
 
   useEffect(() => {
     setSaving(true);
-    console.log(infoDebounce);
-
     const timeoutId = setTimeout(() => {
       setSaving(false);
     }, 1000);
@@ -89,7 +88,7 @@ function AdmissionDetailsByDate() {
                     marginLeft: "4px",
                   }}
                 >
-                  Ân Mạnh Hùng
+                  {generalInfo?.patientName}
                 </span>
               </Typography>
             </Stack>
@@ -111,8 +110,10 @@ function AdmissionDetailsByDate() {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker
               sx={{ width: isDownMd ? "100%" : "auto" }}
-              inputFormat="DD/MM/YYYY"
+              format="DD/MM/YYYY"
               value={date}
+              minDate={dayjs(generalInfo?.admissionDate)}
+              maxDate={dayjs()}
               onChange={(newValue) => {
                 setDate(newValue);
               }}

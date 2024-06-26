@@ -20,7 +20,8 @@ public interface IHospitalAdmissionServices {
     );
     List<HospitalAdmission> findByRoomAndStateAndDeletedIsFalse(
             int roomId,
-            HospitalAdmissionState state
+            HospitalAdmissionState state,
+            String patientName
     );
     HospitalAdmission findHospitalAdmissionById(UUID hospitalAdmissionId);
     HospitalAdmission checkNursePermissionForHospitalAdmission(

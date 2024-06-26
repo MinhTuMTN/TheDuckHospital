@@ -111,14 +111,16 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
     @Override
     public List<HospitalAdmission> findByRoomAndStateAndDeletedIsFalse(
             int roomId,
-            HospitalAdmissionState state
+            HospitalAdmissionState state,
+            String patientName
     ) {
         Room room = roomServices.findRoomById(roomId);
 
         return hospitalAdmissionRepository
-                .findByRoomAndStateAndDeletedIsFalse(
+                .findByRoomAndStateAndPatientProfile_FullNameContainingAndDeletedIsFalse(
                         room,
-                        state
+                        state,
+                        patientName
                 );
     }
 
