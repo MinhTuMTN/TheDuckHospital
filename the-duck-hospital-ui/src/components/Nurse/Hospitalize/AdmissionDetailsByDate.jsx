@@ -1,3 +1,4 @@
+import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Grid,
@@ -8,17 +9,14 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import PersonIcon from "@mui/icons-material/Person";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import VaccinesIcon from "@mui/icons-material/Vaccines";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import DeviceThermostatIcon from "@mui/icons-material/DeviceThermostat";
 import dayjs from "dayjs";
 
-import React, { useEffect, useState } from "react";
 import { useTheme } from "@emotion/react";
+import React, { useEffect, useState } from "react";
 import useDebounce from "../../../hooks/useDebounce";
-import MedicalTestItem from "./MedicalTestItem";
+import MedicalInAdmissionDatails from "./MedicalInAdmissionDatails";
+import VitalSignsComponent from "./VitalSignsComponent";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   padding: "16px 16px",
@@ -122,103 +120,12 @@ function AdmissionDetailsByDate() {
         </Grid>
       </ViewStyle>
       <Grid container>
-        <Grid item xs={10} md={3.5} minHeight={"100px"}>
-          <LayoutStyle direction={"column"}>
-            <Box
-              sx={{
-                width: "100%",
-                paddingBottom: "8px",
-                borderBottom: "1px solid #eaeaea",
-              }}
-            >
-              <Typography variant="h6" fontWeight={600} fontSize={"18px"}>
-                Dấu hiệu sinh tồn
-              </Typography>
-            </Box>
-            <Stack direction={"column"} marginTop={"10px"} width={"100%"}>
-              <Stack marginBottom={"24px"}>
-                <Stack
-                  direction={"row"}
-                  alignItems={"center"}
-                  marginBottom={"8px"}
-                >
-                  <VaccinesIcon
-                    style={{ fontSize: "16px", color: "#DE3F44" }}
-                  />
-                  <Typography
-                    fontSize={"14px"}
-                    marginLeft={"5px"}
-                    fontWeight={600}
-                    color={"#6b7280"}
-                    letterSpacing={0.5}
-                  >
-                    Huyết áp
-                  </Typography>
-                </Stack>
-                <Typography
-                  fontSize={"20px"}
-                  fontWeight={500}
-                  color={"#272b41"}
-                >
-                  100 mg/dl
-                </Typography>
-              </Stack>
-              <Stack marginBottom={"24px"}>
-                <Stack
-                  direction={"row"}
-                  alignItems={"center"}
-                  marginBottom={"8px"}
-                >
-                  <FavoriteIcon
-                    style={{ fontSize: "16px", color: "#DE3F44" }}
-                  />
-                  <Typography
-                    fontSize={"14px"}
-                    marginLeft={"5px"}
-                    fontWeight={600}
-                    color={"#6b7280"}
-                    letterSpacing={0.5}
-                  >
-                    Nhịp tim
-                  </Typography>
-                </Stack>
-                <Typography
-                  fontSize={"20px"}
-                  fontWeight={500}
-                  color={"#272b41"}
-                >
-                  140 Bpm
-                </Typography>
-              </Stack>
-              <Stack marginBottom={"24px"}>
-                <Stack
-                  direction={"row"}
-                  alignItems={"center"}
-                  marginBottom={"8px"}
-                >
-                  <DeviceThermostatIcon
-                    style={{ fontSize: "16px", color: "#DE3F44" }}
-                  />
-                  <Typography
-                    fontSize={"14px"}
-                    marginLeft={"5px"}
-                    fontWeight={600}
-                    color={"#6b7280"}
-                    letterSpacing={0.5}
-                  >
-                    Nhiệt độ
-                  </Typography>
-                </Stack>
-                <Typography
-                  fontSize={"20px"}
-                  fontWeight={500}
-                  color={"#272b41"}
-                >
-                  37.5 C
-                </Typography>
-              </Stack>
-            </Stack>
-          </LayoutStyle>
+        <Grid item xs={12} md={3.5} minHeight={"100px"}>
+          <VitalSignsComponent
+            heartRate={info.heartRate}
+            bloodPressure={info.bloodPressure}
+            temperature={info.temperature}
+          />
         </Grid>
         <Grid
           item
@@ -227,22 +134,36 @@ function AdmissionDetailsByDate() {
           marginLeft={isDownLg ? 0 : 2.2}
           maxHeight={"100%"}
         >
-          <LayoutStyle direction={"column"}>
+          <LayoutStyle
+            direction={"column"}
+            style={{
+              height: "330px",
+            }}
+          >
             <Box
               sx={{
                 width: "100%",
                 paddingBottom: "8px",
                 borderBottom: "1px solid #eaeaea",
+                position: "sticky",
               }}
             >
               <Typography variant="h6" fontWeight={600} fontSize={"18px"}>
-                Kết quả xét nghiệm và chuẩn đoán hình ảnh
+                Kết quả xét nghiệm và chuẩn đoán hình ảnh (3)
               </Typography>
             </Box>
-            <Stack direction={"column"} marginTop={"10px"} width={"100%"}>
-              <MedicalTestItem mode="small" />
-              <MedicalTestItem mode="small" />
-              <MedicalTestItem mode="small" />
+            <Stack
+              direction={"column"}
+              marginTop={"8px"}
+              width={"100%"}
+              style={{
+                overflow: "auto",
+                paddingBottom: "20px",
+              }}
+            >
+              <MedicalInAdmissionDatails ketQua={"Bình thường"} />
+              <MedicalInAdmissionDatails ketQua={""} />
+              <MedicalInAdmissionDatails ketQua={""} />
             </Stack>
           </LayoutStyle>
         </Grid>
