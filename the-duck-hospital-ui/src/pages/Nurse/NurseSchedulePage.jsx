@@ -21,10 +21,7 @@ const LayoutContainer = styled(Grid)(({ theme }) => ({
   paddingRight: 20,
   backgroundColor: "#F5F7FB",
   height: "100%",
-  minHeight: "100vh",
-  [theme.breakpoints.up("lg")]: {
-    paddingTop: 30,
-  },
+  paddingTop: 15,
 }));
 
 const BoxLayout = styled(Grid)({
@@ -44,7 +41,7 @@ const CategoryLine = styled(Stack)({
 });
 
 const MainCalenderLayout = styled(Grid)(({ theme }) => ({
-  marginBottom: 20,
+  marginBottom: 10,
   borderRadius: 20,
   boxShadow: "0px 3px 6px rgba(0, 0, 0, 0.16)",
   backgroundColor: "#ffffff",
@@ -268,7 +265,7 @@ function NurseSchedulePage() {
   }, [nurseType, enqueueSnackbar, currentMonth]);
   return (
     <LayoutContainer container>
-      <BoxLayout item md={3}>
+      <BoxLayout item md={3} xs={12}>
         <Stack direction={"column"}>
           <Stack
             direction={"column"}
@@ -372,7 +369,7 @@ function NurseSchedulePage() {
         </Stack>
       </BoxLayout>
 
-      <MainCalenderLayout item md={8.65}>
+      <MainCalenderLayout item md={8.65} xs={12}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar
             date={selectedDate}

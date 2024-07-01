@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import LeftNavbarNurseSchedule from "../components/Nurse/Schedule/LeftNavbarNurseSchedule";
+import LeftNavbarNurseSchedule from "../components/Nurse/LeftBar/LeftNavbarNurseSchedule";
 import { appColors } from "../utils/appColorsUtils";
+import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
@@ -27,6 +28,7 @@ function NurseScheduleLayout(props) {
 
   return (
     <>
+      <TopNavBar onDrawerClick={setOpen} roomName={"nurse-schedule"} />
       <LeftNavbarNurseSchedule open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>

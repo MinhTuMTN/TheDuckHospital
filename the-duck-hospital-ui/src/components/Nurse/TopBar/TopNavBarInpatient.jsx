@@ -94,8 +94,8 @@ function TopNavBarInpatient(props) {
               "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702293009/hospital-building_ue3udt.png"
             }
             sx={{
-              height: "30px",
-              width: "30px",
+              height: "28px",
+              width: "28px",
             }}
           />
           <Typography
