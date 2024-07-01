@@ -7,7 +7,7 @@ import { enqueueSnackbar } from "notistack";
 
 function ProtectedLayout(props) {
   const { forRole = [] } = props;
-  const { token } = useAuth();
+  const { token, setAvatar } = useAuth();
   const [role, setRole] = useState("loading");
 
   useEffect(() => {
@@ -15,13 +15,15 @@ function ProtectedLayout(props) {
       const response = await checkToken();
       if (response.success) {
         setRole(response.data.data.role);
+        setAvatar(response.data.data.avatar);
       } else {
         setRole(null);
+        setAvatar(null);
         enqueueSnackbar("Vui lòng đăng nhập để tiếp tục", { variant: "error" });
       }
     };
     handleCheckToken();
-  }, []);
+  }, [setAvatar]);
 
   if (!token) {
     console.log("Missing token");

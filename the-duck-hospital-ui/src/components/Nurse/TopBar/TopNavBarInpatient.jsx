@@ -18,6 +18,7 @@ import { useAuth } from "../../../auth/AuthProvider";
 import { usePopover } from "../../../hooks/use-popover";
 import { checkInfo } from "../../../services/customer/AuthServices";
 import AccountPopover from "../../General/Navbar/AccountPopover";
+import CardMediaImage from "./CardMediaImage";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -88,16 +89,7 @@ function TopNavBarInpatient(props) {
           </IconButton>
         )}
         <Stack direction={"row"} alignItems={"center"} spacing={1} flex={1}>
-          <CardMedia
-            component={"img"}
-            image={
-              "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702293009/hospital-building_ue3udt.png"
-            }
-            sx={{
-              height: "28px",
-              width: "28px",
-            }}
-          />
+          <CardMediaImage />
           <Typography
             sx={{
               textAlign: "left",

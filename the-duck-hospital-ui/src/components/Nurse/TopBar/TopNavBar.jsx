@@ -16,6 +16,7 @@ import { usePopover } from "../../../hooks/use-popover";
 import { ExpandMore } from "@mui/icons-material";
 import { useAuth } from "../../../auth/AuthProvider";
 import AccountPopover from "../../General/Navbar/AccountPopover";
+import CardMediaImage from "./CardMediaImage";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -34,7 +35,7 @@ const CustomButton = styled(Box)`
 function TopNavBar(props) {
   const accountPopover = usePopover();
   const { onDrawerClick, roomName, departmentName } = props;
-  const { fullName } = useAuth();
+  const { fullName, avatar } = useAuth();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const smDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   return (
@@ -63,8 +64,8 @@ function TopNavBar(props) {
           justifyContent={"space-between"}
           spacing={2}
           sx={{
-            minHeight: TOP_NAV_HEIGHT, // Đặt chiều cao tối thiểu cho phần header
-            px: 2, // Đặt padding theo chiều ngang cho phần header
+            minHeight: TOP_NAV_HEIGHT,
+            px: 2,
           }}
         >
           {!lgUp && (
@@ -76,16 +77,7 @@ function TopNavBar(props) {
             </IconButton>
           )}
           <Stack direction={"row"} alignItems={"center"} spacing={1} flex={1}>
-            <CardMedia
-              component={"img"}
-              image={
-                "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702293009/hospital-building_ue3udt.png"
-              }
-              sx={{
-                height: "30px",
-                width: "30px",
-              }}
-            />
+            <CardMediaImage />
             {roomName === "counter" || roomName === "nurse-schedule" ? (
               <Typography
                 sx={{
@@ -143,7 +135,10 @@ function TopNavBar(props) {
               <span style={{ position: "relative" }}>
                 <CardMedia
                   component="img"
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyyiip4CAXLbtJL5s2tQ4PdZgvr6NZJJ55rDT3kfPU-hNjoQMm_XqMVqlozf4XhyGMY_o&usqp=CAU"
+                  src={
+                    avatar ||
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyyiip4CAXLbtJL5s2tQ4PdZgvr6NZJJ55rDT3kfPU-hNjoQMm_XqMVqlozf4XhyGMY_o&usqp=CAU"
+                  }
                   sx={{
                     width: "40px",
                     height: "40px",
@@ -190,7 +185,7 @@ function TopNavBar(props) {
                       color: "#8c8c8c",
                     }}
                   >
-                    Điều dưỡng
+                    {roomName === "nurse-schedule" ? "Điều dưỡng" : "Bác sĩ"}
                   </Typography>
                   <ExpandMore
                     sx={{

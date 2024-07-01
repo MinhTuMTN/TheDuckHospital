@@ -73,6 +73,7 @@ import NurseInpatientLayout from "../layouts/NurseInpatientLayout";
 import ChoosePatient from "../pages/Nurse/Hospitalization/ChoosePatient";
 import HospitalizationDetails from "../pages/Nurse/Hospitalization/HospitalizationDetails";
 import PleaseChooseRoom from "../pages/Nurse/Hospitalization/PleaseChooseRoom";
+import DoctorScheduleLayout from "../layouts/DoctorScheduleLayout";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -326,6 +327,7 @@ function Router(props) {
       path: "/",
     },
     {
+      path: "/doctor",
       element: (
         <ProtectedLayout
           forRole={["Doctor", "HeadDoctor", "LaboratoryTechnician"]}
@@ -333,7 +335,7 @@ function Router(props) {
       ),
       children: [
         {
-          path: "/doctor",
+          path: "",
           element: <DoctorLayout />,
           children: [
             {
@@ -353,15 +355,21 @@ function Router(props) {
               element: <History />,
             },
             {
-              path: "doctor-schedules",
-              element: <SchedulePage />,
-            },
-            {
               path: "doctor-test",
               element: <MedicalTestPage />,
             },
+          ],
+        },
+        {
+          path: "/doctor/doctor-schedules",
+          element: <DoctorScheduleLayout />,
+          children: [
             {
-              path: "head-doctor",
+              index: true,
+              element: <SchedulePage />,
+            },
+            {
+              path: "",
               element: <ProtectedLayout forRole={["HeadDoctor"]} />,
               children: [
                 {

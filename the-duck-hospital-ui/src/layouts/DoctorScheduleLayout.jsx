@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
+import LeftNavbarNurseSchedule from "../components/Nurse/LeftBar/LeftNavbarSchedule";
 import { appColors } from "../utils/appColorsUtils";
 import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
 import LeftNavbarSchedule from "../components/Nurse/LeftBar/LeftNavbarSchedule";
@@ -23,12 +24,12 @@ const LayoutContainer = styled("div")({
   backgroundColor: appColors.backgroundColorMain,
   width: "100%",
 });
-function NurseScheduleLayout(props) {
+function DoctorScheduleLayout(props) {
   const [open, setOpen] = React.useState(false);
 
   return (
     <>
-      <TopNavBar onDrawerClick={setOpen} roomName={"nurse-schedule"} />
+      <TopNavBar onDrawerClick={setOpen} roomName={"doctor-schedule"} />
       <LeftNavbarSchedule open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>
@@ -39,4 +40,4 @@ function NurseScheduleLayout(props) {
   );
 }
 
-export default NurseScheduleLayout;
+export default DoctorScheduleLayout;
