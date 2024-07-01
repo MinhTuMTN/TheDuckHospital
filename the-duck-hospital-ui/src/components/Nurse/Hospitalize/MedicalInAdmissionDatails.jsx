@@ -1,8 +1,8 @@
 import { DeleteOutlineOutlined, DownloadOutlined } from "@mui/icons-material";
 import { Grid, IconButton, Stack, Typography, styled } from "@mui/material";
+import PropTypes from "prop-types";
 import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
-import PropTypes from "prop-types";
 const MedicalAdmissionDatails = styled(Grid)({
   padding: "12px 0px",
   backgroundColor: "#ffffff",

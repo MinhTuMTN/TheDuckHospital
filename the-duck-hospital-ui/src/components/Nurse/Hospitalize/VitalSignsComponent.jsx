@@ -1,10 +1,10 @@
+import CloseIcon from "@mui/icons-material/Close";
 import DeviceThermostatIcon from "@mui/icons-material/DeviceThermostat";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VaccinesIcon from "@mui/icons-material/Vaccines";
 import {
   Box,
   Button,
-  Icon,
   IconButton,
   InputAdornment,
   Modal,
@@ -16,7 +16,6 @@ import {
 import PropTypes from "prop-types";
 import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
-import CloseIcon from "@mui/icons-material/Close";
 const LayoutStyle = styled(Stack)(({ theme }) => ({
   padding: "16px 16px",
   marginTop: "16px",

@@ -1,6 +1,7 @@
 import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
+  Button,
   Grid,
   Stack,
   TextField,
@@ -17,6 +18,9 @@ import React, { useEffect, useState } from "react";
 import useDebounce from "../../../hooks/useDebounce";
 import MedicalInAdmissionDatails from "./MedicalInAdmissionDatails";
 import VitalSignsComponent from "./VitalSignsComponent";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import MedicationManagementInAdmission from "./MedicationManagementInAdmission";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   padding: "16px 16px",
@@ -38,6 +42,7 @@ const LayoutStyle = styled(Stack)(({ theme }) => ({
 
 function AdmissionDetailsByDate(props) {
   const { generalInfo } = props;
+  const [isEdit, setIsEdit] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [info, setInfo] = useState({
     bloodPressure: 100,
@@ -170,19 +175,46 @@ function AdmissionDetailsByDate(props) {
         </Grid>
       </Grid>
       <LayoutStyle direction={"column"}>
-        <Box
-          sx={{
+        <Stack
+          direction={"row"}
+          style={{
             width: "100%",
             paddingBottom: "8px",
             borderBottom: "1px solid #eaeaea",
+            justifyContent: "space-between",
           }}
         >
           <Typography variant="h6" fontWeight={600} fontSize={"18px"}>
             Triệu chứng và diễn biến bệnh
           </Typography>
-        </Box>
+          <Button
+            onClick={() => setIsEdit(true)}
+            color={isEdit ? "warning" : "info"}
+            style={{
+              textTransform: "none",
+            }}
+            endIcon={
+              isEdit ? (
+                <BorderColorIcon
+                  style={{
+                    fontSize: "14px",
+                  }}
+                />
+              ) : (
+                <VisibilityIcon
+                  style={{
+                    fontSize: "14px",
+                  }}
+                />
+              )
+            }
+          >
+            Chế độ: {isEdit ? "Cập nhật" : "Xem"}
+          </Button>
+        </Stack>
         <Stack direction={"column"} marginTop={"10px"} width={"100%"}>
           <TextField
+            disabled={!isEdit}
             fullWidth
             label="Triệu chứng"
             value={info.symtoms}
@@ -194,6 +226,7 @@ function AdmissionDetailsByDate(props) {
             placeholder="Nhập triệu chứng của bệnh nhân"
           />
           <TextField
+            disabled={!isEdit}
             fullWidth
             label="Diễn biến bệnh phòng"
             multiline
@@ -201,7 +234,19 @@ function AdmissionDetailsByDate(props) {
             placeholder="Nhập diễn biến bệnh của bệnh nhân"
             style={{ marginTop: "16px" }}
           />
+          <TextField
+            fullWidth
+            disabled={!isEdit}
+            label="Chuẩn đoán"
+            multiline
+            rows={2}
+            placeholder="Nhập diễn biến bệnh của bệnh nhân"
+            style={{ marginTop: "16px" }}
+          />
         </Stack>
+      </LayoutStyle>
+      <LayoutStyle direction={"column"}>
+        <MedicationManagementInAdmission />
       </LayoutStyle>
     </Box>
   );
