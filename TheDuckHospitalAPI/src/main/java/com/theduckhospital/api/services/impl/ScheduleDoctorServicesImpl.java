@@ -539,56 +539,50 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         endDateCalendar.set(Calendar.MINUTE, 59);
         endDateCalendar.set(Calendar.SECOND, 59);
         endDateCalendar.set(Calendar.MILLISECOND, 99);
+        
+        ScheduleRoomItemResponse morningSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                MORNING,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
-        DoctorSchedule morningDoctorSchedule = doctorScheduleRepository
-                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
-                        room,
-                        MORNING,
-                        startDateCalendar.getTime(),
-                        endDateCalendar.getTime()
-                );
-        ScheduleRoomItemResponse morningSchedule = new ScheduleRoomItemResponse(
-                morningDoctorSchedule,
-                calculateNumberOfBookings(morningDoctorSchedule)
-        );
+        ScheduleRoomItemResponse afternoonSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                AFTERNOON,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
-        DoctorSchedule afternoonDoctorSchedule = doctorScheduleRepository
-                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
-                        room,
-                        AFTERNOON,
-                        startDateCalendar.getTime(),
-                        endDateCalendar.getTime()
-                );
-        ScheduleRoomItemResponse afternoonSchedule = new ScheduleRoomItemResponse(
-                afternoonDoctorSchedule,
-                calculateNumberOfBookings(afternoonDoctorSchedule)
-        );
+        ScheduleRoomItemResponse eveningSchedule =  getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                EVENING,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
-        DoctorSchedule eveningDoctorSchedule = doctorScheduleRepository
-                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
-                        room,
-                        EVENING,
-                        startDateCalendar.getTime(),
-                        endDateCalendar.getTime()
-                );
-        ScheduleRoomItemResponse eveningSchedule = new ScheduleRoomItemResponse(
-                eveningDoctorSchedule,
-                calculateNumberOfBookings(afternoonDoctorSchedule)
-        );
-
-        DoctorSchedule nightDoctorSchedule = doctorScheduleRepository
-                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
-                        room,
-                        NIGHT,
-                        startDateCalendar.getTime(),
-                        endDateCalendar.getTime()
-                );
-        ScheduleRoomItemResponse nightSchedule = new ScheduleRoomItemResponse(
-                nightDoctorSchedule,
-                calculateNumberOfBookings(afternoonDoctorSchedule)
-        );
+        ScheduleRoomItemResponse nightSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                NIGHT,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
 
         return new ScheduleRoomHeadDoctorResponse(morningSchedule, afternoonSchedule, eveningSchedule, nightSchedule);
+    }
+
+    private ScheduleRoomItemResponse getScheduleItemResponseByRoomAndSessionAndDate(
+            Room room,
+            ScheduleSession scheduleSession,
+            Date startDate,
+            Date endDate){
+        DoctorSchedule schedule = doctorScheduleRepository
+                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
+                        room,
+                        scheduleSession,
+                        startDate,
+                        endDate
+                );
+        return new ScheduleRoomItemResponse(
+                schedule,
+                calculateNumberOfBookings(schedule)
+        );
     }
 
     @Override
