@@ -243,6 +243,7 @@ public class AccountServicesImpl implements IAccountServices {
         }
 
         String role = getRoleFromAccount(account);
+        Staff staff = account.getStaff();
         NurseType nurseType = null;
         if (Objects.equals(role, "Nurse") || Objects.equals(role, "HeadNurse")) {
             nurseType = ((Nurse) account.getStaff()).getNurseType();
@@ -256,7 +257,11 @@ public class AccountServicesImpl implements IAccountServices {
                 .phoneNumber(account.getPhoneNumber())
                 .createdAt(account.getCreatedAt())
                 .numberOfProfile(account.getNumberOfProfile())
-                .avatar(account.getAvatar())
+                .avatar(
+                        staff != null ?
+                                staff.getAvatar() :
+                                account.getAvatar()
+                )
                 .build();
     }
 

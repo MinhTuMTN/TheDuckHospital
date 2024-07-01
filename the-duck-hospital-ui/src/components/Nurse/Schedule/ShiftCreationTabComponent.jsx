@@ -256,12 +256,14 @@ function ShiftCreationTabComponent(props) {
         nurseType={nurseType}
       />
 
-      <InpatientShiftCreateModal
-        open={openInpatientModal}
-        onClose={() => setOpenInpatientModal(false)}
-        nurse={selectedNurse}
-        nurseType={nurseType}
-      />
+      {openInpatientModal && (
+        <InpatientShiftCreateModal
+          open={openInpatientModal}
+          onClose={() => setOpenInpatientModal(false)}
+          nurse={selectedNurse}
+          nurseType={nurseType}
+        />
+      )}
     </Box>
   );
 }
