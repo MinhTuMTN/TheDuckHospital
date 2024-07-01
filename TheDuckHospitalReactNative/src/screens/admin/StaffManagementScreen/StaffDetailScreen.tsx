@@ -31,9 +31,10 @@ function StaffDetailScreen() {
           <Space paddingTop={4} />
           <Image
             source={{
-              uri: staff.avatar
-                ? staff.avatar
-                : 'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
+              uri:
+                staff.avatar
+                  ? staff.avatar
+                  : 'https://icons.iconarchive.com/icons/icons-land/medical/128/People-Doctor-Male-icon.png',
             }}
             height={250}
             width={250}
@@ -79,13 +80,19 @@ function StaffDetailScreen() {
                   {staff.degree}
                 </TextComponent>
               </FlexComponent>
+            </>
+          )}
 
+          {(staff.role === 'Bác sĩ' || staff.role === 'Điều dưỡng') && (
+            <>
               <FlexComponent style={styles.staffInfoContainer}>
                 <TextComponent bold fontSize={20} style={{flex: 0.4}}>
                   Chuyên khoa:
                 </TextComponent>
                 <TextComponent fontSize={20} style={{flex: 0.6}}>
-                  {staff.departmentName}
+                  {staff.departmentName
+                    ? staff.departmentName
+                    : 'Chưa cập nhật'}
                 </TextComponent>
               </FlexComponent>
             </>

@@ -3,9 +3,13 @@ import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import AlertDialogComponent from '../../AlertDialogComponent';
-import {deleteDoctorInDepartment} from '../../../services/departmentServices';
+import {
+  deleteDoctorInDepartment,
+  deleteNurseInDepartment,
+} from '../../../services/departmentServices';
 
-interface DoctorAlertDialogComponentProps {
+interface StaffItemAlertDialogComponentProps {
+  isDoctor: boolean;
   showAlertDialog?: boolean;
   departmentId: number;
   refreshList: boolean;
@@ -14,8 +18,11 @@ interface DoctorAlertDialogComponentProps {
   setShowAlertDialog?: (showAlertDialog: boolean) => void;
 }
 
-const DoctorAlertDialogComponent = (props: DoctorAlertDialogComponentProps) => {
+const StaffItemAlertDialogComponent = (
+  props: StaffItemAlertDialogComponentProps,
+) => {
   const {
+    isDoctor,
     showAlertDialog,
     departmentId,
     staffId,
@@ -33,7 +40,9 @@ const DoctorAlertDialogComponent = (props: DoctorAlertDialogComponentProps) => {
 
   const onAccept = async () => {
     setLoading(true);
-    const response = await deleteDoctorInDepartment(departmentId, staffId);
+    const response = isDoctor
+      ? await deleteDoctorInDepartment(departmentId, staffId)
+      : await deleteNurseInDepartment(departmentId, staffId);
     setLoading(false);
 
     if (response.success) {
@@ -50,11 +59,17 @@ const DoctorAlertDialogComponent = (props: DoctorAlertDialogComponentProps) => {
       showAlertDialog={showAlertDialog}
       headerBackgroundColor={appColors.primary}
       headerIcon={
-        <FontistoIcon name="doctor" size={24} color={appColors.white} />
+        <FontistoIcon
+          name={isDoctor ? 'doctor' : 'nurse'}
+          size={24}
+          color={appColors.white}
+        />
       }
-      headerLabel={'Xóa bác sĩ khỏi khoa'}
+      headerLabel={`Xóa ${isDoctor ? `bác sĩ` : `điều dưỡng`} khỏi khoa`}
       bodyTextSize={18}
-      bodyText={'Bạn có chắc chắn muốn xóa bác sĩ này khỏi khoa?'}
+      bodyText={`Bạn có chắc chắn muốn xóa ${
+        isDoctor ? `bác sĩ` : `điều dưỡng`
+      } này khỏi khoa?`}
       acceptButtonStyles={styles.deleteButton}
       acceptButtonText={'Xóa'}
       acceptButtonTextColor={appColors.white}
@@ -71,4 +86,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoctorAlertDialogComponent;
+export default StaffItemAlertDialogComponent;

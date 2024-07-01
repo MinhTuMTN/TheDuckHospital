@@ -44,9 +44,10 @@ function StaffItemComponent(props: StaffItemComponentProps) {
         <FlexComponent style={[styles.staffInfoContainer, {flex: 0.6}]}>
           <Image
             source={{
-              uri: staff.avatar
-                ? staff.avatar
-                : 'https://i.vietgiaitri.com/2021/6/23/mua-2-moi-chieu-hospital-playlist-da-tinh-den-chuyen-lam-mua-3-nhung-1-nhan-vat-khong-hai-long-e9d-5841612.jpg',
+              uri:
+                staff.avatar
+                  ? staff.avatar
+                  : 'https://icons.iconarchive.com/icons/icons-land/medical/128/People-Doctor-Male-icon.png',
             }}
             height={85}
             width={85}

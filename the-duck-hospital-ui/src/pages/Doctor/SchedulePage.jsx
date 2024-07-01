@@ -163,7 +163,7 @@ function SchedulePage(props) {
                     justifyContent={"center"}
                     alignItems={"center"}
                   >
-                    {selectedSchedule?.scheduleType === "MORNING" ? (
+                    {selectedSchedule?.scheduleSession === "MORNING" ? (
                       <WbSunnyOutlined
                         sx={{
                           color: "#fff",
@@ -182,7 +182,7 @@ function SchedulePage(props) {
                     )}
                     <Typography sx={{ color: "#fff" }}>
                       Buổi{" "}
-                      {selectedSchedule?.scheduleType === "MORNING"
+                      {selectedSchedule?.scheduleSession === "MORNING"
                         ? "sáng"
                         : "chiều"}
                     </Typography>

@@ -5,7 +5,7 @@ import {
 } from '../types';
 import {del, get, post, put} from './AxiosInstance';
 
-export const getPaginationMedMedicalServices = async (
+export const getPaginationMedicalServices = async (
   search: string,
   limit: number,
   page: number,

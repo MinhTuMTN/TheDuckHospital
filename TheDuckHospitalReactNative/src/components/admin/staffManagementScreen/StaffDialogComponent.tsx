@@ -461,23 +461,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
               <TextComponent bold style={styles.modalText}>
                 Chức vụ*
               </TextComponent>
-              {/* <SelectComponent
-                    options={roles}
-                    keyTitle="label"
-                    value={role.label}
-                    selectInputStyle={{paddingHorizontal: 10}}
-                    placeholderColor={appColors.darkGray}
-                    title="Chọn chức vụ"
-                    error={role.value === '' && firstClick}
-                    errorMessage="Chức vụ không được để trống"
-                    onChange={value => setRole(value)}
-                    selectTextColor={'black'}
-                    placeholder="Chức vụ"
-                    marginRight={8}
-                    selectInputIcon={
-                      <ChevronDownIcon color={appColors.black} size={20} />
-                    }
-                  /> */}
               <SelectDropdown
                 data={roles}
                 onSelect={(selectedItem, index) => {
@@ -578,30 +561,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 }}
               />
 
-              {/* <InputComponent
-                  size="md"
-                  label="Ngày sinh*"
-                  labelStyle={styles.labelInput}
-                  placeholder="Ngày sinh*"
-                  value={dateOfBirth}
-                  onChangeText={newValue => setDateOfBirth(newValue)}
-                  startIcon={<Cake size={24} color={appColors.black} />}
-                  inputContainerStyle={{
-                    backgroundColor: appColors.white,
-                    borderColor: appColors.black,
-                    borderRadius: 10,
-                    marginBottom: 20,
-                    marginRight: 20,
-                  }}
-                  inputContainerFocusStyle={{
-                    backgroundColor: appColors.white,
-                    borderColor: appColors.primary,
-                    borderRadius: 10,
-                    marginBottom: 20,
-                    marginRight: 25,
-                  }}
-                /> */}
-
               <InputComponent
                 editabled={false}
                 label="Ngày sinh *"
@@ -609,8 +568,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 size="md"
                 placeholder="DD/MM/YYYY"
                 value={dayjs(dateOfBirth).format('DD/MM/YYYY')}
-                // inputContainerStyle={styles.inputContainer}
-                // inputContainerFocusStyle={styles.inputContainer}
                 inputContainerStyle={{
                   backgroundColor: appColors.white,
                   borderColor: appColors.black,
@@ -658,28 +615,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   setShowDatePicker(false);
                 }}
               />
-              {/* <View style={{flex: 0.55}}>
-                  <TextComponent bold style={styles.modalText}>
-                    Giới tính*
-                  </TextComponent>
-                  <RadioGroup value={gender} onChange={setGender}>
-                    <HStack space="2xl">
-                      <Radio value="male">
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                        <RadioLabel>Nam</RadioLabel>
-                      </Radio>
-                      <Radio value="female">
-                        <RadioIndicator>
-                          <RadioIcon as={CircleIcon} />
-                        </RadioIndicator>
-                        <RadioLabel>Nữ</RadioLabel>
-                      </Radio>
-                    </HStack>
-                  </RadioGroup>
-                </View> */}
-
               <TextComponent bold style={styles.modalText}>
                 Giới tính *
               </TextComponent>
@@ -725,27 +660,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   );
                 }}
               />
-              {/* <SelectComponent
-                options={genders}
-                keyTitle="genderName"
-                value={gender?.genderName}
-                selectInputStyle={{paddingHorizontal: 10}}
-                placeholderColor={appColors.darkGray}
-                title="Chọn giới tính"
-                onChange={value => setGender(value)}
-                selectTextColor={'black'}
-                placeholder="Giới tính"
-                marginRight={8}
-                marginBottom={15}
-                selectInputIcon={
-                  <FontAwesomeIcon
-                    name="chevron-down"
-                    color={appColors.black}
-                    size={18}
-                  />
-                }
-              /> */}
-
               {!edit && (
                 <InputComponent
                   size="md"
@@ -784,24 +698,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   <TextComponent bold style={styles.modalText}>
                     Bằng cấp*
                   </TextComponent>
-                  {/* <SelectComponent
-                    options={degrees}
-                    keyTitle="value"
-                    value={degree.value}
-                    selectInputStyle={{paddingHorizontal: 10}}
-                    placeholderColor={appColors.darkGray}
-                    title="Chọn bằng cấp"
-                    error={degree.value === '' && firstClick}
-                    errorMessage="Bằng cấp không được để trống"
-                    onChange={value => setDegree(value)}
-                    selectTextColor={'black'}
-                    placeholder="Bằng cấp"
-                    marginRight={8}
-                    selectInputIcon={
-                      <ChevronDownIcon color={appColors.black} size={20} />
-                    }
-                  /> */}
-
                   <SelectDropdown
                     data={degrees}
                     onSelect={(selectedItem, index) => {
@@ -846,23 +742,6 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   <TextComponent bold style={styles.modalText}>
                     Khoa*
                   </TextComponent>
-                  {/* <SelectComponent
-                    options={departments}
-                    keyTitle="departmentName"
-                    value={department.departmentName}
-                    selectInputStyle={{paddingHorizontal: 10}}
-                    placeholderColor={appColors.darkGray}
-                    title="Chọn khoa"
-                    error={department.departmentId === null && firstClick}
-                    errorMessage="Khoa không được để trống"
-                    onChange={value => setDepartment(value)}
-                    selectTextColor={'black'}
-                    placeholder="Khoa"
-                    marginRight={8}
-                    selectInputIcon={
-                      <ChevronDownIcon color={appColors.black} size={20} />
-                    }
-                  /> */}
                   <SelectDropdown
                     data={departments}
                     onSelect={(selectedItem, index) => {
@@ -931,7 +810,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
               enabled={
                 !error &&
                 !(selectedImage === undefined || selectedImage.uri === null) &&
-                !(department === undefined || department.departmentName === '')
+                !(department === undefined || department?.departmentName === '')
               }
               isLoading={isLoading}
               onPress={handleCreateOrUpdateStaff}

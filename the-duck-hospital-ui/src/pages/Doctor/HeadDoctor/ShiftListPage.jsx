@@ -19,8 +19,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import ScheduleItem from "../../../components/Doctor/HeadDoctor/ShiftList/ScheduleItem";
-import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
-import { getDateHasSchedule, getRoomsDepartmentPagination, getSchedulesHeadDoctor } from "../../../services/doctor/headDoctor/ScheduleServices";
+import EventBusyOutlinedIcon from "@mui/icons-material/EventBusyOutlined";
+import {
+  getDateHasSchedule,
+  getExaminationRoomsDepartmentPagination,
+  getSchedulesHeadDoctor,
+  getTreatmentRoomsDepartmentPagination,
+} from "../../../services/doctor/headDoctor/ScheduleServices";
 
 function Row(props) {
   const { row, index, onClick, selectedRow } = props;
@@ -32,12 +37,16 @@ function Row(props) {
         key={index}
         onClick={() => onClick(row.roomId)}
         sx={{
-          background: row.roomId === selectedRow ? theme.palette.template.normal1 : "",
+          background:
+            row.roomId === selectedRow ? theme.palette.template.normal1 : "",
           color: row.roomId === selectedRow ? "#fff" : "",
           "&:hover": {
             cursor: "pointer",
-            background: row.roomId === selectedRow ? theme.palette.template.normal1 : "#dfeaff"
-          }
+            background:
+              row.roomId === selectedRow
+                ? theme.palette.template.normal1
+                : "#dfeaff",
+          },
         }}
       >
         <TableCell
@@ -61,10 +70,16 @@ const CustomDatePicker = styled(DatePicker)(({ theme }) => ({
   },
 }));
 
-const TieuDe = styled(Typography)(({ theme }) => ({
-  fontSize: "1.1rem !important",
+const TieuDeLichTruc = styled(Typography)(({ theme }) => ({
+  fontSize: "1.5rem !important",
   fontWeight: "720 !important",
-  borderBottom: "1px solid #d1d1d1"
+  borderBottom: "1px solid #d1d1d1",
+}));
+
+const TieuDePhong = styled(Typography)(({ theme }) => ({
+  fontSize: "1.0rem !important",
+  fontWeight: "720 !important",
+  borderBottom: "1px solid #d1d1d1",
 }));
 
 function ShiftListPage(props) {
@@ -72,37 +87,67 @@ function ShiftListPage(props) {
   const [valueDate, setValueDate] = useState(dayjs());
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [totalItems, setTotalItems] = useState(0);
-  const [limit, setLimit] = useState(5);
-  const [page, setPage] = useState(1);
-  const [selectedRow, setSelectedRow] = useState(1);
-  const [rooms, setRooms] = useState([]);
+  const [examinationLimit, setExaminationLimit] = useState(5);
+  const [examinationPage, setExaminationPage] = useState(1);
+  const [treatmentLimit, setTreatmentLimit] = useState(5);
+  const [treatmentPage, setTreatmentPage] = useState(1);
+  const [selectedRow, setSelectedRow] = useState(-1);
+  const [examinationRooms, setExaminationRooms] = useState([]);
+  const [treatmentRooms, setTreatmentRooms] = useState([]);
   const [schedules, setSchedules] = useState({});
   const [dateSchedule, setDateSchedule] = useState([]);
   const [refresh, setRefresh] = useState(true);
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage + 1);
+  const handleExaminationPageChange = (event, newPage) => {
+    setExaminationPage(newPage + 1);
   };
 
-  const handleGetRoomInDepartment = useCallback(async () => {
-    const response = await getRoomsDepartmentPagination({
-      page: page - 1,
-      limit: limit,
+  const handleTreatmentPageChange = (event, newPage) => {
+    setTreatmentPage(newPage + 1);
+  };
+
+  const handleGetExaminationRoomInDepartment = useCallback(async () => {
+    const response = await getExaminationRoomsDepartmentPagination({
+      page: examinationPage - 1,
+      limit: examinationLimit,
     });
     if (response.success) {
-      setRooms(response.data.data.rooms);
+      setExaminationRooms(response.data.data.rooms);
       if (response.data.data.rooms.length > 0) {
         setSelectedRow(response.data.data.rooms[0].roomId);
       }
       setTotalItems(response.data.data.total);
-      setPage(response.data.data.page + 1);
-      setLimit(response.data.data.limit);
+      setExaminationPage(response.data.data.page + 1);
+      setExaminationLimit(response.data.data.limit);
     }
-  }, [limit, page]);
+  }, [examinationPage, examinationLimit]);
 
   useEffect(() => {
-    handleGetRoomInDepartment();
-  }, [handleGetRoomInDepartment]);
+    handleGetExaminationRoomInDepartment();
+  }, [handleGetExaminationRoomInDepartment]);
+
+  const handleGetTreatmentRoomInDepartment = useCallback(async () => {
+    const response = await getTreatmentRoomsDepartmentPagination({
+      page: treatmentPage - 1,
+      limit: treatmentLimit,
+    });
+    if (response.success) {
+      setTreatmentRooms(response.data.data.rooms);
+      if (
+        response.data.data.rooms.length > 0 &&
+        !response.data.data.hasExaminationRooms
+      ) {
+        setSelectedRow(response.data.data.rooms[0].roomId);
+      }
+      setTotalItems(response.data.data.total);
+      setTreatmentPage(response.data.data.page + 1);
+      setTreatmentLimit(response.data.data.limit);
+    }
+  }, [treatmentPage, treatmentLimit]);
+
+  useEffect(() => {
+    handleGetTreatmentRoomInDepartment();
+  }, [handleGetTreatmentRoomInDepartment]);
 
   useEffect(() => {
     const handleGetSchedules = async () => {
@@ -113,9 +158,9 @@ function ShiftListPage(props) {
       if (response.success) {
         setSchedules(response.data.data);
       }
-    }
+    };
 
-    handleGetSchedules();
+    if (selectedRow !== -1) handleGetSchedules();
   }, [selectedRow, valueDate, refresh]);
 
   useEffect(() => {
@@ -125,14 +170,12 @@ function ShiftListPage(props) {
       });
       if (response.success) {
         setDateSchedule(
-          response.data.data.map(
-            (date) => dayjs(date).format("YYYY/MM/DD")
-          )
+          response.data.data.map((date) => dayjs(date).format("YYYY/MM/DD"))
         );
       }
     };
 
-    handleGetDateHasSchedule();
+    if (selectedRow !== -1) handleGetDateHasSchedule();
   }, [selectedRow, refresh]);
 
   function disableDateNotHasSchedule(date) {
@@ -141,7 +184,7 @@ function ShiftListPage(props) {
 
   const handleClick = (key) => {
     setSelectedRow(key);
-  }
+  };
 
   return (
     <Stack
@@ -163,10 +206,7 @@ function ShiftListPage(props) {
         >
           Danh sách ca trực
         </Typography>
-        <LocalizationProvider
-          dateAdapter={AdapterDayjs}
-          adapterLocale="en-gb"
-        >
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <CustomDatePicker
             label="Ngày làm việc"
             value={valueDate}
@@ -182,127 +222,274 @@ function ShiftListPage(props) {
         sx={{ mt: 3, justifyContent: "space-between" }}
       >
         <Grid item xs={9.8}>
-          <Stack direction="row" spacing={2}>
-            <Stack
-              direction="column"
-              component={Paper}
-              sx={{
-                paddingBottom: 2,
-                borderRadius: "10px",
-                border: `1px solid #dadada`,
-                width: "50%",
-              }}
-              spacing="2px"
-            >
-              <TieuDe sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}>
-                Buổi Sáng
-              </TieuDe>
-              {schedules.morning?.doctor ?
-                <ScheduleItem
-                  schedule={schedules.morning}
-                  setRefresh={setRefresh}
-                  refresh={refresh}
-                  valueDate={valueDate}
-                /> :
-                <Stack
-                  sx={{
-                    padding: 2,
-
-                  }}
-                  spacing={1}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  height={"100%"}
-                  direction={"row"}
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={2}>
+              <Stack
+                direction="column"
+                component={Paper}
+                sx={{
+                  paddingBottom: 2,
+                  borderRadius: "10px",
+                  border: `1px solid #dadada`,
+                  width: "50%",
+                }}
+                spacing="2px"
+              >
+                <TieuDeLichTruc
+                  sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
                 >
-                  <EventBusyOutlinedIcon />
-                  <Typography sx={{ fontSize: "18px" }}>
-                    Không có lịch trực
-                  </Typography>
-                </Stack>}
+                  Buổi Sáng
+                </TieuDeLichTruc>
+                {schedules.morning?.doctor ? (
+                  <ScheduleItem
+                    schedule={schedules.morning}
+                    setRefresh={setRefresh}
+                    refresh={refresh}
+                    valueDate={valueDate}
+                    selectedRow={selectedRow}
+                    treatmentRooms={treatmentRooms}
+                  />
+                ) : (
+                  <Stack
+                    sx={{
+                      padding: 2,
+                    }}
+                    spacing={1}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"100%"}
+                    direction={"row"}
+                  >
+                    <EventBusyOutlinedIcon />
+                    <Typography sx={{ fontSize: "18px" }}>
+                      Không có lịch trực
+                    </Typography>
+                  </Stack>
+                )}
+              </Stack>
+              <Stack
+                direction="column"
+                component={Paper}
+                sx={{
+                  paddingBottom: 2,
+                  borderRadius: "10px",
+                  border: `1px solid #dadada`,
+                  width: "50%",
+                }}
+                spacing="2px"
+              >
+                <Box>
+                  <TieuDeLichTruc
+                    sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
+                  >
+                    Buổi Chiều
+                  </TieuDeLichTruc>
+                </Box>
+                {schedules.afternoon?.doctor ? (
+                  <ScheduleItem
+                    schedule={schedules.afternoon}
+                    setRefresh={setRefresh}
+                    refresh={refresh}
+                    valueDate={valueDate}
+                    selectedRow={selectedRow}
+                    treatmentRooms={treatmentRooms}
+                  />
+                ) : (
+                  <Stack
+                    sx={{
+                      padding: 2,
+                    }}
+                    spacing={1}
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    height={"100%"}
+                    direction={"row"}
+                  >
+                    <EventBusyOutlinedIcon />
+                    <Typography sx={{ fontSize: "18px" }}>
+                      Không có lịch trực
+                    </Typography>
+                  </Stack>
+                )}
+              </Stack>
             </Stack>
-            <Stack
-              direction="column"
-              component={Paper}
-              sx={{
-                paddingBottom: 2,
-                borderRadius: "10px",
-                border: `1px solid #dadada`,
-                width: "50%",
-              }}
-              spacing="2px"
-            >
-              <Box>
-                <TieuDe sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}>
-                  Buổi Chiều
-                </TieuDe>
-              </Box>
-              {schedules.afternoon?.doctor ?
-                <ScheduleItem
-                  schedule={schedules.afternoon}
-                  setRefresh={setRefresh}
-                  refresh={refresh}
-                  valueDate={valueDate}
-                /> :
+            {treatmentRooms?.find((room) => room.roomId === selectedRow) !==
+              undefined && (
+              <Stack direction="row" spacing={2}>
                 <Stack
+                  direction="column"
+                  component={Paper}
                   sx={{
-                    padding: 2,
-
+                    paddingBottom: 2,
+                    borderRadius: "10px",
+                    border: `1px solid #dadada`,
+                    width: "50%",
                   }}
-                  spacing={1}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  height={"100%"}
-                  direction={"row"}
+                  spacing="2px"
                 >
-                  <EventBusyOutlinedIcon />
-                  <Typography sx={{ fontSize: "18px" }}>
-                    Không có lịch trực
-                  </Typography>
-                </Stack>}
-            </Stack>
+                  <TieuDeLichTruc
+                    sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
+                  >
+                    Buổi Tối
+                  </TieuDeLichTruc>
+                  {schedules.evening?.doctor ? (
+                    <ScheduleItem
+                      schedule={schedules.evening}
+                      setRefresh={setRefresh}
+                      refresh={refresh}
+                      valueDate={valueDate}
+                      selectedRow={selectedRow}
+                      treatmentRooms={treatmentRooms}
+                    />
+                  ) : (
+                    <Stack
+                      sx={{
+                        padding: 2,
+                      }}
+                      spacing={1}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      height={"100%"}
+                      direction={"row"}
+                    >
+                      <EventBusyOutlinedIcon />
+                      <Typography sx={{ fontSize: "18px" }}>
+                        Không có lịch trực
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+                <Stack
+                  direction="column"
+                  component={Paper}
+                  sx={{
+                    paddingBottom: 2,
+                    borderRadius: "10px",
+                    border: `1px solid #dadada`,
+                    width: "50%",
+                  }}
+                  spacing="2px"
+                >
+                  <TieuDeLichTruc
+                    sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
+                  >
+                    Buổi Khuya
+                  </TieuDeLichTruc>
+                  {schedules.night?.doctor ? (
+                    <ScheduleItem
+                      schedule={schedules.night}
+                      setRefresh={setRefresh}
+                      refresh={refresh}
+                      valueDate={valueDate}
+                      selectedRow={selectedRow}
+                      treatmentRooms={treatmentRooms}
+                    />
+                  ) : (
+                    <Stack
+                      sx={{
+                        padding: 2,
+                      }}
+                      spacing={1}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      height={"100%"}
+                      direction={"row"}
+                    >
+                      <EventBusyOutlinedIcon />
+                      <Typography sx={{ fontSize: "18px" }}>
+                        Không có lịch trực
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+              </Stack>
+            )}
           </Stack>
         </Grid>
         <Grid item xs={2.2}>
-          <Stack
-            direction="column"
-            component={Paper}
-            sx={{
-              paddingBottom: 2,
-              borderRadius: "10px",
-              border: `1px solid #dadada`,
-            }}
-            spacing="2px"
-          >
-            <TieuDe sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}>
-              Danh sách phòng
-            </TieuDe>
-            <Table>
-              <TableBody>
-                {rooms?.map((row, index) => (
-                  <Row
-                    key={index}
-                    row={row}
-                    onClick={handleClick}
-                    selectedRow={selectedRow}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              component={"div"}
+          <Stack spacing={1}>
+            <Stack
+              direction="column"
+              component={Paper}
               sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                marginTop: "10px",
+                borderRadius: "10px",
+                border: `1px solid #dadada`,
               }}
-              count={totalItems}
-              onPageChange={handlePageChange}
-              page={page - 1}
-              rowsPerPage={limit}
-              rowsPerPageOptions={[]}
-            />
+              spacing="2px"
+            >
+              <TieuDePhong
+                sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
+              >
+                Phòng khám bệnh
+              </TieuDePhong>
+              <Table>
+                <TableBody>
+                  {examinationRooms?.map((row, index) => (
+                    <Row
+                      key={index}
+                      row={row}
+                      onClick={handleClick}
+                      selectedRow={selectedRow}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                component={"div"}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "10px",
+                }}
+                count={totalItems}
+                onPageChange={handleExaminationPageChange}
+                page={examinationPage - 1}
+                rowsPerPage={examinationLimit}
+                rowsPerPageOptions={[]}
+              />
+            </Stack>
+            <Stack
+              direction="column"
+              component={Paper}
+              sx={{
+                borderRadius: "10px",
+                border: `1px solid #dadada`,
+              }}
+              spacing="2px"
+            >
+              <TieuDePhong
+                sx={{ paddingTop: 2, paddingBottom: 1, paddingX: 2 }}
+              >
+                Phòng nội trú
+              </TieuDePhong>
+              <Table>
+                <TableBody>
+                  {treatmentRooms?.map((row, index) => (
+                    <Row
+                      key={index}
+                      row={row}
+                      onClick={handleClick}
+                      selectedRow={selectedRow}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                component={"div"}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "10px",
+                }}
+                count={totalItems}
+                onPageChange={handleTreatmentPageChange}
+                page={treatmentPage - 1}
+                rowsPerPage={treatmentLimit}
+                rowsPerPageOptions={[]}
+              />
+            </Stack>
           </Stack>
         </Grid>
       </Grid>

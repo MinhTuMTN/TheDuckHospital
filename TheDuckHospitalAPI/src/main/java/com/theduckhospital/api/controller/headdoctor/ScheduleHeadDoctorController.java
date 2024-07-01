@@ -171,8 +171,24 @@ public class ScheduleHeadDoctorController {
         );
     }
 
-    @GetMapping("/rooms-pagination")
-    public ResponseEntity<?> getPaginationRoomsDepartment(
+    @GetMapping("/examination-rooms-pagination")
+    public ResponseEntity<?> getPaginationExaminationRoomsDepartment(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit
+
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get examination rooms in department successfully")
+                        .data(roomServices.getPaginationExaminationRooms(authorizationHeader, page, limit))
+                        .build()
+        );
+    }
+
+    @GetMapping("/treatment-rooms-pagination")
+    public ResponseEntity<?> getPaginationTreatmentRoomsDepartment(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit
@@ -182,11 +198,10 @@ public class ScheduleHeadDoctorController {
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get rooms in department successfully")
-                        .data(roomServices.getPaginationRooms(authorizationHeader, page, limit))
+                        .data(roomServices.getPaginationTreatmentRooms(authorizationHeader, page, limit))
                         .build()
         );
     }
-
 
     @GetMapping("/doctors/filter")
     public ResponseEntity<?> getActiveDoctorsPagination(

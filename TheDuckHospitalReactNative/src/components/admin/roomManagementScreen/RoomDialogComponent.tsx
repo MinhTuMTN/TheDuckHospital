@@ -26,13 +26,34 @@ import SelectDropdown from 'react-native-select-dropdown';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getAllDepartments} from '../../../services/departmentServices';
+import {getPaginationMedicalServices} from '../../../services/medicalServiceServices';
 
-// const departments = [
-//   {departmentId: 1, departmentName: 'Tim mạch'},
-//   {departmentId: 2, departmentName: 'Tai mũi họng'},
-//   {departmentId: 3, departmentName: 'Nhi'},
-//   {departmentId: 4, departmentName: 'Ung bướu'},
-// ];
+const roomTypeOptions = [
+  {
+    value: 'EXAMINATION_ROOM',
+    name: 'Phòng khám',
+  },
+  {
+    value: 'TREATMENT_ROOM_STANDARD',
+    name: 'Phòng điều trị thường',
+  },
+  {
+    value: 'TREATMENT_ROOM_VIP',
+    name: 'Phòng điều trị VIP',
+  },
+  {
+    value: 'LABORATORY_ROOM_NORMAL',
+    name: 'Phòng xét nghiệm thường',
+  },
+  {
+    value: 'LABORATORY_ROOM_ADMISSION',
+    name: 'Phòng xét nghiệm nội trú',
+  },
+  {
+    value: 'MEETING_ROOM',
+    name: 'Phòng họp',
+  },
+];
 
 interface RoomDialogComponentProps {
   modalVisible?: boolean;
@@ -57,9 +78,15 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
   const [name, setName] = useState(edit ? room.roomName : '');
   const [description, setDescription] = useState(edit ? room.description : '');
   const [departments, setDepartments] = useState([]);
+  const [testServices, setTestServices] = useState([]);
+  const [medicalTest, setMedicalTest] = useState<any>({});
   const [department, setDepartment] = useState(
     edit ? room.department : {departmentId: null, departmentName: ''},
   );
+  const [roomType, setRoomType] = useState({
+    value: 'EXAMINATION_ROOM',
+    name: 'Phòng khám',
+  });
   const [error, setError] = React.useState(false);
   const [firstClick, setFirstClick] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -125,6 +152,25 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
     };
     try {
       handleGetAllDepartments();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const handleGetAllTestServices = async () => {
+      const response = await getPaginationMedicalServices('', 100, 0, [
+        'MedicalTest',
+      ]);
+      if (response.success) {
+        setTestServices(response.data.data);
+        setMedicalTest(response.data.data[0]);
+      } else {
+        console.log(response);
+      }
+    };
+    try {
+      handleGetAllTestServices();
     } catch (error) {
       console.log(error);
     }
@@ -218,18 +264,18 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
               />
 
               <TextComponent bold style={styles.modalText}>
-                Khoa*
+                Loại phòng*
               </TextComponent>
               <SelectDropdown
-                data={departments}
+                data={roomTypeOptions}
                 onSelect={(selectedItem, index) => {
-                  setDepartment(selectedItem);
+                  setRoomType(selectedItem);
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {
-                  return selectedItem.departmentName;
+                  return selectedItem.name;
                 }}
                 rowTextForSelection={(item, index) => {
-                  return item.departmentName;
+                  return item.name;
                 }}
                 renderDropdownIcon={() => (
                   <FontAwesomeIcon
@@ -245,8 +291,7 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                   borderRadius: 10,
                   height: '18%',
                   width: '100%',
-                  marginBottom:
-                    !firstClick && department.departmentId === null ? 0 : 25,
+                  marginBottom: 10,
                 }}
                 buttonTextStyle={{
                   textAlign: 'left',
@@ -260,15 +305,13 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                         color={appColors.black}
                       />
                       <Text style={styles.dropdownBtnTxt}>
-                        {selectedItem
-                          ? selectedItem.departmentName
-                          : department?.departmentName}
+                        {selectedItem ? selectedItem.name : roomType.name}
                       </Text>
                     </View>
                   );
                 }}
               />
-              {department.departmentName === '' && !firstClick && (
+              {roomType?.value === '' && !firstClick && (
                 <TextComponent
                   color={appColors.error}
                   fontSize={12}
@@ -280,8 +323,156 @@ const RoomDialogComponent = (props: RoomDialogComponentProps) => {
                       width: '100%',
                     },
                   ]}>
-                  Cần chọn khoa
+                  Cần chọn loại phòng
                 </TextComponent>
+              )}
+
+              {roomType?.value !== 'LABORATORY_ROOM_NORMAL' &&
+                roomType?.value !== 'LABORATORY_ROOM_NORMAL' && (
+                  <>
+                    <TextComponent bold style={styles.modalText}>
+                      Khoa*
+                    </TextComponent>
+                    <SelectDropdown
+                      data={departments}
+                      onSelect={(selectedItem, index) => {
+                        setDepartment(selectedItem);
+                      }}
+                      buttonTextAfterSelection={(selectedItem, index) => {
+                        return selectedItem.departmentName;
+                      }}
+                      rowTextForSelection={(item, index) => {
+                        return item.departmentName;
+                      }}
+                      renderDropdownIcon={() => (
+                        <FontAwesomeIcon
+                          name="chevron-down"
+                          color={appColors.black}
+                          size={18}
+                        />
+                      )}
+                      buttonStyle={{
+                        backgroundColor: appColors.white,
+                        borderColor: appColors.black,
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        height: '18%',
+                        width: '100%',
+                        marginBottom:
+                          !firstClick && department.departmentId === null
+                            ? 0
+                            : 25,
+                      }}
+                      buttonTextStyle={{
+                        textAlign: 'left',
+                      }}
+                      renderCustomizedButtonChild={(selectedItem, index) => {
+                        return (
+                          <View style={styles.dropdownBtnChildStyle}>
+                            <MaterialCommunityIcons
+                              name="google-classroom"
+                              size={24}
+                              color={appColors.black}
+                            />
+                            <Text style={styles.dropdownBtnTxt}>
+                              {selectedItem
+                                ? selectedItem.departmentName
+                                : department?.departmentName}
+                            </Text>
+                          </View>
+                        );
+                      }}
+                    />
+                    {department.departmentName === '' && !firstClick && (
+                      <TextComponent
+                        color={appColors.error}
+                        fontSize={12}
+                        style={[
+                          {
+                            paddingLeft: 5,
+                            marginTop: 10,
+                            marginBottom: 25,
+                            width: '100%',
+                          },
+                        ]}>
+                        Cần chọn khoa
+                      </TextComponent>
+                    )}
+                  </>
+                )}
+
+              {(roomType?.value === 'LABORATORY_ROOM_NORMAL' ||
+                roomType?.value === 'LABORATORY_ROOM_NORMAL') && (
+                <>
+                  <TextComponent bold style={styles.modalText}>
+                    Dịch vụ xét nghiệm*
+                  </TextComponent>
+                  <SelectDropdown
+                    data={departments}
+                    onSelect={(selectedItem, index) => {
+                      setMedicalTest(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem.serviceName;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item.serviceName;
+                    }}
+                    renderDropdownIcon={() => (
+                      <FontAwesomeIcon
+                        name="chevron-down"
+                        color={appColors.black}
+                        size={18}
+                      />
+                    )}
+                    buttonStyle={{
+                      backgroundColor: appColors.white,
+                      borderColor: appColors.black,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      height: '18%',
+                      width: '100%',
+                      marginBottom:
+                        !firstClick && department.departmentId === null
+                          ? 0
+                          : 25,
+                    }}
+                    buttonTextStyle={{
+                      textAlign: 'left',
+                    }}
+                    renderCustomizedButtonChild={(selectedItem, index) => {
+                      return (
+                        <View style={styles.dropdownBtnChildStyle}>
+                          <MaterialCommunityIcons
+                            name="google-classroom"
+                            size={24}
+                            color={appColors.black}
+                          />
+                          <Text style={styles.dropdownBtnTxt}>
+                            {selectedItem
+                              ? selectedItem.serviceName
+                              : medicalTest?.serviceName}
+                          </Text>
+                        </View>
+                      );
+                    }}
+                  />
+                  {medicalTest?.serviceName === '' && !firstClick && (
+                    <TextComponent
+                      color={appColors.error}
+                      fontSize={12}
+                      style={[
+                        {
+                          paddingLeft: 5,
+                          marginTop: 10,
+                          marginBottom: 25,
+                          width: '100%',
+                        },
+                      ]}>
+                      Cần chọn dịch vụ xét nghiệm
+                    </TextComponent>
+                  )}
+                </>
               )}
 
               {/* <SelectComponent
@@ -341,7 +532,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '90%',
-    height: '65%',
+    height: '80%',
     backgroundColor: appColors.white,
     borderRadius: 10,
     borderColor: appColors.gray,
@@ -390,6 +581,7 @@ const styles = StyleSheet.create({
   },
   modalBody: {
     margin: 20,
+    height: "100%",
   },
   dropdownBtnChildStyle: {
     flex: 1,

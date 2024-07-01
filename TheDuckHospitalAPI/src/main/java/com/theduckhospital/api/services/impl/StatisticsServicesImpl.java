@@ -4,7 +4,6 @@ import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.MedicalExamState;
 import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
-import com.theduckhospital.api.dto.response.admin.DoctorItemStatisticsResponse;
 import com.theduckhospital.api.dto.response.HomeStatisticsResponse;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.*;
@@ -55,35 +54,18 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
     @Override
     public TotalStatisticsResponse getStatistics() {
+        List<Object[]> bookingsPerDepartment = bookingRepository.findTop5DepartmentsWithBookingsCount();
 
-        List<Department> departments = departmentRepository.findAll();
+        List<DepartmentStatisticsResponse> departmentStatisticsResponses = new ArrayList<>();
+        for (Object[] result : bookingsPerDepartment) {
+            Department department = (Department) result[0];
+            Optional<Doctor> optional = doctorRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
+            Doctor headDoctor = optional.orElse(null);
+            Long totalPatients = (Long) result[1];
 
-        List<Booking> bookings = bookingRepository.findAll();
-
-        Map<Department, Long> bookingsPerDepartment = bookings.stream()
-                .filter(booking -> !booking.isDeleted())
-                .map(Booking::getTimeSlot)
-                .filter(Objects::nonNull)
-                .map(TimeSlot::getDoctorSchedule)
-                .filter(Objects::nonNull)
-                .map(DoctorSchedule::getDoctor)
-                .filter(Objects::nonNull)
-                .map(Doctor::getDepartment)
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        departments.forEach(department -> bookingsPerDepartment.putIfAbsent(department, 0L));
-
-        List<DepartmentStatisticsResponse> departmentStatistics = bookingsPerDepartment
-                .entrySet().stream()
-                .map(entry -> new DepartmentStatisticsResponse(
-                        entry.getKey(),
-                        doctorServices.findHeadDoctor(entry.getKey()),
-                        entry.getValue())).sorted((response1, response2) ->
-                        Long.compare(response2.getTotalPatients(), response1.getTotalPatients())).toList();
-
-        List<DepartmentStatisticsResponse> topDepartment = departmentStatistics.stream().limit(10)
-                .collect(Collectors.toList());
+            DepartmentStatisticsResponse response = new DepartmentStatisticsResponse(department, headDoctor, totalPatients);
+            departmentStatisticsResponses.add(response);
+        }
 
         // Total patients
         long totalPatients = patientRepository.count();
@@ -99,54 +81,28 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         pieChartData.add(getPaymentMethodCount(4, "WALLET"));
 
 
-        return new TotalStatisticsResponse(topDepartment, totalPatients, totalDepartments, pieChartData);
+        return new TotalStatisticsResponse(departmentStatisticsResponses, totalPatients, totalDepartments, pieChartData);
     }
 
     @Override
     public TotalStatisticsByDepartmentResponse getStatisticsByDepartment(int departmentId) {
         Department department = departmentServices.getDepartmentById(departmentId);
 
-        List<Doctor> doctors = doctorRepository.findByDepartmentOrderByRatingDesc(department);
+        List<Doctor> doctors = doctorRepository.findTop5DoctorsByDepartment(department.getDepartmentId());
         List<DoctorItemStatisticsResponse> topDoctors = new ArrayList<>();
-        List<MedicalExaminationRecord> medicalExaminationRecords = medicalExaminationRepository
-                .findByDeletedIsFalseAndState(MedicalExamState.DONE);
+//        List<MedicalExaminationRecord> medicalExaminationRecords = medicalExaminationRepository
+//                .findByDeletedIsFalseAndState(MedicalExamState.DONE);
 
         for (Doctor doctor : doctors) {
-            long totalPatients = medicalExaminationRecords.stream()
-                    .filter(record -> record.getDoctorSchedule().getDoctor().getStaffId() == doctor.getStaffId())
-                    .count();
+            long totalPatients = medicalExaminationRepository
+                    .countByDeletedIsFalseAndStateAndDoctorSchedule_Doctor(MedicalExamState.DONE, doctor);
+
+//            long totalPatients = medicalExaminationRecords.stream()
+//                    .filter(record -> record.getDoctorSchedule().getDoctor().getStaffId() == doctor.getStaffId())
+//                    .count();
 
             topDoctors.add(new DoctorItemStatisticsResponse(doctor, totalPatients));
         }
-
-//        List<Department> departments = departmentRepository.findAll();
-//
-//        List<Booking> bookings = bookingRepository.findAll();
-//
-//        Map<Department, Long> bookingsPerDepartment = bookings.stream()
-//                .filter(booking -> !booking.isDeleted())
-//                .map(Booking::getTimeSlot)
-//                .filter(Objects::nonNull)
-//                .map(TimeSlot::getDoctorSchedule)
-//                .filter(Objects::nonNull)
-//                .map(DoctorSchedule::getDoctor)
-//                .filter(Objects::nonNull)
-//                .map(Doctor::getDepartment)
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-//
-//        departments.forEach(department -> bookingsPerDepartment.putIfAbsent(department, 0L));
-//
-//        List<DepartmentStatisticsResponse> departmentStatistics = bookingsPerDepartment
-//                .entrySet().stream()
-//                .map(entry -> new DepartmentStatisticsResponse(
-//                        entry.getKey(),
-//                        doctorServices.findHeadDoctor(entry.getKey()),
-//                        entry.getValue())).sorted((response1, response2) ->
-//                        Long.compare(response2.getTotalPatients(), response1.getTotalPatients())).toList();
-//
-//        List<DepartmentStatisticsResponse> topDepartment = departmentStatistics.stream().limit(10)
-//                .collect(Collectors.toList());
 
         // Total patients
         long totalPatients = patientRepository.count();
@@ -156,14 +112,6 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
         //Total nurses
         long totalNurses = nurseRepository.countByDepartmentAndDeletedIsFalse(department);
-
-        // Statistics payment method
-//        List<PieChartItemResponse> pieChartData = new ArrayList<>();
-//        pieChartData.add(getPaymentMethodCount(1, "VNPAY"));
-//        pieChartData.add(getPaymentMethodCount(2, "CASH"));
-//        pieChartData.add(getPaymentMethodCount(3, "MOMO"));
-//        pieChartData.add(getPaymentMethodCount(4, "WALLET"));
-
 
         return new TotalStatisticsByDepartmentResponse(topDoctors, totalPatients, totalDoctors, totalNurses);
     }
@@ -178,14 +126,16 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         endDateCalendar.set(Calendar.SECOND, 59);
         endDateCalendar.set(Calendar.MILLISECOND, 99);
 
-        List<Transaction> transactions = transactionRepository.findByCreatedAtBetween(
-                startDateCalendar.getTime(),
-                endDateCalendar.getTime());
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        Map<String, Double> totalAmountByDate = transactions.stream()
-                .filter(t -> t.getPaymentType() == PaymentType.BOOKING || t.getPaymentType() == PaymentType.MEDICAL_TEST)
+        List<Transaction> bookingAndTestTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime(),
+                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST)
+        );
+
+        Map<String, Double> totalAmountByDate = bookingAndTestTransactions.stream()
+//                .filter(t -> t.getPaymentType() == PaymentType.BOOKING || t.getPaymentType() == PaymentType.MEDICAL_TEST)
                 .sorted(Comparator.comparing(Transaction::getCreatedAt))
                 .collect(Collectors.groupingBy(
                         transaction -> dateFormat.format(transaction.getCreatedAt()),
@@ -193,7 +143,13 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         Collectors.summingDouble(Transaction::getAmount)
                 ));
 
-        Map<String, Double> totalAmountMedicalTestByDate = transactions.stream()
+        List<Transaction> testTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime(),
+                List.of(PaymentType.MEDICAL_TEST)
+        );
+
+        Map<String, Double> totalAmountMedicalTestByDate = testTransactions.stream()
                 .filter(t -> t.getPaymentType() == PaymentType.MEDICAL_TEST)
                 .collect(Collectors.groupingBy(
                         transaction -> dateFormat.format(transaction.getCreatedAt()),
@@ -201,8 +157,14 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         Collectors.summingDouble(Transaction::getAmount)
                 ));
 
-        Map<String, Double> totalAmountBookingByDate = transactions.stream()
-                .filter(t -> t.getPaymentType() == PaymentType.BOOKING)
+        List<Transaction> bookingTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime(),
+                List.of(PaymentType.MEDICAL_TEST)
+        );
+
+        Map<String, Double> totalAmountBookingByDate = bookingTransactions.stream()
+//                .filter(t -> t.getPaymentType() == PaymentType.BOOKING)
                 .collect(Collectors.groupingBy(
                         transaction -> dateFormat.format(transaction.getCreatedAt()),
                         LinkedHashMap::new,
@@ -275,7 +237,6 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 //                                && booking.getTimeSlot().getDoctorSchedule().getDoctor()
 //                                .getDepartment().getDepartmentId() == departmentId)
 //                .toList();
-
 
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

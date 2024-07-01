@@ -281,7 +281,7 @@ public class RoomServicesImpl implements IRoomServices {
     }
 
     @Override
-    public PaginationRoomsResponse getPaginationRooms(
+    public PaginationRoomsResponse getPaginationExaminationRooms(
             String authorization,
             int page,
             int limit
@@ -294,7 +294,11 @@ public class RoomServicesImpl implements IRoomServices {
         Department department = headDoctor.getDepartment();
 
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Room> roomPage = roomRepository.findByDepartmentAndDeletedIsFalse(department, pageable);
+        Page<Room> roomPage = roomRepository.findByDepartmentAndRoomTypeInAndDeletedIsFalseOrderByRoomName(
+                department,
+                List.of(RoomType.EXAMINATION_ROOM),
+                pageable
+        );
 
         List<RoomResponse> response = new ArrayList<>();
         for (Room room : roomPage.getContent()) {
@@ -303,9 +307,55 @@ public class RoomServicesImpl implements IRoomServices {
 
         return new PaginationRoomsResponse(
                 response,
-                roomRepository.countByDepartmentAndDeletedIsFalse(department),
+                roomRepository.countByDepartmentAndRoomTypeInAndDeletedIsFalse(
+                        department,
+                        List.of(RoomType.EXAMINATION_ROOM)
+                ),
                 page,
-                limit
+                limit,
+                !response.isEmpty()
+        );
+    }
+
+    @Override
+    public PaginationRoomsResponse getPaginationTreatmentRooms(
+            String authorization,
+            int page,
+            int limit
+    ) {
+        Doctor headDoctor = doctorServices.getDoctorByToken(authorization);
+        if (!headDoctor.isHeadOfDepartment()) {
+            throw new RuntimeException("You are not head of department");
+        }
+
+        Department department = headDoctor.getDepartment();
+
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Room> roomPage = roomRepository.findByDepartmentAndRoomTypeInAndDeletedIsFalseOrderByRoomName(
+                department,
+                Arrays.asList(RoomType.TREATMENT_ROOM_STANDARD, RoomType.TREATMENT_ROOM_VIP),
+                pageable
+        );
+
+        long numberOfExaminationRooms = roomRepository.countByDepartmentAndRoomTypeInAndDeletedIsFalse(
+                department,
+                List.of(RoomType.EXAMINATION_ROOM)
+        );
+
+        List<RoomResponse> response = new ArrayList<>();
+        for (Room room : roomPage.getContent()) {
+            response.add(new RoomResponse(room));
+        }
+
+        return new PaginationRoomsResponse(
+                response,
+                roomRepository.countByDepartmentAndRoomTypeInAndDeletedIsFalse(
+                        department,
+                        Arrays.asList(RoomType.TREATMENT_ROOM_STANDARD, RoomType.TREATMENT_ROOM_VIP)
+                ),
+                page,
+                limit,
+                numberOfExaminationRooms != 0
         );
     }
 

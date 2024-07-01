@@ -16,8 +16,12 @@ export const getTreatmentRoomsDepartment = () => {
     return get("/head-doctor/schedules/treatment-rooms");
 };
 
-export const getRoomsDepartmentPagination = (params) => {
-    return get("/head-doctor/schedules/rooms-pagination", params);
+export const getExaminationRoomsDepartmentPagination = (params) => {
+    return get("/head-doctor/schedules/examination-rooms-pagination", params);
+};
+
+export const getTreatmentRoomsDepartmentPagination = (params) => {
+    return get("/head-doctor/schedules/treatment-rooms-pagination", params);
 };
 
 export const getSchedulesHeadDoctor = (params) => {

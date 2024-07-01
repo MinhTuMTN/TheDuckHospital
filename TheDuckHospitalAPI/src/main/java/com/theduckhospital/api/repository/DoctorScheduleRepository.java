@@ -21,10 +21,11 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             ScheduleSession scheduleSession
     );
 
-    DoctorSchedule findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(
+    DoctorSchedule findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
             Room room,
-            Date date,
-            ScheduleSession scheduleSession
+            ScheduleSession scheduleSession,
+            Date startDate,
+            Date endDate
     );
 
     List<DoctorSchedule> findByRoomAndDateOrderByScheduleSession(
