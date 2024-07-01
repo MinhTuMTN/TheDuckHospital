@@ -1,10 +1,11 @@
 import { Grid } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import CreateInpatientMedicalTest from "./CreateInpatientMedicalTest";
 import ListInpatientMedicalTest from "./ListInpatientMedicalTest";
 import { getInpatientMedicalTests } from "../../../services/nurse/HospitalizeServices";
 import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { HospitalizationContext } from "../../../pages/Nurse/Hospitalization/HospitalizationDetails";
 
 function InpatientMedicalTest(props) {
   const { medicalTestServices } = props;
@@ -18,7 +19,7 @@ function InpatientMedicalTest(props) {
   const [params, setParams] = useState({
     serviceId: "",
   });
-
+  const { setOnRefresh } = useContext(HospitalizationContext);
   const handleGetMedicalTests = useCallback(async () => {
     const response = await getInpatientMedicalTests(
       hospitalizationId,
@@ -58,7 +59,8 @@ function InpatientMedicalTest(props) {
 
   useEffect(() => {
     handleGetMedicalTests();
-  }, [handleGetMedicalTests]);
+    setOnRefresh(handleGetMedicalTests);
+  }, [handleGetMedicalTests, setOnRefresh]);
   return (
     <Grid container>
       <CreateInpatientMedicalTest medicalTestServices={medicalTestServices} />

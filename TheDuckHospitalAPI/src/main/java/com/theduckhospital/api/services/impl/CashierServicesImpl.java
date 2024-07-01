@@ -60,7 +60,12 @@ public class CashierServicesImpl implements ICashierServices {
                 throw new BadRequestException("Medical test has been paid", 10011);
             }
 
-            patientProfile = medicalTest.getMedicalExaminationRecord().getPatientProfile();
+            MedicalExaminationRecord medicalExaminationRecord = medicalTest.getMedicalExaminationRecord();
+            if (medicalExaminationRecord == null) {
+                patientProfile = medicalTest.getHospitalAdmission().getPatientProfile();
+            } else {
+                patientProfile = medicalExaminationRecord.getPatientProfile();
+            }
             id = medicalTest.getMedicalTestId();
             code = medicalTest.getMedicalTestCode();
             amount = medicalTest.getPrice();

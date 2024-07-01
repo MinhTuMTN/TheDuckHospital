@@ -1,4 +1,4 @@
-import { get, post } from "../AxiosInstance";
+import { del, get, post } from "../AxiosInstance";
 
 export const getRoomStatistic = () => {
   return get("/nurse/hospital-admissions/room-statistics");
@@ -61,5 +61,14 @@ export const getInpatientMedicalTests = (
       page,
       size: size,
     }
+  );
+};
+
+export const deleteInpatientMedicalTest = (
+  hospitalizationId,
+  medicalTestId
+) => {
+  return del(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/medical-tests/${medicalTestId}`
   );
 };

@@ -9,7 +9,7 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React, { useEffect, useMemo } from "react";
+import React, { createContext, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdmissionDetailsByDate from "../../../components/Nurse/Hospitalize/AdmissionDetailsByDate";
 import PatientInfoTab from "../../../components/Nurse/Hospitalize/PatientInfoTab";
@@ -38,10 +38,13 @@ const StyledGrid = styled(Grid)(({ theme }) => ({
   [theme.breakpoints.up("lg")]: {},
 }));
 
+export const HospitalizationContext = createContext();
+
 function HospitalizationDetails() {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const [generalInfo, setGeneralInfo] = React.useState({});
   const [medicalTestServices, setMedicalTestServices] = React.useState([]);
+  const [onRefresh, setOnRefresh] = React.useState(() => {});
   const { hospitalizationId, roomId } = useParams();
   const roomName = useMemo(() => {
     try {
@@ -119,44 +122,48 @@ function HospitalizationDetails() {
     }
   }, [hospitalizationId]);
   return (
-    <Box
-      flex={1}
-      sx={{
-        backgroundColor: appColors.backgroundColorMain,
-      }}
+    <HospitalizationContext.Provider
+      value={{ generalInfo, onRefresh, setOnRefresh }}
     >
-      <StyledGrid container>
-        <PatientInfoTab
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-          data={data}
-          generalInfo={generalInfo}
-        />
-        <Grid
-          item
-          xs={12}
-          md={8.8}
-          lg={9}
-          xl={9}
-          marginTop={2}
-          sx={{
-            paddingX: "12px",
-          }}
-        >
-          <Typography variant="h5" fontWeight={600} letterSpacing={1}>
-            Phòng {roomName}
-          </Typography>
-          <Breadcrumbs separator="›" aria-label="breadcrumb">
-            {breadcrumbs}
-          </Breadcrumbs>
-          {selectedTab === 0 ? (
-            <AdmissionDetailsByDate generalInfo={generalInfo} />
-          ) : (
-            <InpatientMedicalTest medicalTestServices={medicalTestServices} />
-          )}
-        </Grid>
-      </StyledGrid>
-    </Box>
+      <Box
+        flex={1}
+        sx={{
+          backgroundColor: appColors.backgroundColorMain,
+        }}
+      >
+        <StyledGrid container>
+          <PatientInfoTab
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+            data={data}
+            generalInfo={generalInfo}
+          />
+          <Grid
+            item
+            xs={12}
+            md={8.8}
+            lg={9}
+            xl={9}
+            marginTop={2}
+            sx={{
+              paddingX: "12px",
+            }}
+          >
+            <Typography variant="h5" fontWeight={600} letterSpacing={1}>
+              Phòng {roomName}
+            </Typography>
+            <Breadcrumbs separator="›" aria-label="breadcrumb">
+              {breadcrumbs}
+            </Breadcrumbs>
+            {selectedTab === 0 ? (
+              <AdmissionDetailsByDate generalInfo={generalInfo} />
+            ) : (
+              <InpatientMedicalTest medicalTestServices={medicalTestServices} />
+            )}
+          </Grid>
+        </StyledGrid>
+      </Box>
+    </HospitalizationContext.Provider>
   );
 }
 
