@@ -14,25 +14,14 @@ import {
   styled,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
 
 import LogoutIcon from "@mui/icons-material/Logout";
-const sidebarItems = [
-  {
-    display: "Phòng D202",
-    numberOfPatients: 3,
-  },
-  {
-    display: "Phòng D203",
-    numberOfPatients: 5,
-  },
-  {
-    display: "Phòng D204",
-    numberOfPatients: 7,
-  },
-];
+import { useSnackbar } from "notistack";
+import { getInpatientRooms } from "../../../services/nurse/HospitalizeServices";
+
 const StyledLogo = styled(CardMedia)(({ theme }) => ({
   display: "flex",
   width: "220px",
@@ -56,126 +45,151 @@ const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
 function LeftNavbarNurseInpatient(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const [rooms, setRooms] = useState([]);
   const { setToken } = useAuth();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const content = (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        height: "100%",
-        textAlign: "center",
-      }}
-    >
-      <Box>
-        <Tooltip title="Trang chủ">
-          <Box
-            sx={{
-              paddingY: 1,
-              display: "flex",
-              width: "100%",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/")}
-          >
-            <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
-          </Box>
-        </Tooltip>
-        <Box
-          sx={{
-            justifyContent: "flex-start",
-            width: "100%",
-            paddingX: 2,
-            marginTop: 2,
-          }}
-        >
-          <Typography
-            sx={{
-              textAlign: "left",
-              textTransform: "none",
-              fontWeight: "bold",
-              color: "#466f92",
-              fontSize: "14px",
-            }}
-          >
-            Danh sách phòng
-          </Typography>
-        </Box>
-        <List>
-          {sidebarItems.map((item, index) => (
-            <NavLink
-              key={`nav-bar-store-${index}`}
-              style={{ textDecoration: "none" }}
-              to={item.to}
-            >
-              <ListItem disablePadding key={item.section}>
-                <CustomListItemButton>
-                  <ListItemText
-                    disableTypography
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: "500",
-                      color: "#5a5c61",
-                    }}
-                    primary={
-                      item.display + " (" + item.numberOfPatients + " giường)"
-                    }
-                  />
-                </CustomListItemButton>
-              </ListItem>
-            </NavLink>
-          ))}
-        </List>
-      </Box>
-
-      <Stack
-        direction={"column"}
-        spacing={2}
+  const content = useMemo(() => {
+    return (
+      <Box
         sx={{
-          position: "sticky",
-          borderTop: "1px solid #e0e0e0",
-          paddingX: 2,
-          paddingY: 2.5,
-          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          height: "100%",
+          textAlign: "center",
         }}
       >
-        <Button
-          variant="contained"
-          sx={{
-            color: "white",
-            backgroundColor: "#ff0d00d9",
-            fontSize: "14px",
-            textTransform: "none",
-            justifyContent: "center",
-            width: "100%",
-            ":hover": {
-              backgroundColor: "error.main",
-            },
-          }}
-          onClick={() => {
-            setToken(null);
-            window.location.href = "/";
-          }}
-        >
-          <Typography
+        <Box>
+          <Tooltip title="Trang chủ">
+            <Box
+              sx={{
+                paddingY: 1,
+                display: "flex",
+                width: "100%",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/")}
+            >
+              <StyledLogo image="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701511186/Medical-removebg-preview_v5hwdt.png" />
+            </Box>
+          </Tooltip>
+          <Box
             sx={{
-              marginRight: "10px",
+              justifyContent: "flex-start",
+              width: "100%",
+              paddingX: 2,
+              marginTop: 2,
             }}
           >
-            Đăng xuất
-          </Typography>
-          <LogoutIcon
+            <Typography
+              sx={{
+                textAlign: "left",
+                textTransform: "none",
+                fontWeight: "bold",
+                color: "#466f92",
+                fontSize: "14px",
+              }}
+            >
+              Danh sách phòng
+            </Typography>
+          </Box>
+          <List>
+            {rooms.map((item, index) => (
+              <Box
+                key={`nav-bar-store-${index}`}
+                style={{ textDecoration: "none" }}
+                onClick={() => {
+                  navigate(
+                    `/nurse-inpatient/${item.roomId}-${item.roomName}/patients`
+                  );
+                }}
+              >
+                <ListItem disablePadding key={item.section}>
+                  <CustomListItemButton>
+                    <ListItemText
+                      disableTypography
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "500",
+                        color: "#5a5c61",
+                      }}
+                      primary={
+                        item.roomName + " (" + item.beingUsed + " giường)"
+                      }
+                    />
+                  </CustomListItemButton>
+                </ListItem>
+              </Box>
+            ))}
+          </List>
+        </Box>
+
+        <Stack
+          direction={"column"}
+          spacing={2}
+          sx={{
+            position: "sticky",
+            borderTop: "1px solid #e0e0e0",
+            paddingX: 2,
+            paddingY: 2.5,
+            width: "100%",
+          }}
+        >
+          <Button
+            variant="contained"
             sx={{
-              fontSize: "20px",
+              color: "white",
+              backgroundColor: "#ff0d00d9",
+              fontSize: "14px",
+              textTransform: "none",
+              justifyContent: "center",
+              width: "100%",
+              ":hover": {
+                backgroundColor: "error.main",
+              },
             }}
-          />
-        </Button>
-      </Stack>
-    </Box>
-  );
+            onClick={() => {
+              setToken(null);
+              window.location.href = "/";
+            }}
+          >
+            <Typography
+              sx={{
+                marginRight: "10px",
+              }}
+            >
+              Đăng xuất
+            </Typography>
+            <LogoutIcon
+              sx={{
+                fontSize: "20px",
+              }}
+            />
+          </Button>
+        </Stack>
+      </Box>
+    );
+  }, [rooms, navigate, setToken]);
+
+  useEffect(() => {
+    const handleGetRooms = async () => {
+      const response = await getInpatientRooms();
+      if (response.success) {
+        const rooms = response.data.data;
+        rooms.sort((a, b) => a.roomName.localeCompare(b.roomName));
+        setRooms(rooms);
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra khi lấy danh sách phòng trực", {
+          variant: "error",
+        });
+      }
+    };
+
+    handleGetRooms();
+  }, [enqueueSnackbar]);
 
   if (lgUp) {
     return (

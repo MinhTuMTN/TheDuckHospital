@@ -50,6 +50,7 @@ public interface IMedicalTestServices {
     );
     Page<MedicalTest> getMedicalTestsByHospitalAdmission(
             HospitalAdmission hospitalAdmission,
+            int serviceId,
             int page,
             int size
     );

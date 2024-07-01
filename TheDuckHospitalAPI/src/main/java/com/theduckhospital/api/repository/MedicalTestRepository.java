@@ -1,10 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.MedicalTestState;
-import com.theduckhospital.api.entity.MedicalExaminationRecord;
-import com.theduckhospital.api.entity.HospitalAdmission;
-import com.theduckhospital.api.entity.MedicalTest;
-import com.theduckhospital.api.entity.Room;
+import com.theduckhospital.api.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +33,11 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
     List<MedicalTest> findByMedicalExaminationRecordAndDeletedIsFalse(MedicalExaminationRecord medicalExaminationRecord);
     Page<MedicalTest> findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
             HospitalAdmission hospitalAdmission,
+            Pageable pageable
+    );
+    Page<MedicalTest> findByHospitalAdmissionAndMedicalServiceAndDeletedIsFalseOrderByDateDesc(
+            HospitalAdmission hospitalAdmission,
+            MedicalService medicalService,
             Pageable pageable
     );
 }

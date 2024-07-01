@@ -68,9 +68,12 @@ public class MedicalTest {
     @ToStringExclude
     private Transaction transaction;
 
+    private Date createdDate;
+
     @PrePersist
     public void prePersist() {
         this.medicalTestId = UUID.randomUUID();
         this.medicalTestCode = "MT" + this.medicalTestId.toString().substring(0, 13);
+        this.createdDate = new Date();
     }
 }

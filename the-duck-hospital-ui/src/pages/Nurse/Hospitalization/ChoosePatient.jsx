@@ -15,14 +15,18 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import LayoutComponent from "../../../components/General/LayoutComponent";
 import { appColors } from "../../../utils/appColorsUtils";
 import SearchIcon from "@mui/icons-material/Search";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { getGender } from "../../../utils/genderUtils";
 import { getAge } from "../../../utils/getAgeUtils";
+import { getPatientsInRoom } from "../../../services/nurse/HospitalizeServices";
+import useDebounce from "../../../hooks/useDebounce";
+import { enqueueSnackbar } from "notistack";
+import dayjs from "dayjs";
 
 const Layout = styled(Grid)(({ theme }) => ({
   padding: theme.spacing("16px"),
@@ -58,92 +62,95 @@ const headCellStyle = {
   backgroundColor: "#f1f5fa",
 };
 
-const rows = [
-  {
-    patientCode: "BN97E92D23",
-    patientName: "Nguyễn Thị Vân Yên",
-    patientGender: "FEMALE",
-    province: "Hà Nội",
-    patientDateOfBirth: "1996/07/12",
-    admissionDate: "15/12/2021",
-  },
-  {
-    patientCode: "BN92R92D53",
-    patientName: "Nguyễn Trung Nghĩa",
-    patientGender: "MALE",
-    province: "Bà Rịa - Vũng Tàu",
-    patientDateOfBirth: "1973/10/08",
-    admissionDate: "19/12/2021",
-  },
-  {
-    patientCode: "BN21R92W39",
-    patientName: "Huỳnh Hoàng Việt",
-    patientGender: "MALE",
-    province: "Tp.Hồ Chí Minh",
-    patientDateOfBirth: "1973/06/20",
-    admissionDate: "10/12/2021",
-  },
-];
 function ChoosePatient() {
   const [patientName, setPatientName] = React.useState("");
+  const patientNameDebounce = useDebounce(patientName, 500);
+  const [patients, setPatients] = React.useState([]);
+
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+
+  const { id, roomName } = useMemo(() => {
+    const strArr = roomId.split("-");
+    return {
+      id: strArr[0],
+      roomName: strArr[1],
+    };
+  }, [roomId]);
+  const breadcrumbs = useMemo(() => {
+    return [
+      <Link
+        underline="hover"
+        key="1"
+        color="inherit"
+        href=">"
+        onClick={() => navigate("/")}
+        style={{
+          cursor: "pointer",
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Trang chủ
+      </Link>,
+      <Typography
+        key="2"
+        color={"inherit"}
+        style={{
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Nội trú
+      </Typography>,
+      <Typography
+        key="3"
+        color={"inherit"}
+        style={{
+          fontWeight: "500",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Danh sách phòng
+      </Typography>,
+      <Typography
+        key="4"
+        color={"#5a5a5a"}
+        style={{
+          fontWeight: "560",
+          fontSize: "14px",
+          letterSpacing: "0.5px",
+        }}
+      >
+        Phòng {roomName}
+      </Typography>,
+    ];
+  }, [navigate, roomName]);
+
   const handleChange = (event) => {
     setPatientName(event.target.value);
   };
-  const navigate = useNavigate();
-  const breadcrumbs = [
-    <Link
-      underline="hover"
-      key="1"
-      color="inherit"
-      href=">"
-      onClick={() => navigate("/")}
-      style={{
-        cursor: "pointer",
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Trang chủ
-    </Link>,
-    <Typography
-      key="2"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Nội trú
-    </Typography>,
-    <Typography
-      key="3"
-      color={"inherit"}
-      style={{
-        fontWeight: "500",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Danh sách phòng
-    </Typography>,
-    <Typography
-      key="4"
-      color={"#5a5a5a"}
-      style={{
-        fontWeight: "560",
-        fontSize: "14px",
-        letterSpacing: "0.5px",
-      }}
-    >
-      Phòng A202
-    </Typography>,
-  ];
-
-  const handleChoose = () => {
-    navigate("patient-hospitalization-details");
+  const handleChoose = (hospitalizationId) => {
+    navigate(hospitalizationId);
   };
+  const handleGetPatientInRoom = useCallback(async () => {
+    const response = await getPatientsInRoom(id, patientNameDebounce);
+    if (response.success) {
+      setPatients(response.data.data);
+    } else {
+      enqueueSnackbar("Lỗi khi lấy danh sách bệnh nhân", {
+        variant: "error",
+      });
+    }
+  }, [id, patientNameDebounce]);
+
+  useEffect(() => {
+    handleGetPatientInRoom();
+  }, [handleGetPatientInRoom]);
+
   return (
     <Box
       flex={1}
@@ -155,7 +162,7 @@ function ChoosePatient() {
         <LayoutComponent container>
           <Grid item xs={12}>
             <Typography variant="h5" fontWeight={600} letterSpacing={1}>
-              Phòng A202
+              Phòng {roomName}
             </Typography>
             <Breadcrumbs separator="›" aria-label="breadcrumb">
               {breadcrumbs}
@@ -226,52 +233,70 @@ function ChoosePatient() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, index) => (
+                  {patients.map((patient, index) => (
                     <TableRow
-                      key={row.patientCode}
+                      key={patient.patientCode}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell
                         align="left"
                         style={{ ...cellStyle, letterSpacing: "0.5px" }}
                       >
-                        {row.patientCode}
+                        {patient.patientCode}
                       </TableCell>
                       <TableCell
                         align="left"
                         style={{ ...cellStyle, letterSpacing: "1px" }}
                       >
-                        {row.patientName}
+                        {patient.patientName}
                       </TableCell>
 
                       <TableCell
                         align="right"
                         style={{ ...cellStyle, letterSpacing: "1px" }}
                       >
-                        {getAge(row.patientDateOfBirth)}
+                        {getAge(patient.patientBirthDate)}
                       </TableCell>
                       <TableCell align="right" style={cellStyle}>
-                        {getGender(row.patientGender)}
+                        {getGender(patient.patientGender)}
                       </TableCell>
                       <TableCell align="right" style={cellStyle}>
-                        {row.province}
+                        {patient.provinceName}
                       </TableCell>
                       <TableCell
                         align="right"
                         style={{ ...cellStyle, letterSpacing: "1px" }}
                       >
-                        {row.admissionDate}
+                        {dayjs(patient.admissionDate).format("DD/MM/YYYY")}
                       </TableCell>
                       <TableCell
                         align="center"
                         style={{ ...cellStyle, letterSpacing: "1px" }}
                       >
-                        <IconButton onClick={() => handleChoose()}>
+                        <IconButton
+                          onClick={() =>
+                            handleChoose(patient.hospitalAdmissionId)
+                          }
+                        >
                           <NavigateNextIcon />
                         </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
+                  {patients.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography
+                          variant="body1"
+                          color="textSecondary"
+                          fontWeight={500}
+                          p={2}
+                        >
+                          Không có bệnh nhân nào để hiển thị
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

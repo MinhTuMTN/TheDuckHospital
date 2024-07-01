@@ -72,6 +72,7 @@ import ChooseRoomForPatient from "../pages/Nurse/Hospitalization/ChooseRoomForPa
 import NurseInpatientLayout from "../layouts/NurseInpatientLayout";
 import ChoosePatient from "../pages/Nurse/Hospitalization/ChoosePatient";
 import HospitalizationDetails from "../pages/Nurse/Hospitalization/HospitalizationDetails";
+import PleaseChooseRoom from "../pages/Nurse/Hospitalization/PleaseChooseRoom";
 
 const LoadComponent = (Component) => (props) =>
   (
@@ -307,14 +308,14 @@ function Router(props) {
           children: [
             {
               index: true,
+              element: <PleaseChooseRoom />,
+            },
+            {
+              path: ":roomId/patients",
               element: <ChoosePatient />,
             },
             {
-              path: "choose-patient",
-              element: <ChoosePatient />,
-            },
-            {
-              path: "patient-hospitalization-details",
+              path: ":roomId/patients/:hospitalizationId",
               element: <HospitalizationDetails />,
             },
           ],
@@ -381,100 +382,100 @@ function Router(props) {
     //   path: "/",
     //   element: <ProtectedLayout forRole={["Admin"]} />,
     //   children: [
+    {
+      path: "/admin",
+      element: <AdminLayout />,
+      children: [
         {
-          path: "/admin",
-          element: <AdminLayout />,
-          children: [
-            {
-              path: "analytics/general",
-              element: <AnalyticsGeneral />,
-            },
-            {
-              path: "analytics/department-based",
-              element: <AnalyticsDepartmentBased />,
-            },
-            {
-              element: <AnalyticsGeneral />,
-              index: true,
-            },
-            {
-              path: "account-management",
-              element: <AccountListPage />,
-            },
-            {
-              path: "account-management/:userId",
-              element: <AccountDetailPage />,
-            },
-            {
-              path: "account-management/:userId/patient-profile/:patientProfileId",
-              element: <PatientProfileDetailPage />,
-            },
-            {
-              path: "staff-management",
-              element: <StaffListPage />,
-            },
-            {
-              path: "staff-management/:staffId",
-              element: <StaffDetailPage />,
-            },
-            {
-              path: "room-management",
-              element: <RoomListPage />,
-            },
-            {
-              path: "room-management/:roomId",
-              element: <RoomDetailPage />,
-            },
-            {
-              path: "department-management",
-              element: <DepartmentListPage />,
-            },
-            {
-              path: "department-management/:departmentId",
-              element: <DepartmentDetailPage />,
-            },
-            {
-              path: "department-management/:departmentId/staff/:staffId",
-              element: <StaffDetailPage />,
-            },
-            {
-              path: "patient-management",
-              element: <PatientListPage />,
-            },
-            {
-              path: "patient-management/:patientId",
-              element: <PatientDetailPage />,
-            },
-            {
-              path: "patient-management/:patientId/patient-profile/:patientProfileId",
-              element: <PatientProfileDetailPage />,
-            },
-            {
-              path: "service-management",
-              element: <MedicalServiceListPage />,
-            },
-            {
-              path: "service-management/:serviceId",
-              element: <MedicalServiceDetailPage />,
-            },
-            {
-              path: "transaction-management",
-              element: <TransactionListPage />,
-            },
-            {
-              path: "transaction-management/:transactionId",
-              element: <TransactionDetailPage />,
-            },
-            {
-              path: "medicine-management",
-              element: <MedicineListPage />,
-            },
-            {
-              path: "medicine-management/:medicineId",
-              element: <MedicineDetailPage />,
-            },
-          ],
+          path: "analytics/general",
+          element: <AnalyticsGeneral />,
         },
+        {
+          path: "analytics/department-based",
+          element: <AnalyticsDepartmentBased />,
+        },
+        {
+          element: <AnalyticsGeneral />,
+          index: true,
+        },
+        {
+          path: "account-management",
+          element: <AccountListPage />,
+        },
+        {
+          path: "account-management/:userId",
+          element: <AccountDetailPage />,
+        },
+        {
+          path: "account-management/:userId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
+        },
+        {
+          path: "staff-management",
+          element: <StaffListPage />,
+        },
+        {
+          path: "staff-management/:staffId",
+          element: <StaffDetailPage />,
+        },
+        {
+          path: "room-management",
+          element: <RoomListPage />,
+        },
+        {
+          path: "room-management/:roomId",
+          element: <RoomDetailPage />,
+        },
+        {
+          path: "department-management",
+          element: <DepartmentListPage />,
+        },
+        {
+          path: "department-management/:departmentId",
+          element: <DepartmentDetailPage />,
+        },
+        {
+          path: "department-management/:departmentId/staff/:staffId",
+          element: <StaffDetailPage />,
+        },
+        {
+          path: "patient-management",
+          element: <PatientListPage />,
+        },
+        {
+          path: "patient-management/:patientId",
+          element: <PatientDetailPage />,
+        },
+        {
+          path: "patient-management/:patientId/patient-profile/:patientProfileId",
+          element: <PatientProfileDetailPage />,
+        },
+        {
+          path: "service-management",
+          element: <MedicalServiceListPage />,
+        },
+        {
+          path: "service-management/:serviceId",
+          element: <MedicalServiceDetailPage />,
+        },
+        {
+          path: "transaction-management",
+          element: <TransactionListPage />,
+        },
+        {
+          path: "transaction-management/:transactionId",
+          element: <TransactionDetailPage />,
+        },
+        {
+          path: "medicine-management",
+          element: <MedicineListPage />,
+        },
+        {
+          path: "medicine-management/:medicineId",
+          element: <MedicineDetailPage />,
+        },
+      ],
+    },
     //   ],
     // },
   ]);

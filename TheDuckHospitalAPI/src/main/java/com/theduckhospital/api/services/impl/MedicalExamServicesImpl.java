@@ -545,6 +545,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         hospitalAdmission.setSymptom(request.getSymptom());
         hospitalAdmission.setDiagnosis(request.getDiagnosis());
         hospitalAdmission.setHistoryOfAllergy(request.getHistoryOfAllergy());
+        hospitalAdmission.setUnderlyingDisease(request.getUnderlyingDisease());
         hospitalAdmissionRepository.save(hospitalAdmission);
 
         medicalExaminationRecord.setSymptom(request.getSymptom());
