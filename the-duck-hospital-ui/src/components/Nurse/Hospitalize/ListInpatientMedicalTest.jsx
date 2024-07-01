@@ -70,7 +70,10 @@ function ListInpatientMedicalTest(props) {
 
       <Grid container>
         {medicalTests.map((medicalTest, index) => (
-          <MedicalTestItem key={index} medicalTest={medicalTest} />
+          <MedicalTestItem
+            key={`medical-test-${index}`}
+            medicalTest={medicalTest}
+          />
         ))}
       </Grid>
 

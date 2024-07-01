@@ -96,7 +96,7 @@ public class InpatientNurseController {
         );
     }
 
-    @DeleteMapping("/hospitalization/{hospitalizationId}/medical-test/{medicalTestId}")
+    @DeleteMapping("/hospitalization/{hospitalizationId}/medical-tests/{medicalTestId}")
     public ResponseEntity<?> deleteInpatientMedicalTest(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("hospitalizationId") UUID hospitalizationId,

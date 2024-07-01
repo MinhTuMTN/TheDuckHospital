@@ -5,15 +5,11 @@ import {
   Button,
   CardMedia,
   FormControl,
-  FormControlLabel,
-  FormLabel,
   IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
   Modal,
-  Radio,
-  RadioGroup,
   Select,
   Stack,
   TextField,
@@ -104,7 +100,9 @@ const shifts = [
 ];
 
 function InpatientShiftCreateModal(props) {
+  var isoWeek = require("dayjs/plugin/isoWeek");
   const { open, onClose, nurse } = props;
+  const [weekNumberEls, setWeekNumberEls] = React.useState([]);
   const [roomId, setRoomId] = React.useState("");
   const [roomSchedules, setRoomSchedules] = React.useState([{}]);
   const { enqueueSnackbar } = useSnackbar();
@@ -125,30 +123,15 @@ function InpatientShiftCreateModal(props) {
     nights: [],
   });
   const [currentMonth, setCurrentMonth] = useState(dayjs());
-  function disableInvalidMorningDate(date) {
-    return invalidDate[selectedSession.toLowerCase() + "s"]?.includes(
-      date.format("YYYY/MM/DD")
-    );
-  }
-  const [selectMode, setSelectMode] = useState("custom");
 
-  useEffect(() => {
-    const handleGetRooms = async () => {
-      const standardResponse = await getRoomSchedules(
-        "TREATMENT_ROOM_STANDARD"
+  const disableInvalidMorningDate = useCallback(
+    (date) => {
+      return invalidDate[selectedSession.toLowerCase() + "s"]?.includes(
+        date.format("YYYY/MM/DD")
       );
-      const vipResponse = await getRoomSchedules("TREATMENT_ROOM_VIP");
-      if (standardResponse.success && vipResponse.success) {
-        const rooms = standardResponse.data.data.concat(vipResponse.data.data);
-        setRoomSchedules(rooms);
-        if (rooms.length > 0) {
-          setRoomId(rooms[0].roomId);
-        }
-      }
-    };
-    handleGetRooms();
-  }, []);
-
+    },
+    [invalidDate, selectedSession]
+  );
   const handleOnChangeCalendar = useCallback(
     (newDate) => {
       const onChangeFunction =
@@ -173,7 +156,6 @@ function InpatientShiftCreateModal(props) {
   const handleMonthChange = useCallback((month) => {
     setCurrentMonth(month);
   }, []);
-
   const handleCreateInpatientShift = async () => {
     const response = await createInpatientShiftSchedule(
       roomId,
@@ -200,6 +182,23 @@ function InpatientShiftCreateModal(props) {
       });
     }
   };
+
+  useEffect(() => {
+    const handleGetRooms = async () => {
+      const standardResponse = await getRoomSchedules(
+        "TREATMENT_ROOM_STANDARD"
+      );
+      const vipResponse = await getRoomSchedules("TREATMENT_ROOM_VIP");
+      if (standardResponse.success && vipResponse.success) {
+        const rooms = standardResponse.data.data.concat(vipResponse.data.data);
+        setRoomSchedules(rooms);
+        if (rooms.length > 0) {
+          setRoomId(rooms[0].roomId);
+        }
+      }
+    };
+    handleGetRooms();
+  }, []);
 
   useEffect(() => {
     const hanleGetInpatientShift = async () => {
@@ -231,6 +230,63 @@ function InpatientShiftCreateModal(props) {
 
     hanleGetInpatientShift();
   }, [currentMonth, roomId, nurse?.staffId]);
+
+  useEffect(() => {
+    const handleFindWeekElements = () => {
+      setWeekNumberEls(document.querySelectorAll("p[role='rowheader']"));
+    };
+
+    if (open && weekNumberEls.length === 0) {
+      handleFindWeekElements();
+    }
+  }, [open, weekNumberEls]);
+
+  useEffect(() => {
+    const handleFindWeekElements = () => {
+      setWeekNumberEls(document.querySelectorAll("p[role='rowheader']"));
+    };
+
+    handleFindWeekElements();
+  }, [currentMonth]);
+
+  useEffect(() => {
+    const handleOnClickWeekNumber = (e) => {
+      const weekNumber = e.target.innerText;
+      dayjs.extend(isoWeek);
+      const startDate = currentMonth.isoWeek(weekNumber).startOf("isoWeek");
+
+      let days = [];
+      const month = currentMonth.get("month");
+      for (let i = 0; i < 7; i++) {
+        const tempDay = startDate.add(i, "day");
+        if (tempDay.get("month") === month) {
+          days.push(tempDay);
+        }
+      }
+
+      days.forEach((day) => {
+        if (disableInvalidMorningDate(day)) return;
+        handleOnChangeCalendar(day);
+      });
+    };
+    weekNumberEls.forEach((weekNumberEl) => {
+      weekNumberEl.style.color = appColors.primary;
+      weekNumberEl.style.cursor = "pointer";
+      weekNumberEl.addEventListener("click", handleOnClickWeekNumber);
+    });
+
+    return () => {
+      weekNumberEls.forEach((weekNumberEl) => {
+        weekNumberEl.removeEventListener("click", handleOnClickWeekNumber);
+      });
+    };
+  }, [
+    weekNumberEls,
+    currentMonth,
+    isoWeek,
+    disableInvalidMorningDate,
+    handleOnChangeCalendar,
+  ]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -312,22 +368,6 @@ function InpatientShiftCreateModal(props) {
               </FormControl>
             </Box>
 
-            <Box width={'100%'}>
-            <FormControl>
-              <FormLabel id="demo-radio-buttons-group-label">Chọn ngày theo dạng</FormLabel>
-              <RadioGroup
-                aria-labelledby="demo-radio-buttons-group-label"
-                defaultValue="female"
-                name="radio-buttons-group"
-                onChange={(e) => setSelectMode(e.target.value)}
-                value={selectMode}
-              >
-                <FormControlLabel value="range" control={<Radio />} label="Chọn khoảng ngày" />
-                <FormControlLabel value="custom" control={<Radio />} label="Tuỳ chỉnh" />
-              </RadioGroup>
-            </FormControl>
-            </Box>
-
             <Box width="100%">
               <Stack direction={"row"} spacing={2}>
                 {shifts?.map((shift) => (
@@ -357,12 +397,12 @@ function InpatientShiftCreateModal(props) {
                   </Button>
                 ))}
               </Stack>
-              {selectMode === "custom" ? (
-                <LocalizationProvider
+              <LocalizationProvider
                 dateAdapter={AdapterDayjs}
                 adapterLocale="en-gb"
               >
                 <DateCalendar
+                  displayWeekNumber
                   value={valueDate}
                   minDate={minDate}
                   disabled={roomId === ""}
@@ -394,9 +434,6 @@ function InpatientShiftCreateModal(props) {
                   }}
                 />
               </LocalizationProvider>
-              ) : (
-                <></>
-              )}
             </Box>
           </Stack>
           <Stack justifyContent={"flex-end"} width={"100%"} direction={"row"}>

@@ -370,7 +370,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         if (serviceId > 0) {
             MedicalService medicalService = medicalServiceServices
                     .getMedicalServiceById(serviceId);
-            return medicalTestRepository.findByHospitalAdmissionAndMedicalServiceAndDeletedIsFalseOrderByDateDesc(
+            return medicalTestRepository
+                    .findByHospitalAdmissionAndMedicalServiceAndDeletedIsFalseOrderByDateDesc(
                     hospitalAdmission,
                     medicalService,
                     pageable
@@ -393,6 +394,19 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         ) {
             throw new BadRequestException("Invalid hospital admission", 400);
         }
+
+        // Completed medical test cannot be deleted
+        if (medicalTest.getState() == MedicalTestState.DONE) {
+            throw new BadRequestException("Completed medical test cannot be deleted", 3001);
+        }
+
+        // Paid medical test cannot be deleted
+        if (medicalTest.getTransaction() != null &&
+                medicalTest.getTransaction().getStatus() == TransactionStatus.SUCCESS
+        ) {
+            throw new BadRequestException("Paid medical test cannot be deleted", 3000);
+        }
+
 
         medicalTest.setDeleted(true);
         medicalTestRepository.save(medicalTest);

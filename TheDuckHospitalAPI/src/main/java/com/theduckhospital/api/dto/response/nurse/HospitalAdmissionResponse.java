@@ -1,9 +1,7 @@
 package com.theduckhospital.api.dto.response.nurse;
 
 import com.theduckhospital.api.constant.Gender;
-import com.theduckhospital.api.entity.HospitalAdmission;
-import com.theduckhospital.api.entity.Patient;
-import com.theduckhospital.api.entity.PatientProfile;
+import com.theduckhospital.api.entity.*;
 import lombok.Data;
 
 import java.util.Date;
@@ -20,6 +18,10 @@ public class HospitalAdmissionResponse {
     private Date patientBirthDate;
     private String underlyingDisease;
     private String allergy;
+    private String streetName;
+    private String wardName;
+    private String districtName;
+    private String provinceName;
 
     public HospitalAdmissionResponse(HospitalAdmission hospitalAdmission) {
         this.hospitalAdmissionId = hospitalAdmission.getHospitalAdmissionId();
@@ -34,6 +36,13 @@ public class HospitalAdmissionResponse {
         this.patientName = patientProfile.getFullName();
         this.patientGender = patientProfile.getGender();
         this.patientBirthDate = patientProfile.getDateOfBirth();
+        this.streetName = patientProfile.getStreetName();
+        Ward ward = patientProfile.getWard();
+        this.wardName = ward == null ? null : ward.getWardName();
+        District district = ward == null ? null : ward.getDistrict();
+        this.districtName = district == null ? null : district.getDistrictName();
+        Province province = district == null ? null : district.getProvince();
+        this.provinceName = province == null ? null : province.getProvinceName();
 
         Patient patient = patientProfile.getPatient();
         this.patientCode = patient == null ? null : patient.getPatientCode();

@@ -1,17 +1,21 @@
-import { Divider, Grid, Stack, Typography, styled } from "@mui/material";
-import React, { memo } from "react";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import { appColors } from "../../../utils/appColorsUtils";
 import {
   BiotechOutlined,
   CalendarMonthOutlined,
-  ContentPasteGoOutlined,
   ContentPasteOutlined,
   DeleteOutlineOutlined,
   DownloadOutlined,
   EditNoteOutlined,
   PrintOutlined,
 } from "@mui/icons-material";
+import { Box, Divider, Grid, Typography, styled } from "@mui/material";
+import React, { memo, useContext } from "react";
+import { appColors } from "../../../utils/appColorsUtils";
+import dayjs from "dayjs";
+import Invoice from "../../Doctor/Invoice";
+import { useReactToPrint } from "react-to-print";
+import { HospitalizationContext } from "../../../pages/Nurse/Hospitalization/HospitalizationDetails";
+import { enqueueSnackbar } from "notistack";
+import { deleteInpatientMedicalTest } from "../../../services/nurse/HospitalizeServices";
 
 const LineInfo = memo((props) => {
   return (
@@ -55,128 +59,213 @@ const MedicalTestContainer = styled(Grid)({
 });
 
 function MedicalTestItem(props) {
-  const { mode = "normal" } = props;
+  const { mode = "normal", medicalTest } = props;
+  const componentRef = React.useRef();
+  const { generalInfo } = useContext(HospitalizationContext);
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+  const handleViewResult = () => {
+    if (!medicalTest.result) {
+      enqueueSnackbar("Chưa có kết quả xét nghiệm", {
+        variant: "error",
+      });
+      return;
+    }
+
+    // Open in new tab
+    window.open(medicalTest.result, "_blank");
+  };
+  const handleDelete = async () => {
+    const response = await deleteInpatientMedicalTest(
+      generalInfo.hospitalAdmissionId,
+      medicalTest.medicalTestId
+    );
+
+    if (response.success) {
+      enqueueSnackbar("Xoá xét nghiệm thành công", {
+        variant: "success",
+      });
+    } else {
+      if (response.errorCode === 3000)
+        enqueueSnackbar("Không thể xoá xét nghiệm đã thanh toán", {
+          variant: "error",
+        });
+      else if (response.errorCode === 3001)
+        enqueueSnackbar("Không thể xoá xét nghiệm đã có kết quả", {
+          variant: "error",
+        });
+      else
+        enqueueSnackbar("Xoá xét nghiệm thất bại", {
+          variant: "error",
+        });
+    }
+  };
   return (
-    <MedicalTestContainer item xs={12} container>
-      <Grid item xs={mode === "small" ? 11 : 9} container rowGap={1}>
-        <LineInfo
-          mode={mode}
-          icon={
-            <BiotechOutlined
-              sx={{
-                color: appColors.primary,
-              }}
-            />
-          }
-          name="Loại xét nghiệm"
-          value="Xét nghiệm máu"
-        />
-        <LineInfo
-          mode={mode}
-          icon={
-            <EditNoteOutlined
-              sx={{
-                color: appColors.primary,
-              }}
-            />
-          }
-          name="Chỉ định"
-          value="Chỉ định thực hiện"
-        />
-        <LineInfo
-          mode={mode}
-          icon={
-            <CalendarMonthOutlined
-              sx={{
-                color: appColors.primary,
-              }}
-            />
-          }
-          name="Ngày thực hiện"
-          value="12/12/2021 - 22:00"
-        />
-        <LineInfo
-          mode={mode}
-          icon={
-            <ContentPasteOutlined
-              sx={{
-                color: appColors.error,
-              }}
-            />
-          }
-          nameStyles={{
-            color: appColors.error,
-          }}
-          valueStyles={{
-            color: appColors.error,
-            fontWeight: 600,
-          }}
-          name="Kết quả xét nghiệm"
-          value="Bình thường. Không có dấu hiệu bất thường"
-        />
-      </Grid>
-      <Divider orientation="vertical" />
-      <Grid
-        item
-        container
-        xs={mode === "small" ? 0.8 : 2.8}
-        display={"flex"}
-        rowGap={2}
-        pl={1}
-      >
-        <Grid item xs={12} display={"flex"} columnGap={1}>
-          <DownloadOutlined
-            sx={{
-              color: appColors.doneText,
-            }}
+    <>
+      <MedicalTestContainer item xs={12} container>
+        <Grid item xs={mode === "small" ? 11 : 9} container rowGap={1}>
+          <LineInfo
+            mode={mode}
+            icon={
+              <BiotechOutlined
+                sx={{
+                  color: appColors.primary,
+                }}
+              />
+            }
+            name="Loại xét nghiệm"
+            value={medicalTest.serviceName}
           />
-          {mode !== "small" && (
-            <Typography
-              sx={{
-                color: appColors.doneText,
-                fontWeight: 600,
-              }}
-            >
-              Kết quả xét nghiệm
-            </Typography>
-          )}
-        </Grid>
-        <Grid item xs={12} display={"flex"} columnGap={1}>
-          <PrintOutlined
-            sx={{
-              color: appColors.primary,
-            }}
+          <LineInfo
+            mode={mode}
+            icon={
+              <EditNoteOutlined
+                sx={{
+                  color: appColors.primary,
+                }}
+              />
+            }
+            name="Chỉ định"
+            value={medicalTest.note}
           />
-          {mode !== "small" && (
-            <Typography
-              sx={{
-                color: appColors.primary,
-                fontWeight: 600,
-              }}
-            >
-              In phiếu xét nghiệm
-            </Typography>
-          )}
-        </Grid>
-        <Grid item xs={12} display={"flex"} columnGap={1}>
-          <DeleteOutlineOutlined
-            sx={{
+          <LineInfo
+            mode={mode}
+            icon={
+              <CalendarMonthOutlined
+                sx={{
+                  color: appColors.primary,
+                }}
+              />
+            }
+            name="Ngày thực hiện"
+            value={dayjs(medicalTest.createdDate).format("DD/MM/YYYY - HH:mm")}
+          />
+          <LineInfo
+            mode={mode}
+            icon={
+              <ContentPasteOutlined
+                sx={{
+                  color: appColors.error,
+                }}
+              />
+            }
+            nameStyles={{
               color: appColors.error,
             }}
+            valueStyles={{
+              color: appColors.error,
+              fontWeight: 600,
+            }}
+            name="Kết quả xét nghiệm"
+            value={medicalTest.testResult || "Chưa có kết quả"}
           />
-          {mode !== "small" && (
-            <Typography
+        </Grid>
+        <Divider orientation="vertical" />
+        <Grid
+          item
+          container
+          xs={mode === "small" ? 0.8 : 2.8}
+          display={"flex"}
+          rowGap={2}
+          pl={1}
+        >
+          <Grid
+            sx={{
+              cursor: medicalTest.result ? "pointer" : "not-allowed",
+            }}
+            onClick={handleViewResult}
+            item
+            xs={12}
+            display={"flex"}
+            columnGap={1}
+          >
+            <DownloadOutlined
+              sx={{
+                color: appColors.doneText,
+              }}
+            />
+            {mode !== "small" && (
+              <Typography
+                sx={{
+                  color: appColors.doneText,
+                  fontWeight: 600,
+                }}
+              >
+                Kết quả xét nghiệm
+              </Typography>
+            )}
+          </Grid>
+          <Grid
+            sx={{
+              cursor: "pointer",
+            }}
+            item
+            xs={12}
+            display={"flex"}
+            columnGap={1}
+            onClick={handlePrint}
+          >
+            <PrintOutlined
+              sx={{
+                color: appColors.primary,
+              }}
+            />
+            {mode !== "small" && (
+              <Typography
+                sx={{
+                  color: appColors.primary,
+                  fontWeight: 600,
+                }}
+              >
+                In phiếu xét nghiệm
+              </Typography>
+            )}
+          </Grid>
+          <Grid
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={handleDelete}
+            item
+            xs={12}
+            display={"flex"}
+            columnGap={1}
+          >
+            <DeleteOutlineOutlined
               sx={{
                 color: appColors.error,
-                fontWeight: 600,
               }}
-            >
-              Xoá xét nghiệm
-            </Typography>
-          )}
+            />
+            {mode !== "small" && (
+              <Typography
+                sx={{
+                  color: appColors.error,
+                  fontWeight: 600,
+                }}
+              >
+                Xoá xét nghiệm
+              </Typography>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
-    </MedicalTestContainer>
+      </MedicalTestContainer>
+      <Box sx={{ display: "none" }}>
+        <Invoice
+          ref={componentRef}
+          patientInfo={{
+            patient: {
+              fullName: generalInfo.patientName,
+              dateOfBirth: generalInfo.dateOfBirth,
+              patientCode: generalInfo.patientCode,
+              address: generalInfo.provinceName,
+            },
+          }}
+          doctorName={""}
+          medicalTest={medicalTest}
+        />
+      </Box>
+    </>
   );
 }
 
