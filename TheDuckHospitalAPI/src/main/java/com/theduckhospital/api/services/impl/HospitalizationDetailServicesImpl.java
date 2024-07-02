@@ -45,15 +45,44 @@ public class HospitalizationDetailServicesImpl implements IHospitalizationDetail
         details.setHospitalizationDate(hospitalizationDate);
         details.setNurse(nurse);
         details.setDiagnosis(request.getDiagnosis());
+        details.setDiseaseProgression(request.getDiseaseProgression());
         details.setSymptom(request.getSymptoms());
         details.setTemperature(request.getTemperature());
         details.setBloodPressure(request.getBloodPressure());
         details.setHeartRate(request.getHeartRate());
+        details.setHospitalizationDate(hospitalizationDate);
 
-        Doctor doctor = doctorServices.getDoctorById(request.getDoctorId());
-        details.setTreatingDoctor(doctor);
+        if (request.getDoctorId() != null) {
+            Doctor doctor = doctorServices.getDoctorById(request.getDoctorId());
+            details.setTreatingDoctor(doctor);
+        }
 
         hospitalizationDetailRepository.save(details);
+        return details;
+    }
+
+    @Override
+    public HospitalizationDetail getDailyHospitalAdmissionDetails(
+            Nurse nurse,
+            HospitalAdmission hospitalAdmission,
+            Date date
+    ) {
+        Optional<HospitalizationDetail> optional = hospitalizationDetailRepository
+                .findByHospitalAdmissionAndHospitalizationDate(
+                        hospitalAdmission,
+                        DateCommon.getStarOfDay(date)
+                );
+
+        HospitalizationDetail details;
+        if (optional.isEmpty()) {
+            details = new HospitalizationDetail();
+            details.setHospitalAdmission(hospitalAdmission);
+            details.setHospitalizationDate(DateCommon.getStarOfDay(date));
+            hospitalizationDetailRepository.save(details);
+        } else {
+            details = optional.get();
+        }
+
         return details;
     }
 }

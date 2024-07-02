@@ -9,6 +9,7 @@ import java.util.UUID;
 public class UpdateDailyHospitalAdmissionDetails {
     private Date date;
     private String symptoms;
+    private String diseaseProgression;
     private String diagnosis;
     private String temperature;
     private String bloodPressure;

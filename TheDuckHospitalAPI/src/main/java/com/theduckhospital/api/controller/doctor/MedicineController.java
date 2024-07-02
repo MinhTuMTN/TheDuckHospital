@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/doctor/medicines")
-@PreAuthorize("hasAnyRole('ROLE_DOCTOR', 'ROLE_HEAD_DOCTOR')")
+@PreAuthorize("hasAnyRole('ROLE_DOCTOR', 'ROLE_HEAD_DOCTOR', 'ROLE_NURSE', 'ROLE_HEAD_NURSE')")
 public class MedicineController {
     private final IMedicineServices medicineServices;
 
