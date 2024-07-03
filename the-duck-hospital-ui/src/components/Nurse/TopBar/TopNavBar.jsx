@@ -78,7 +78,9 @@ function TopNavBar(props) {
           )}
           <Stack direction={"row"} alignItems={"center"} spacing={1} flex={1}>
             <CardMediaImage />
-            {roomName === "counter" || roomName === "nurse-schedule" ? (
+            {roomName === "counter" ||
+            roomName === "nurse-schedule" ||
+            roomName === "doctor-schedule" ? (
               <Typography
                 sx={{
                   textAlign: "left",
