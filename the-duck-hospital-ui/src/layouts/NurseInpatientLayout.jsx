@@ -20,7 +20,7 @@ function NurseInpatientLayout() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <TopNavBarInpatient onDrawerClick={setOpen} roomName={"counter"} />
+      <TopNavBarInpatient onDrawerClick={setOpen} />
       <LeftNavbarNurseInpatient open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <Outlet />

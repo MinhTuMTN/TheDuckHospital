@@ -1,10 +1,9 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { Outlet } from "react-router-dom";
-import LeftNavbarNurseSchedule from "../components/Nurse/LeftBar/LeftNavbarSchedule";
-import { appColors } from "../utils/appColorsUtils";
-import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
 import LeftNavbarSchedule from "../components/Nurse/LeftBar/LeftNavbarSchedule";
+import TopNavBar from "../components/Nurse/TopBar/TopNavBar";
+import { appColors } from "../utils/appColorsUtils";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
