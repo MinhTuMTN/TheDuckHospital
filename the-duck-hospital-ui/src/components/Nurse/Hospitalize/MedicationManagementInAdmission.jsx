@@ -102,7 +102,7 @@ function MedicationManagementInAdmission() {
   const handleGetAllMedicines = useCallback(async () => {
     const response = await searchMedicine(medicineQuery);
     if (response.success) {
-      setMedicines(response.data.data.items);
+      setMedicines(response.data.data);
     }
   }, [medicineQuery]);
 
@@ -240,10 +240,8 @@ function MedicationManagementInAdmission() {
           size="medium"
           disablePortal
           id="combo-box-demo"
-          options={
-            editMedication ? [selectedMedication] : listMedicationForNurse
-          }
-          getOptionLabel={(option) => `${option.name}`}
+          options={editMedication ? [selectedMedication] : medicines}
+          getOptionLabel={(option) => `${option.medicineName}`}
           isOptionEqualToValue={(option, value) =>
             option.medicineId === value.medicineId
           }

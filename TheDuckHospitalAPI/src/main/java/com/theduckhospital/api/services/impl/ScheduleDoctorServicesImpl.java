@@ -287,7 +287,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     @Override
     public List<DoctorScheduleResponse> getTodayDoctorSchedules(String authorization) throws ParseException {
         Doctor doctor = doctorServices.getDoctorByToken(authorization);
-        Date today = DateCommon.getToday();
+        Date today = DateCommon.getStarOfDay(DateCommon.getToday());
         return doctorScheduleRepository
                 .findByDoctorAndDateAndDeletedIsFalseOrderByScheduleSessionAsc(
                         doctor,
