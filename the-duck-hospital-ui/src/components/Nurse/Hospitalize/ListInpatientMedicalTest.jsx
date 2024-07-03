@@ -29,6 +29,7 @@ function ListInpatientMedicalTest(props) {
     medicalTests,
     pagination,
     onPaginate,
+    onRefresh,
   } = props;
   return (
     <ContainerLayout item xs={12}>
@@ -73,6 +74,7 @@ function ListInpatientMedicalTest(props) {
           <MedicalTestItem
             key={`medical-test-${index}`}
             medicalTest={medicalTest}
+            onRefresh={onRefresh}
           />
         ))}
       </Grid>

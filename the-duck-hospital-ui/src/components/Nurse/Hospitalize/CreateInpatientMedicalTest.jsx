@@ -9,11 +9,11 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React from "react";
-import { appColors } from "../../../utils/appColorsUtils";
-import { createInpatientMedicalTest } from "../../../services/nurse/HospitalizeServices";
-import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import React from "react";
+import { useParams } from "react-router-dom";
+import { createInpatientMedicalTest } from "../../../services/nurse/HospitalizeServices";
+import { appColors } from "../../../utils/appColorsUtils";
 
 const ContainerLayout = styled(Grid)({
   padding: "16px 16px",
@@ -35,7 +35,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function CreateInpatientMedicalTest(props) {
-  const { medicalTestServices } = props;
+  const { medicalTestServices, onRefresh } = props;
   const [selectedService, setSelectedService] = React.useState(null);
   const [note, setNote] = React.useState("");
   const { hospitalizationId } = useParams();
@@ -53,6 +53,10 @@ function CreateInpatientMedicalTest(props) {
       enqueueSnackbar("Tạo xét nghiệm thành công", { variant: "success" });
       setNote("");
       setSelectedService(null);
+      console.log(onRefresh);
+      if (onRefresh) {
+        onRefresh();
+      }
     } else {
       enqueueSnackbar("Tạo xét nghiệm thất bại", { variant: "error" });
     }

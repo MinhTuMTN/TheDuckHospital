@@ -39,14 +39,17 @@ public class HospitalizationDetailServicesImpl implements IHospitalizationDetail
                         hospitalAdmission,
                         hospitalizationDate
                 );
+        if (optional.isEmpty()) {
+            return null;
+        }
 
-        HospitalizationDetail details = optional.orElseGet(HospitalizationDetail::new);
+        HospitalizationDetail details = optional.get();
         details.setHospitalAdmission(hospitalAdmission);
         details.setHospitalizationDate(hospitalizationDate);
         details.setNurse(nurse);
         details.setDiagnosis(request.getDiagnosis());
         details.setDiseaseProgression(request.getDiseaseProgression());
-        details.setSymptom(request.getSymptoms());
+        details.setSymptom(request.getSymptom());
         details.setTemperature(request.getTemperature());
         details.setBloodPressure(request.getBloodPressure());
         details.setHeartRate(request.getHeartRate());

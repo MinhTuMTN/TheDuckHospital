@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
@@ -39,5 +40,10 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             HospitalAdmission hospitalAdmission,
             MedicalService medicalService,
             Pageable pageable
+    );
+    List<MedicalTest> findByHospitalAdmissionAndDateBetweenAndDeletedIsFalse(
+            HospitalAdmission hospitalAdmission,
+            Date startDate,
+            Date endDate
     );
 }

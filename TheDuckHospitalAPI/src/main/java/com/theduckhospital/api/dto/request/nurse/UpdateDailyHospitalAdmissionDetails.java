@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 public class UpdateDailyHospitalAdmissionDetails {
     private Date date;
-    private String symptoms;
+    private String symptom;
     private String diseaseProgression;
     private String diagnosis;
     private String temperature;

@@ -121,6 +121,7 @@ function HospitalizationDetails() {
       handleGetAllMedicalTests();
     }
   }, [hospitalizationId]);
+
   return (
     <HospitalizationContext.Provider
       value={{ generalInfo, onRefresh, setOnRefresh }}

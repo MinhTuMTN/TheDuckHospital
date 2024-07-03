@@ -40,8 +40,6 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final NotificationRepository notificationRepository;
     private final AccountRepository accountRepository;
     private final IFirebaseServices firebaseServices;
-    @Value("${settings.date}")
-    private String todayDate;
 
     public ScheduleDoctorServicesImpl(
             IDoctorServices doctorServices,
@@ -382,8 +380,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Doctor schedule not found");
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = formatter.parse(todayDate);
+        Date date = DateCommon.getToday();
         if (doctorSchedule.getDate().before(date)) {
             throw new BadRequestException("Doctor schedule is not available");
         }
