@@ -59,7 +59,7 @@ const MedicalTestContainer = styled(Grid)({
 });
 
 function MedicalTestItem(props) {
-  const { mode = "normal", medicalTest } = props;
+  const { mode = "normal", medicalTest, onRefresh } = props;
   const componentRef = React.useRef();
   const { generalInfo } = useContext(HospitalizationContext);
   const handlePrint = useReactToPrint({
@@ -86,6 +86,9 @@ function MedicalTestItem(props) {
       enqueueSnackbar("Xoá xét nghiệm thành công", {
         variant: "success",
       });
+      if (onRefresh) {
+        onRefresh();
+      }
     } else {
       if (response.errorCode === 3000)
         enqueueSnackbar("Không thể xoá xét nghiệm đã thanh toán", {
@@ -127,7 +130,7 @@ function MedicalTestItem(props) {
               />
             }
             name="Chỉ định"
-            value={medicalTest.note}
+            value={medicalTest.note || "Không có chỉ định"}
           />
           <LineInfo
             mode={mode}

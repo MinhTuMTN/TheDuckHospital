@@ -1,11 +1,10 @@
 import { Grid } from "@mui/material";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import { enqueueSnackbar } from "notistack";
+import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getInpatientMedicalTests } from "../../../services/nurse/HospitalizeServices";
 import CreateInpatientMedicalTest from "./CreateInpatientMedicalTest";
 import ListInpatientMedicalTest from "./ListInpatientMedicalTest";
-import { getInpatientMedicalTests } from "../../../services/nurse/HospitalizeServices";
-import { useParams } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
-import { HospitalizationContext } from "../../../pages/Nurse/Hospitalization/HospitalizationDetails";
 
 function InpatientMedicalTest(props) {
   const { medicalTestServices } = props;
@@ -19,7 +18,6 @@ function InpatientMedicalTest(props) {
   const [params, setParams] = useState({
     serviceId: "",
   });
-  const { setOnRefresh } = useContext(HospitalizationContext);
   const handleGetMedicalTests = useCallback(async () => {
     const response = await getInpatientMedicalTests(
       hospitalizationId,
@@ -43,6 +41,16 @@ function InpatientMedicalTest(props) {
     }
   }, [params, hospitalizationId, pagination.size, pagination.page]);
 
+  const handleRefresh = useCallback(() => {
+    setPagination((prev) => ({
+      ...prev,
+      page: 0,
+    }));
+    setParams({
+      serviceId: "",
+    });
+  }, []);
+
   const onChangeServiceId = useCallback(
     (serviceId) => {
       setPagination((prev) => ({
@@ -59,17 +67,20 @@ function InpatientMedicalTest(props) {
 
   useEffect(() => {
     handleGetMedicalTests();
-    setOnRefresh(handleGetMedicalTests);
-  }, [handleGetMedicalTests, setOnRefresh]);
+  }, [handleGetMedicalTests]);
   return (
     <Grid container>
-      <CreateInpatientMedicalTest medicalTestServices={medicalTestServices} />
+      <CreateInpatientMedicalTest
+        medicalTestServices={medicalTestServices}
+        onRefresh={handleRefresh}
+      />
       <ListInpatientMedicalTest
         medicalTests={medicalTests}
         medicalTestServices={medicalTestServices}
         onChangeServiceId={onChangeServiceId}
         pagination={pagination}
         onPaginate={setPagination}
+        onRefresh={handleRefresh}
       />
     </Grid>
   );

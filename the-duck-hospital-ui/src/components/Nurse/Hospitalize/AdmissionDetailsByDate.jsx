@@ -14,13 +14,19 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 import { useTheme } from "@emotion/react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useDebounce from "../../../hooks/useDebounce";
 import MedicalInAdmissionDatails from "./MedicalInAdmissionDatails";
 import VitalSignsComponent from "./VitalSignsComponent";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import MedicationManagementInAdmission from "./MedicationManagementInAdmission";
+import {
+  getHospitalizationDetailsByDate,
+  getMedicalTestsByDate,
+  updateHospitalizationDetailsByDate,
+} from "../../../services/nurse/HospitalizeServices";
+import { enqueueSnackbar } from "notistack";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   padding: "16px 16px",
@@ -42,28 +48,149 @@ const LayoutStyle = styled(Stack)(({ theme }) => ({
 
 function AdmissionDetailsByDate(props) {
   const { generalInfo } = props;
+
   const [isEdit, setIsEdit] = useState(false);
+  const [vitalSignEdit, setVitalSignEdit] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [info, setInfo] = useState({
     bloodPressure: 100,
     heartRate: 140,
     temperature: 37.5,
-    symtoms: "",
-    diseaseProgress: "",
+    symptom: "",
+    diseaseProgression: "",
+    diagnosis: "",
   });
-  const infoDebounce = useDebounce(info, 1000);
-  const [saving, setSaving] = useState(false);
+  const [medicalTests, setMedicalTests] = useState([]);
+
+  const infoDebounce = useDebounce(
+    {
+      symptom: info.symptom,
+      diseaseProgression: info.diseaseProgression,
+      diagnosis: info.diagnosis,
+    },
+    1000
+  );
   const theme = useTheme();
   const isDownLg = useMediaQuery(theme.breakpoints.down("lg"));
   const isDownMd = useMediaQuery(theme.breakpoints.down("md"));
 
+  const handleSignOfVitalityChange = useCallback(
+    (bloodPressure, heartRate, temperature) => {
+      setInfo((prev) => {
+        return {
+          ...prev,
+          bloodPressure,
+          heartRate,
+          temperature,
+        };
+      });
+
+      setVitalSignEdit(true);
+    },
+    []
+  );
+
   useEffect(() => {
-    setSaving(true);
-    const timeoutId = setTimeout(() => {
+    const handleUpdateHospitalizationDetailsByDate = async () => {
+      setSaving(true);
+      setVitalSignEdit(false);
+      const response = await updateHospitalizationDetailsByDate(
+        generalInfo?.hospitalAdmissionId,
+        {
+          bloodPressure: info.bloodPressure,
+          heartRate: info.heartRate,
+          temperature: info.temperature,
+          symptom: infoDebounce.symptom,
+          diseaseProgression: infoDebounce.diseaseProgression,
+          diagnosis: infoDebounce.diagnosis,
+          date: date,
+        }
+      );
       setSaving(false);
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [infoDebounce]);
+
+      if (response.success) {
+        setInfo((prev) => {
+          return {
+            ...prev,
+            updatedAt: response.data.data.updatedAt,
+          };
+        });
+      } else {
+        console.log(response.error);
+        enqueueSnackbar("Đã xảy ra lỗi khi cập nhật thông tin chữa trị", {
+          variant: "error",
+        });
+      }
+    };
+
+    if (vitalSignEdit || isEdit) {
+      handleUpdateHospitalizationDetailsByDate();
+    }
+  }, [
+    infoDebounce.diagnosis,
+    infoDebounce.symptom,
+    infoDebounce.diseaseProgression,
+    info.bloodPressure,
+    info.heartRate,
+    info.temperature,
+    date,
+    generalInfo,
+    isEdit,
+    vitalSignEdit,
+  ]);
+
+  useEffect(() => {
+    const handleGetHospitalizationDetailsByDate = async (hospitalizationId) => {
+      const response = await getHospitalizationDetailsByDate(
+        hospitalizationId,
+        date.format("YYYY-MM-DD")
+      );
+
+      if (response.success) {
+        const data = response.data.data;
+        setInfo({
+          bloodPressure: data.bloodPressure,
+          heartRate: data.heartRate,
+          temperature: data.temperature,
+          symptom: data.symptom,
+          diseaseProgression: data.diseaseProgression,
+          diagnosis: data.diagnosis,
+          updatedAt: data.updatedAt,
+        });
+      } else {
+        enqueueSnackbar("Đã xảy ra lỗi khi lấy thông tin chữa trị", {
+          variant: "error",
+        });
+      }
+    };
+    const handleGetMedicalTestsByDate = async (hospitalizationId) => {
+      const response = await getMedicalTestsByDate(
+        hospitalizationId,
+        date.format("YYYY-MM-DD")
+      );
+
+      if (response.success) {
+        setMedicalTests(response.data.data);
+      } else {
+        enqueueSnackbar("Đã xảy ra lỗi khi lấy thông tin xét nghiệm", {
+          variant: "error",
+        });
+      }
+    };
+
+    const hospitalizationId = generalInfo?.hospitalAdmissionId;
+    if (!hospitalizationId) {
+      return;
+    }
+
+    // Call 2 API at the same time
+    Promise.all([
+      handleGetHospitalizationDetailsByDate(hospitalizationId),
+      handleGetMedicalTestsByDate(hospitalizationId),
+    ]);
+  }, [generalInfo, date]);
+
   return (
     <Box>
       <ViewStyle container>
@@ -98,7 +225,9 @@ function AdmissionDetailsByDate(props) {
             <Typography variant="body1" fontSize={"10px"} marginLeft={"24px"}>
               {saving
                 ? "Đang lưu..."
-                : "Cập nhật lần cuối lúc: 18h00 - 23/04/2023 (BS. Nguyễn Thị Hồng)"}
+                : `Cập nhật lần cuối lúc: ${dayjs(info.updatedAt).format(
+                    "HH:mm - DD/MM/YYYY"
+                  )} (BS. Nguyễn Thị Hồng)`}
             </Typography>
           </Stack>
         </Grid>
@@ -118,6 +247,8 @@ function AdmissionDetailsByDate(props) {
               minDate={dayjs(generalInfo?.admissionDate)}
               maxDate={dayjs()}
               onChange={(newValue) => {
+                setIsEdit(false);
+                setVitalSignEdit(false);
                 setDate(newValue);
               }}
               renderInput={(params) => <Box>{params.inputProps.value}</Box>}
@@ -131,6 +262,7 @@ function AdmissionDetailsByDate(props) {
             heartRate={info.heartRate}
             bloodPressure={info.bloodPressure}
             temperature={info.temperature}
+            onChange={handleSignOfVitalityChange}
           />
         </Grid>
         <Grid
@@ -155,7 +287,8 @@ function AdmissionDetailsByDate(props) {
               }}
             >
               <Typography variant="h6" fontWeight={600} fontSize={"18px"}>
-                Kết quả xét nghiệm và chuẩn đoán hình ảnh (3)
+                Kết quả xét nghiệm và chuẩn đoán hình ảnh (
+                {medicalTests?.length})
               </Typography>
             </Box>
             <Stack
@@ -167,9 +300,13 @@ function AdmissionDetailsByDate(props) {
                 paddingBottom: "20px",
               }}
             >
-              <MedicalInAdmissionDatails ketQua={"Bình thường"} />
-              <MedicalInAdmissionDatails ketQua={""} />
-              <MedicalInAdmissionDatails ketQua={""} />
+              {medicalTests.map((item, index) => (
+                <MedicalInAdmissionDatails
+                  index={index}
+                  key={`medical-test-by-date-${index}`}
+                  medicalTest={item}
+                />
+              ))}
             </Stack>
           </LayoutStyle>
         </Grid>
@@ -214,34 +351,51 @@ function AdmissionDetailsByDate(props) {
         </Stack>
         <Stack direction={"column"} marginTop={"10px"} width={"100%"}>
           <TextField
-            disabled={!isEdit}
             fullWidth
             label="Triệu chứng"
-            value={info.symtoms}
+            value={info.symptom || ""}
             onChange={(e) => {
-              setInfo({ ...info, symtoms: e.target.value });
+              setInfo({ ...info, symptom: e.target.value });
             }}
             multiline
             rows={2}
             placeholder="Nhập triệu chứng của bệnh nhân"
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              readOnly: !isEdit,
+            }}
           />
           <TextField
-            disabled={!isEdit}
             fullWidth
-            label="Diễn biến bệnh phòng"
+            label={"Diễn biến bệnh phòng"}
+            value={info.diseaseProgression || ""}
+            onChange={(e) => {
+              setInfo({ ...info, diseaseProgression: e.target.value });
+            }}
             multiline
             rows={4}
             placeholder="Nhập diễn biến bệnh của bệnh nhân"
             style={{ marginTop: "16px" }}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              readOnly: !isEdit,
+            }}
           />
           <TextField
             fullWidth
-            disabled={!isEdit}
             label="Chuẩn đoán"
+            value={info.diagnosis || ""}
+            onChange={(e) => {
+              setInfo({ ...info, diagnosis: e.target.value });
+            }}
             multiline
             rows={2}
             placeholder="Nhập diễn biến bệnh của bệnh nhân"
             style={{ marginTop: "16px" }}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              readOnly: !isEdit,
+            }}
           />
         </Stack>
       </LayoutStyle>

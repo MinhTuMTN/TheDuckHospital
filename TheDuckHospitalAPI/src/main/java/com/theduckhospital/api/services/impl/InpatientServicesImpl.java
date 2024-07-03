@@ -271,4 +271,27 @@ public class InpatientServicesImpl implements IInpatientServices {
     ) {
         return false;
     }
+
+    @Override
+    public List<DoctorMedicalTestResponse> getInpatientMedicalTestsByDate(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            Date date
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        List<MedicalTest> medicalTests = medicalTestServices
+                .getMedicalTestsByHospitalAdmissionAndDate(
+                        hospitalAdmission,
+                        date
+                );
+
+        return medicalTests.stream()
+                .map(DoctorMedicalTestResponse::new)
+                .toList();
+    }
 }

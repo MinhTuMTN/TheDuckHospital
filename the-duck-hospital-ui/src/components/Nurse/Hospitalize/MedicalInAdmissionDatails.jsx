@@ -3,6 +3,7 @@ import { Grid, IconButton, Stack, Typography, styled } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
+import dayjs from "dayjs";
 const MedicalAdmissionDatails = styled(Grid)({
   padding: "12px 0px",
   backgroundColor: "#ffffff",
@@ -20,8 +21,7 @@ const CustomButton = styled(IconButton)({
   },
 });
 function MedicalInAdmissionDatails(props) {
-  const { ketQua } = props;
-  const [isShow, setIsShow] = React.useState(ketQua === "" ? false : true);
+  const { medicalTest, index } = props;
 
   return (
     <MedicalAdmissionDatails container>
@@ -38,7 +38,7 @@ function MedicalInAdmissionDatails(props) {
         }}
       >
         <Typography variant="h4" sx={{ fontWeight: 500 }}>
-          1
+          {index + 1}
         </Typography>
       </Grid>
       <Grid item xs={9} md={10} container>
@@ -52,7 +52,7 @@ function MedicalInAdmissionDatails(props) {
                   fontSize: "16px",
                 }}
               >
-                Xét nghiệm máu
+                {medicalTest?.serviceName}
               </Typography>
               <Typography
                 style={{
@@ -63,7 +63,8 @@ function MedicalInAdmissionDatails(props) {
                   marginTop: "7px",
                 }}
               >
-                (12/12/2021 lúc 16:00)
+                ({dayjs(medicalTest?.date).format("DD/MM/YYYY")} lúc{" "}
+                {dayjs(medicalTest?.date).format("HH:mm")})
               </Typography>
             </Stack>
             <Typography
@@ -74,10 +75,9 @@ function MedicalInAdmissionDatails(props) {
                 fontWeight: 450,
               }}
             >
-              Chỉ định: Xét nghiệm tiểu đường tuýt 2, huyết áp, đây là nội dung
-              rất dài
+              Chỉ định: {medicalTest?.note || "Không có chỉ định"}
             </Typography>
-            {ketQua === "" ? (
+            {!medicalTest?.testResult ? (
               <Typography
                 style={{
                   color: "#2751fa",
@@ -96,7 +96,7 @@ function MedicalInAdmissionDatails(props) {
                   fontWeight: 500,
                 }}
               >
-                Kết quả: {ketQua}
+                Kết quả: {medicalTest?.testResult}
               </Typography>
             )}
           </Stack>
@@ -110,14 +110,7 @@ function MedicalInAdmissionDatails(props) {
             height={"100%"}
             paddingX={3}
           >
-            <CustomButton disabled={isShow} size="small">
-              <DeleteOutlineOutlined
-                sx={{
-                  fontSize: "20px",
-                }}
-              />
-            </CustomButton>
-            <CustomButton disabled={!isShow} size="small">
+            <CustomButton disabled={!medicalTest?.result} size="small">
               <DownloadOutlined
                 sx={{
                   fontSize: "20px",

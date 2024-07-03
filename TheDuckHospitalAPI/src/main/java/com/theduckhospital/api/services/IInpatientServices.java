@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
+import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
 import com.theduckhospital.api.entity.HospitalAdmission;
@@ -65,5 +66,10 @@ public interface IInpatientServices {
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             CreateTreatmentMedicineRequest request
+    );
+    List<DoctorMedicalTestResponse> getInpatientMedicalTestsByDate(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            Date date
     );
 }

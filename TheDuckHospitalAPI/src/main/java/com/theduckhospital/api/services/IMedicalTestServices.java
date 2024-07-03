@@ -58,4 +58,8 @@ public interface IMedicalTestServices {
             HospitalAdmission hospitalAdmission,
             UUID medicalTestId
     );
+    List<MedicalTest> getMedicalTestsByHospitalAdmissionAndDate(
+            HospitalAdmission hospitalAdmission,
+            Date date
+    );
 }
