@@ -5,55 +5,56 @@ import {appColors} from '../../../constants/appColors';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
 import {globalStyles} from '../../../styles/globalStyles';
-import DoctorAlertDialogComponent from './DoctorAlertDialogComponent';
+import StaffItemAlertDialogComponent from './StaffItemAlertDialogComponent';
 
-interface DoctorItemComponentProps {
-  doctor: any;
+interface StaffDepartmentItemComponentProps {
+  isDoctor: boolean;
+  staff: any;
   departmentId: number;
   refreshList: boolean;
   setRefreshList: (refreshList: boolean) => void;
 }
 
-function DoctorItemComponent(props: DoctorItemComponentProps) {
-  const {doctor, departmentId, refreshList, setRefreshList} = props;
-  const [showDoctorAlertDialog, setShowDoctorAlertDialog] = useState(false);
+function StaffDepartmentItemComponent(props: StaffDepartmentItemComponentProps) {
+  const {isDoctor, staff, departmentId, refreshList, setRefreshList} = props;
+  const [showStaffAlertDialog, setShowStaffAlertDialog] = useState(false);
 
   const toggleAlert = () => {
-    setShowDoctorAlertDialog(!showDoctorAlertDialog);
+    setShowStaffAlertDialog(!showStaffAlertDialog);
   };
 
   return (
-    <ContainerComponent style={styles.doctorItemContainer}>
-      <FlexComponent style={[styles.doctorInfoContainer, {flex: 0.5}]}>
+    <ContainerComponent style={styles.staffItemContainer}>
+      <FlexComponent style={[styles.staffInfoContainer, {flex: 0.5}]}>
         <TextComponent bold fontSize={21}>
-          {doctor.fullName}
+          {staff.fullName}
         </TextComponent>
-        <TextComponent fontSize={16}>{doctor.phoneNumber}</TextComponent>
+        <TextComponent fontSize={16}>{staff.phoneNumber}</TextComponent>
       </FlexComponent>
 
       <FlexComponent
         style={[
-          styles.doctorInfoContainer,
+          styles.staffInfoContainer,
           {alignItems: 'flex-end', flex: 0.3},
         ]}>
         <FlexComponent style={styles.statusContainer}>
           <EntypoIcon
             name="dot-single"
             size={20}
-            color={doctor.deleted ? appColors.darkRed : appColors.green}
+            color={staff.deleted ? appColors.darkRed : appColors.green}
           />
           <TextComponent
             bold
             fontSize={12}
-            color={doctor.deleted ? appColors.darkRed : appColors.green}>
-            {doctor.deleted ? 'Ngưng hoạt động' : 'Còn hoạt động'}
+            color={staff.deleted ? appColors.darkRed : appColors.green}>
+            {staff.deleted ? 'Ngưng hoạt động' : 'Còn hoạt động'}
           </TextComponent>
         </FlexComponent>
       </FlexComponent>
 
       <FlexComponent
         style={[
-          styles.doctorInfoContainer,
+          styles.staffInfoContainer,
           {alignItems: 'flex-end', flex: 0.2},
         ]}>
         <Pressable onPress={toggleAlert}>
@@ -68,20 +69,21 @@ function DoctorItemComponent(props: DoctorItemComponentProps) {
         </Pressable>
       </FlexComponent>
 
-      <DoctorAlertDialogComponent
-        staffId={doctor.staffId}
+      <StaffItemAlertDialogComponent
+      isDoctor={isDoctor}
+        staffId={staff.staffId}
         departmentId={departmentId}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
-        setShowAlertDialog={setShowDoctorAlertDialog}
-        showAlertDialog={showDoctorAlertDialog}
+        setShowAlertDialog={setShowStaffAlertDialog}
+        showAlertDialog={showStaffAlertDialog}
       />
     </ContainerComponent>
   );
 }
 
 const styles = StyleSheet.create({
-  doctorItemContainer: {
+  staffItemContainer: {
     flex: 0.6,
     flexDirection: 'row',
     borderRadius: 10,
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
     shadowOpacity: globalStyles.shadow.shadowOpacity,
     elevation: globalStyles.shadow.elevation,
   },
-  doctorInfoContainer: {
+  staffInfoContainer: {
     justifyContent: 'center',
   },
   statusContainer: {
@@ -105,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoctorItemComponent;
+export default StaffDepartmentItemComponent;

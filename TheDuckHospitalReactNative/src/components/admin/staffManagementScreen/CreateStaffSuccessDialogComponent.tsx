@@ -2,8 +2,7 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {appColors} from '../../../constants/appColors';
 import AlertDialogComponent from '../../AlertDialogComponent';
-import {ActivitySquare, Users} from 'lucide-react-native';
-import {deleteStaff, restoreStaff} from '../../../services/staffServices';
+import {Users} from 'lucide-react-native';
 
 interface CreateStaffSuccessDialogComponentProps {
   staff: any;

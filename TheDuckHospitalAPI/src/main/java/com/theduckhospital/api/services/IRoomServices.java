@@ -30,7 +30,12 @@ public interface IRoomServices {
     Room findRoomById(int roomId);
     List<Room> getExaminationRoomsDepartment(String authorization);
     List<Room> getTreatmentRoomsDepartment(String authorization);
-    PaginationRoomsResponse getPaginationRooms(
+    PaginationRoomsResponse getPaginationExaminationRooms(
+            String authorization,
+            int page,
+            int limit
+    );
+    PaginationRoomsResponse getPaginationTreatmentRooms(
             String authorization,
             int page,
             int limit

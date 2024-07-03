@@ -351,7 +351,7 @@ function ChooseDayPage(props) {
                 {selectedSchedules.map((schedule) => (
                   <Stack key={schedule.doctorScheduleId}>
                     <Typography fontSize={14} fontWeight={500}>
-                      {schedule.scheduleType === "MORNING"
+                      {schedule.scheduleSession === "MORNING"
                         ? "Buổi sáng"
                         : "Buổi chiều"}
                     </Typography>

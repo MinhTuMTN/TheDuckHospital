@@ -65,6 +65,7 @@ import WalletScreen from './src/screens/patient/Wallet/WalletScreen';
 import store from './src/store/store';
 import DoctorInformationScreen from './src/screens/patient/DoctorInformationScreen';
 import WebViewScreen from './src/screens/patient/MedicalRegistrationProcess/WebViewScreen';
+import StatisticsByDepartmentScreen from './src/screens/admin/StatisticsScreen/StatisticsByDepartmentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -133,6 +134,10 @@ const App = () => {
                   <Stack.Screen
                     name="StatisticsScreen"
                     component={StatisticsScreen}
+                  />
+                  <Stack.Screen
+                    name="StatisticsByDepartmentScreen"
+                    component={StatisticsByDepartmentScreen}
                   />
                   <Stack.Screen
                     name="DepartmentDetailScreen"

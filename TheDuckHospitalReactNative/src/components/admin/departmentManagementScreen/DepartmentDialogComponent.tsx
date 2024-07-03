@@ -20,7 +20,8 @@ import SelectDropdown from 'react-native-select-dropdown';
 import FormControlComponent from '../../FormControlComponent';
 import {
   createDepartment,
-  getDoctorWithinDepartment,
+  getDoctorsWithinDepartment,
+  getNursesWithinDepartment,
   updateDepartment,
 } from '../../../services/departmentServices';
 
@@ -56,8 +57,12 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
     edit ? department?.description : '',
   );
   const [headDoctors, setHeadDoctors] = useState([]);
+  const [headNurses, setHeadNurses] = useState([]);
   const [headDoctor, setHeadDoctor] = useState(
     edit ? department?.headDoctor : {fullName: 'Chưa cập nhật', staffId: ''},
+  );
+  const [headNurse, setHeadNurse] = useState(
+    edit ? department?.headNurse : {fullName: 'Chưa cập nhật', staffId: ''},
   );
   const [error, setError] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -72,10 +77,12 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
         setName(department?.departmentName);
         setDescription(department?.description);
         setHeadDoctor(department?.headDoctor);
+        setHeadNurse(department?.headNurse);
       } else {
         setName('');
         setDescription('');
         setHeadDoctor({fullName: 'Chưa cập nhật', staffId: ''});
+        setHeadNurse({fullName: 'Chưa cập nhật', staffId: ''});
       }
     }
   };
@@ -108,6 +115,7 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
           departmentName: name,
           description: description,
           staffId: headDoctor?.staffId,
+          headNurseId: headNurse?.staffId,
         };
 
         setIsLoading(true);
@@ -130,8 +138,8 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
   };
 
   React.useEffect(() => {
-    const handleGetDoctorWithinDepartment = async () => {
-      const response = await getDoctorWithinDepartment(
+    const handleGetDoctorsWithinDepartment = async () => {
+      const response = await getDoctorsWithinDepartment(
         department?.departmentId,
       );
       if (response.success) {
@@ -140,8 +148,28 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
         console.log(response);
       }
     };
+    
     try {
-      handleGetDoctorWithinDepartment();
+      handleGetDoctorsWithinDepartment();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const handleGetNursesWithinDepartment = async () => {
+      const response = await getNursesWithinDepartment(
+        department?.departmentId,
+      );
+      if (response.success) {
+        setHeadNurses(response.data.data);
+      } else {
+        console.log(response);
+      }
+    };
+    
+    try {
+      handleGetNursesWithinDepartment();
     } catch (error) {
       console.log(error);
     }
@@ -287,6 +315,55 @@ const DepartmentDialogComponent = (props: DepartmentDialogComponentProps) => {
                     }}
                   />
 
+<TextComponent bold style={styles.labelText}>
+                    Trưởng điều dưỡng*
+                  </TextComponent>
+                  <SelectDropdown
+                    data={headNurses}
+                    onSelect={(selectedItem, index) => {
+                      setHeadNurse(selectedItem);
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem.fullName;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item.fullName;
+                    }}
+                    renderDropdownIcon={() => (
+                      <FontAwesomeIcon
+                        name="chevron-down"
+                        color={appColors.black}
+                        size={18}
+                      />
+                    )}
+                    buttonStyle={{
+                      backgroundColor: appColors.white,
+                      borderColor: appColors.black,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      width: '100%',
+                      marginBottom: 25,
+                    }}
+                    buttonTextStyle={{
+                      textAlign: 'left',
+                    }}
+                    renderCustomizedButtonChild={(selectedItem, index) => {
+                      return (
+                        <View style={styles.dropdownBtnChildStyle}>
+                          <FontistoIcon
+                            name="nurse"
+                            color={appColors.black}
+                            size={24}
+                          />
+                          <Text style={styles.dropdownBtnTxt}>
+                            {selectedItem
+                              ? selectedItem.fullName
+                              : headNurse?.fullName}
+                          </Text>
+                        </View>
+                      );
+                    }}
+                  />
                   {/* <SelectComponent
                     options={headDoctors}
                     keyTitle="fullName"

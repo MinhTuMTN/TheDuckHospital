@@ -306,7 +306,7 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
                         borderRadius: 10,
                         width: '100%',
                         marginBottom:
-                          department.departmentName === '' && !firstClick
+                          department?.departmentName === '' && !firstClick
                             ? 0
                             : 15,
                       }}
@@ -330,7 +330,7 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
                         );
                       }}
                     />
-                    {department.departmentName === '' && !firstClick && (
+                    {department?.departmentName === '' && !firstClick && (
                       <TextComponent
                         color={appColors.error}
                         fontSize={12}
@@ -451,7 +451,7 @@ const ServiceDialogComponent = (props: ServiceDialogComponentProps) => {
                 ) &&
                   !(
                     (department === undefined ||
-                      department.departmentName === '') &&
+                      department?.departmentName === '') &&
                     serviceType?.value === 'MedicalExamination'
                   ) &&
                   !(price.trim() === '') &&

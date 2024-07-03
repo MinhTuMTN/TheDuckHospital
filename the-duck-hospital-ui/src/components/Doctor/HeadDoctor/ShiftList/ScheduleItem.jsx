@@ -1,11 +1,11 @@
 import styled from "@emotion/styled";
-import PhoneAndroidOutlinedIcon from '@mui/icons-material/PhoneAndroidOutlined';
-import FingerprintIcon from '@mui/icons-material/Fingerprint';
-import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
-import BookmarkAddedOutlinedIcon from '@mui/icons-material/BookmarkAddedOutlined';
-import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
-import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
-import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
+import PhoneAndroidOutlinedIcon from "@mui/icons-material/PhoneAndroidOutlined";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
+import BookmarkAddedOutlinedIcon from "@mui/icons-material/BookmarkAddedOutlined";
+import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import {
   Box,
   Button,
@@ -19,7 +19,11 @@ import {
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 import FormatDate from "../../../General/FormatDate";
-import { deleteDoctorSchedule, getActiveDoctors, updateDoctorSchedule } from "../../../../services/doctor/headDoctor/ScheduleServices";
+import {
+  deleteDoctorSchedule,
+  getActiveDoctors,
+  updateDoctorSchedule,
+} from "../../../../services/doctor/headDoctor/ScheduleServices";
 import { enqueueSnackbar } from "notistack";
 import DialogConfirm from "../../../General/DialogConfirm";
 import DialogForm from "../../../General/DialogForm";
@@ -45,7 +49,14 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function ScheduleItem(props) {
-  const { schedule, setRefresh, refresh, valueDate } = props;
+  const {
+    schedule,
+    setRefresh,
+    refresh,
+    valueDate,
+    selectedRow,
+    treatmentRooms,
+  } = props;
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [editDoctorSchedule, setEditDoctorSchedule] = useState({
@@ -61,9 +72,8 @@ function ScheduleItem(props) {
     if (response.success) {
       enqueueSnackbar("Xóa lịch trực thành công", { variant: "success" });
       setRefresh(!refresh);
-
     } else enqueueSnackbar("Xóa lịch trực thất bại", { variant: "error" });
-  }
+  };
 
   const getDoctorsInDepartment = useCallback(async () => {
     const response = await getActiveDoctors();
@@ -84,15 +94,23 @@ function ScheduleItem(props) {
       return;
     }
 
-    if (editDoctorSchedule.slot < schedule.numberOfBookings ||
+    if (
+      editDoctorSchedule.slot < schedule.numberOfBookings ||
       editDoctorSchedule.slot === 0
     ) {
-      enqueueSnackbar("Số chỗ phải lớn hơn lượng đặt hiện tại và lớn hơn 0", { variant: "error" });
+      enqueueSnackbar("Số chỗ phải lớn hơn lượng đặt hiện tại và lớn hơn 0", {
+        variant: "error",
+      });
       return;
     }
 
-    if (dayjs(valueDate).isSame(currentDay, 'day') || dayjs(valueDate).isBefore(currentDay, 'day')) {
-      enqueueSnackbar("Chỉ được cập nhật lịch trực trước hôm nay một ngày", { variant: "error" });
+    if (
+      dayjs(valueDate).isSame(currentDay, "day") ||
+      dayjs(valueDate).isBefore(currentDay, "day")
+    ) {
+      enqueueSnackbar("Chỉ được cập nhật lịch trực trước hôm nay một ngày", {
+        variant: "error",
+      });
       return;
     }
 
@@ -122,7 +140,7 @@ function ScheduleItem(props) {
           <Person2OutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
@@ -139,7 +157,7 @@ function ScheduleItem(props) {
           <WcOutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
@@ -156,16 +174,14 @@ function ScheduleItem(props) {
           <PhoneAndroidOutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
             Số điện thoại
           </Typography>
         </Stack>
-        <Typography>
-          {schedule.doctor.phoneNumber}
-        </Typography>
+        <Typography>{schedule.doctor.phoneNumber}</Typography>
       </Stack>
 
       <Stack direction="row" justifyContent="space-between">
@@ -173,16 +189,14 @@ function ScheduleItem(props) {
           <FingerprintIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
             CCCD
           </Typography>
         </Stack>
-        <Typography>
-          {schedule.doctor.identityNumber}
-        </Typography>
+        <Typography>{schedule.doctor.identityNumber}</Typography>
       </Stack>
 
       <Stack direction="row" justifyContent="space-between">
@@ -190,7 +204,7 @@ function ScheduleItem(props) {
           <CakeOutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
@@ -207,32 +221,28 @@ function ScheduleItem(props) {
           <BookmarkAddedOutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
             Đặt trước
           </Typography>
         </Stack>
-        <Typography>
-          {schedule.numberOfBookings}
-        </Typography>
+        <Typography>{schedule.numberOfBookings}</Typography>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="row" spacing={1}>
           <EventAvailableOutlinedIcon />
           <Typography
             sx={{
-              fontSize: "18px",
+              fontSize: "20px",
               fontWeight: 600,
             }}
           >
             Chỗ còn lại
           </Typography>
         </Stack>
-        <Typography>
-          {schedule.slot - schedule.numberOfBookings}
-        </Typography>
+        <Typography>{schedule.slot - schedule.numberOfBookings}</Typography>
       </Stack>
       <Stack
         spacing={1}
@@ -259,7 +269,12 @@ function ScheduleItem(props) {
         </CustomButton>
         <CustomButton
           variant="contained"
-          disabled={dayjs(valueDate).isSame(currentDay, 'day') || dayjs(valueDate).isBefore(currentDay, 'day')}
+          disabled={
+            (dayjs(valueDate).isSame(currentDay, "day") ||
+              dayjs(valueDate).isBefore(currentDay, "day")) ||
+            treatmentRooms?.find((room) => room.roomId === selectedRow) ===
+              undefined
+          }
           sx={{
             background: "linear-gradient(to right, #42a5f5, #6fccea)",
             color: "#fff",
@@ -305,24 +320,25 @@ function ScheduleItem(props) {
           setUpdateButtonClicked(false);
         }}
       >
-        <Stack
-          direction="row"
-          width={"30rem"}
-          mt={3}
-          spacing={1}
-        >
+        <Stack direction="row" width={"30rem"} mt={3} spacing={1}>
           <Box style={{ width: "60%" }}>
             <CustomTypography
               variant="body1"
               style={{
-                color: editDoctorSchedule.selectedDoctor === "" && updateButtonClicked ? "red" : "",
+                color:
+                  editDoctorSchedule.selectedDoctor === "" &&
+                  updateButtonClicked
+                    ? "red"
+                    : "",
               }}
             >
               Bác sĩ
             </CustomTypography>
             <FormControl
               fullWidth
-              error={editDoctorSchedule.selectedDoctor === "" && updateButtonClicked}
+              error={
+                editDoctorSchedule.selectedDoctor === "" && updateButtonClicked
+              }
             >
               <Select
                 value={editDoctorSchedule.selectedDoctor}
@@ -347,9 +363,10 @@ function ScheduleItem(props) {
                   </MenuItem>
                 ))}
               </Select>
-              {editDoctorSchedule.selectedDoctor === "" && updateButtonClicked && (
-                <FormHelperText>Bác sĩ không được để trống</FormHelperText>
-              )}
+              {editDoctorSchedule.selectedDoctor === "" &&
+                updateButtonClicked && (
+                  <FormHelperText>Bác sĩ không được để trống</FormHelperText>
+                )}
             </FormControl>
           </Box>
           <Box
@@ -360,8 +377,12 @@ function ScheduleItem(props) {
             <CustomTypography
               variant="body1"
               style={{
-                color: (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                  editDoctorSchedule.slot === 0) && updateButtonClicked ? "red" : "",
+                color:
+                  (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                    editDoctorSchedule.slot === 0) &&
+                  updateButtonClicked
+                    ? "red"
+                    : "",
               }}
             >
               Số lượng chỗ
@@ -372,24 +393,31 @@ function ScheduleItem(props) {
               autoComplete="off"
               InputProps={{ inputProps: { min: schedule.numberOfBookings } }}
               value={
-                editDoctorSchedule.slot ?
-                  editDoctorSchedule.slot.toString() :
-                  schedule.numberOfBookings.toString()
+                editDoctorSchedule.slot
+                  ? editDoctorSchedule.slot.toString()
+                  : schedule.numberOfBookings.toString()
               }
               onChange={(e) => {
                 setEditDoctorSchedule((prev) => ({
                   ...prev,
-                  slot: e.target.value && parseInt(e.target.value) >= schedule.numberOfBookings ?
-                  parseInt(e.target.value) : schedule.numberOfBookings,
+                  slot:
+                    e.target.value &&
+                    parseInt(e.target.value) >= schedule.numberOfBookings
+                      ? parseInt(e.target.value)
+                      : schedule.numberOfBookings,
                 }));
               }}
               required
-              error={(editDoctorSchedule.slot < schedule.numberOfBookings ||
-                editDoctorSchedule.slot === 0) && updateButtonClicked}
+              error={
+                (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                  editDoctorSchedule.slot === 0) &&
+                updateButtonClicked
+              }
               helperText={
                 (editDoctorSchedule.slot < schedule.numberOfBookings ||
                   editDoctorSchedule.slot === 0) &&
-                updateButtonClicked && "Số lượng chỗ không hợp lệ"
+                updateButtonClicked &&
+                "Số lượng chỗ không hợp lệ"
               }
             />
           </Box>

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.PaymentMethod;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Transaction;
@@ -54,7 +55,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     long countByPaymentMethod(String paymentMethod);
 
-    List<Transaction> findByCreatedAtBetween(Date startDate, Date endDate);
+    List<Transaction> findByCreatedAtBetweenAndPaymentTypeIn(Date startDate, Date endDate, List<PaymentType> paymentTypes);
 
     Page<Transaction> findByCreatedAtBetweenAndAccountAndStatusOrderByCreatedAtDesc(
             Date startDate,

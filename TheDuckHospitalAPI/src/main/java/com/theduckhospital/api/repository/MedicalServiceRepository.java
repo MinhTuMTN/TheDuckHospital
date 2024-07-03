@@ -23,5 +23,7 @@ public interface MedicalServiceRepository extends JpaRepository<MedicalService, 
             List<ServiceType> serviceTypes
     );
 
+    List<MedicalService> findByServiceTypeAndDeletedIsFalseOrderByServiceName(ServiceType serviceType);
+
     List<MedicalService> findByDepartmentAndServiceType(Department department, ServiceType serviceType);
 }

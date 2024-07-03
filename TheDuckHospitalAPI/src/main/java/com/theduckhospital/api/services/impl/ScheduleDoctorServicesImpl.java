@@ -84,13 +84,16 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Medical service is not in your department");
         }
 
-        List<DoctorSchedule> doctorSchedules = new ArrayList<>();
+        Calendar dateCalendar;
+
+                List<DoctorSchedule> doctorSchedules = new ArrayList<>();
         for (Date date : request.getMorningDates()) {
+            dateCalendar = DateCommon.getCalendar(date);
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
                     medicalService,
                     department,
                     doctor,
-                    date,
+                    dateCalendar.getTime(),
                     MORNING,
                     request
             );
@@ -99,11 +102,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         for (Date date : request.getAfternoonDates()) {
+            dateCalendar = DateCommon.getCalendar(date);
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
                     medicalService,
                     department,
                     doctor,
-                    date,
+                    dateCalendar.getTime(),
                     AFTERNOON,
                     request
             );
@@ -112,11 +116,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         for (Date date : request.getEveningDates()) {
+            dateCalendar = DateCommon.getCalendar(date);
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
                     medicalService,
                     department,
                     doctor,
-                    date,
+                    dateCalendar.getTime(),
                     EVENING,
                     request
             );
@@ -125,11 +130,12 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         }
 
         for (Date date : request.getNightDates()) {
+            dateCalendar = DateCommon.getCalendar(date);
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(
                     medicalService,
                     department,
                     doctor,
-                    date,
+                    dateCalendar.getTime(),
                     NIGHT,
                     request
             );
@@ -523,21 +529,58 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Room is not in your department");
         }
 
-        DoctorSchedule morningDoctorSchedule = doctorScheduleRepository
-                .findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(room, date, MORNING);
-        ScheduleRoomItemResponse morningSchedule = new ScheduleRoomItemResponse(
-                morningDoctorSchedule,
-                calculateNumberOfBookings(morningDoctorSchedule)
-        );
+        Calendar startDateCalendar = DateCommon.getCalendar(date);
 
-        DoctorSchedule afternoonDoctorSchedule = doctorScheduleRepository
-                .findDoctorScheduleByRoomAndDateAndScheduleSessionAndDeletedIsFalse(room, date, AFTERNOON);
-        ScheduleRoomItemResponse afternoonSchedule = new ScheduleRoomItemResponse(
-                afternoonDoctorSchedule,
-                calculateNumberOfBookings(afternoonDoctorSchedule)
-        );
+        Calendar endDateCalendar = DateCommon.getCalendar(date);
+        endDateCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endDateCalendar.set(Calendar.MINUTE, 59);
+        endDateCalendar.set(Calendar.SECOND, 59);
+        endDateCalendar.set(Calendar.MILLISECOND, 99);
 
-        return new ScheduleRoomHeadDoctorResponse(morningSchedule, afternoonSchedule);
+        ScheduleRoomItemResponse morningSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                MORNING,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
+
+        ScheduleRoomItemResponse afternoonSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                AFTERNOON,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
+
+        ScheduleRoomItemResponse eveningSchedule =  getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                EVENING,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
+
+        ScheduleRoomItemResponse nightSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
+                room,
+                NIGHT,
+                startDateCalendar.getTime(),
+                endDateCalendar.getTime());
+
+        return new ScheduleRoomHeadDoctorResponse(morningSchedule, afternoonSchedule, eveningSchedule, nightSchedule);
+    }
+
+    private ScheduleRoomItemResponse getScheduleItemResponseByRoomAndSessionAndDate(
+            Room room,
+            ScheduleSession scheduleSession,
+            Date startDate,
+            Date endDate
+    ){
+        DoctorSchedule schedule = doctorScheduleRepository
+                .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
+                        room,
+                        scheduleSession,
+                        startDate,
+                        endDate
+                );
+        return new ScheduleRoomItemResponse(
+                schedule,
+                calculateNumberOfBookings(schedule)
+        );
     }
 
     @Override

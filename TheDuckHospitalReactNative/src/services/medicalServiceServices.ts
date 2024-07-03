@@ -5,13 +5,17 @@ import {
 } from '../types';
 import {del, get, post, put} from './AxiosInstance';
 
-export const getPaginationMedMedicalServices = async (
+export const getPaginationMedicalServices = async (
   search: string,
   limit: number,
   page: number,
   serviceTypes: string[],
 ) => {
   return get(`/admin/services/filtered`, {search, limit, page, serviceTypes});
+};
+
+export const getAllActiveTests = async () => {
+  return get(`/admin/services/active-tests`);
 };
 
 export const deleteService = async (serviceId: number) => {

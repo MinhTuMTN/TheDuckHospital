@@ -34,6 +34,7 @@ public interface IStaffServices {
             int page,
             int limit,
             List<Role> staffRole,
+            List<Integer> departmentIds,
             List<Boolean> staffStatus
     );
 }

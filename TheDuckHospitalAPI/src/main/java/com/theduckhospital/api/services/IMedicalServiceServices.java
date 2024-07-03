@@ -23,6 +23,9 @@ public interface IMedicalServiceServices {
             int limit,
             List<ServiceType> serviceTypes
     );
+
+    List<MedicalService> getAllActiveTests();
+
     MedicalService updateMedicalService(int serviceId, UpdateServiceRequest request);
     List<MedicalService> doctorGetAllMedicalTests();
     MedicalService getMedicalServiceByIdAndServiceType(int serviceId, ServiceType serviceType);

@@ -169,7 +169,7 @@ function AnalyticsDepartmentBased(props) {
                 </Stack>
               </Grid>
               <Grid item xs={12} md={4}>
-                <TopDoctor topDoctors={statistics.topDoctors?.slice(0, 5)} />
+                <TopDoctor topDoctors={statistics.topDoctors} />
               </Grid>
             </Grid>
           </Stack>

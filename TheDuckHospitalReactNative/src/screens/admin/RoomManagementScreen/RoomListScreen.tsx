@@ -71,8 +71,6 @@ function RoomListScreen() {
     );
     setIsLoadingAPI(false);
 
-    console.log(response);
-
     if (response.success) {
       if (paginationParams.page === 0) {
         setRooms(response.data?.data.rooms);

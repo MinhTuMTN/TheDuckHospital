@@ -24,6 +24,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../hooks/AuthHooks';
 import {navigationProps} from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import StatisticsByDepartmentScreen from '../screens/admin/StatisticsScreen/StatisticsByDepartmentScreen';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const auth = useAuth();
@@ -81,7 +82,7 @@ const Drawer = createDrawerNavigator();
 function AdminLeftSideDrawer() {
   return (
     <Drawer.Navigator
-      initialRouteName="Thống kê"
+      initialRouteName="Thống kê tổng quát"
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerLabelStyle: {...styles.drawerLabel},
@@ -90,11 +91,25 @@ function AdminLeftSideDrawer() {
         headerTitleStyle: {...styles.headerTitle},
       }}>
       <Drawer.Screen
-        name="Thống kê"
+        name="Thống kê tổng quát"
         component={StatisticsScreen}
         options={{
           drawerIcon: ({color, size}) => (
             <BarChart3 size={24} color={color} style={styles.drawerItemIcon} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Thống kê theo khoa"
+        component={StatisticsByDepartmentScreen}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <MaterialIcons
+              name="analytics"
+              size={24}
+              color={color}
+              style={styles.drawerItemIcon}
+            />
           ),
         }}
       />

@@ -13,6 +13,8 @@ function MuiTextFeild(props) {
     label,
     name,
     value,
+    placeholder,
+    disabled = false,
     onChange,
     error = null,
     children,
@@ -24,10 +26,12 @@ function MuiTextFeild(props) {
     <CustomTextField
       variant="outlined"
       label={label}
+      placeholder={placeholder}
       name={name}
       value={value}
       onChange={onChange}
       type={type}
+      disabled={disabled}
       {...(error && { error: true, helperText: error })}
       {...others}
     >

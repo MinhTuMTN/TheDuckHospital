@@ -11,12 +11,14 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import {appColors} from '../../../constants/appColors';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import DoctorItemComponent from '../../../components/admin/departmentManagementScreen/DoctorItemComponent';
 import {Info} from 'lucide-react-native';
-import HeadDoctorAlertDialogComponent from '../../../components/admin/departmentManagementScreen/HeadDoctorAlertDialogComponent';
-import DoctorDialogComponent from '../../../components/admin/departmentManagementScreen/DoctorDialogComponent';
 import {useRoute} from '@react-navigation/native';
 import {getDepartmentById} from '../../../services/departmentServices';
+import StaffDepartmentItemComponent from '../../../components/admin/departmentManagementScreen/StaffDepartmentItemComponent';
+import HeadDepartmentAlertDialogComponent from '../../../components/admin/departmentManagementScreen/HeadDepartmentAlertDialogComponent';
+import AddStaffDialogComponent from '../../../components/admin/departmentManagementScreen/AddStaffDialogComponent';
+import {Text} from '@gluestack-ui/themed';
+import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
 
 function DepartmentDetailScreen() {
   const route = useRoute();
@@ -25,12 +27,9 @@ function DepartmentDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showHeadDoctorAlertDialog, setShowHeadDoctorAlertDialog] =
+  const [showHeadDepartmentAlertDialog, setShowHeadDepartmentAlertDialog] =
     useState(false);
-
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
+  const [isDoctor, setIsDoctor] = useState(false);
 
   useEffect(() => {
     const handleGetDepartmentDetail = async () => {
@@ -50,8 +49,8 @@ function DepartmentDetailScreen() {
     <ContainerComponent style={{paddingTop: 0}}>
       <Header title={'Thông tin chi tiết khoa'} paddingTop={40} />
       <ContainerComponent style={styles.container}>
-        <Info size={32} color={appColors.black} />
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
+        <Info size={28} color={appColors.black} />
+        <TextComponent bold fontSize={24} style={styles.listLabel}>
           Thông tin cơ bản
         </TextComponent>
       </ContainerComponent>
@@ -61,83 +60,146 @@ function DepartmentDetailScreen() {
       ) : (
         <>
           <ContainerComponent style={styles.detailContainer}>
-            <FlexComponent style={styles.departmentInfoContainer}>
-              <TextComponent bold fontSize={20} style={{flex: 0.35}}>
-                Tên khoa:
-              </TextComponent>
-              <TextComponent fontSize={20} style={{flex: 0.65}}>
-                {department?.departmentName}
-              </TextComponent>
-            </FlexComponent>
+            <GestureHandlerRootView>
+              <ScrollView>
+                <FlexComponent style={styles.departmentInfoContainer}>
+                  <TextComponent bold fontSize={18} style={{flex: 0.45}}>
+                    Tên khoa:
+                  </TextComponent>
+                  <TextComponent fontSize={16} style={{flex: 0.55}}>
+                    {department?.departmentName}
+                  </TextComponent>
+                </FlexComponent>
 
-            <FlexComponent style={styles.departmentInfoContainer}>
-              <TextComponent bold fontSize={20} style={{flex: 0.35}}>
-                Trưởng khoa:
-              </TextComponent>
-              <FlexComponent
-                style={{
-                  flexDirection: 'row',
-                  flex: department?.headDoctor ? 0.45 : 0.65,
-                  alignItems: 'center',
-                }}>
-                <TextComponent fontSize={20}>
-                  {department?.headDoctorName}
-                </TextComponent>
-                {department?.headDoctor ? (
-                  <ButtonComponent
-                    containerStyles={styles.deleteButtonContainer}
-                    onPress={() => setShowHeadDoctorAlertDialog(true)}>
-                    <View>
-                      <TextComponent
+                <FlexComponent style={styles.departmentInfoContainer}>
+                  <TextComponent bold fontSize={18} style={{flex: 0.45}}>
+                    Trưởng khoa:
+                  </TextComponent>
+                  <FlexComponent
+                    style={{
+                      flexDirection: 'row',
+                      flex: 0.55,
+                      alignItems: 'center',
+                    }}>
+                    <TextComponent fontSize={16}>
+                      {department?.headDoctorName}
+                    </TextComponent>
+                    {department?.headDoctor ? (
+                      <Text
                         bold
                         fontSize={16}
-                        color={appColors.darkRed}>
-                        Xóa
-                      </TextComponent>
-                    </View>
-                  </ButtonComponent>
-                ) : (
-                  <TextComponent fontSize={20}>Chưa cập nhật</TextComponent>
-                )}
-              </FlexComponent>
-            </FlexComponent>
+                        color={appColors.darkRed}
+                        onPress={() => {
+                          setShowHeadDepartmentAlertDialog(true);
+                          setIsDoctor(true);
+                        }}>{` (Xóa)`}</Text>
+                    ) : (
+                      // <ButtonComponent
+                      //   containerStyles={styles.deleteButtonContainer}
+                      //   onPress={() => {
+                      //     setShowHeadDepartmentAlertDialog(true);
+                      //     setIsDoctor(true);
+                      //   }}>
+                      //   <View>
+                      //     <TextComponent
+                      //       bold
+                      //       fontSize={16}
+                      //       color={appColors.darkRed}>
+                      //       Xóa
+                      //     </TextComponent>
+                      //   </View>
+                      // </ButtonComponent>
+                      <TextComponent fontSize={16}>Chưa cập nhật</TextComponent>
+                    )}
+                  </FlexComponent>
+                </FlexComponent>
 
-            <FlexComponent style={styles.departmentInfoContainer}>
-              <TextComponent bold fontSize={20} style={{flex: 0.35}}>
-                Mô tả:
-              </TextComponent>
-              <TextComponent fontSize={20} style={{flex: 0.65}}>
-                {department?.description
-                  ? department?.description
-                  : 'Chưa cập nhật'}
-              </TextComponent>
-            </FlexComponent>
+                <FlexComponent style={styles.departmentInfoContainer}>
+                  <TextComponent bold fontSize={18} style={{flex: 0.45}}>
+                    Điều dưỡng trưởng:
+                  </TextComponent>
+                  <FlexComponent
+                    style={{
+                      flexDirection: 'row',
+                      flex: 0.55,
+                      alignItems: 'center',
+                    }}>
+                    <TextComponent fontSize={16}>
+                      {department?.headNurseName}
+                    </TextComponent>
+                    {department?.headNurse ? (
+                      <Text
+                        bold
+                        fontSize={16}
+                        color={appColors.darkRed}
+                        onPress={() => {
+                          setShowHeadDepartmentAlertDialog(true);
+                          setIsDoctor(false);
+                        }}>{` (Xóa)`}</Text>
+                    ) : (
+                      // <ButtonComponent
+                      //   containerStyles={styles.deleteButtonContainer}
+                      //   onPress={() => {
+                      //     setShowHeadDepartmentAlertDialog(true);
+                      //     setIsDoctor(false);
+                      //   }}>
+                      //   <View>
+                      //     <TextComponent
+                      //       bold
+                      //       fontSize={16}
+                      //       color={appColors.darkRed}>
+                      //       Xóa
+                      //     </TextComponent>
+                      //   </View>
+                      // </ButtonComponent>
+                      <TextComponent fontSize={16}>Chưa cập nhật</TextComponent>
+                    )}
+                  </FlexComponent>
+                </FlexComponent>
+
+                <FlexComponent style={styles.departmentInfoContainer}>
+                  <TextComponent bold fontSize={18} style={{flex: 0.45}}>
+                    Mô tả:
+                  </TextComponent>
+                  <TextComponent fontSize={16} style={{flex: 0.55}}>
+                    {department?.description
+                      ? department?.description
+                      : 'Chưa cập nhật'}
+                  </TextComponent>
+                </FlexComponent>
+              </ScrollView>
+            </GestureHandlerRootView>
           </ContainerComponent>
         </>
       )}
       <ContainerComponent style={styles.container}>
-        <FontistoIcon name="doctor" size={32} color={appColors.black} />
-        <TextComponent bold fontSize={28} style={styles.listLabel}>
+        <FontistoIcon name="doctor" size={28} color={appColors.black} />
+        <TextComponent bold fontSize={24} style={styles.listLabel}>
           Danh sách bác sĩ
         </TextComponent>
-        <ButtonComponent
-          containerStyles={styles.addButtonContainer}
-          onPress={toggleModal}>
-          <FlexComponent style={styles.buttonContent}>
-            <TextComponent
-              bold
-              fontSize={16}
-              color={appColors.textPrimary}
-              style={styles.addButtonText}>
-              Thêm
-            </TextComponent>
-            <AntDesignIcon
-              name="plus"
-              size={20}
-              color={appColors.textPrimary}
-            />
-          </FlexComponent>
-        </ButtonComponent>
+        {!loading && (
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={() => {
+              setModalVisible(!modalVisible);
+              setIsDoctor(true);
+            }}>
+            <FlexComponent style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={16}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <AntDesignIcon
+                name="plus"
+                size={20}
+                color={appColors.textPrimary}
+              />
+            </FlexComponent>
+          </ButtonComponent>
+        )}
       </ContainerComponent>
 
       {loading ? (
@@ -152,18 +214,76 @@ function DepartmentDetailScreen() {
             extraData={department?.doctors}
             refreshing={true}
             renderItem={({item}) => (
-              <DoctorItemComponent
+              <StaffDepartmentItemComponent
                 departmentId={departmentId}
                 refreshList={refreshList}
                 setRefreshList={setRefreshList}
-                doctor={item}
+                staff={item}
+                isDoctor={true}
               />
             )}
             style={{width: '100%'}}
           />
         </SafeAreaView>
       )}
-      <DoctorDialogComponent
+
+      <ContainerComponent style={styles.container}>
+        <FontistoIcon name="nurse" size={28} color={appColors.black} />
+        <TextComponent bold fontSize={24} style={styles.listLabel}>
+          Danh sách điều dưỡng
+        </TextComponent>
+        {!loading && (
+          <ButtonComponent
+            containerStyles={styles.addButtonContainer}
+            onPress={() => {
+              setModalVisible(!modalVisible);
+              setIsDoctor(false);
+            }}>
+            <FlexComponent style={styles.buttonContent}>
+              <TextComponent
+                bold
+                fontSize={16}
+                color={appColors.textPrimary}
+                style={styles.addButtonText}>
+                Thêm
+              </TextComponent>
+              <AntDesignIcon
+                name="plus"
+                size={20}
+                color={appColors.textPrimary}
+              />
+            </FlexComponent>
+          </ButtonComponent>
+        )}
+      </ContainerComponent>
+
+      {loading ? (
+        <ContentLoaderComponent />
+      ) : (
+        <SafeAreaView style={styles.scrollViewContainer}>
+          <FlatList
+            data={department?.nurses}
+            keyExtractor={(item: any, index: number) =>
+              `nurse-${item.id}-${index}`
+            }
+            extraData={department?.nurses}
+            refreshing={true}
+            renderItem={({item}) => (
+              <StaffDepartmentItemComponent
+                departmentId={departmentId}
+                refreshList={refreshList}
+                setRefreshList={setRefreshList}
+                staff={item}
+                isDoctor={false}
+              />
+            )}
+            style={{width: '100%'}}
+          />
+        </SafeAreaView>
+      )}
+
+      <AddStaffDialogComponent
+        isDoctor={isDoctor}
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         departmentId={department?.departmentId}
@@ -171,11 +291,12 @@ function DepartmentDetailScreen() {
         modalVisible={modalVisible}
       />
 
-      <HeadDoctorAlertDialogComponent
-        staffId={department?.headDoctorId}
+      <HeadDepartmentAlertDialogComponent
+        isDoctor={isDoctor}
+        staffId={isDoctor ? department?.headDoctorId : department?.headNurseId}
         setDepartmentDetail={setDepartment}
-        setShowAlertDialog={setShowHeadDoctorAlertDialog}
-        showAlertDialog={showHeadDoctorAlertDialog}
+        setShowAlertDialog={setShowHeadDepartmentAlertDialog}
+        showAlertDialog={showHeadDepartmentAlertDialog}
       />
     </ContainerComponent>
   );
