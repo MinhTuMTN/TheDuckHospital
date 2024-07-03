@@ -1,4 +1,3 @@
-import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import EditCalendarOutlinedIcon from "@mui/icons-material/EditCalendarOutlined";
@@ -23,12 +22,21 @@ import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthProvider";
+import { Person } from "@mui/icons-material";
 
-const sidebarItems = [
+const sidebarItemsNurse = [
   {
     display: "Lịch trực",
     icon: <TodayIcon />,
     to: "/nurse-schedule",
+  },
+];
+
+const sidebarItemsDoctor = [
+  {
+    display: "Lịch trực",
+    icon: <TodayIcon />,
+    to: "/doctor/doctor-schedules",
   },
 ];
 
@@ -43,6 +51,21 @@ const headNurseSidebarItems = [
     display: "Tạo ca trực",
     icon: <EditCalendarOutlinedIcon />,
     to: "/nurse-schedule/head-nurse/schedule-management/create",
+    label: "Quản lý ca trực",
+  },
+];
+
+const headDoctorSidebarItems = [
+  {
+    display: "Danh sách ca trực",
+    icon: <Person />,
+    to: "/doctor/doctor-schedules/schedule-management",
+    label: "Quản lý ca trực",
+  },
+  {
+    display: "Tạo ca trực",
+    icon: <Person />,
+    to: "/doctor/doctor-schedules/schedule-management/create",
     label: "Quản lý ca trực",
   },
 ];
@@ -72,15 +95,17 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
   padding: `0 0 ${theme.spacing(0.3)} ${theme.spacing(2.5)}`,
 }));
 
-function LeftNavbarNurseSchedule(props) {
+function LeftNavbarSchedule(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { fullName, setToken } = useAuth();
-  const theme = useTheme();
+  const { setToken, role } = useAuth();
   const navigate = useNavigate();
-  const { role } = useAuth();
-
-  const mainItems = sidebarItems;
+  const mainItems =
+    role === "Nurse" || role === "HeadNurse"
+      ? sidebarItemsNurse
+      : sidebarItemsDoctor;
+  const headSilebarItems =
+    role === "HeadNurse" ? headNurseSidebarItems : headDoctorSidebarItems;
   const content = (
     <Box
       sx={{
@@ -122,7 +147,7 @@ function LeftNavbarNurseSchedule(props) {
               fontSize: "18px",
             }}
           >
-            Điều dưỡng
+            {role === "Nurse" || role === "HeadNurse" ? "Điều dưỡng" : "Bác sĩ"}
           </Typography>
         </Box>
         <List>
@@ -146,7 +171,7 @@ function LeftNavbarNurseSchedule(props) {
           ))}
         </List>
 
-        {role === "HeadNurse" && (
+        {(role === "HeadNurse" || role === "HeadDoctor") && (
           <>
             <Box
               sx={{
@@ -165,11 +190,11 @@ function LeftNavbarNurseSchedule(props) {
                   fontSize: "18px",
                 }}
               >
-                Điều dưỡng trưởng
+                {role === "HeadNurse" ? "Điều dưỡng trưởng" : "Trưởng khoa"}
               </Typography>
             </Box>
             <List>
-              {headNurseSidebarItems.map((item, index) => (
+              {headSilebarItems.map((item, index) => (
                 <NavLink
                   key={`nav-bar-store-${index}`}
                   style={{ textDecoration: "none" }}
@@ -197,62 +222,13 @@ function LeftNavbarNurseSchedule(props) {
         direction={"column"}
         spacing={2}
         sx={{
+          position: "sticky",
           borderTop: "1px solid #e0e0e0",
           paddingX: 2,
           paddingY: 2.5,
           width: "100%",
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <CardMedia
-            component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702377250/camel_ckn4py.png"
-            sx={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              padding: "5px",
-              border: "1px solid #c8c8c8",
-              boxShadow: "0px 0px 5px 0px #c8c8c8",
-            }}
-          />
-          <Stack
-            direction={"column"}
-            spacing={0}
-            sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "12px",
-                color: "#8c8c8c",
-                textAlign: "left",
-              }}
-            >
-              Điều dưỡng
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                color: theme.palette.text.main,
-                textAlign: "left",
-                fontWeight: "500",
-              }}
-            >
-              {fullName}
-            </Typography>
-          </Stack>
-        </Stack>
-
         <Button
           variant="contained"
           sx={{
@@ -325,9 +301,9 @@ function LeftNavbarNurseSchedule(props) {
     </SwipeableDrawer>
   );
 }
-LeftNavbarNurseSchedule.propTypes = {
+LeftNavbarSchedule.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
 };
 
-export default LeftNavbarNurseSchedule;
+export default LeftNavbarSchedule;

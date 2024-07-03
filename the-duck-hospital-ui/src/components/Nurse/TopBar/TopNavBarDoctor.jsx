@@ -1,7 +1,6 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   Box,
-  CardMedia,
   IconButton,
   Stack,
   SvgIcon,
@@ -9,18 +8,15 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import React from "react";
-import { useLocation } from "react-router-dom";
-import { DoctorContext } from "../../auth/DoctorProvider";
-import { useAuth } from "../../auth/AuthProvider";
+import { useAuth } from "../../../auth/AuthProvider";
+import CardMediaImage from "./CardMediaImage";
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
 
 function TopNavBarDoctor(props) {
-  const { onDrawerClick } = props;
-  const location = useLocation();
+  const { onDrawerClick, roomName, departmentName } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { roomName, departmentName } = React.useContext(DoctorContext);
   const { role } = useAuth();
 
   return (
@@ -38,8 +34,6 @@ function TopNavBarDoctor(props) {
           top: 0,
           width: {
             lg: `calc(100vw - ${SIDE_NAV_WIDTH}px)`,
-            md: "100vw",
-            sm: "100vw",
             xs: "100vw",
           },
           zIndex: (theme) => theme.zIndex.appBar,
@@ -52,51 +46,20 @@ function TopNavBarDoctor(props) {
           justifyContent={"space-between"}
           spacing={2}
           sx={{
-            minHeight: TOP_NAV_HEIGHT, // Đặt chiều cao tối thiểu cho phần header
-            px: 2, // Đặt padding theo chiều ngang cho phần header
+            minHeight: TOP_NAV_HEIGHT,
+            px: 2,
           }}
         >
           {!lgUp && (
             <IconButton onClick={() => onDrawerClick(true)}>
-              {" "}
               <SvgIcon fontSize="small">
                 <MenuIcon />
               </SvgIcon>
             </IconButton>
           )}
           <Stack direction={"row"} alignItems={"center"} spacing={1}>
-            <CardMedia
-              component={"img"}
-              image={
-                "https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702293009/hospital-building_ue3udt.png"
-              }
-              sx={{
-                height: "30px",
-                width: "30px",
-              }}
-            />
-
-            <Typography
-              variant={"body1"}
-              style={{
-                fontSize: "20px",
-                fontWeight: "500",
-              }}
-            >
-              {location?.state?.label}
-            </Typography>
-
-            {!roomName || !departmentName ? (
-              <Typography
-                variant={"body1"}
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "500",
-                }}
-              >
-                {"Khám chữa bệnh"}
-              </Typography>
-            ) : role === "Doctor" || role === "HeadDoctor" ? (
+            <CardMediaImage />
+            {role === "Doctor" || role === "HeadDoctor" ? (
               <Typography
                 variant={"body1"}
                 style={{

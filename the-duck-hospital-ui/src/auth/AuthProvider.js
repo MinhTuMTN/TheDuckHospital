@@ -6,6 +6,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [token, setToken_] = useState(localStorage.getItem("token"));
   const [fullName, setFullName_] = useState(localStorage.getItem("fullName"));
+  const [avatar, setAvatar_] = useState(localStorage.getItem("avatar") || null);
   const [role, setRole_] = useState(localStorage.getItem("role"));
   const [nurseType, setNurseType_] = useState(
     localStorage.getItem("nurseType")
@@ -25,6 +26,10 @@ const AuthProvider = ({ children }) => {
 
   const setNurseType = (newNurseType) => {
     setNurseType_(newNurseType);
+  };
+
+  const setAvatar = (newAvatar) => {
+    setAvatar_(newAvatar);
   };
 
   useEffect(() => {
@@ -61,6 +66,14 @@ const AuthProvider = ({ children }) => {
     }
   }, [nurseType]);
 
+  useEffect(() => {
+    if (avatar) {
+      localStorage.setItem("avatar", avatar);
+    } else {
+      localStorage.removeItem("avatar");
+    }
+  }, [avatar]);
+
   // Memoized value of the authentication context
   const contextValue = useMemo(
     () => ({
@@ -68,12 +81,14 @@ const AuthProvider = ({ children }) => {
       setToken,
       fullName,
       setFullName,
+      avatar,
+      setAvatar,
       role,
       setRole,
       nurseType,
       setNurseType,
     }),
-    [token, fullName, role, nurseType]
+    [token, fullName, role, nurseType, avatar]
   );
 
   // Provide the authentication context to the children components

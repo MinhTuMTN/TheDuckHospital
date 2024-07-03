@@ -1,9 +1,8 @@
-import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import Filter9PlusIcon from "@mui/icons-material/Filter9Plus";
+import KingBedIcon from "@mui/icons-material/KingBed";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
-import KingBedIcon from "@mui/icons-material/KingBed";
 import {
   Box,
   Button,
@@ -53,7 +52,6 @@ const StyledLogo = styled(CardMedia)(({ theme }) => ({
   paddingX: "16px",
 }));
 const CustomListItemButton = styled(ListItemButton)(({ theme, active }) => ({
-  //marginLeft: theme.spacing("16px"),
   width: "100%",
   color: "#797575",
   fontSize: "13px",
@@ -71,8 +69,7 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 function LeftNavbar(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { fullName, setToken } = useAuth();
-  const theme = useTheme();
+  const { setToken } = useAuth();
   const navigate = useNavigate();
   const content = (
     <Box
@@ -191,62 +188,13 @@ function LeftNavbar(props) {
         direction={"column"}
         spacing={2}
         sx={{
+          position: "sticky",
           borderTop: "1px solid #e0e0e0",
           paddingX: 2,
           paddingY: 2.5,
           width: "100%",
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <CardMedia
-            component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702286975/kitty_qrtjrw.png"
-            sx={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              padding: "5px",
-              border: "1px solid #c8c8c8",
-              boxShadow: "0px 0px 5px 0px #c8c8c8",
-            }}
-          />
-          <Stack
-            direction={"column"}
-            spacing={0}
-            sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "12px",
-                color: "#8c8c8c",
-                textAlign: "left",
-              }}
-            >
-              Điều dưỡng
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                color: theme.palette.text.main,
-                textAlign: "left",
-                fontWeight: "500",
-              }}
-            >
-              {fullName}
-            </Typography>
-          </Stack>
-        </Stack>
-
         <Button
           variant="contained"
           sx={{

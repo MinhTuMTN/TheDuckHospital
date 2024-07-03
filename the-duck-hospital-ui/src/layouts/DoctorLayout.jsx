@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useContext } from "react";
 import { Outlet } from "react-router-dom";
-import TopNavBarDoctor from "../components/Doctor/TopNavBarDoctor";
+import { DoctorContext } from "../auth/DoctorProvider";
 import LeftNavBarDoctor from "../components/Doctor/LeftNavbarDoctor";
+import TopNavBarDoctor from "../components/Nurse/TopBar/TopNavBarDoctor";
 const SIDE_NAV_WIDTH = 280;
 
 const LayoutRoot = styled("div")(({ theme }) => ({
@@ -22,10 +23,15 @@ const LayoutContainer = styled("div")({
 });
 function DoctorLayout(props) {
   const [open, setOpen] = React.useState(false);
+  const { roomName, departmentName } = useContext(DoctorContext);
 
   return (
     <>
-      <TopNavBarDoctor onDrawerClick={setOpen} />
+      <TopNavBarDoctor
+        roomName={roomName}
+        departmentName={departmentName}
+        onDrawerClick={setOpen}
+      />
       <LeftNavBarDoctor open={open} onOpenClose={setOpen} />
       <LayoutRoot>
         <LayoutContainer>
