@@ -28,8 +28,12 @@ export const restoreDepartment = async (departmentId: number) => {
   return put(`/admin/departments/${departmentId}/restore`);
 };
 
-export const getDoctorWithinDepartment = async (departmentId: number) => {
+export const getDoctorsWithinDepartment = async (departmentId: number) => {
   return get(`/admin/departments/${departmentId}/doctors`);
+};
+
+export const getNursesWithinDepartment = async (departmentId: number) => {
+  return get(`/admin/departments/${departmentId}/nurses`);
 };
 
 export const getDoctorWithoutDepartment = async (departmentId: number) => {

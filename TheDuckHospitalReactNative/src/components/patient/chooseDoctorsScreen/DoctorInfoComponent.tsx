@@ -93,7 +93,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
             }
             label={t('chooseDoctorForBooking.department')}
             labelColor={'#8F8F8F'}
-            value={item.department.departmentName}
+            value={item.department?.departmentName}
             valueColor={'#4F4F4F'}
             flexLabel={2}
             flexValue={3}

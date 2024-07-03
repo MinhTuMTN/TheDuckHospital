@@ -46,6 +46,7 @@ public class RoomServicesImpl implements IRoomServices {
     }
     @Override
     public RoomResponse createRoom(CreateRoomRequest request) {
+        System.out.println(request);
         boolean isLaboratoryRoom = request.getRoomType() == RoomType.LABORATORY_ROOM_ADMISSION
                 || request.getRoomType() == RoomType.LABORATORY_ROOM_NORMAL;
 

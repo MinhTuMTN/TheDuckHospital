@@ -14,6 +14,10 @@ export const getPaginationMedicalServices = async (
   return get(`/admin/services/filtered`, {search, limit, page, serviceTypes});
 };
 
+export const getAllActiveTests = async () => {
+  return get(`/admin/services/active-tests`);
+};
+
 export const deleteService = async (serviceId: number) => {
   return del(`/admin/services/${serviceId}`);
 };

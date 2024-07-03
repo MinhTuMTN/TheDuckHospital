@@ -15,6 +15,7 @@ import {appColors} from '../../../constants/appColors';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
 import {
@@ -44,8 +45,15 @@ const roles = [
   {value: 'DOCTOR', label: 'Bác sĩ'},
   {value: 'LABORATORY_TECHNICIAN', label: 'Bác sĩ xét nghiệm'},
   {value: 'NURSE', label: 'Điều dưỡng'},
-  {value: 'ADMIN', label: 'Quản lý'},
+  {value: 'CASHIER', label: 'Thu ngân'},
 ];
+
+const nurseTypes = [
+  {value: 'null', label: 'Không'},
+  {value: 'CLINICAL_NURSE', label: 'Phòng khám'},
+  {value: 'INPATIENT_NURSE', label: 'Nội trú'},
+];
+
 const degrees = [{value: 'BS'}, {value: 'TS'}, {value: 'PGS'}, {value: 'GS'}];
 
 const genders = [
@@ -109,6 +117,13 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
   const [role, setRole] = useState(
     edit ? roles.find(role => role.label === staff.role) : roles[0],
   );
+  const [nurseType, setNurseType] = useState(
+    edit
+      ? staff?.nurseType === null
+        ? nurseTypes[0]
+        : nurseTypes.find(nurseType => nurseType.value === staff.nurseType)
+      : nurseTypes[0],
+  );
   const [gender, setGender] = React.useState(
     edit
       ? genders.find(gender => gender.genderId === staff.gender)
@@ -150,6 +165,15 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
             : degrees[0],
         );
         setRole(roles.find(role => role.label === staff.role));
+        setNurseType(
+          staff.role === 'Nurse'
+            ? staff?.nurseType === null
+              ? nurseTypes[0]
+              : nurseTypes.find(
+                  nurseType => nurseType.value === staff.nurseType,
+                )
+            : undefined,
+        );
         setDepartment(staff.department);
         setSelectedImage({
           uri: staff?.avatar,
@@ -167,6 +191,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
         setGender(genders[0]);
         setDegree(degrees[0]);
         setRole(roles[0]);
+        setNurseType(nurseTypes[0]);
         setDepartment({departmentId: null, departmentName: ''});
         setSelectedImage({
           uri: null,
@@ -179,9 +204,9 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
 
   const handleCreateOrUpdateStaff = async () => {
     if (firstClick) setFirstClick(false);
-    if (error || selectedImage.uri === null) {
-      return;
-    }
+    // if (error || selectedImage.uri === null) {
+    //   return;
+    // }
     if (!edit) {
       const formData = new FormData();
       formData.append('fullName', name);
@@ -192,8 +217,15 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
       formData.append('role', role ? role.value : roles[0].value);
       formData.append('gender', gender ? gender.genderId : 0);
       formData.append('degree', degree ? degree.value : degrees[0].value);
-      formData.append('departmentId', department.departmentId);
-      formData.append('avatar', selectedImage);
+      formData.append(
+        'departmentId',
+        department?.departmentId ? department?.departmentId : -1,
+      );
+      // formData.append('avatar', selectedImage);
+      formData.append(
+        'nurseType',
+        nurseType?.value === 'null' ? '' : nurseType?.value,
+      );
       // const data = {
       //   fullName: name,
       //   phoneNumber: phoneNumber,
@@ -235,8 +267,12 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
       formData.append('gender', gender ? gender.genderId : 0);
       formData.append('avatar', selectedImage);
       formData.append('degree', degree ? degree.value : degrees[0].value);
-      formData.append('departmentId', department.departmentId);
+      formData.append(
+        'departmentId',
+        department ? department.departmentId : '',
+      );
       formData.append('avatar', selectedImage);
+      formData.append('nurseType', nurseType?.value);
       // const data = {
       //   fullName: name,
       //   phoneNumber: phoneNumber,
@@ -616,7 +652,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                 }}
               />
               <TextComponent bold style={styles.modalText}>
-                Giới tính *
+                Giới tính*
               </TextComponent>
               <SelectDropdown
                 data={genders}
@@ -738,20 +774,23 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                       );
                     }}
                   />
-
+                </>
+              )}
+              {role?.value === 'NURSE' && !edit && (
+                <>
                   <TextComponent bold style={styles.modalText}>
-                    Khoa*
+                    Loại điều dưỡng*
                   </TextComponent>
                   <SelectDropdown
-                    data={departments}
+                    data={nurseTypes}
                     onSelect={(selectedItem, index) => {
-                      setDepartment(selectedItem);
+                      setNurseType(selectedItem);
                     }}
                     buttonTextAfterSelection={(selectedItem, index) => {
-                      return selectedItem.departmentName;
+                      return selectedItem.label;
                     }}
                     rowTextForSelection={(item, index) => {
-                      return item.departmentName;
+                      return item.label;
                     }}
                     renderDropdownIcon={() => (
                       <FontAwesomeIcon
@@ -766,7 +805,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                       borderWidth: 1,
                       borderRadius: 10,
                       width: '100%',
-                      marginBottom: 25,
+                      marginBottom: 15,
                     }}
                     buttonTextStyle={{
                       textAlign: 'left',
@@ -774,15 +813,13 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                     renderCustomizedButtonChild={(selectedItem, index) => {
                       return (
                         <View style={styles.dropdownBtnChildStyle}>
-                          <MaterialCommunityIcons
-                            name="google-classroom"
+                          <FontistoIcon
+                            name="nurse"
                             size={24}
                             color={appColors.black}
                           />
                           <Text style={styles.dropdownBtnTxt}>
-                            {selectedItem
-                              ? selectedItem.departmentName
-                              : department?.departmentName}
+                            {nurseType?.label}
                           </Text>
                         </View>
                       );
@@ -790,6 +827,61 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
                   />
                 </>
               )}
+              {(role?.value === 'DOCTOR' ||
+                (role?.value === 'NURSE' && nurseType?.value !== 'null')) &&
+                !edit && (
+                  <>
+                    <TextComponent bold style={styles.modalText}>
+                      Khoa*
+                    </TextComponent>
+                    <SelectDropdown
+                      data={departments}
+                      onSelect={(selectedItem, index) => {
+                        setDepartment(selectedItem);
+                      }}
+                      buttonTextAfterSelection={(selectedItem, index) => {
+                        return selectedItem.departmentName;
+                      }}
+                      rowTextForSelection={(item, index) => {
+                        return item.departmentName;
+                      }}
+                      renderDropdownIcon={() => (
+                        <FontAwesomeIcon
+                          name="chevron-down"
+                          color={appColors.black}
+                          size={18}
+                        />
+                      )}
+                      buttonStyle={{
+                        backgroundColor: appColors.white,
+                        borderColor: appColors.black,
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        width: '100%',
+                        marginBottom: 25,
+                      }}
+                      buttonTextStyle={{
+                        textAlign: 'left',
+                      }}
+                      renderCustomizedButtonChild={(selectedItem, index) => {
+                        return (
+                          <View style={styles.dropdownBtnChildStyle}>
+                            <MaterialCommunityIcons
+                              name="google-classroom"
+                              size={24}
+                              color={appColors.black}
+                            />
+                            <Text style={styles.dropdownBtnTxt}>
+                              {selectedItem
+                                ? selectedItem.departmentName
+                                : department?.departmentName}
+                            </Text>
+                          </View>
+                        );
+                      }}
+                    />
+                  </>
+                )}
             </FormControlComponent>
           </ScrollView>
           <ButtonGroup
@@ -809,8 +901,13 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
             <ButtonComponent
               enabled={
                 !error &&
-                !(selectedImage === undefined || selectedImage.uri === null) &&
-                !(department === undefined || department?.departmentName === '')
+                // !(selectedImage === undefined || selectedImage.uri === null) &&
+                !(
+                  (department === undefined ||
+                    department?.departmentName === '') &&
+                  (role?.value === 'DOCTOR' ||
+                    (role?.value === 'NURSE' && nurseType?.value !== 'null'))
+                )
               }
               isLoading={isLoading}
               onPress={handleCreateOrUpdateStaff}

@@ -127,7 +127,7 @@ public class StaffServicesImpl implements IStaffServices {
 
             accountRepository.save(account);
             staffRepository.save(staff);
-            updateAvatarAsync(staff.getStaffId(), request.getAvatar().getBytes());
+//            updateAvatarAsync(staff.getStaffId(), request.getAvatar().getBytes());
 
             return Map.of(
                     "phoneNumber", request.getPhoneNumber(),

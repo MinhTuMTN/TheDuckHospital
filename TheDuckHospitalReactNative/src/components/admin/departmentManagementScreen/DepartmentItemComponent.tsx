@@ -43,11 +43,11 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
       <ContainerComponent style={styles.departmentItemContainer}>
         <FlexComponent style={[styles.departmentInfoContainer, {flex: 0.5}]}>
           <TextComponent bold fontSize={21}>
-            {department.departmentName}
+            {department?.departmentName}
           </TextComponent>
           <TextComponent fontSize={16}>
-            {department.headDoctorName
-              ? department.headDoctorName
+            {department?.headDoctorName
+              ? department?.headDoctorName
               : 'Chưa cập nhật'}
           </TextComponent>
         </FlexComponent>
@@ -61,13 +61,13 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
             <EntypoIcon
               name="dot-single"
               size={20}
-              color={department.deleted ? appColors.darkRed : appColors.green}
+              color={department?.deleted ? appColors.darkRed : appColors.green}
             />
             <TextComponent
               bold
               fontSize={12}
-              color={department.deleted ? appColors.darkRed : appColors.green}>
-              {department.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
+              color={department?.deleted ? appColors.darkRed : appColors.green}>
+              {department?.deleted ? 'Ngừng hoạt động' : 'Còn hoạt động'}
             </TextComponent>
           </FlexComponent>
         </FlexComponent>
@@ -89,7 +89,7 @@ function DepartmentItemComponent(props: DepartmentItemComponentProps) {
           </Pressable>
           <Pressable onPress={toggleAlert}>
             {({pressed}) =>
-              department.deleted ? (
+              department?.deleted ? (
                 <ArchiveRestore
                   size={24}
                   color={appColors.green}

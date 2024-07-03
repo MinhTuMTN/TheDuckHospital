@@ -539,7 +539,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         endDateCalendar.set(Calendar.MINUTE, 59);
         endDateCalendar.set(Calendar.SECOND, 59);
         endDateCalendar.set(Calendar.MILLISECOND, 99);
-        
+
         ScheduleRoomItemResponse morningSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
                 room,
                 MORNING,
@@ -571,7 +571,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             Room room,
             ScheduleSession scheduleSession,
             Date startDate,
-            Date endDate){
+            Date endDate
+    ){
         DoctorSchedule schedule = doctorScheduleRepository
                 .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
                         room,
