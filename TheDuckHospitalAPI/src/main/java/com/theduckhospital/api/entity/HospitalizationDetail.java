@@ -32,6 +32,8 @@ public class HospitalizationDetail {
     @Nationalized
     private String symptom;
     @Nationalized
+    private String diseaseProgression;
+    @Nationalized
     private String temperature;
     @Nationalized
     private String bloodPressure;

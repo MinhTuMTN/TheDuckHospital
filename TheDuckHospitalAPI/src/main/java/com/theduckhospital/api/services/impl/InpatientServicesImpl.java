@@ -4,6 +4,7 @@ import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
@@ -18,7 +19,6 @@ import com.theduckhospital.api.services.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +32,7 @@ public class InpatientServicesImpl implements IInpatientServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final IHospitalizationDetailServices hospitalizationDetailServices;
     private final IDoctorServices doctorServices;
+    private final ITreatmentMedicineServices treatmentMedicineServices;
 
     public InpatientServicesImpl(
             NurseScheduleRepository nurseScheduleRepository,
@@ -40,7 +41,8 @@ public class InpatientServicesImpl implements IInpatientServices {
             IMedicalTestServices medicalTestServices,
             IMedicalServiceServices medicalServiceServices,
             IHospitalizationDetailServices hospitalizationDetailServices,
-            IDoctorServices doctorServices
+            IDoctorServices doctorServices,
+            ITreatmentMedicineServices treatmentMedicineServices
     ) {
         this.nurseScheduleRepository = nurseScheduleRepository;
         this.hospitalAdmissionServices = hospitalAdmissionServices;
@@ -49,6 +51,7 @@ public class InpatientServicesImpl implements IInpatientServices {
         this.medicalServiceServices = medicalServiceServices;
         this.hospitalizationDetailServices = hospitalizationDetailServices;
         this.doctorServices = doctorServices;
+        this.treatmentMedicineServices = treatmentMedicineServices;
     }
 
     @Override
@@ -166,7 +169,7 @@ public class InpatientServicesImpl implements IInpatientServices {
     }
 
     @Override
-    public boolean updateDailyHospitalAdmissionDetails(
+    public HospitalizationDetail updateDailyHospitalAdmissionDetails(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             UpdateDailyHospitalAdmissionDetails request
@@ -178,12 +181,37 @@ public class InpatientServicesImpl implements IInpatientServices {
                         hospitalizationId
                 );
 
-        hospitalizationDetailServices.updateDailyHospitalAdmissionDetails(
+        return hospitalizationDetailServices.updateDailyHospitalAdmissionDetails(
                 nurse,
                 hospitalAdmission,
                 request
         );
-        return true;
+    }
+
+    @Override
+    public HospitalizationDetail getDailyHospitalAdmissionDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            Date date
+    ) {
+        Date today = DateCommon.getEndOfDay(DateCommon.getToday());
+        date = DateCommon.getStarOfDay(date);
+        if (date.after(today)) {
+            throw new BadRequestException("Date must be before today", 400);
+        }
+
+        Nurse nurse = nurseServices.getNurseByToken(inpatientNurseAuthorization);
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        nurse,
+                        hospitalizationId
+                );
+
+        return hospitalizationDetailServices.getDailyHospitalAdmissionDetails(
+                nurse,
+                hospitalAdmission,
+                date
+        );
     }
 
     @Override
@@ -215,5 +243,32 @@ public class InpatientServicesImpl implements IInpatientServices {
                 );
 
         return new HospitalAdmissionResponse(hospitalAdmission);
+    }
+
+    @Override
+    public List<TreatmentMedicine> getMedicinesOfHospitalAdmission(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            Date date
+    ) {
+        HospitalizationDetail hospitalizationDetail = getDailyHospitalAdmissionDetails(
+                inpatientNurseAuthorization,
+                hospitalizationId,
+                date
+        );
+
+        return treatmentMedicineServices
+                .getTreatmentMedicinesByHospitalizationDetail(
+                        hospitalizationDetail
+                );
+    }
+
+    @Override
+    public boolean createTreatmentMedicine(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            CreateTreatmentMedicineRequest request
+    ) {
+        return false;
     }
 }
