@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.ScheduleType;
 import jakarta.persistence.*;

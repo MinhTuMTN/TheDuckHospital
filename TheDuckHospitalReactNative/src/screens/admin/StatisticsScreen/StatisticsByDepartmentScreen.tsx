@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, StyleSheet, Pressable} from 'react-native';
 import {
   ContainerComponent,
@@ -8,25 +8,28 @@ import {
 } from '../../../components';
 import {appColors} from '../../../constants/appColors';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
-import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ScrollView} from '@gluestack-ui/themed';
-import {CalendarDays, LifeBuoy, LineChartIcon} from 'lucide-react-native';
+import {CalendarDays, LineChartIcon, NotepadText} from 'lucide-react-native';
 import {LineChart} from 'react-native-chart-kit';
 import {appInfo} from '../../../constants/appInfo';
 import dayjs from 'dayjs';
 import DatePicker from 'react-native-date-picker';
-import {PieChart} from 'react-native-gifted-charts';
 import {
-  getAllStatistics,
-  getBookingStatistics,
-  getRevenueStatistics,
+  getAllStatisticsByDepartment,
+  getBookingStatisticsByDepartment,
+  getRevenueStatisticsByDepartment,
 } from '../../../services/statisticsServices';
-import DepartmentStatisticsItemComponent from '../../../components/admin/statisticsScreen/DepartmentStatisticsItemComponent';
-import LegendComponent from '../../../components/admin/statisticsScreen/LegendComponent';
 import StatisticsItemComponent from '../../../components/admin/statisticsScreen/StatisticsItemComponent';
+import SelectDropdown from 'react-native-select-dropdown';
+import {getAllActiveDepartments} from '../../../services/departmentServices';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Text} from '@gluestack-ui/themed';
+import DepartmentStatisticsItemComponent from '../../../components/admin/statisticsScreen/DepartmentStatisticsItemComponent';
+import DoctorStatisticsItemComponent from '../../../components/admin/statisticsScreen/DoctorStatisticsItemComponent';
 
-function StatisticsScreen() {
+function StatisticsByDepartmentScreen() {
   const [showDatePicker1, setShowDatePicker1] = React.useState(false);
   const [showDatePicker2, setShowDatePicker2] = React.useState(false);
   const [showDatePicker3, setShowDatePicker3] = React.useState(false);
@@ -42,68 +45,40 @@ function StatisticsScreen() {
   const [statistics, setStatistics] = React.useState<any>({});
   const [revenueStatistics, setRevenueStatistics] = React.useState<any>({});
   const [bookingStatistics, setBookingStatistics] = React.useState<any>({});
-  const [pieData, setPieData] = useState([
-    {
-      value: 0,
-      color: '#009FFF',
-      gradientCenterColor: appColors.primary,
-      focused: true,
-      text: '',
-      label: '',
-    },
-    {
-      value: 0,
-      color: '#93FCF8',
-      gradientCenterColor: '#3BE9DE',
-      text: '',
-      label: '',
-    },
-    {
-      value: 0,
-      color: '#BDB2FA',
-      gradientCenterColor: '#8F80F3',
-      text: '',
-      label: '',
-    },
-  ]);
-
-  const getTotalValueSum = (data: any) => {
-    return data.reduce(
-      (accumulator: any, current: any) => accumulator + current.value,
-      0,
-    );
-  };
+  const [activeDepartments, setActiveDepartments] = React.useState([]);
+  const [selectedDepartment, setSelectedDepartment] = React.useState<any>(null);
 
   React.useEffect(() => {
     const handleGetAllStatistics = async () => {
-      const response = await getAllStatistics();
+      const response = await getAllStatisticsByDepartment(
+        selectedDepartment.departmentId,
+      );
 
       if (response.success) {
         setStatistics(response.data?.data);
-        let pieDataAPI = response.data?.data.paymentMethodStatistics;
-        pieDataAPI = pieDataAPI.sort((a: any, b: any) => b.value - a.value);
-        const totalValueSum = getTotalValueSum(pieDataAPI);
-
-        let updatedPieData = pieData.map((item, index) => {
-          const apiItem = pieDataAPI[index];
-          return {
-            ...item,
-            value: apiItem.value,
-            text: `${Math.round((apiItem.value * 100) / totalValueSum)}%`,
-            label: apiItem.label,
-          };
-        });
-
-        setPieData(updatedPieData);
       }
     };
 
-    handleGetAllStatistics();
-  }, [startDate1]);
+    if (selectedDepartment !== null) handleGetAllStatistics();
+  }, [selectedDepartment]);
+
+  React.useEffect(() => {
+    const handleGetAllActiveDepartments = async () => {
+      const response = await getAllActiveDepartments();
+
+      if (response.success) {
+        setActiveDepartments(response.data?.data);
+        setSelectedDepartment(response.data?.data[0]);
+      }
+    };
+
+    handleGetAllActiveDepartments();
+  }, []);
 
   React.useEffect(() => {
     const handleGetRevenueStatistics = async () => {
-      const response = await getRevenueStatistics(
+      const response = await getRevenueStatisticsByDepartment(
+        selectedDepartment.departmentId,
         dayjs(startDate1).format('YYYY/MM/DD'),
         dayjs(endDate1).format('YYYY/MM/DD'),
       );
@@ -113,12 +88,13 @@ function StatisticsScreen() {
       }
     };
 
-    handleGetRevenueStatistics();
-  }, [startDate1, endDate1]);
+    if (selectedDepartment !== null) handleGetRevenueStatistics();
+  }, [startDate1, endDate1, selectedDepartment]);
 
   React.useEffect(() => {
     const handleGetBookingStatistics = async () => {
-      const response = await getBookingStatistics(
+      const response = await getBookingStatisticsByDepartment(
+        selectedDepartment.departmentId,
         dayjs(startDate2).format('YYYY/MM/DD'),
         dayjs(endDate2).format('YYYY/MM/DD'),
       );
@@ -128,36 +104,87 @@ function StatisticsScreen() {
       }
     };
 
-    handleGetBookingStatistics();
-  }, [startDate2, endDate2]);
+    if (selectedDepartment !== null) handleGetBookingStatistics();
+  }, [startDate2, endDate2, selectedDepartment]);
 
   return (
     <ScrollView>
+      <ContainerComponent style={styles.cardStatistics}>
+        <ContainerComponent style={styles.container}>
+          <MaterialIcons
+            name="meeting-room"
+            size={28}
+            color={appColors.primary}
+          />
+          <TextComponent
+            color={appColors.primary}
+            bold
+            fontSize={24}
+            style={styles.listLabel}>
+            Chọn khoa cần thống kê
+          </TextComponent>
+        </ContainerComponent>
+        <SelectDropdown
+          data={activeDepartments}
+          onSelect={(selectedItem, index) => {
+            setSelectedDepartment(selectedItem);
+          }}
+          buttonTextAfterSelection={(selectedItem, index) => {
+            return selectedItem.departmentName;
+          }}
+          rowTextForSelection={(item, index) => {
+            return item.departmentName;
+          }}
+          renderDropdownIcon={() => (
+            <FontAwesomeIcon
+              name="chevron-down"
+              color={appColors.black}
+              size={18}
+            />
+          )}
+          buttonStyle={{
+            backgroundColor: appColors.white,
+            borderColor: appColors.black,
+            borderWidth: 1,
+            borderRadius: 10,
+            width: '100%',
+            marginTop: 20,
+            marginBottom: 10,
+          }}
+          buttonTextStyle={{
+            textAlign: 'left',
+          }}
+          renderCustomizedButtonChild={(selectedItem, index) => {
+            return (
+              <View style={styles.dropdownBtnChildStyle}>
+                <NotepadText size={24} color={appColors.black} />
+                <Text style={styles.dropdownBtnTxt}>
+                  {selectedItem
+                    ? selectedItem.departmentName
+                    : selectedDepartment?.departmentName}
+                </Text>
+              </View>
+            );
+          }}
+        />
+      </ContainerComponent>
       <FlexComponent direction="row" justifyContent="space-evenly">
         <StatisticsItemComponent
           marginLeft={10}
           icon={
-            <FontistoIcon
-              name="bed-patient"
-              size={65}
-              color={appColors.primary}
-            />
+            <FontistoIcon name="doctor" size={65} color={appColors.primary} />
           }
-          label={`Số bệnh nhân`}
-          value={statistics.totalPatients}
+          label={`Số bác sĩ`}
+          value={statistics.totalDoctors}
         />
 
         <StatisticsItemComponent
           marginLeft={0}
           icon={
-            <MaterialCommunityIcon
-              name="google-classroom"
-              size={65}
-              color={appColors.primary}
-            />
+            <FontistoIcon name="nurse" size={65} color={appColors.primary} />
           }
-          label={`Số chuyên khoa`}
-          value={statistics.totalDepartments}
+          label={`Số điều dưỡng`}
+          value={statistics.totalNurses}
         />
       </FlexComponent>
 
@@ -256,13 +283,13 @@ function StatisticsScreen() {
             <TextComponent style={{paddingBottom: 5}}>
               Biểu đồ đường thống kê doanh thu
             </TextComponent>
-            {revenueStatistics.values?.length > 0 && (
+            {revenueStatistics.totalValues?.length > 0 && (
               <LineChart
                 data={{
                   labels: revenueStatistics.labels,
                   datasets: [
                     {
-                      data: revenueStatistics.values,
+                      data: revenueStatistics.totalValues,
                     },
                   ],
                 }}
@@ -388,7 +415,7 @@ function StatisticsScreen() {
             <TextComponent style={{paddingBottom: 5}}>
               Biểu đồ đường thống kê lượt đặt khám
             </TextComponent>
-            {bookingStatistics.values?.length > 0 && (
+            {bookingStatistics?.values?.length > 0 && (
               <LineChart
                 data={{
                   labels: bookingStatistics.labels,
@@ -430,62 +457,6 @@ function StatisticsScreen() {
       <ContainerComponent style={styles.cardStatistics}>
         <ContainerComponent
           style={[styles.container, {paddingTop: 20, paddingBottom: 5}]}>
-          <LifeBuoy size={28} color={appColors.primary} />
-          <TextComponent
-            color={appColors.primary}
-            bold
-            fontSize={24}
-            style={styles.listLabel}>
-            Thống kê loại thanh toán
-          </TextComponent>
-        </ContainerComponent>
-        <FlexComponent
-          alignItems="center"
-          style={{backgroundColor: appColors.white, paddingLeft: 20}}>
-          <TextComponent style={{fontSize: 16, paddingVertical: 10}}>
-            Biểu đồ tròn thống kê loại thanh toán
-          </TextComponent>
-          <FlexComponent
-            direction="row"
-            justifyContent="space-evenly"
-            alignItems="center">
-            <PieChart
-              showText
-              textColor={appColors.black}
-              data={pieData}
-              donut
-              showGradient
-              sectionAutoFocus
-              radius={95}
-              innerRadius={45}
-              centerLabelComponent={() => {
-                return (
-                  <View
-                    style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <TextComponent
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 'bold',
-                      }}>
-                      {pieData[0].text}
-                    </TextComponent>
-                    <TextComponent style={{fontSize: 14}}>
-                      {pieData[0].label}
-                    </TextComponent>
-                  </View>
-                );
-              }}
-            />
-            <ContainerComponent style={{paddingTop: 0, paddingLeft: 20}}>
-              {pieData[0].label !== '' && <LegendComponent pieData={pieData} />}
-            </ContainerComponent>
-          </FlexComponent>
-        </FlexComponent>
-      </ContainerComponent>
-
-      <ContainerComponent style={styles.cardStatistics}>
-        <ContainerComponent
-          style={[styles.container, {paddingTop: 20, paddingBottom: 5}]}>
           <FontAwesome6Icon
             name="ranking-star"
             size={24}
@@ -496,13 +467,13 @@ function StatisticsScreen() {
             bold
             fontSize={24}
             style={styles.listLabel}>
-            5 khoa có nhiều lượt khám
+            5 bác sĩ ưu tú
           </TextComponent>
         </ContainerComponent>
-        {statistics.topDepartments?.map((item: any, index: number) => (
-          <DepartmentStatisticsItemComponent
+        {statistics?.topDoctors?.map((item: any, index: number) => (
+          <DoctorStatisticsItemComponent
             key={index}
-            departmentItem={item}
+            doctor={item}
             index={index}
           />
         ))}
@@ -571,6 +542,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  dropdownBtnChildStyle: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  dropdownBtnTxt: {
+    color: appColors.black,
+    fontSize: 16,
+    marginHorizontal: 12,
+  },
 });
 
-export default StatisticsScreen;
+export default StatisticsByDepartmentScreen;

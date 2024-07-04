@@ -1,12 +1,13 @@
 package com.theduckhospital.api.repository;
 
-import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -17,16 +18,23 @@ import java.util.UUID;
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     List<Doctor> findByDepartmentIsNull();
+
     long countByDeletedFalse();
+
     Optional<Doctor> findByStaffIdAndDepartment(UUID doctorId, Department department);
+
     Page<Doctor> findAllByFullNameContainingAndDegreeAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, Degree degree, String department_departmentName, Pageable pageable
     );
+
     Page<Doctor> findByFullNameContainingAndDeletedFalseAndDepartment(String fullName, Department department, Pageable pageable);
+
     long countByDeletedFalseAndDepartment(Department department);
+
     Page<Doctor> findAllByFullNameContainingAndDepartment_DepartmentNameContainingAndDeletedIsFalseAndDoctorSchedulesNotEmpty(
             String fullName, String department_departmentName, Pageable pageable
     );
+
     @Query("SELECT d " +
             "FROM Doctor d " +
             "WHERE d.deleted = false " +
@@ -42,8 +50,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Date today,
             Pageable pageable
     );
+
     List<Doctor> findAllByHeadOfDepartmentIsTrue();
-    List<Doctor> findByDepartmentOrderByRatingDesc(Department department);
+
+    //    List<Doctor> findByDepartmentOrderByRatingDesc(Department department);
+    @Query(value = "SELECT d FROM Doctor d WHERE d.department.departmentId = :departmentId ORDER BY d.rating DESC LIMIT 5")
+    List<Doctor> findTop5DoctorsByDepartment(@Param("departmentId") int departmentId);
+
     @Query("SELECT d " +
             "FROM Doctor d " +
             "WHERE d.deleted = false " +
@@ -57,7 +70,21 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             Date today,
             Pageable pageable
     );
+
     long countByDepartmentAndDeletedIsFalse(Department department);
+
     List<Doctor> findDoctorsByDepartmentAndDeletedIsFalse(Department department);
-    Optional<Doctor>  findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
+
+    Optional<Doctor> findByDepartmentAndHeadOfDepartmentIsTrue(Department department);
+
+    @Query(value = "SELECT d FROM Doctor d " +
+            "WHERE d.deleted IN :deleted " +
+            "AND d.department.departmentId IN :departmentIds " +
+            "AND d.fullName LIKE %:fullName%"
+    )
+    Page<Doctor> findDoctor(@Param("fullName") String fullName,
+                            @Param("deleted") List<Boolean> deleted,
+                            @Param("departmentIds") List<Integer> departmentIds,
+                            Pageable pageable
+    );
 }

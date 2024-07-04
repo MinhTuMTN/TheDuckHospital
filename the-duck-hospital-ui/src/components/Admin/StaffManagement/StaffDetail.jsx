@@ -451,7 +451,7 @@ function StaffDetail(props) {
                   ? staff?.avatar
                   : "https://www.shareicon.net/data/512x512/2016/08/18/813844_people_512x512.png"
               }
-              alt="top-product"
+              alt="staff-avatar"
               style={{
                 width: 200,
                 height: 200,

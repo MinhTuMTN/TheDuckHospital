@@ -1,6 +1,7 @@
 package com.theduckhospital.api.controller.nurse;
 
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
+import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.IInpatientServices;
@@ -132,6 +133,90 @@ public class InpatientNurseController {
                                 authorization,
                                 hospitalizationId,
                                 updateDailyHospitalAdmissionDetails
+                        )
+                )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/details")
+    public ResponseEntity<?> getDailyHospitalAdmissionDetails(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get daily hospital admission details successfully")
+                .data(inpatientServices
+                        .getDailyHospitalAdmissionDetails(
+                                authorization,
+                                hospitalizationId,
+                                date
+                        )
+                )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/medical-tests-by-date")
+    public ResponseEntity<?> getInpatientMedicalTestsByDate(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get inpatient medical tests by date successfully")
+                .data(inpatientServices
+                        .getInpatientMedicalTestsByDate(
+                                authorization,
+                                hospitalizationId,
+                                date
+                        )
+                )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/medicines")
+    public ResponseEntity<?> getMedicinesOfHospitalAdmission(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get medicines of hospital admission successfully")
+                .data(inpatientServices
+                        .getMedicinesOfHospitalAdmission(
+                                authorization,
+                                hospitalizationId,
+                                date
+                        )
+                )
+                .build()
+        );
+    }
+
+    @PostMapping("/hospitalization/{hospitalizationId}/medicines")
+    public ResponseEntity<?> createTreatmentMedicine(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestBody CreateTreatmentMedicineRequest createTreatmentMedicineRequest
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Create treatment medicine successfully")
+                .data(inpatientServices
+                        .createTreatmentMedicine(
+                                authorization,
+                                hospitalizationId,
+                                createTreatmentMedicineRequest
                         )
                 )
                 .build()

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.theduckhospital.api.constant.RoomType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

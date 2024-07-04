@@ -11,11 +11,13 @@ public class PaginationRoomsResponse {
     private long total;
     private int page;
     private int limit;
+    private boolean hasExaminationRooms;
 
-    public PaginationRoomsResponse(List<RoomResponse> rooms, long total, int page, int limit) {
+    public PaginationRoomsResponse(List<RoomResponse> rooms, long total, int page, int limit, boolean hasExaminationRooms) {
         this.rooms = rooms;
         this.total = total;
         this.page = page;
         this.limit = limit;
+        this.hasExaminationRooms = hasExaminationRooms;
     }
 }

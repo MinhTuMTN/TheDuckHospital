@@ -19,29 +19,29 @@ const getSchedule = (doctor) => {
     if (a.dayOfWeek > b.dayOfWeek) return 1;
     if (a.dayOfWeek < b.dayOfWeek) return -1;
     else {
-      if (a.scheduleType === "MORNING") return -1;
+      if (a.scheduleSession === "MORNING") return -1;
       return 1;
     }
   });
 
   let previousSchedule = {
     dayOfWeek: 0,
-    scheduleType: "",
+    scheduleSession: "",
   };
   doctor.doctorSchedules?.forEach((item) => {
     if (
-      item.scheduleType === previousSchedule.scheduleType &&
+      item.scheduleSession === previousSchedule.scheduleSession &&
       item.dayOfWeek === previousSchedule.dayOfWeek
     )
       return;
-    if (item.scheduleType === "MORNING") {
+    if (item.scheduleSession === "MORNING") {
       schedule += `Sáng ${days[item.dayOfWeek]}, `;
     } else {
       schedule += `Chiều ${days[item.dayOfWeek]}, `;
     }
 
     previousSchedule.dayOfWeek = item.dayOfWeek;
-    previousSchedule.scheduleType = item.scheduleType;
+    previousSchedule.scheduleSession = item.scheduleSession;
   });
   return schedule;
 };

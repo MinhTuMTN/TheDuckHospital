@@ -14,7 +14,7 @@ import {
   styled,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect } from "react";
 import { appColors } from "../../../utils/appColorsUtils";
 const LayoutStyle = styled(Stack)(({ theme }) => ({
   padding: "16px 16px",
@@ -31,8 +31,37 @@ const modalStyle = {
   justifyContent: "center",
 };
 const VitalSignsComponent = (props) => {
-  const { heartRate, bloodPressure, temperature } = props;
+  const { heartRate, bloodPressure, temperature, onChange = () => {} } = props;
+  const [changeInfo, setChangeInfo] = React.useState({
+    heartRate: heartRate,
+    bloodPressure: bloodPressure,
+    temperature: temperature,
+  });
   const [openModal, setOpenModal] = React.useState(false);
+  const handleUpdateVitalSigns = () => {
+    onChange(
+      changeInfo.bloodPressure,
+      changeInfo.heartRate,
+      changeInfo.temperature
+    );
+    setOpenModal(false);
+  };
+  const handleCloseModal = () => {
+    setChangeInfo({
+      heartRate: heartRate,
+      bloodPressure: bloodPressure,
+      temperature: temperature,
+    });
+    setOpenModal(false);
+  };
+
+  useEffect(() => {
+    setChangeInfo({
+      heartRate: heartRate,
+      bloodPressure: bloodPressure,
+      temperature: temperature,
+    });
+  }, [heartRate, bloodPressure, temperature]);
   return (
     <LayoutStyle direction={"column"}>
       <Box
@@ -121,137 +150,159 @@ const VitalSignsComponent = (props) => {
           Cập nhật
         </Typography>
       </Button>
-      <Modal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        style={modalStyle}
-      >
-        <Stack
-          direction={"column"}
-          style={{
-            backgroundColor: appColors.white,
-            borderRadius: "8px",
-            width: "400px",
-          }}
-        >
+      {openModal && (
+        <Modal open={openModal} onClose={handleCloseModal} style={modalStyle}>
           <Stack
-            direction={"row"}
-            padding={"8px 16px"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
+            direction={"column"}
             style={{
-              borderBottom: "1px solid #b7b7b7",
+              backgroundColor: appColors.white,
+              borderRadius: "8px",
+              width: "400px",
             }}
           >
-            <Typography fontSize={"18px"} fontWeight={600}>
-              Cập nhật dấu hiệu sinh tồn
-            </Typography>
-            <IconButton onClick={() => setOpenModal(false)}>
-              <CloseIcon />{" "}
-            </IconButton>
-          </Stack>
-          <Stack padding={"24px 16px 16px 16px"} direction={"column"}>
-            <Box component="form" width={"100%"} noValidate autoComplete="off">
-              <TextField
-                value={heartRate}
-                fullWidth
-                label="Nhịp tim"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VaccinesIcon style={{ fontSize: "18px" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">Bpm</InputAdornment>
-                  ),
-                  style: {
-                    padding: "8px 12px",
-                  },
-                }}
-                style={{ marginBottom: "16px" }}
-              />
-              <TextField
-                value={bloodPressure}
-                fullWidth
-                label="Huyết áp"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VaccinesIcon style={{ fontSize: "18px" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">mg/dl</InputAdornment>
-                  ),
-                  style: {
-                    padding: "8px 12px",
-                  },
-                }}
-                style={{ marginBottom: "16px" }}
-              />
-              <TextField
-                value={temperature}
-                fullWidth
-                label="Nhiệt độ"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <VaccinesIcon style={{ fontSize: "18px" }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">°C</InputAdornment>
-                  ),
-                  style: {
-                    padding: "8px 12px",
-                  },
-                }}
-              />
-            </Box>
-          </Stack>
-          <Stack
-            padding={"8px 16px 12px 16px"}
-            direction={"row"}
-            justifyContent={"flex-end"}
-            alignItems={"center"}
-          >
-            <Button
-              onClick={() => setOpenModal(false)}
+            <Stack
+              direction={"row"}
+              padding={"8px 16px"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
               style={{
-                padding: "8px 16px",
-                marginRight: "8px",
+                borderBottom: "1px solid #b7b7b7",
               }}
             >
-              <Typography
-                textTransform={"none"}
-                fontSize={"14px"}
-                fontWeight={600}
-                color={appColors.blueBackground}
-                letterSpacing={0.5}
-              >
-                Hủy
+              <Typography fontSize={"18px"} fontWeight={600}>
+                Cập nhật dấu hiệu sinh tồn
               </Typography>
-            </Button>
-            <Button
-              style={{
-                padding: "8px 16px",
-                backgroundColor: appColors.blueBackground,
-              }}
+              <IconButton onClick={handleCloseModal}>
+                <CloseIcon />{" "}
+              </IconButton>
+            </Stack>
+            <Stack padding={"24px 16px 16px 16px"} direction={"column"}>
+              <Box
+                component="form"
+                width={"100%"}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  value={changeInfo.heartRate}
+                  onChange={(e) => {
+                    setChangeInfo((prev) => ({
+                      ...prev,
+                      heartRate: e.target.value,
+                    }));
+                  }}
+                  fullWidth
+                  label="Nhịp tim"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <VaccinesIcon style={{ fontSize: "18px" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">Bpm</InputAdornment>
+                    ),
+                    style: {
+                      padding: "8px 12px",
+                    },
+                  }}
+                  style={{ marginBottom: "16px" }}
+                />
+                <TextField
+                  value={changeInfo.bloodPressure}
+                  onChange={(e) => {
+                    setChangeInfo((prev) => ({
+                      ...prev,
+                      bloodPressure: e.target.value,
+                    }));
+                  }}
+                  fullWidth
+                  label="Huyết áp"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <VaccinesIcon style={{ fontSize: "18px" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">mg/dl</InputAdornment>
+                    ),
+                    style: {
+                      padding: "8px 12px",
+                    },
+                  }}
+                  style={{ marginBottom: "16px" }}
+                />
+                <TextField
+                  value={changeInfo.temperature}
+                  onChange={(e) => {
+                    setChangeInfo((prev) => ({
+                      ...prev,
+                      temperature: e.target.value,
+                    }));
+                  }}
+                  fullWidth
+                  label="Nhiệt độ"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <VaccinesIcon style={{ fontSize: "18px" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">°C</InputAdornment>
+                    ),
+                    style: {
+                      padding: "8px 12px",
+                    },
+                  }}
+                />
+              </Box>
+            </Stack>
+            <Stack
+              padding={"8px 16px 12px 16px"}
+              direction={"row"}
+              justifyContent={"flex-end"}
+              alignItems={"center"}
             >
-              <Typography
-                textTransform={"none"}
-                fontSize={"14px"}
-                fontWeight={600}
-                color={appColors.white}
-                letterSpacing={0.5}
+              <Button
+                onClick={handleCloseModal}
+                style={{
+                  padding: "8px 16px",
+                  marginRight: "8px",
+                }}
               >
-                Cập nhật
-              </Typography>
-            </Button>
+                <Typography
+                  textTransform={"none"}
+                  fontSize={"14px"}
+                  fontWeight={600}
+                  color={appColors.blueBackground}
+                  letterSpacing={0.5}
+                >
+                  Hủy
+                </Typography>
+              </Button>
+              <Button
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: appColors.blueBackground,
+                }}
+                onClick={handleUpdateVitalSigns}
+              >
+                <Typography
+                  textTransform={"none"}
+                  fontSize={"14px"}
+                  fontWeight={600}
+                  color={appColors.white}
+                  letterSpacing={0.5}
+                >
+                  Cập nhật
+                </Typography>
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </Modal>
+        </Modal>
+      )}
     </LayoutStyle>
   );
 };

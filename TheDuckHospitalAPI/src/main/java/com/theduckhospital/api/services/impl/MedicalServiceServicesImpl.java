@@ -44,7 +44,7 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         List<MedicalService> medicalServices = medicalServiceRepository.findByDepartmentAndServiceType(department, ServiceType.MedicalExamination);
         if (request.getServiceType() == ServiceType.MedicalExamination && !medicalServices.isEmpty()) {
             throw new StatusCodeException("Department already has a medical examination service", 409);
-        };
+        }
 
         MedicalService medicalService = getMedicalService(request, department);
 
@@ -102,6 +102,13 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         List<MedicalService> medicalServices = services.subList(start, end);
 
         return new FilteredMedicalServicesResponse(medicalServices, services.size(), page, limit);
+    }
+
+    @Override
+    public List<MedicalService> getAllActiveTests() {
+        return medicalServiceRepository.findByServiceTypeAndDeletedIsFalseOrderByServiceName(
+                ServiceType.MedicalTest
+        );
     }
 
     @NotNull

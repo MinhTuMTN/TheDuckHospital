@@ -4,11 +4,17 @@ import Button from "@mui/material/Button";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { useTheme } from "@emotion/react";
 
 StaffFilter.propTypes = {
+  isDepartmentFilter: PropTypes.bool,
   options: PropTypes.array,
   label: PropTypes.string,
   selectedValues: PropTypes.array,
@@ -16,8 +22,9 @@ StaffFilter.propTypes = {
 };
 
 StaffFilter.defaultProps = {
+  isDepartmentFilter: false,
   selectedValues: [],
-  onChange: () => { },
+  onChange: () => {},
 };
 
 export default function StaffFilter(props) {
@@ -53,10 +60,7 @@ export default function StaffFilter(props) {
         }}
         onClick={handleClick}
       >
-        <Typography
-          color={theme.palette.template.darker}
-          fontWeight={600}
-        >
+        <Typography color={theme.palette.template.darker} fontWeight={600}>
           {props.label}
         </Typography>
       </Button>
@@ -78,14 +82,28 @@ export default function StaffFilter(props) {
               control={
                 <Checkbox
                   icon={icon}
-                  checked={props.selectedValues.includes(option.value)}
+                  checked={props.selectedValues.includes(
+                    props?.isDepartmentFilter
+                      ? option.departmentId
+                      : option.value
+                  )}
                   checkedIcon={checkedIcon}
-                  name={option.name}
+                  name={
+                    props?.isDepartmentFilter
+                      ? option.departmentName
+                      : option.name
+                  }
                   onChange={props.onChange}
-                  value={option.value}
+                  value={
+                    props?.isDepartmentFilter
+                      ? option.departmentId
+                      : option.value
+                  }
                 />
               }
-              label={option.name}
+              label={
+                props?.isDepartmentFilter ? option.departmentName : option.name
+              }
             />
           ))}
         </FormGroup>

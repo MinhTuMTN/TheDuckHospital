@@ -23,7 +23,7 @@ import {Filter} from 'lucide-react-native';
 import ButtonComponent from '../../../components/ButtonComponent';
 import ServiceDialogComponent from '../../../components/admin/serviceManagementScreen/ServiceDialogComponent';
 import {useDebounce} from 'use-debounce';
-import {getPaginationMedMedicalServices} from '../../../services/medicalServiceServices';
+import {getPaginationMedicalServices} from '../../../services/medicalServiceServices';
 
 function ServiceListScreen() {
   const [showPopover, setShowPopover] = useState(false);
@@ -78,7 +78,7 @@ function ServiceListScreen() {
     }
 
     setIsLoadingAPI(true);
-    const response = await getPaginationMedMedicalServices(
+    const response = await getPaginationMedicalServices(
       debouncedSearchText.trim(),
       paginationParams.limit,
       paginationParams.page,

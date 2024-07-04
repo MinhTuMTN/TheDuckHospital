@@ -39,7 +39,7 @@ function useCustomMediaQuery() {
   }, [isLargeScreen, isMediumScreen]);
 }
 
-const scheduleTypes = [
+const scheduleSessions = [
   {
     key: "MORNING",
     value: "Buổi sáng",
@@ -109,7 +109,7 @@ function Row(props) {
             }}
           >
             {
-              scheduleTypes.find((type) => type.key === row.scheduleSession)
+              scheduleSessions.find((type) => type.key === row.scheduleSession)
                 ?.value
             }
           </CustomText>

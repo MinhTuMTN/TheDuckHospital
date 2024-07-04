@@ -92,6 +92,7 @@ export type updateDepartmentDataProps = {
   departmentName: string;
   description: string;
   staffId: string;
+  headNurseId: string;
 };
 
 export type createOrUpdateMedicineDataProps = {
@@ -105,6 +106,9 @@ export type createOrUpdateRoomDataProps = {
   roomName: string;
   description: string;
   departmentId: number;
+  roomType: string;
+  medicalServiceId: number;
+  capacity: number;
 };
 
 export type createStaffDataProps = {

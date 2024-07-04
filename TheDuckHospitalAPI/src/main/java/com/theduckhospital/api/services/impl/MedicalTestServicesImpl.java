@@ -412,6 +412,21 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         medicalTestRepository.save(medicalTest);
     }
 
+    @Override
+    public List<MedicalTest> getMedicalTestsByHospitalAdmissionAndDate(
+            HospitalAdmission hospitalAdmission,
+            Date date
+    ) {
+        Date startDate = DateCommon.getStarOfDay(date);
+        Date endDate = DateCommon.getEndOfDay(date);
+        return medicalTestRepository
+                .findByHospitalAdmissionAndDateBetweenAndDeletedIsFalse(
+                        hospitalAdmission,
+                        startDate,
+                        endDate
+                );
+    }
+
     private Room getLabRoomById(Integer roomId) {
         if (roomId == null) {
             throw new BadRequestException("Invalid room id", 400);

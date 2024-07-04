@@ -35,8 +35,6 @@ public class NurseServicesImpl implements INurseServices {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
     private final RoomRepository roomRepository;
-    @Value("${settings.date}")
-    private String appToday;
     public NurseServicesImpl(
             NurseRepository nurseRepository,
             NurseScheduleRepository nurseScheduleRepository, JwtTokenProvider jwtTokenProvider,
@@ -357,14 +355,7 @@ public class NurseServicesImpl implements INurseServices {
 
     @Override
     public List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date today;
-        try {
-             today = format.parse(appToday);
-        } catch (ParseException e) {
-            throw new BadRequestException("Invalid date");
-        }
-
+        Date today = DateCommon.getToday();
         Nurse nurse = getNurseByToken(authorization);
         List<DoctorSchedule> doctorSchedules = nurseScheduleRepository
                 .findTodayExaminationSchedules(

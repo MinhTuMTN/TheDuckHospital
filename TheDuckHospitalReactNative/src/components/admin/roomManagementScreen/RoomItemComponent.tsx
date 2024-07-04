@@ -9,6 +9,33 @@ import RoomDialogComponent from './RoomDialogComponent';
 import RoomAlertDialogComponent from './RoomAlertDialogComponent';
 import {ArchiveRestore} from 'lucide-react-native';
 
+const roomTypeOptions = [
+  {
+    value: 'EXAMINATION_ROOM',
+    name: 'Phòng khám',
+  },
+  {
+    value: 'TREATMENT_ROOM_STANDARD',
+    name: 'Phòng điều trị thường',
+  },
+  {
+    value: 'TREATMENT_ROOM_VIP',
+    name: 'Phòng điều trị VIP',
+  },
+  {
+    value: 'LABORATORY_ROOM_NORMAL',
+    name: 'Phòng xét nghiệm thường',
+  },
+  {
+    value: 'LABORATORY_ROOM_ADMISSION',
+    name: 'Phòng xét nghiệm nội trú',
+  },
+  {
+    value: 'MEETING_ROOM',
+    name: 'Phòng họp',
+  },
+];
+
 interface RoomItemComponentProps {
   room: any;
   refreshList: boolean;
@@ -32,15 +59,26 @@ function RoomItemComponent(props: RoomItemComponentProps) {
 
   return (
     <ContainerComponent style={styles.roomItemContainer}>
-      <FlexComponent style={[styles.roomInfoContainer, {flex: 0.5}]}>
+      <FlexComponent style={[styles.roomInfoContainer, {flex: 0.3}]}>
         <TextComponent bold fontSize={21}>
           {room.roomName}
         </TextComponent>
-        <TextComponent fontSize={16}>{room.departmentName}</TextComponent>
+
+        <TextComponent fontSize={16}>
+          {room.departmentName
+            ? room.departmentName
+            : room.medicalService.serviceName}
+        </TextComponent>
       </FlexComponent>
 
       <FlexComponent
-        style={[styles.roomInfoContainer, {alignItems: 'flex-end', flex: 0.3}]}>
+        style={[styles.roomInfoContainer, {alignItems: 'center', flex: 0.5}]}>
+        <TextComponent fontSize={16}>
+          {
+            roomTypeOptions.find(roomType => roomType.value === room?.roomType)
+              ?.name
+          }
+        </TextComponent>
         <FlexComponent style={styles.statusContainer}>
           <EntypoIcon
             name="dot-single"

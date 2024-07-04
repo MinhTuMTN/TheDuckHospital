@@ -17,12 +17,13 @@ import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
 import {
   addDoctorToDepartment,
+  addNurseToDepartment,
   getDoctorWithoutDepartment,
+  getNurseWithoutDepartment,
 } from '../../../services/departmentServices';
 
-// const doctors = ['Lâm Mộc Văn', 'Lý Đại Bàng', 'Lý Thị Định', 'Đinh Văn Hoan'];
-
-interface DoctorDialogComponentProps {
+interface AddStaffDialogComponentProps {
+  isDoctor: boolean;
   departmentId: number;
   modalVisible?: boolean;
   refreshList: boolean;
@@ -30,35 +31,44 @@ interface DoctorDialogComponentProps {
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
-const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
+const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
   const {
+    isDoctor,
     departmentId,
     refreshList,
     modalVisible,
     setRefreshList,
     setModalVisible,
   } = props;
-  const [doctors, setDoctors] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [doctor, setDoctor] = useState({staffId: '', fullName: 'Chọn bác sĩ'});
+  const [staff, setStaff] = useState({
+    staffId: '',
+    fullName: isDoctor ? 'Chọn bác sĩ' : 'Chọn điều dưỡng',
+  });
   const [isFirstClick, setIsFirstClick] = useState(true);
 
   const closeModal = () => {
     if (setModalVisible) {
       setModalVisible(false);
       setIsFirstClick(true);
-      setDoctor({staffId: '', fullName: 'Chọn bác sĩ'});
+      setStaff({
+        staffId: '',
+        fullName: isDoctor ? 'Chọn bác sĩ' : 'Chọn điều dưỡng',
+      });
     }
   };
 
-  const handleAddDoctorToDepartment = async () => {
+  const handleAddStaffToDepartment = async () => {
     if (isFirstClick) setIsFirstClick(false);
-    if (doctor === null || doctor.staffId === '') return;
+    if (staff === null || staff.staffId === '') return;
     setLoading(true);
-    const response = await addDoctorToDepartment(departmentId, doctor.staffId);
+    const response = isDoctor
+      ? await addDoctorToDepartment(departmentId, staff.staffId)
+      : await addNurseToDepartment(departmentId, staff.staffId);
     setLoading(false);
     if (response.success) {
-      setDoctors(response.data.data);
+      setStaffs(response.data.data);
       setRefreshList(!refreshList);
       closeModal();
     } else {
@@ -67,16 +77,18 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
   };
 
   React.useEffect(() => {
-    const handleGetDoctorWithoutDepartment = async () => {
-      const response = await getDoctorWithoutDepartment(departmentId);
+    const handleGetStaffWithoutDepartment = async () => {
+      const response = isDoctor
+        ? await getDoctorWithoutDepartment(departmentId)
+        : await getNurseWithoutDepartment(departmentId);
       if (response.success) {
-        setDoctors(response.data.data);
+        setStaffs(response.data.data);
       } else {
         console.log(response);
       }
     };
     try {
-      handleGetDoctorWithoutDepartment();
+      handleGetStaffWithoutDepartment();
     } catch (error) {
       console.log(error);
     }
@@ -92,9 +104,13 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
         <View style={styles.modalView}>
           <FlexComponent style={styles.modalHeader}>
             <FlexComponent style={{flexDirection: 'row', alignItems: 'center'}}>
-              <FontistoIcon name="doctor" size={24} color={appColors.white} />
+              <FontistoIcon
+                name={isDoctor ? 'doctor' : 'nurse'}
+                size={24}
+                color={appColors.white}
+              />
               <TextComponent style={styles.headerText}>
-                Thêm bác sĩ vào khoa
+                {isDoctor ? `Thêm bác sĩ vào khoa` : `Thêm điều dưỡng vào khoa`}
               </TextComponent>
             </FlexComponent>
             <Pressable onPress={closeModal}>
@@ -106,12 +122,12 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
 
           <ScrollView style={styles.modalBody}>
             <TextComponent bold style={styles.labelText}>
-              Bác sĩ*
+              {isDoctor ? `Bác sĩ*` : `Điều dưỡng*`}
             </TextComponent>
             <SelectDropdown
-              data={doctors}
+              data={staffs}
               onSelect={(selectedItem, index) => {
-                setDoctor(selectedItem);
+                setStaff(selectedItem);
               }}
               buttonTextAfterSelection={(selectedItem, index) => {
                 return selectedItem.fullName;
@@ -140,18 +156,18 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                 return (
                   <View style={styles.dropdownBtnChildStyle}>
                     <FontistoIcon
-                      name="doctor"
+                      name={isDoctor ? 'doctor' : 'nurse'}
                       color={appColors.black}
                       size={24}
                     />
                     <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem.fullName : doctor.fullName}
+                      {selectedItem ? selectedItem.fullName : staff.fullName}
                     </Text>
                   </View>
                 );
               }}
             />
-            {doctor && doctor.staffId === '' && !isFirstClick && (
+            {staff && staff.staffId === '' && !isFirstClick && (
               <TextComponent
                 color={appColors.error}
                 fontSize={12}
@@ -161,7 +177,7 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
                     marginTop: 10,
                   },
                 ]}>
-                Cần chọn bác sĩ
+                {isDoctor ? `Cần chọn bác sĩ` : `Cần chọn điều dưỡng`}
               </TextComponent>
             )}
           </ScrollView>
@@ -180,9 +196,9 @@ const DoctorDialogComponent = (props: DoctorDialogComponentProps) => {
               <TextComponent style={styles.buttonTextStyle}>Hủy</TextComponent>
             </ButtonComponent>
             <ButtonComponent
-              enabled={!(doctor?.staffId === '')}
+              enabled={!(staff?.staffId === '')}
               isLoading={loading}
-              onPress={handleAddDoctorToDepartment}
+              onPress={handleAddStaffToDepartment}
               containerStyles={[styles.button, {marginRight: 15}]}>
               <TextComponent style={styles.buttonTextStyle}>Thêm</TextComponent>
             </ButtonComponent>
@@ -263,4 +279,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoctorDialogComponent;
+export default AddStaffDialogComponent;

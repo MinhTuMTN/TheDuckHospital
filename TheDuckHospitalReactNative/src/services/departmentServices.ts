@@ -28,16 +28,28 @@ export const restoreDepartment = async (departmentId: number) => {
   return put(`/admin/departments/${departmentId}/restore`);
 };
 
-export const getDoctorWithinDepartment = async (departmentId: number) => {
+export const getDoctorsWithinDepartment = async (departmentId: number) => {
   return get(`/admin/departments/${departmentId}/doctors`);
+};
+
+export const getNursesWithinDepartment = async (departmentId: number) => {
+  return get(`/admin/departments/${departmentId}/nurses`);
 };
 
 export const getDoctorWithoutDepartment = async (departmentId: number) => {
   return get(`/admin/doctors/not-in-department`);
 };
 
+export const getNurseWithoutDepartment = async (departmentId: number) => {
+  return get(`/admin/nurses/not-in-department`);
+};
+
 export const deleteHeadDoctor = async (staffId: string) => {
   return del(`/admin/doctors/${staffId}/head-doctor`);
+};
+
+export const deleteHeadNurse = async (staffId: string) => {
+  return del(`/admin/nurses/${staffId}/head-nurse`);
 };
 
 export const deleteDoctorInDepartment = async (
@@ -47,6 +59,13 @@ export const deleteDoctorInDepartment = async (
   return del(`/admin/departments/${departmentId}/doctors/${doctorId}`);
 };
 
+export const deleteNurseInDepartment = async (
+  departmentId: number,
+  nurseId: string,
+) => {
+  return del(`/admin/departments/${departmentId}/nurses/${nurseId}`);
+};
+
 export const addDoctorToDepartment = async (
   departmentId: number,
   doctorId: string,
@@ -54,14 +73,24 @@ export const addDoctorToDepartment = async (
   return put(`/admin/departments/${departmentId}/doctors/${doctorId}`);
 };
 
+export const addNurseToDepartment = async (
+  departmentId: number,
+  nurseId: string,
+) => {
+  return put(`/admin/departments/${departmentId}/nurses/${nurseId}`);
+};
+
 export const getDepartmentWithoutService = async () => {
   return get(`/admin/departments/without-services`);
-}
+};
 
 export const getAllDepartments = async () => {
   return get(`/admin/departments`);
-}
+};
+export const getAllActiveDepartments = async () => {
+  return get('/admin/departments/active-departments');
+};
 
 export const getDepartmentById = async (departmentId: number) => {
   return get(`/admin/departments/${departmentId}`);
-}
+};

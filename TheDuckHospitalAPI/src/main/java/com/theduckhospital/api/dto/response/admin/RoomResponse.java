@@ -14,6 +14,7 @@ public class RoomResponse {
     private Integer departmentId;
     private String departmentName;
     private Department department;
+    private MedicalService medicalService;
     private RoomType roomType;
     private String serviceName;
     private Integer serviceId;
@@ -27,6 +28,7 @@ public class RoomResponse {
         this.description = room.getDescription();
         this.departmentId = room.getDepartment() == null ? null : room.getDepartment().getDepartmentId();
         this.departmentName = room.getDepartment() == null ? null : room.getDepartment().getDepartmentName();
+        this.medicalService = room.getMedicalService();
         this.department = room.getDepartment();
         this.deleted = room.isDeleted();
         this.roomType = room.getRoomType();

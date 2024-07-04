@@ -18,9 +18,10 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import ModalMedication from "./ModalMedication";
 import { getScheduleSession } from "../../../utils/scheduleSessionUtils";
+import { searchMedicine } from "../../../services/doctor/MedicineServices";
 const listMedication = [
   {
     id: 1,
@@ -77,6 +78,9 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 function MedicationManagementInAdmission() {
+  const [medicines, setMedicines] = React.useState([]);
+  const [medicineQuery, setMedicineQuery] = React.useState("");
+
   const [addMedication, setAddMedication] = React.useState(false);
   const [editMedication, setEditMedication] = React.useState(false);
   const [deleteMedication, setDeleteMedication] = React.useState(false);
@@ -94,6 +98,17 @@ function MedicationManagementInAdmission() {
       [buoi]: !prev[buoi],
     }));
   };
+
+  const handleGetAllMedicines = useCallback(async () => {
+    const response = await searchMedicine(medicineQuery);
+    if (response.success) {
+      setMedicines(response.data.data);
+    }
+  }, [medicineQuery]);
+
+  useEffect(() => {
+    handleGetAllMedicines();
+  }, [handleGetAllMedicines]);
   return (
     <>
       <Stack
@@ -225,10 +240,8 @@ function MedicationManagementInAdmission() {
           size="medium"
           disablePortal
           id="combo-box-demo"
-          options={
-            editMedication ? [selectedMedication] : listMedicationForNurse
-          }
-          getOptionLabel={(option) => `${option.name}`}
+          options={editMedication ? [selectedMedication] : medicines}
+          getOptionLabel={(option) => `${option.medicineName}`}
           isOptionEqualToValue={(option, value) =>
             option.medicineId === value.medicineId
           }

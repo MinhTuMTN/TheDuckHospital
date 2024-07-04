@@ -54,5 +54,7 @@ public interface MedicalExaminationRepository
             @Param("doctorId") UUID doctorId
     );
 
-    List<MedicalExaminationRecord> findByDeletedIsFalseAndState(MedicalExamState medicalExamState);
+//    List<MedicalExaminationRecord> findByDeletedIsFalseAndState(MedicalExamState medicalExamState);
+
+    long countByDeletedIsFalseAndStateAndDoctorSchedule_Doctor(MedicalExamState medicalExamState, Doctor doctor);
 }

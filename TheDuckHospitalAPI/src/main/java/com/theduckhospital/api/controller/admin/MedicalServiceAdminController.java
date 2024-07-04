@@ -50,6 +50,17 @@ public class MedicalServiceAdminController {
         );
     }
 
+    @GetMapping("/active-tests")
+    public ResponseEntity<?> getAllActiveMedicalTest() {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get filtered services pagination successfully")
+                        .data(serviceServices.getAllActiveTests())
+                        .build()
+        );
+    }
+
     @GetMapping("/{serviceId}")
     public ResponseEntity<?> getServiceById(@PathVariable int serviceId) {
         return ResponseEntity.ok(

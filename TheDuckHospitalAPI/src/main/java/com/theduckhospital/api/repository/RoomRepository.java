@@ -26,10 +26,14 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
     );
     Optional<Room> findRoomByRoomIdAndDepartmentAndDeletedIsFalse(int roomId, Department department);
     Page<Room> findPaginationByOrderByDeleted(Pageable pageable);
-    Page<Room> findByDepartmentAndDeletedIsFalse(Department department, Pageable pageable);
+    Page<Room> findByDepartmentAndRoomTypeInAndDeletedIsFalseOrderByRoomName(
+            Department department,
+            List<RoomType> roomTypes,
+            Pageable pageable
+    );
     List<Room> findByDepartmentAndRoomTypeAndDeletedIsFalse(Department department, RoomType roomType);
     List<Room> findByDepartmentAndRoomTypeInAndDeletedIsFalse(Department department, List<RoomType> roomType);
-    long countByDepartmentAndDeletedIsFalse(Department department);
+    long countByDepartmentAndRoomTypeInAndDeletedIsFalse(Department department, List<RoomType> roomTypes);
     List<Room> findAllByOrderByDeletedAscRoomNameAsc();
     Page<Room> findByRoomNameContainingAndRoomTypeInAndDeletedInOrderByRoomName(
             String roomName,

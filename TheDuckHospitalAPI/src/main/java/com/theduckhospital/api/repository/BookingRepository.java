@@ -2,6 +2,7 @@ package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.entity.Booking;
+import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.PatientProfile;
 import org.springframework.data.domain.Page;
@@ -11,10 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
@@ -66,6 +64,15 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate,
             @Param("departmentId") int departmentId);
+
+    @Query("SELECT d, COALESCE(COUNT(b), 0) " +
+            "FROM Department d " +
+            "LEFT JOIN Booking b ON b.timeSlot.doctorSchedule.doctor.department = d " +
+            "WHERE b.deleted = false AND b.timeSlot.doctorSchedule.doctor.department IS NOT NULL " +
+            "GROUP BY d " +
+            "ORDER BY COALESCE(COUNT(b), 0) DESC LIMIT 5"
+    )
+    List<Object[]> findTop5DepartmentsWithBookingsCount();
 
     Optional<Booking> findByPatientProfileAndTimeSlot_DoctorScheduleAndDeletedIsFalse(
             PatientProfile patientProfile,

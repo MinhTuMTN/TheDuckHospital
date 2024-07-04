@@ -72,3 +72,25 @@ export const deleteInpatientMedicalTest = (
     `/inpatient-nurse/hospitalization/${hospitalizationId}/medical-tests/${medicalTestId}`
   );
 };
+
+export const getHospitalizationDetailsByDate = (hospitalizationId, date) => {
+  return get(`/inpatient-nurse/hospitalization/${hospitalizationId}/details`, {
+    date,
+  });
+};
+
+export const updateHospitalizationDetailsByDate = (hospitalizationId, data) => {
+  return post(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/details`,
+    data
+  );
+};
+
+export const getMedicalTestsByDate = (hospitalizationId, date) => {
+  return get(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/medical-tests-by-date`,
+    {
+      date,
+    }
+  );
+};
