@@ -1,5 +1,6 @@
 import PersonIcon from "@mui/icons-material/Person";
 import {
+  Autocomplete,
   Box,
   Button,
   Grid,
@@ -14,7 +15,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 import { useTheme } from "@emotion/react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import useDebounce from "../../../hooks/useDebounce";
 import MedicalInAdmissionDatails from "./MedicalInAdmissionDatails";
 import VitalSignsComponent from "./VitalSignsComponent";
@@ -24,9 +25,11 @@ import MedicationManagementInAdmission from "./MedicationManagementInAdmission";
 import {
   getHospitalizationDetailsByDate,
   getMedicalTestsByDate,
+  getTreatmentMedicinesByDate,
   updateHospitalizationDetailsByDate,
 } from "../../../services/nurse/HospitalizeServices";
 import { enqueueSnackbar } from "notistack";
+import { HospitalizationContext } from "../../../pages/Nurse/Hospitalization/HospitalizationDetails";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   padding: "16px 16px",
@@ -47,7 +50,7 @@ const LayoutStyle = styled(Stack)(({ theme }) => ({
 }));
 
 function AdmissionDetailsByDate(props) {
-  const { generalInfo } = props;
+  const { generalInfo, doctors } = useContext(HospitalizationContext);
 
   const [isEdit, setIsEdit] = useState(false);
   const [vitalSignEdit, setVitalSignEdit] = useState(false);
@@ -60,14 +63,19 @@ function AdmissionDetailsByDate(props) {
     symptom: "",
     diseaseProgression: "",
     diagnosis: "",
+    doctorId: "",
+    doctorName: "",
+    doctorDegree: "",
   });
   const [medicalTests, setMedicalTests] = useState([]);
+  const [treatmentMedicines, setTreatmentMedicines] = useState([]);
 
   const infoDebounce = useDebounce(
     {
       symptom: info.symptom,
       diseaseProgression: info.diseaseProgression,
       diagnosis: info.diagnosis,
+      doctorId: info.doctorId,
     },
     1000
   );
@@ -105,6 +113,7 @@ function AdmissionDetailsByDate(props) {
           diseaseProgression: infoDebounce.diseaseProgression,
           diagnosis: infoDebounce.diagnosis,
           date: date,
+          doctorId: infoDebounce.doctorId,
         }
       );
       setSaving(false);
@@ -131,6 +140,7 @@ function AdmissionDetailsByDate(props) {
     infoDebounce.diagnosis,
     infoDebounce.symptom,
     infoDebounce.diseaseProgression,
+    infoDebounce.doctorId,
     info.bloodPressure,
     info.heartRate,
     info.temperature,
@@ -157,6 +167,9 @@ function AdmissionDetailsByDate(props) {
           diseaseProgression: data.diseaseProgression,
           diagnosis: data.diagnosis,
           updatedAt: data.updatedAt,
+          doctorId: data.doctorId || "",
+          doctorName: data.doctorName || "",
+          doctorDegree: data.doctorDegree || "",
         });
       } else {
         enqueueSnackbar("Đã xảy ra lỗi khi lấy thông tin chữa trị", {
@@ -178,6 +191,20 @@ function AdmissionDetailsByDate(props) {
         });
       }
     };
+    const handleGetTreatmentMedicinesByDate = async (hospitalizationId) => {
+      const response = await getTreatmentMedicinesByDate(
+        hospitalizationId,
+        date.format("YYYY-MM-DD")
+      );
+
+      if (response.success) {
+        setTreatmentMedicines(response.data.data);
+      } else {
+        enqueueSnackbar("Đã xảy ra lỗi khi lấy thông tin thuốc", {
+          variant: "error",
+        });
+      }
+    };
 
     const hospitalizationId = generalInfo?.hospitalAdmissionId;
     if (!hospitalizationId) {
@@ -188,6 +215,7 @@ function AdmissionDetailsByDate(props) {
     Promise.all([
       handleGetHospitalizationDetailsByDate(hospitalizationId),
       handleGetMedicalTestsByDate(hospitalizationId),
+      handleGetTreatmentMedicinesByDate(hospitalizationId),
     ]);
   }, [generalInfo, date]);
 
@@ -397,10 +425,53 @@ function AdmissionDetailsByDate(props) {
               readOnly: !isEdit,
             }}
           />
+          <Autocomplete
+            readOnly={!isEdit}
+            size="medium"
+            disablePortal
+            id="combo-box-demo"
+            disableClearable
+            options={doctors}
+            getOptionLabel={(option) =>
+              `${option.doctorDegree} ${option.doctorName}`
+            }
+            isOptionEqualToValue={(option, value) =>
+              option.doctorId === value.doctorId || value.doctorId === ""
+            }
+            value={info}
+            onChange={(event, newValue) => {
+              setInfo((prev) => {
+                return {
+                  ...prev,
+                  doctorId: newValue.doctorId,
+                  doctorName: newValue.doctorName,
+                  doctorDegree: newValue.doctorDegree,
+                };
+              });
+            }}
+            width={"100%"}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                InputLabelProps={{ shrink: true }}
+                label={"Bác sĩ điều trị"}
+                placeholder="Chọn bác sĩ điều trị"
+              />
+            )}
+            sx={{
+              flex: 2,
+            }}
+            style={{ marginTop: "16px" }}
+          />
         </Stack>
       </LayoutStyle>
       <LayoutStyle direction={"column"}>
-        <MedicationManagementInAdmission />
+        <MedicationManagementInAdmission
+          treatmentMedicines={treatmentMedicines}
+          onChange={setTreatmentMedicines}
+          hospitalizationId={generalInfo?.hospitalAdmissionId}
+          date={date}
+        />
       </LayoutStyle>
     </Box>
   );

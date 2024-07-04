@@ -6,6 +6,7 @@ import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
+import com.theduckhospital.api.dto.request.nurse.HospitalizationDetailResponse;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
@@ -19,6 +20,7 @@ import com.theduckhospital.api.services.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -257,6 +259,26 @@ public class InpatientServicesImpl implements IInpatientServices {
                 date
         );
 
+        if (hospitalizationDetail.getTreatmentMedicines().isEmpty()) {
+            // Subtract 1 day
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DATE, -1);
+
+            HospitalizationDetail yesterdayHospitalizationDetail = hospitalizationDetailServices
+                    .getDailyHospitalAdmissionDetails(
+                            hospitalizationDetail.getNurse(),
+                            hospitalizationDetail.getHospitalAdmission(),
+                            calendar.getTime()
+                    );
+
+            return treatmentMedicineServices
+                    .getTreatmentMedicinesByYesterdayHospitalizationDetail(
+                            yesterdayHospitalizationDetail,
+                            hospitalizationDetail
+                    );
+        }
+
         return treatmentMedicineServices
                 .getTreatmentMedicinesByHospitalizationDetail(
                         hospitalizationDetail
@@ -264,12 +286,46 @@ public class InpatientServicesImpl implements IInpatientServices {
     }
 
     @Override
-    public boolean createTreatmentMedicine(
+    public List<TreatmentMedicine> createTreatmentMedicine(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             CreateTreatmentMedicineRequest request
     ) {
-        return false;
+        if (request.getQuantityPerTime() <= 0)
+            throw new BadRequestException("Quantity per time must be greater than 0", 400);
+
+        HospitalizationDetail hospitalizationDetail = getDailyHospitalAdmissionDetails(
+                inpatientNurseAuthorization,
+                hospitalizationId,
+                DateCommon.getStarOfDay(request.getDate())
+        );
+
+        return treatmentMedicineServices
+                .createTreatmentMedicinesByHospitalizationDetail(
+                        hospitalizationDetail,
+                        request
+                );
+    }
+
+    @Override
+    public List<TreatmentMedicine> deleteTreatmentMedicine(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UUID treatmentMedicineId,
+            boolean deleteFromTomorrow
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        return treatmentMedicineServices
+                .deleteTreatmentMedicine(
+                        hospitalAdmission,
+                        treatmentMedicineId,
+                        deleteFromTomorrow
+                );
     }
 
     @Override
@@ -293,5 +349,12 @@ public class InpatientServicesImpl implements IInpatientServices {
         return medicalTests.stream()
                 .map(DoctorMedicalTestResponse::new)
                 .toList();
+    }
+
+    @Override
+    public HospitalizationDetailResponse convertHospitalizationDetailDTO(
+            HospitalizationDetail hospitalizationDetail
+    ) {
+        return new HospitalizationDetailResponse(hospitalizationDetail);
     }
 }

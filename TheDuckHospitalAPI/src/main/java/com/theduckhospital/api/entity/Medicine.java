@@ -36,6 +36,11 @@ public class Medicine {
     @ToStringExclude
     private List<PrescriptionItem> prescriptionItem;
 
+    @OneToMany(mappedBy = "medicine")
+    @ToStringExclude
+    @JsonBackReference
+    private List<TreatmentMedicine> treatmentMedicines;
+
     @PrePersist
     private void onCreate() {
         this.createdAt = new Date();

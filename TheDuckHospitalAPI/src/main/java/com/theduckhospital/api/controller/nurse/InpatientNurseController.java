@@ -4,6 +4,7 @@ import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
 import com.theduckhospital.api.dto.response.GeneralResponse;
+import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.services.IInpatientServices;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -124,17 +125,17 @@ public class InpatientNurseController {
             @PathVariable("hospitalizationId") UUID hospitalizationId,
             @RequestBody UpdateDailyHospitalAdmissionDetails updateDailyHospitalAdmissionDetails
     ) {
+        HospitalizationDetail hospitalizationDetail = inpatientServices
+                .updateDailyHospitalAdmissionDetails(
+                        authorization,
+                        hospitalizationId,
+                        updateDailyHospitalAdmissionDetails
+                );
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .statusCode(200)
                 .message("Update daily hospital admission details successfully")
-                .data(inpatientServices
-                        .updateDailyHospitalAdmissionDetails(
-                                authorization,
-                                hospitalizationId,
-                                updateDailyHospitalAdmissionDetails
-                        )
-                )
+                .data(inpatientServices.convertHospitalizationDetailDTO(hospitalizationDetail))
                 .build()
         );
     }
@@ -145,17 +146,17 @@ public class InpatientNurseController {
             @PathVariable("hospitalizationId") UUID hospitalizationId,
             @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date
     ) {
+        HospitalizationDetail hospitalizationDetail = inpatientServices
+                .getDailyHospitalAdmissionDetails(
+                        authorization,
+                        hospitalizationId,
+                        date
+                );
         return ResponseEntity.ok(GeneralResponse.builder()
                 .success(true)
                 .statusCode(200)
                 .message("Get daily hospital admission details successfully")
-                .data(inpatientServices
-                        .getDailyHospitalAdmissionDetails(
-                                authorization,
-                                hospitalizationId,
-                                date
-                        )
-                )
+                .data(inpatientServices.convertHospitalizationDetailDTO(hospitalizationDetail))
                 .build()
         );
     }
@@ -217,6 +218,29 @@ public class InpatientNurseController {
                                 authorization,
                                 hospitalizationId,
                                 createTreatmentMedicineRequest
+                        )
+                )
+                .build()
+        );
+    }
+
+    @DeleteMapping("/hospitalization/{hospitalizationId}/medicines/{treatmentMedicineId}")
+    public ResponseEntity<?> deleteTreatmentMedicine(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @PathVariable("treatmentMedicineId") UUID treatmentMedicineId,
+            @RequestParam(value = "tomorrow", defaultValue = "false") boolean deleteFromTomorrow
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Create treatment medicine successfully")
+                .data(inpatientServices
+                        .deleteTreatmentMedicine(
+                                authorization,
+                                hospitalizationId,
+                                treatmentMedicineId,
+                                deleteFromTomorrow
                         )
                 )
                 .build()

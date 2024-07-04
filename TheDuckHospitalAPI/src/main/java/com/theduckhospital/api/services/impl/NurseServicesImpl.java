@@ -355,7 +355,7 @@ public class NurseServicesImpl implements INurseServices {
 
     @Override
     public List<NurseDoctorScheduleItemResponse> getTodayExaminationSchedules(String authorization) {
-        Date today = DateCommon.getToday();
+        Date today = DateCommon.getStarOfDay(DateCommon.getToday());
         Nurse nurse = getNurseByToken(authorization);
         List<DoctorSchedule> doctorSchedules = nurseScheduleRepository
                 .findTodayExaminationSchedules(

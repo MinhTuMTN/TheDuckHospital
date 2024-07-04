@@ -39,16 +39,18 @@ const FooterModal = styled(Stack)(({ theme }) => ({
 const ModalMedication = (props) => {
   const {
     openModal,
-    setOpenModal,
+    onClose,
     modalTitle,
     iconTitle,
     buttonAPIName,
     secondButtonAPIName,
+    onButtonAPIClick,
+    onSecondButtonAPIClick,
   } = props;
   return (
     <Modal
       open={openModal}
-      onClose={() => setOpenModal(false)}
+      onClose={onClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -62,7 +64,7 @@ const ModalMedication = (props) => {
             style={{
               marginRight: "-6px",
             }}
-            onClick={() => setOpenModal(false)}
+            onClick={onClose}
           >
             <Close color="disabled" />
           </IconButton>
@@ -76,7 +78,7 @@ const ModalMedication = (props) => {
               style={{
                 textTransform: "none",
               }}
-              onClick={() => setOpenModal(false)}
+              onClick={onSecondButtonAPIClick}
             >
               {secondButtonAPIName}
             </Button>
@@ -87,7 +89,7 @@ const ModalMedication = (props) => {
               style={{
                 textTransform: "none",
               }}
-              onClick={() => setOpenModal(false)}
+              onClick={onClose}
             >
               Hủy
             </Button>
@@ -98,6 +100,7 @@ const ModalMedication = (props) => {
             style={{
               textTransform: "none",
             }}
+            onClick={onButtonAPIClick}
           >
             {buttonAPIName}
           </Button>

@@ -15,9 +15,9 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
-import { getMedicineUnit } from "../../../services/doctor/MedicineServices";
 import FormatCurrency from "../../General/FormatCurrency";
 import PropTypes from "prop-types";
+import { getMedicineUnit } from "../../../utils/medicineUtils";
 function ContactItem(props) {
   const { title, content, titleMinWidth = 0 } = props;
   return (

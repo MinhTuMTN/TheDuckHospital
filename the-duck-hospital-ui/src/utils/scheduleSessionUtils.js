@@ -15,6 +15,21 @@ export const getScheduleSession = (scheduleSession) => {
   }
 };
 
+export const getScheduleSessionForMedicine = (scheduleSession) => {
+  switch (scheduleSession) {
+    case "MORNING":
+      return "Sáng";
+    case "AFTERNOON":
+      return "Trưa";
+    case "EVENING":
+      return "Chiều";
+    case "NIGHT":
+      return "Tối";
+    default:
+      return "";
+  }
+};
+
 export const getScheduleSessionColor = (scheduleSession) => {
   switch (scheduleSession) {
     case "MORNING":

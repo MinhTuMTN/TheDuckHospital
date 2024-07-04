@@ -19,54 +19,15 @@ import {
   styled,
 } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
-import ModalMedication from "./ModalMedication";
-import { getScheduleSession } from "../../../utils/scheduleSessionUtils";
 import { searchMedicine } from "../../../services/doctor/MedicineServices";
-const listMedication = [
-  {
-    id: 1,
-    name: "Paracetamol",
-    dosage: "150",
-    unit: "ml",
-    prescription: "Uống sau khi ăn",
-    time: ["MORNING"],
-  },
-  {
-    id: 2,
-    name: "Adrenergic Modifiers",
-    dosage: "1",
-    unit: "viên",
-    prescription: "Uống trước khi ăn 30 phút",
-    time: ["MORNING", "AFTERNOON"],
-  },
-  {
-    id: 3,
-    name: "Jardiance",
-    dosage: "1",
-    unit: "viên",
-    prescription: "",
-    time: ["MORNING", "AFTERNOON"],
-  },
-];
-
-const listMedicationForNurse = [
-  {
-    id: 1,
-    name: "Paracetamol",
-  },
-  {
-    id: 2,
-    name: "Adrenergic Modifiers",
-  },
-  {
-    id: 3,
-    name: "Jardiance",
-  },
-  {
-    id: 4,
-    name: "Beta Blockers",
-  },
-];
+import { getMedicineUnit } from "../../../utils/medicineUtils";
+import { getScheduleSessionForMedicine } from "../../../utils/scheduleSessionUtils";
+import ModalMedication from "./ModalMedication";
+import { enqueueSnackbar } from "notistack";
+import {
+  addTreatmenMedicines,
+  deleteTreatmentMedicine,
+} from "../../../services/nurse/HospitalizeServices";
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   width: "34px",
@@ -77,34 +38,73 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-function MedicationManagementInAdmission() {
+function MedicationManagementInAdmission(props) {
+  const { treatmentMedicines, onChange, date, hospitalizationId } = props;
   const [medicines, setMedicines] = React.useState([]);
   const [medicineQuery, setMedicineQuery] = React.useState("");
 
-  const [addMedication, setAddMedication] = React.useState(false);
-  const [editMedication, setEditMedication] = React.useState(false);
-  const [deleteMedication, setDeleteMedication] = React.useState(false);
-  const [query, setQuery] = React.useState("");
+  const [modalState, setModalState] = React.useState("CLOSED");
   const [selectedMedication, setSelectedMedication] = React.useState({});
-  const [selectedBuoi, setSelectedBuoi] = React.useState({
-    MORNING: false,
-    AFTERNOON: false,
-    EVENING: false,
-    NIGHT: false,
-  });
-  const handleBuoiChange = (buoi) => {
-    setSelectedBuoi((prev) => ({
-      ...prev,
-      [buoi]: !prev[buoi],
-    }));
-  };
 
+  const handleScheduleSessionChange = (scheduleSession) => {
+    setSelectedMedication((prev) => {
+      return {
+        ...prev,
+        [scheduleSession.toLowerCase()]: !prev[scheduleSession.toLowerCase()],
+      };
+    });
+  };
   const handleGetAllMedicines = useCallback(async () => {
     const response = await searchMedicine(medicineQuery);
     if (response.success) {
       setMedicines(response.data.data);
     }
   }, [medicineQuery]);
+  const handleAddMedicines = useCallback(async () => {
+    console.log(selectedMedication);
+    if (isNaN(selectedMedication.quantityPerTime)) {
+      enqueueSnackbar("Liều lượng không hợp lệ", { variant: "error" });
+      return;
+    }
+
+    const dataToSent = {
+      date: date,
+      medicineId: selectedMedication.medicineId,
+      quantityPerTime: selectedMedication.quantityPerTime,
+      note: selectedMedication.note,
+      morning: selectedMedication.morning,
+      afternoon: selectedMedication.afternoon,
+      evening: selectedMedication.evening,
+      night: selectedMedication.night,
+    };
+
+    const response = await addTreatmenMedicines(hospitalizationId, dataToSent);
+    if (response.success) {
+      onChange(response.data.data);
+      setModalState("CLOSED");
+    } else {
+      enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+    }
+  }, [onChange, selectedMedication, date, hospitalizationId]);
+
+  const handleDeleteTreatmentMedicine = useCallback(
+    async (tomorrow) => {
+      const response = await deleteTreatmentMedicine(
+        hospitalizationId,
+        selectedMedication.treatmentMedicineId,
+        tomorrow
+      );
+
+      if (response.success) {
+        onChange(response.data.data);
+        enqueueSnackbar("Đã xoá thuốc thành công", { variant: "success" });
+        setModalState("CLOSED");
+      } else {
+        enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+      }
+    },
+    [hospitalizationId, selectedMedication, onChange]
+  );
 
   useEffect(() => {
     handleGetAllMedicines();
@@ -124,7 +124,19 @@ function MedicationManagementInAdmission() {
           Quản lý thuốc trong ngày
         </Typography>
         <Button
-          onClick={() => setAddMedication(true)}
+          onClick={() => {
+            setModalState("ADD");
+            setSelectedMedication({
+              medicineId: "",
+              medicineName: "",
+              unit: "",
+              quantityPerTime: "",
+              morning: false,
+              afternoon: false,
+              evening: false,
+              night: false,
+            });
+          }}
           style={{
             textTransform: "none",
           }}
@@ -160,34 +172,49 @@ function MedicationManagementInAdmission() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {listMedication?.length > 0 ? (
-              listMedication?.map((medication, index) => (
-                <TableRow key={medication.id}>
+            {treatmentMedicines?.length > 0 ? (
+              treatmentMedicines?.map((medication, index) => (
+                <TableRow key={medication.treatmentMedicineId}>
                   <TableCell align="center">{index + 1}</TableCell>
                   <TableCell align="left">
                     <Stack direction={"column"}>
-                      <Typography>{medication.name}</Typography>
-                      {medication.prescription && (
+                      <Typography>{medication.medicineName}</Typography>
+                      {medication.note && (
                         <Typography
                           style={{
                             color: "#666666",
                             fontSize: "13px",
                           }}
                         >
-                          Chỉ định: {medication.prescription}
+                          Chỉ định: {medication.note}
                         </Typography>
                       )}
                     </Stack>
                   </TableCell>
-                  <TableCell align="right">{medication.dosage}</TableCell>
-                  <TableCell align="left">{medication.unit}</TableCell>
+                  <TableCell align="right">
+                    {medication.quantityPerTime}
+                  </TableCell>
+                  <TableCell align="left">
+                    {getMedicineUnit(medication.unit)}
+                  </TableCell>
                   <TableCell align="left">
                     <Stack direction={"column"} spacing={0}>
-                      {medication.time.map((time, index) => (
-                        <Typography fontSize={"14px"}>
-                          {getScheduleSession(time)}
-                        </Typography>
-                      ))}
+                      {["MORNING", "AFTERNOON", "EVENING", "NIGHT"].map(
+                        (time, index) => {
+                          if (!medication[time.toLowerCase()]) return null;
+
+                          return (
+                            <Typography
+                              fontSize={"14px"}
+                              key={`${
+                                medication.treatmentMedicineId
+                              }-${time.toLowerCase()}`}
+                            >
+                              {getScheduleSessionForMedicine(time)}
+                            </Typography>
+                          );
+                        }
+                      )}
                     </Stack>
                   </TableCell>
                   <TableCell align="center">
@@ -195,7 +222,7 @@ function MedicationManagementInAdmission() {
                       <StyledIconButton
                         onClick={() => {
                           setSelectedMedication(medication);
-                          setEditMedication(true);
+                          setModalState("EDIT");
                         }}
                       >
                         <Create color="primary" />
@@ -203,7 +230,7 @@ function MedicationManagementInAdmission() {
                       <StyledIconButton
                         onClick={() => {
                           setSelectedMedication(medication);
-                          setDeleteMedication(true);
+                          setModalState("DELETE");
                         }}
                       >
                         <Delete color="error" />
@@ -223,38 +250,52 @@ function MedicationManagementInAdmission() {
         </TableContainer>
       </Box>
       <ModalMedication
-        openModal={addMedication || editMedication}
-        setOpenModal={editMedication ? setEditMedication : setAddMedication}
-        modalTitle={editMedication ? "Chỉnh sửa thuốc" : "Thêm thuốc"}
+        openModal={modalState === "ADD" || modalState === "EDIT"}
+        onClose={() => setModalState("CLOSED")}
+        modalTitle={modalState === "EDIT" ? "Chỉnh sửa thuốc" : "Thêm thuốc"}
         iconTitle={
-          editMedication ? (
+          modalState === "EDIT" ? (
             <Create fontSize="18px" />
           ) : (
             <PlaylistAdd fontSize="18px" />
           )
         }
-        buttonAPIName={editMedication ? "Cập nhật" : "Thêm"}
+        buttonAPIName={modalState === "EDIT" ? "Cập nhật" : "Thêm"}
+        onButtonAPIClick={handleAddMedicines}
       >
         <Autocomplete
-          disabled={editMedication}
+          disabled={modalState === "EDIT"}
           size="medium"
           disablePortal
           id="combo-box-demo"
-          options={editMedication ? [selectedMedication] : medicines}
-          getOptionLabel={(option) => `${option.medicineName}`}
-          isOptionEqualToValue={(option, value) =>
-            option.medicineId === value.medicineId
+          options={modalState === "EDIT" ? [selectedMedication] : medicines}
+          getOptionLabel={(option) =>
+            option.medicineId !== ""
+              ? `${option.medicineName} (${getMedicineUnit(option.unit)})`
+              : ""
           }
-          value={editMedication ? selectedMedication : null}
-          onChange={(event, value) => {}}
+          isOptionEqualToValue={(option, value) =>
+            option.medicineId === value.medicineId || value.medicineId === ""
+          }
+          value={selectedMedication}
+          onChange={(event, value) => {
+            setSelectedMedication((prev) => {
+              return {
+                ...prev,
+                medicineId: value?.medicineId || "",
+                medicineName: value?.medicineName || "",
+                unit: value?.unit || "",
+              };
+            });
+          }}
           width={"100%"}
           renderInput={(params) => (
             <TextField
               {...params}
               placeholder="Chọn thuốc"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onBlur={() => setQuery("")}
+              value={medicineQuery}
+              onChange={(e) => setMedicineQuery(e.target.value)}
+              onBlur={() => setMedicineQuery("")}
             />
           )}
           sx={{
@@ -263,8 +304,15 @@ function MedicationManagementInAdmission() {
         />
         <TextField
           fullWidth
+          autoComplete="off"
           placeholder="Chỉ định"
-          value={editMedication ? selectedMedication.prescription : ""}
+          value={selectedMedication.note || ""}
+          onChange={(e) =>
+            setSelectedMedication((prev) => ({
+              ...prev,
+              note: e.target.value,
+            }))
+          }
           style={{ marginTop: "16px", marginBottom: "16px" }}
           InputProps={{
             style: { padding: "4px 0px" },
@@ -272,8 +320,15 @@ function MedicationManagementInAdmission() {
         />
         <TextField
           fullWidth
+          autoComplete="off"
           placeholder="Liều lượng 1 lần"
-          value={editMedication ? selectedMedication.dosage : ""}
+          value={selectedMedication.quantityPerTime}
+          onChange={(e) =>
+            setSelectedMedication((prev) => ({
+              ...prev,
+              quantityPerTime: e.target.value,
+            }))
+          }
           style={{ marginBottom: "8px" }}
           InputProps={{
             style: { padding: "4px 0px" },
@@ -293,12 +348,8 @@ function MedicationManagementInAdmission() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={
-                    editMedication
-                      ? selectedMedication.time.includes("MORNING")
-                      : selectedBuoi.MORNING
-                  }
-                  onChange={() => handleBuoiChange("MORNING")}
+                  checked={selectedMedication.morning}
+                  onChange={() => handleScheduleSessionChange("MORNING")}
                   name="MORNING"
                 />
               }
@@ -307,12 +358,8 @@ function MedicationManagementInAdmission() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={
-                    editMedication
-                      ? selectedMedication.time.includes("AFTERNOON")
-                      : selectedBuoi.AFTERNOON
-                  }
-                  onChange={() => handleBuoiChange("AFTERNOON")}
+                  checked={selectedMedication.afternoon}
+                  onChange={() => handleScheduleSessionChange("AFTERNOON")}
                   name="AFTERNOON"
                 />
               }
@@ -321,12 +368,8 @@ function MedicationManagementInAdmission() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={
-                    editMedication
-                      ? selectedMedication.time.includes("EVENING")
-                      : selectedBuoi.EVENING
-                  }
-                  onChange={() => handleBuoiChange("EVENING")}
+                  checked={selectedMedication.evening}
+                  onChange={() => handleScheduleSessionChange("EVENING")}
                   name="EVENING"
                 />
               }
@@ -335,12 +378,8 @@ function MedicationManagementInAdmission() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={
-                    editMedication
-                      ? selectedMedication.time.includes("NIGHT")
-                      : selectedBuoi.NIGHT
-                  }
-                  onChange={() => handleBuoiChange("NIGHT")}
+                  checked={selectedMedication.night}
+                  onChange={() => handleScheduleSessionChange("NIGHT")}
                   name="NIGHT"
                 />
               }
@@ -350,12 +389,14 @@ function MedicationManagementInAdmission() {
         </Stack>
       </ModalMedication>
       <ModalMedication
-        openModal={deleteMedication}
-        setOpenModal={setDeleteMedication}
+        openModal={modalState === "DELETE"}
+        onClose={() => setModalState("CLOSED")}
         modalTitle="Dừng uống thuốc"
         iconTitle={<DoDisturbOnIcon fontSize="18px" />}
         buttonAPIName="Hôm nay"
         secondButtonAPIName="Ngày mai"
+        onSecondButtonAPIClick={() => handleDeleteTreatmentMedicine(true)}
+        onButtonAPIClick={() => handleDeleteTreatmentMedicine(false)}
       >
         <Typography variant="body2" fontSize={"14px"}>
           Bạn có chắc chắn muốn dừng uống thuốc{" "}
@@ -364,7 +405,7 @@ function MedicationManagementInAdmission() {
               textTransform: "capitalize",
             }}
           >
-            {selectedMedication.name}
+            {selectedMedication.medicineName}
           </strong>{" "}
           không?
         </Typography>

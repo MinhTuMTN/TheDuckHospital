@@ -155,7 +155,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Doctor schedule not found");
         }
 
-        if (doctorSchedule.getDate().before(DateCommon.getToday())) {
+        if (doctorSchedule.getDate().before(DateCommon.getStarOfDay(DateCommon.getToday()))) {
             throw new BadRequestException("Doctor schedule is not available");
         }
 
@@ -172,7 +172,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Time slot not found");
         }
 
-        if (doctorSchedule.getDate().before(DateCommon.getToday())) {
+        if (doctorSchedule.getDate().before(DateCommon.getStarOfDay(DateCommon.getToday()))) {
             throw new BadRequestException("Doctor schedule is not available");
         }
 
@@ -271,7 +271,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
     @Override
     public List<DoctorScheduleRoomResponse> getDoctorSchedulesByDepartmentId(Integer departmentId) throws ParseException {
-        Date today = DateCommon.getToday();
+        Date today = DateCommon.getStarOfDay(DateCommon.getToday());
 
         List<DoctorSchedule> schedules = doctorScheduleRepository
                 .findByMedicalService_Department_DepartmentIdAndDateAndDeletedIsFalse(
@@ -380,7 +380,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             throw new BadRequestException("Doctor schedule not found");
         }
 
-        Date date = DateCommon.getToday();
+        Date date = DateCommon.getStarOfDay(DateCommon.getToday());
         if (doctorSchedule.getDate().before(date)) {
             throw new BadRequestException("Doctor schedule is not available");
         }

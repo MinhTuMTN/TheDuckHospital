@@ -146,17 +146,17 @@ public class DoctorServicesImpl implements IDoctorServices {
         if (degree == null)
             doctors = doctorRepository
                     .findDoctorsWithoutDegree(
-                    fullName, department == null ? "" : department.getDepartmentName(),
-                    DateCommon.getToday(),
-                    pageable
+                            fullName, department == null ? "" : department.getDepartmentName(),
+                            DateCommon.getStarOfDay(DateCommon.getToday()),
+                            pageable
                     );
         else
             doctors = doctorRepository
                     .findDoctorsByDegree(
-                    fullName, degree,
-                    department == null ? "" : department.getDepartmentName(),
-                    DateCommon.getToday(),
-                    pageable
+                            fullName, degree,
+                            department == null ? "" : department.getDepartmentName(),
+                            DateCommon.getStarOfDay(DateCommon.getToday()),
+                            pageable
                     );
 
         List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
@@ -166,7 +166,7 @@ public class DoctorServicesImpl implements IDoctorServices {
             doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
                     || doctorSchedule.getDate().before(DateCommon.getToday())
             );
-                if (doctorSchedules.isEmpty()) {
+            if (doctorSchedules.isEmpty()) {
                 remove.getAndIncrement();
                 return;
             }

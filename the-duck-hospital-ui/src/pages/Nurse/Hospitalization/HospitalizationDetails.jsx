@@ -17,6 +17,7 @@ import { appColors } from "../../../utils/appColorsUtils";
 import InpatientMedicalTest from "../../../components/Nurse/Hospitalize/InpatientMedicalTest";
 import {
   getAllMedicalTestServices,
+  getDoctorInDepartment,
   getGeneralInfoOfHospitalization,
 } from "../../../services/nurse/HospitalizeServices";
 import { enqueueSnackbar } from "notistack";
@@ -44,6 +45,7 @@ function HospitalizationDetails() {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const [generalInfo, setGeneralInfo] = React.useState({});
   const [medicalTestServices, setMedicalTestServices] = React.useState([]);
+  const [doctors, setDoctors] = React.useState([]);
   const [onRefresh, setOnRefresh] = React.useState(() => {});
   const { hospitalizationId, roomId } = useParams();
   const roomName = useMemo(() => {
@@ -115,16 +117,21 @@ function HospitalizationDetails() {
           variant: "error",
         });
     };
+    const handleGetAllDoctorsInDepartment = async () => {
+      const response = await getDoctorInDepartment();
+      if (response.success) setDoctors(response.data.data);
+    };
 
     if (hospitalizationId) {
       handleGetGeneralInfoOfHospitalization();
       handleGetAllMedicalTests();
+      handleGetAllDoctorsInDepartment();
     }
   }, [hospitalizationId]);
 
   return (
     <HospitalizationContext.Provider
-      value={{ generalInfo, onRefresh, setOnRefresh }}
+      value={{ generalInfo, onRefresh, setOnRefresh, doctors }}
     >
       <Box
         flex={1}
@@ -157,7 +164,7 @@ function HospitalizationDetails() {
               {breadcrumbs}
             </Breadcrumbs>
             {selectedTab === 0 ? (
-              <AdmissionDetailsByDate generalInfo={generalInfo} />
+              <AdmissionDetailsByDate />
             ) : (
               <InpatientMedicalTest medicalTestServices={medicalTestServices} />
             )}

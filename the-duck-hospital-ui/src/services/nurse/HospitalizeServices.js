@@ -94,3 +94,34 @@ export const getMedicalTestsByDate = (hospitalizationId, date) => {
     }
   );
 };
+
+export const getTreatmentMedicinesByDate = (hospitalizationId, date) => {
+  return get(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/medicines`,
+    {
+      date,
+    }
+  );
+};
+
+export const addTreatmenMedicines = (hospitalizationId, data) => {
+  return post(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/medicines`,
+    data
+  );
+};
+
+export const deleteTreatmentMedicine = (
+  hospitalizationId,
+  treatmentMedicineId,
+  tomorrow
+) => {
+  return del(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/medicines/${treatmentMedicineId}`,
+    { tomorrow }
+  );
+};
+
+export const getDoctorInDepartment = () => {
+  return get(`/inpatient-nurse/doctors`);
+};

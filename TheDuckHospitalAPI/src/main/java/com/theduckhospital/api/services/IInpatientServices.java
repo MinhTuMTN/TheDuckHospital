@@ -1,16 +1,12 @@
 package com.theduckhospital.api.services;
 
-import com.google.api.services.storage.Storage;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
-import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
-import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
-import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
+import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
-import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.entity.TreatmentMedicine;
@@ -62,14 +58,23 @@ public interface IInpatientServices {
             UUID hospitalizationId,
             Date date
     );
-    boolean createTreatmentMedicine(
+    List<TreatmentMedicine> createTreatmentMedicine(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             CreateTreatmentMedicineRequest request
+    );
+    List<TreatmentMedicine> deleteTreatmentMedicine(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UUID treatmentMedicineId,
+            boolean deleteFromTomorrow
     );
     List<DoctorMedicalTestResponse> getInpatientMedicalTestsByDate(
             String inpatientNurseAuthorization,
             UUID hospitalizationId,
             Date date
+    );
+    HospitalizationDetailResponse convertHospitalizationDetailDTO(
+            HospitalizationDetail hospitalizationDetail
     );
 }

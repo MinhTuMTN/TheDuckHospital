@@ -9,8 +9,8 @@ import {
   tableCellClasses,
 } from "@mui/material";
 import React from "react";
-import { getMedicineUnit } from "../../services/doctor/MedicineServices";
 import FormatCurrency from "../General/FormatCurrency";
+import { getMedicineUnit } from "../../utils/medicineUtils";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {

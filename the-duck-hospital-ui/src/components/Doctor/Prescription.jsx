@@ -25,7 +25,6 @@ import {
   addMedicine,
   deleteMedicine,
   getMedicineItems,
-  getMedicineUnit,
   searchMedicine,
 } from "../../services/doctor/MedicineServices";
 import { enqueueSnackbar } from "notistack";
@@ -34,6 +33,7 @@ import FormatCurrency from "../General/FormatCurrency";
 import PrescriptionInvoice from "./PrescriptionInvoice";
 import { useAuth } from "../../auth/AuthProvider";
 import { useReactToPrint } from "react-to-print";
+import { getMedicineUnit } from "../../utils/medicineUtils";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
