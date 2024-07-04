@@ -20,6 +20,7 @@ import {
   getGeneralInfoOfHospitalization,
 } from "../../../services/nurse/HospitalizeServices";
 import { enqueueSnackbar } from "notistack";
+import HospitalDischarge from "../../../components/Nurse/Hospitalize/HospitalDischarge";
 
 const data = [
   { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án" },
@@ -157,8 +158,10 @@ function HospitalizationDetails() {
             </Breadcrumbs>
             {selectedTab === 0 ? (
               <AdmissionDetailsByDate generalInfo={generalInfo} />
-            ) : (
+            ) : selectedTab === 1 ? (
               <InpatientMedicalTest medicalTestServices={medicalTestServices} />
+            ) : (
+              <HospitalDischarge />
             )}
           </Grid>
         </StyledGrid>
