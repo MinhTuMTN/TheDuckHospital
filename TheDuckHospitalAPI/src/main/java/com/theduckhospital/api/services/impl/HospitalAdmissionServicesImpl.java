@@ -1,9 +1,6 @@
 package com.theduckhospital.api.services.impl;
 
-import com.theduckhospital.api.constant.Fee;
-import com.theduckhospital.api.constant.HospitalAdmissionState;
-import com.theduckhospital.api.constant.NurseType;
-import com.theduckhospital.api.constant.RoomType;
+import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.nurse.HospitalAdmissionDetails;
 import com.theduckhospital.api.dto.request.nurse.UpdateRoomHospitalAdmission;
 import com.theduckhospital.api.entity.HospitalAdmission;
@@ -79,6 +76,7 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
                 : Fee.VIP_ROOM_FEE
         );
         hospitalAdmission.setNurse(nurse);
+        hospitalAdmission.setAdmissionDate(DateCommon.getStarOfDay(DateCommon.getToday()));
         hospitalAdmission.setState(HospitalAdmissionState.BEING_TREATED);
         hospitalAdmissionRepository.save(hospitalAdmission);
 

@@ -18,4 +18,9 @@ public interface IHospitalizationDetailServices {
             HospitalAdmission hospitalAdmission,
             Date date
     );
+    HospitalizationDetail getDailyHospitalAdmissionDetailsOrNull(
+            Nurse nurse,
+            HospitalAdmission hospitalAdmission,
+            Date date
+    );
 }

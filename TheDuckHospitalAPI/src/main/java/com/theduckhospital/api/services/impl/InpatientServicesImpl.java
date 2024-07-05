@@ -266,11 +266,14 @@ public class InpatientServicesImpl implements IInpatientServices {
             calendar.add(Calendar.DATE, -1);
 
             HospitalizationDetail yesterdayHospitalizationDetail = hospitalizationDetailServices
-                    .getDailyHospitalAdmissionDetails(
+                    .getDailyHospitalAdmissionDetailsOrNull(
                             hospitalizationDetail.getNurse(),
                             hospitalizationDetail.getHospitalAdmission(),
                             calendar.getTime()
                     );
+            if (yesterdayHospitalizationDetail == null) {
+                return List.of();
+            }
 
             return treatmentMedicineServices
                     .getTreatmentMedicinesByYesterdayHospitalizationDetail(

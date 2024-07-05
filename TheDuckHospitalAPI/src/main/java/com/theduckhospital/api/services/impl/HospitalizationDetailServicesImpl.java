@@ -11,13 +11,19 @@ import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IHospitalizationDetailServices;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class HospitalizationDetailServicesImpl implements IHospitalizationDetailServices {
     private final HospitalizationDetailRepository hospitalizationDetailRepository;
     private final IDoctorServices doctorServices;
+    private final Map<String, Lock> lockMap;
 
     public HospitalizationDetailServicesImpl(
             HospitalizationDetailRepository hospitalizationDetailRepository,
@@ -25,6 +31,17 @@ public class HospitalizationDetailServicesImpl implements IHospitalizationDetail
     ) {
         this.hospitalizationDetailRepository = hospitalizationDetailRepository;
         this.doctorServices = doctorServices;
+        this.lockMap = new ConcurrentHashMap<>();
+    }
+
+    private String getLockKey(HospitalAdmission hospitalAdmission, Date date) {
+        date = DateCommon.getStarOfDay(date);
+        return hospitalAdmission.getHospitalAdmissionId().toString() + "_" + date.getTime();
+    }
+
+    private Lock getLock(HospitalAdmission hospitalAdmission, Date date) {
+        String key = getLockKey(hospitalAdmission, date);
+        return lockMap.computeIfAbsent(key, k -> new ReentrantLock());
     }
 
     @Override
@@ -70,22 +87,50 @@ public class HospitalizationDetailServicesImpl implements IHospitalizationDetail
             HospitalAdmission hospitalAdmission,
             Date date
     ) {
-        Optional<HospitalizationDetail> optional = hospitalizationDetailRepository
-                .findByHospitalAdmissionAndHospitalizationDate(
-                        hospitalAdmission,
-                        DateCommon.getStarOfDay(date)
-                );
+        Lock lock = getLock(hospitalAdmission, date);
+        lock.lock();
+        try {
+            Optional<HospitalizationDetail> optional = hospitalizationDetailRepository
+                    .findByHospitalAdmissionAndHospitalizationDate(
+                            hospitalAdmission,
+                            DateCommon.getStarOfDay(date)
+                    );
 
-        HospitalizationDetail details;
-        if (optional.isEmpty()) {
-            details = new HospitalizationDetail();
-            details.setHospitalAdmission(hospitalAdmission);
-            details.setHospitalizationDate(DateCommon.getStarOfDay(date));
-            hospitalizationDetailRepository.save(details);
-        } else {
-            details = optional.get();
+            HospitalizationDetail details;
+            if (optional.isEmpty()) {
+                details = new HospitalizationDetail();
+                details.setHospitalAdmission(hospitalAdmission);
+                details.setHospitalizationDate(DateCommon.getStarOfDay(date));
+                details.setTreatmentMedicines(new ArrayList<>());
+                hospitalizationDetailRepository.save(details);
+            } else {
+                details = optional.get();
+            }
+
+            return details;
+        } finally {
+            lock.unlock();
         }
+    }
 
-        return details;
+    @Override
+    public HospitalizationDetail getDailyHospitalAdmissionDetailsOrNull(
+            Nurse nurse,
+            HospitalAdmission hospitalAdmission,
+            Date date
+    ) {
+        Lock lock = getLock(hospitalAdmission, date);
+        lock.lock();
+        try {
+            Optional<HospitalizationDetail> optional = hospitalizationDetailRepository
+                    .findByHospitalAdmissionAndHospitalizationDate(
+                            hospitalAdmission,
+                            DateCommon.getStarOfDay(date)
+                    );
+
+            return optional.orElse(null);
+        } finally {
+            lock.unlock();
+        }
     }
 }
