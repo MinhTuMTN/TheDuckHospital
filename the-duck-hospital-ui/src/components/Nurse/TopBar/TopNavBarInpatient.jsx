@@ -37,7 +37,7 @@ const CustomButton = styled(Box)`
 function TopNavBarInpatient(props) {
   const { onDrawerClick } = props;
   const accountPopover = usePopover();
-  const { setFullName, fullName, setNurseType } = useAuth();
+  const { setFullName, fullName, setNurseType, avatar } = useAuth();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   useEffect(() => {
     const handleGetFullName = async () => {
@@ -120,7 +120,7 @@ function TopNavBarInpatient(props) {
             <span style={{ position: "relative" }}>
               <CardMedia
                 component="img"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyyiip4CAXLbtJL5s2tQ4PdZgvr6NZJJ55rDT3kfPU-hNjoQMm_XqMVqlozf4XhyGMY_o&usqp=CAU"
+                src={avatar}
                 sx={{
                   width: "40px",
                   height: "40px",

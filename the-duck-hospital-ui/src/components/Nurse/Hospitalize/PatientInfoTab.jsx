@@ -15,6 +15,10 @@ import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
 import { getGender } from "../../../utils/genderUtils";
 import { getAge } from "../../../utils/getAgeUtils";
+import { ArrowForwardIosSharp } from "@mui/icons-material";
+import MuiAccordion from "@mui/material/Accordion";
+import MuiAccordionSummary from "@mui/material/AccordionSummary";
+import MuiAccordionDetails from "@mui/material/AccordionDetails";
 const patientCardStyle = {
   flex: "0 0 auto",
   marginTop: "16px",
@@ -39,8 +43,48 @@ const FireNav = styled(List)({
   },
 });
 
+const Accordion = styled((props) => (
+  <MuiAccordion disableGutters elevation={0} {...props} />
+))(({ theme }) => ({
+  "&:not(:last-child)": {
+    borderBottom: 0,
+  },
+  "&::before": {
+    display: "none",
+  },
+}));
+
+const AccordionSummary = styled((props) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharp style={{ fontSize: "14px" }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor: appColors.white,
+  height: theme.spacing(4),
+  flexDirection: "row",
+
+  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
+    transform: "rotate(90deg)",
+  },
+  "& .MuiAccordionSummary-content": {
+    marginLeft: theme.spacing("-4px"),
+  },
+}));
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(0),
+}));
+
 function PatientInfoTab(props) {
   const { selectedTab, setSelectedTab, data, generalInfo } = props;
+
+  const [expanded, setExpanded] = React.useState("panel1");
+
+  const handleChange = (panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
+  };
+
   return (
     <Grid
       item
@@ -207,40 +251,110 @@ function PatientInfoTab(props) {
           }}
         >
           <FireNav component="nav" disablePadding>
-            {data.map((item, index) => (
-              <ListItemButton
-                key={item.label}
-                onClick={() => setSelectedTab(index)}
-                sx={{
-                  py: 0,
-                  minHeight: 40,
-                  color:
-                    selectedTab === index ? "white" : "rgba(84, 84, 84, 0.8)",
-                  backgroundColor:
-                    selectedTab === index ? "#0e82fd" : "inherit",
-                  "&:hover": {
-                    backgroundColor:
-                      selectedTab === index ? "#0e82fd" : "rgba(0, 0, 0, 0.04)",
-                  },
-                }}
-              >
-                <ListItemIcon
+            {data.map((item, index) =>
+              index === 2 ? (
+                <Accordion
+                  expanded={expanded === "panel1"}
+                  onChange={handleChange("panel1")}
+                >
+                  <AccordionSummary
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.04)", // Đặt màu nền khi hover
+                      },
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        color: "rgba(84, 84, 84, 0.8)",
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <Typography
+                      color={"rgba(84, 84, 84, 0.8)"}
+                      fontSize={"14px"}
+                      fontWeight={"medium"}
+                    >
+                      {item.label}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {item.menu.map((subItem, subIndex) => (
+                      <ListItemButton
+                        key={subItem.id}
+                        onClick={() => setSelectedTab(subItem.id)}
+                        sx={{
+                          py: 0,
+                          minHeight: 44,
+                          color:
+                            selectedTab === subItem.id
+                              ? "white"
+                              : "rgba(84, 84, 84, 0.8)",
+                          backgroundColor:
+                            selectedTab === subItem.id ? "#0e82fd" : "inherit",
+                          "&:hover": {
+                            backgroundColor:
+                              selectedTab === subItem.id
+                                ? "#0e82fd"
+                                : "rgba(0, 0, 0, 0.04)",
+                          },
+                        }}
+                      >
+                        <ListItemText
+                          primary={subItem.labelMenu}
+                          primaryTypographyProps={{
+                            fontSize: 14,
+                            fontWeight: "medium",
+                            color:
+                              selectedTab === subItem.id
+                                ? appColors.backgroundColorMain
+                                : "inherit",
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              ) : (
+                <ListItemButton
+                  key={item.label}
+                  onClick={() => setSelectedTab(index)}
                   sx={{
-                    color: selectedTab === index ? appColors.white : "inherit",
+                    py: 0,
+                    minHeight: 44,
+                    color:
+                      selectedTab === index ? "white" : "rgba(84, 84, 84, 0.8)",
+                    backgroundColor:
+                      selectedTab === index ? "#0e82fd" : "inherit",
+                    "&:hover": {
+                      backgroundColor:
+                        selectedTab === index
+                          ? "#0e82fd"
+                          : "rgba(0, 0, 0, 0.04)",
+                    },
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontSize: 14,
-                    fontWeight: "medium",
-                    color: selectedTab === index ? appColors.white : "inherit",
-                  }}
-                />
-              </ListItemButton>
-            ))}
+                  <ListItemIcon
+                    sx={{
+                      color:
+                        selectedTab === index ? appColors.white : "inherit",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontSize: 14,
+                      fontWeight: "medium",
+                      color:
+                        selectedTab === index ? appColors.white : "inherit",
+                    }}
+                  />
+                </ListItemButton>
+              )
+            )}
           </FireNav>
         </Stack>
       </Stack>
