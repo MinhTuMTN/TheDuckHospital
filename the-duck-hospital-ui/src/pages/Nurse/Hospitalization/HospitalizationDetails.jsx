@@ -21,11 +21,21 @@ import {
 } from "../../../services/nurse/HospitalizeServices";
 import { enqueueSnackbar } from "notistack";
 import HospitalDischarge from "../../../components/Nurse/Hospitalize/HospitalDischarge";
+import AdmissionReceipt from "../../../components/Nurse/Hospitalize/AdmissionReceipt";
+import PrescriptionHospitalDischarge from "../../../components/Nurse/Hospitalize/PrescriptionHospitalDischarge";
 
 const data = [
-  { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án" },
-  { icon: <Dns />, label: "Xét nghiệm" },
-  { icon: <ExitToAppIcon />, label: "Xuất viện" },
+  { icon: <FolderSharedIcon />, label: "Hồ sơ bệnh án", menu: [] },
+  { icon: <Dns />, label: "Xét nghiệm", menu: [] },
+  {
+    icon: <ExitToAppIcon />,
+    label: "Xuất viện",
+    menu: [
+      { id: 4, labelMenu: "Biên lai thanh toán" },
+      { id: 6, labelMenu: "Toa thuốc ra viện" },
+      { id: 5, labelMenu: "Phiếu xuất viện" },
+    ],
+  },
 ];
 
 const StyledGrid = styled(Grid)(({ theme }) => ({
@@ -161,8 +171,12 @@ function HospitalizationDetails() {
               <AdmissionDetailsByDate generalInfo={generalInfo} />
             ) : selectedTab === 1 ? (
               <InpatientMedicalTest medicalTestServices={medicalTestServices} />
-            ) : (
+            ) : selectedTab === 4 ? (
+              <AdmissionReceipt />
+            ) : selectedTab === 5 ? (
               <HospitalDischarge />
+            ) : (
+              <PrescriptionHospitalDischarge />
             )}
           </Grid>
         </StyledGrid>
