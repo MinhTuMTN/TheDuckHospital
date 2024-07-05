@@ -1,9 +1,9 @@
-import { DeleteOutlineOutlined, DownloadOutlined } from "@mui/icons-material";
+import { DownloadOutlined } from "@mui/icons-material";
 import { Grid, IconButton, Stack, Typography, styled } from "@mui/material";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import React from "react";
 import { appColors } from "../../../utils/appColorsUtils";
-import dayjs from "dayjs";
 const MedicalAdmissionDatails = styled(Grid)({
   padding: "12px 0px",
   backgroundColor: "#ffffff",
