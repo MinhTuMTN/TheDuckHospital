@@ -30,6 +30,7 @@ public class InpatientServicesImpl implements IInpatientServices {
     private final IHospitalizationDetailServices hospitalizationDetailServices;
     private final IDoctorServices doctorServices;
     private final ITreatmentMedicineServices treatmentMedicineServices;
+    private final IPaymentServices paymentServices;
 
     public InpatientServicesImpl(
             NurseScheduleRepository nurseScheduleRepository,
@@ -39,7 +40,8 @@ public class InpatientServicesImpl implements IInpatientServices {
             IMedicalServiceServices medicalServiceServices,
             IHospitalizationDetailServices hospitalizationDetailServices,
             IDoctorServices doctorServices,
-            ITreatmentMedicineServices treatmentMedicineServices
+            ITreatmentMedicineServices treatmentMedicineServices,
+            IPaymentServices paymentServices
     ) {
         this.nurseScheduleRepository = nurseScheduleRepository;
         this.hospitalAdmissionServices = hospitalAdmissionServices;
@@ -49,6 +51,7 @@ public class InpatientServicesImpl implements IInpatientServices {
         this.hospitalizationDetailServices = hospitalizationDetailServices;
         this.doctorServices = doctorServices;
         this.treatmentMedicineServices = treatmentMedicineServices;
+        this.paymentServices = paymentServices;
     }
 
     @Override
@@ -361,61 +364,16 @@ public class InpatientServicesImpl implements IInpatientServices {
             String inpatientNurseAuthorization,
             UUID hospitalizationId
     ) {
-        HospitalAdmissionInvoice hospitalAdmissionInvoice = new HospitalAdmissionInvoice();
         HospitalAdmission hospitalAdmission = hospitalAdmissionServices
                 .checkNursePermissionForHospitalAdmission(
                         inpatientNurseAuthorization,
                         hospitalizationId
                 );
-        Date admissionDate = hospitalAdmission.getAdmissionDate();
-        Date today = DateCommon.getStarOfDay(
-                DateCommon.getToday()
-        );
+        return getInvoicesOfHospitalAdmission(hospitalAdmission);
+    }
 
-        // Room Fee
-        long days = DateCommon.getDaysBetween(admissionDate, today) + 1;
-        InvoiceDetails roomFee = new InvoiceDetails();
-        Room room = hospitalAdmission.getRoom();
-        roomFee.setServiceName(room.getRoomType()
-            == RoomType.TREATMENT_ROOM_STANDARD
-                ? "Phòng điều trị thường"
-                : "Phòng dịch vụ"
-        );
-        roomFee.setQuantity(days);
-        roomFee.setUnitPrice(hospitalAdmission.getRoomFee());
-        roomFee.setTotal(roomFee.getUnitPrice() * roomFee.getQuantity());
-
-        // Medicine Fee
-        List<InvoiceDetails> treatmentMedicineFees = treatmentMedicineServices
-                .getTreatmentMedicineInvoices(hospitalAdmission);
-
-        // Advance Fee
-        hospitalAdmissionInvoice.setAdvanceFee(
-                hospitalAdmission.getPaidFee()
-        );
-
-        // Total Fee
-        double totalProvisionalFee = roomFee.getTotal() + treatmentMedicineFees.stream()
-                .mapToDouble(InvoiceDetails::getTotal)
-                .sum();
-
-        hospitalAdmissionInvoice.setGeneralInfo(new HospitalAdmissionResponse(hospitalAdmission));
-        hospitalAdmissionInvoice.setPaymentCode(
-                "DI" + hospitalAdmission.getHospitalAdmissionCode()
-                        .substring(2)
-        );
-        hospitalAdmissionInvoice.setProvisionalFee(totalProvisionalFee);
-        hospitalAdmissionInvoice.setAdvanceFee(
-                hospitalAdmissionInvoice.getAdvanceFee()
-        );
-        hospitalAdmissionInvoice.setTotalFee(
-                totalProvisionalFee - hospitalAdmissionInvoice.getAdvanceFee()
-        );
-
-        List<InvoiceDetails> details = new ArrayList<>(List.of(roomFee));
-        details.addAll(treatmentMedicineFees);
-        hospitalAdmissionInvoice.setDetails(details);
-
-        return hospitalAdmissionInvoice;
+    @Override
+    public HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(HospitalAdmission hospitalAdmission) {
+        return paymentServices.getInvoicesOfHospitalAdmission(hospitalAdmission);
     }
 }

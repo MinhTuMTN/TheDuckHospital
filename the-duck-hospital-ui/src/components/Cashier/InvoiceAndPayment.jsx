@@ -44,7 +44,7 @@ const StyledLogo = styled("img")(({ theme }) => ({
 function InvoiceAndPayment(props) {
   const { paymentDetails = {}, onSuccess = () => {} } = props;
   const [showModal, setShowModal] = React.useState(false);
-  const [paymentMethod, setPaymentMethod] = React.useState("VNPAY");
+  const [paymentMethod, setPaymentMethod] = React.useState("CASH");
   const date = useMemo(
     () => (paymentDetails ? dayjs(paymentDetails?.date) : dayjs()),
     [paymentDetails]
@@ -61,16 +61,18 @@ function InvoiceAndPayment(props) {
         enqueueSnackbar("Thanh toán thành công", {
           variant: "success",
         });
-        return;
       } else {
         window.open(response.data.data.paymentUrl, "_blank");
       }
       onSuccess();
       setShowModal(false);
     } else {
-      enqueueSnackbar("Đã có lỗi xảy ra, vui lòng thử lại sau", {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        "Đã có lỗi xảy ra, vui lòng thử lại sau hoặc hoá đơn đã được thanh toán",
+        {
+          variant: "error",
+        }
+      );
     }
   }, [paymentMethod, paymentDetails, enqueueSnackbar, onSuccess]);
   return (
@@ -133,7 +135,11 @@ function InvoiceAndPayment(props) {
           Phí thanh toán
         </Typography>
         <Typography fontStyle={"italic"} fontSize={"16px"}>
-          <FormatCurrency amount={paymentMethod === "CASH" ? 0 : 1500} />
+          <FormatCurrency
+            amount={
+              paymentMethod === "CASH" || paymentDetails?.amount <= 0 ? 0 : 1500
+            }
+          />
         </Typography>
       </Box>
       <Divider />
@@ -159,7 +165,10 @@ function InvoiceAndPayment(props) {
           >
             <FormatCurrency
               amount={
-                paymentDetails?.amount + (paymentMethod === "CASH" ? 0 : 1500)
+                paymentDetails?.amount +
+                (paymentMethod === "CASH" || paymentDetails?.amount <= 0
+                  ? 0
+                  : 1500)
               }
             />
           </Typography>
@@ -182,6 +191,7 @@ function InvoiceAndPayment(props) {
                 value="VNPAY"
                 name="paymentMethod"
                 inputProps={{ "aria-label": "MOMO" }}
+                disabled={paymentDetails?.amount <= 0}
               />
               <Typography
                 component={"label"}
@@ -211,6 +221,7 @@ function InvoiceAndPayment(props) {
                 value="MOMO"
                 name="paymentMethod"
                 inputProps={{ "aria-label": "MOMO" }}
+                disabled={paymentDetails?.amount <= 0}
               />
               <Typography
                 component={"label"}

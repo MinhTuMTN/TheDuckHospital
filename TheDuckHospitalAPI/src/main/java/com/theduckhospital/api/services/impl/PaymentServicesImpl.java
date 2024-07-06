@@ -5,13 +5,15 @@ import com.google.gson.JsonObject;
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
+import com.theduckhospital.api.dto.request.nurse.HospitalAdmissionInvoice;
+import com.theduckhospital.api.dto.request.nurse.InvoiceDetails;
 import com.theduckhospital.api.dto.response.PaymentResponse;
+import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.*;
-import com.theduckhospital.api.services.IAccountServices;
-import com.theduckhospital.api.services.IPaymentServices;
+import com.theduckhospital.api.services.*;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,8 @@ public class PaymentServicesImpl implements IPaymentServices {
     private final TimeSlotRepository timeSlotRepository;
     private final MedicalTestRepository medicalTestRepository;
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
+    private final IDischargeServices dischargeServices;
+    private final ITreatmentMedicineServices treatmentMedicineServices;
 
     public PaymentServicesImpl(
             PasswordEncoder passwordEncoder,
@@ -47,7 +51,9 @@ public class PaymentServicesImpl implements IPaymentServices {
             BookingRepository bookingRepository,
             TimeSlotRepository timeSlotRepository,
             MedicalTestRepository medicalTestRepository,
-            HospitalAdmissionRepository hospitalAdmissionRepository) {
+            HospitalAdmissionRepository hospitalAdmissionRepository,
+            IDischargeServices dischargeServices,
+            ITreatmentMedicineServices treatmentMedicineServices) {
         this.passwordEncoder = passwordEncoder;
         this.accountServices = accountServices;
         this.transactionRepository = transactionRepository;
@@ -55,6 +61,8 @@ public class PaymentServicesImpl implements IPaymentServices {
         this.timeSlotRepository = timeSlotRepository;
         this.medicalTestRepository = medicalTestRepository;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
+        this.dischargeServices = dischargeServices;
+        this.treatmentMedicineServices = treatmentMedicineServices;
     }
     @Override
     public PaymentResponse vnPayCreatePaymentUrl(double amount, UUID transactionId)  throws UnsupportedEncodingException {
@@ -222,6 +230,25 @@ public class PaymentServicesImpl implements IPaymentServices {
 
     @Override
     public PaymentResponse createHospitalAdmissionPaymentUrl(Transaction transaction, PayMedicalTestRequest request) {
+        PaymentMethod paymentMethod = request.getPaymentMethod();
+        String pinCode = request.getPinCode();
+
+        return createPaymentResponse(transaction, paymentMethod, pinCode, request.isMobile());
+    }
+
+    @Override
+    public PaymentResponse createDischargePaymentUrl(Transaction transaction, PayMedicalTestRequest request) {
+        if (transaction.getAmount() <= 0) {
+            updateTransactionAndBooking(
+                    transaction,
+                    "CASH",
+                    "CASH",
+                    TransactionStatus.SUCCESS
+            );
+
+            return PaymentResponse.builder().cashSuccess(true).build();
+        }
+
         PaymentMethod paymentMethod = request.getPaymentMethod();
         String pinCode = request.getPinCode();
 
@@ -476,6 +503,52 @@ public class PaymentServicesImpl implements IPaymentServices {
     }
 
     @Override
+    public Transaction createDischargeTransaction(PayMedicalTestRequest request, String origin, Cashier cashier) {
+        try {
+            Optional<HospitalAdmission> optional = hospitalAdmissionRepository
+                    .findByHospitalAdmissionCodeAndDeletedIsFalse(
+                            "HA" + request.getMedicalTestCode().substring(2)
+                    );
+            if (optional.isEmpty()) {
+                throw new BadRequestException("Not found hospital admission", 10010);
+            }
+            HospitalAdmission hospitalAdmission = optional.get();
+            Discharge discharge = dischargeServices
+                    .getDischargeByHospitalAdmission(hospitalAdmission);
+
+            // If paid
+            if (discharge.getTransaction() != null
+                    && discharge.getTransaction().getStatus() == TransactionStatus.SUCCESS
+            ) {
+                throw new BadRequestException("This hospital admission has been paid", 10011);
+            }
+            // If exist but not success
+            if (discharge.getTransaction() != null) {
+                transactionRepository.deleteById(
+                        discharge.getTransaction()
+                                .getTransactionId()
+                );
+            }
+
+            Transaction transaction = getDischargeTransaction(
+                    discharge,
+                    origin,
+                    request.getPaymentMethod(),
+                    cashier
+            );
+            transaction.setDischarge(discharge);
+            transactionRepository.save(transaction);
+
+            discharge.setTransaction(transaction);
+            dischargeServices.saveDischarge(discharge);
+            return transaction;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new BadRequestException("Error when create transaction", 400);
+        }
+    }
+
+    @Override
     public Transaction createHospitalAdmissionTransaction(PayMedicalTestRequest request, String origin, Cashier cashier) {
         try {
             Optional<HospitalAdmission> optional = hospitalAdmissionRepository
@@ -514,6 +587,61 @@ public class PaymentServicesImpl implements IPaymentServices {
         }
     }
 
+    @Override
+    public HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(HospitalAdmission hospitalAdmission) {
+        HospitalAdmissionInvoice hospitalAdmissionInvoice = new HospitalAdmissionInvoice();
+        Date admissionDate = hospitalAdmission.getAdmissionDate();
+        Date today = DateCommon.getStarOfDay(
+                DateCommon.getToday()
+        );
+
+        // Room Fee
+        long days = DateCommon.getDaysBetween(admissionDate, today) + 1;
+        InvoiceDetails roomFee = new InvoiceDetails();
+        Room room = hospitalAdmission.getRoom();
+        roomFee.setServiceName(room.getRoomType()
+                == RoomType.TREATMENT_ROOM_STANDARD
+                ? "Phòng điều trị thường"
+                : "Phòng dịch vụ"
+        );
+        roomFee.setQuantity(days);
+        roomFee.setUnitPrice(hospitalAdmission.getRoomFee());
+        roomFee.setTotal(roomFee.getUnitPrice() * roomFee.getQuantity());
+
+        // Medicine Fee
+        List<InvoiceDetails> treatmentMedicineFees = treatmentMedicineServices
+                .getTreatmentMedicineInvoices(hospitalAdmission);
+
+        // Advance Fee
+        hospitalAdmissionInvoice.setAdvanceFee(
+                hospitalAdmission.getPaidFee()
+        );
+
+        // Total Fee
+        double totalProvisionalFee = roomFee.getTotal() + treatmentMedicineFees.stream()
+                .mapToDouble(InvoiceDetails::getTotal)
+                .sum();
+
+        hospitalAdmissionInvoice.setGeneralInfo(new HospitalAdmissionResponse(hospitalAdmission));
+        hospitalAdmissionInvoice.setPaymentCode(
+                "DI" + hospitalAdmission.getHospitalAdmissionCode()
+                        .substring(2)
+        );
+        hospitalAdmissionInvoice.setProvisionalFee(totalProvisionalFee);
+        hospitalAdmissionInvoice.setAdvanceFee(
+                hospitalAdmissionInvoice.getAdvanceFee()
+        );
+        hospitalAdmissionInvoice.setTotalFee(
+                totalProvisionalFee - hospitalAdmissionInvoice.getAdvanceFee()
+        );
+
+        List<InvoiceDetails> details = new ArrayList<>(List.of(roomFee));
+        details.addAll(treatmentMedicineFees);
+        hospitalAdmissionInvoice.setDetails(details);
+
+        return hospitalAdmissionInvoice;
+    }
+
     private Transaction getHospitalAdmissionTransaction(
             HospitalAdmission hospitalAdmission,
             String origin,
@@ -541,6 +669,48 @@ public class PaymentServicesImpl implements IPaymentServices {
         transaction.setFee(fee);
         transaction.setOrigin(origin);
         transaction.setPaymentType(PaymentType.ADVANCE_FEE);
+
+        return transaction;
+    }
+
+    private Transaction getDischargeTransaction(
+            Discharge discharge,
+            String origin,
+            PaymentMethod paymentMethod,
+            Cashier cashier
+    ) {
+        Account account = null;
+        HospitalAdmission hospitalAdmission = discharge.getHospitalAdmission();
+        try {
+            account = hospitalAdmission
+                    .getPatientProfile()
+                    .getAccount();
+        } catch (Exception e) {
+            System.out.println(discharge.getDischargeId() + ": " + "Not found account");
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setCashier(cashier);
+        transaction.setAccount(account);
+
+        HospitalAdmissionInvoice hospitalAdmissionInvoice = getInvoicesOfHospitalAdmission(
+                hospitalAdmission
+        );
+
+        double totalFee = hospitalAdmissionInvoice.getTotalFee();
+        double provisionalFee = hospitalAdmissionInvoice.getProvisionalFee();
+        transaction.setAmount(totalFee);
+        double fee = paymentMethod == PaymentMethod.WALLET || totalFee <= 0
+                ? 0D
+                : paymentMethod == PaymentMethod.VNPAY
+                ? Fee.VNPAY_HOSPITAL_ADMISSION_FEE
+                : Fee.MOMO_HOSPITAL_ADMISSION_FEE;
+        transaction.setFee(fee);
+        transaction.setOrigin(origin);
+        transaction.setPaymentType(PaymentType.DISCHARGE);
+
+        hospitalAdmission.setTotalFee(provisionalFee);
+        hospitalAdmissionRepository.save(hospitalAdmission);
 
         return transaction;
     }
@@ -624,6 +794,14 @@ public class PaymentServicesImpl implements IPaymentServices {
                 HospitalAdmission hospitalAdmission = transaction.getHospitalAdmission();
                 hospitalAdmission.setState(HospitalAdmissionState.WAITING_FOR_TREATMENT);
                 hospitalAdmission.setPaidFee(hospitalAdmission.getPaidFee() + transaction.getAmount());
+                hospitalAdmissionRepository.save(hospitalAdmission);
+            } else if (transaction.getPaymentType() == PaymentType.DISCHARGE) {
+                Discharge discharge = transaction.getDischarge();
+                HospitalAdmission hospitalAdmission = discharge.getHospitalAdmission();
+                hospitalAdmission.setPaidDischargeFee(true);
+                hospitalAdmission.setDischargeFee(
+                        transaction.getAmount()
+                );
                 hospitalAdmissionRepository.save(hospitalAdmission);
             }
 

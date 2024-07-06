@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.PayMedicalTestRequest;
 import com.theduckhospital.api.dto.request.cashier.CashierPaymentRequest;
+import com.theduckhospital.api.dto.request.nurse.HospitalAdmissionInvoice;
 import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.cashier.BillDetailsResponse;
 import com.theduckhospital.api.entity.*;
@@ -26,23 +27,25 @@ public class CashierServicesImpl implements ICashierServices {
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
     private final IPaymentServices paymentServices;
     private final IAccountServices accountServices;
+    private final InpatientServicesImpl inpatientServices;
 
     public CashierServicesImpl(
             MedicalTestRepository medicalTestRepository,
             HospitalAdmissionRepository hospitalAdmissionRepository,
             IPaymentServices paymentServices,
-            IAccountServices accountServices
+            IAccountServices accountServices,
+            InpatientServicesImpl inpatientServices
     ) {
         this.medicalTestRepository = medicalTestRepository;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
         this.paymentServices = paymentServices;
         this.accountServices = accountServices;
+        this.inpatientServices = inpatientServices;
     }
 
     @Override
     public BillDetailsResponse getPaymentDetails(String paymentCode) {
         PatientProfile patientProfile;
-        String code;
         UUID id;
         double amount = 0;
         Date date;
@@ -67,7 +70,6 @@ public class CashierServicesImpl implements ICashierServices {
                 patientProfile = medicalExaminationRecord.getPatientProfile();
             }
             id = medicalTest.getMedicalTestId();
-            code = medicalTest.getMedicalTestCode();
             amount = medicalTest.getPrice();
             date = medicalTest.getDate();
             note = medicalTest.getNote();
@@ -87,10 +89,30 @@ public class CashierServicesImpl implements ICashierServices {
 
             patientProfile = hospitalAdmission.getPatientProfile();
             id = hospitalAdmission.getHospitalAdmissionId();
-            code = hospitalAdmission.getHospitalAdmissionCode();
             amount = Fee.HOSPITAL_ADMISSION_FEE;
             date = hospitalAdmission.getAdmissionDate();
             paymentType = PaymentType.ADVANCE_FEE;
+        } else if (paymentCode.startsWith("DI")){
+            String hospitalAdmissionCode = "HA" + paymentCode.substring(2);
+            Optional<HospitalAdmission> optional = hospitalAdmissionRepository
+                    .findByHospitalAdmissionCodeAndDeletedIsFalse(hospitalAdmissionCode);
+            if (optional.isEmpty()) {
+                throw new NotFoundException("Hospital admission not found");
+            }
+
+            HospitalAdmission hospitalAdmission = optional.get();
+            if (hospitalAdmission.getPaidDischargeFee()
+                    || hospitalAdmission.getState() == HospitalAdmissionState.DISCHARGED
+            ) {
+                throw new BadRequestException("Hospital admission has been paid", 10012);
+            }
+            patientProfile = hospitalAdmission.getPatientProfile();
+            id = hospitalAdmission.getHospitalAdmissionId();
+
+            HospitalAdmissionInvoice invoice = inpatientServices.getInvoicesOfHospitalAdmission(hospitalAdmission);
+            amount = invoice.getTotalFee();
+            date = DateCommon.getStarOfDay(DateCommon.getToday());
+            paymentType = PaymentType.DISCHARGE;
         } else {
             return null;
         }
@@ -100,7 +122,7 @@ public class CashierServicesImpl implements ICashierServices {
         int yearOfBirth = calendar.get(Calendar.YEAR);
 
         return BillDetailsResponse.builder()
-                .code(code)
+                .code(paymentCode)
                 .id(id)
                 .patientName(patientProfile.getFullName())
                 .yearOfBirth(yearOfBirth)
@@ -151,6 +173,20 @@ public class CashierServicesImpl implements ICashierServices {
                             transaction,
                             payMedicalTestRequest
                     );
+        } else if (paymentCode.startsWith("DI")) {
+            Transaction transaction = paymentServices
+                    .createDischargeTransaction(
+                            payMedicalTestRequest,
+                            origin,
+                            cashier
+                    );
+
+            return paymentServices
+                    .createDischargePaymentUrl(
+                            transaction,
+                            payMedicalTestRequest
+                    );
+
         }
         return null;
     }

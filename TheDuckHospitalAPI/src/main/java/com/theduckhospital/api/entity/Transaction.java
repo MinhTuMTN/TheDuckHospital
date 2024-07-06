@@ -43,6 +43,11 @@ public class Transaction {
     @ToStringExclude
     private MedicalTest medicalTest;
 
+    @OneToOne(mappedBy = "transaction", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    @ToStringExclude
+    private Discharge discharge;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @ToStringExclude

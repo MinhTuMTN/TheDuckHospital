@@ -42,4 +42,25 @@ public class Discharge {
     @JsonBackReference
     @ToStringExclude
     private Doctor doctor;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "transactionId", referencedColumnName = "transactionId")
+    @JsonBackReference
+    @ToStringExclude
+    private Transaction transaction;
+
+    private Date createdAt;
+    private Date lastModifiedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = new Date();
+        this.lastModifiedAt = new Date();
+        this.dischargeId = UUID.randomUUID();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastModifiedAt = new Date();
+    }
 }

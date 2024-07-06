@@ -4,6 +4,8 @@ export const getPaymentType = (paymentType) => {
       return "Xét nghiệm";
     case "ADVANCE_FEE":
       return "Thanh toán tạm ứng";
+    case "DISCHARGE":
+      return "Thanh toán xuất viện";
     default:
       return "Khám bệnh";
   }

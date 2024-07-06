@@ -60,8 +60,10 @@ public class HospitalAdmission {
     private double debtFee;
     private double paidFee;
     private double totalFee;
+    private Double dischargeFee;
 
     private HospitalAdmissionState state;
+    private Boolean paidDischargeFee;
 
     @OneToMany(mappedBy = "hospitalAdmission")
     @ToStringExclude
@@ -112,6 +114,7 @@ public class HospitalAdmission {
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.deleted = false;
+        this.paidDischargeFee = false;
     }
 
     @PreUpdate

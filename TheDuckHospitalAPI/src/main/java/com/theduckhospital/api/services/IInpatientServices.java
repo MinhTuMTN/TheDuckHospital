@@ -7,6 +7,7 @@ import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
+import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.MedicalService;
 import com.theduckhospital.api.entity.TreatmentMedicine;
@@ -80,5 +81,8 @@ public interface IInpatientServices {
     HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(
             String inpatientNurseAuthorization,
             UUID hospitalizationId
+    );
+    HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(
+            HospitalAdmission hospitalAdmission
     );
 }
