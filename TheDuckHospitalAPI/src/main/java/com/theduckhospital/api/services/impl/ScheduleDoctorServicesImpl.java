@@ -86,7 +86,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         Calendar dateCalendar;
 
-                List<DoctorSchedule> doctorSchedules = new ArrayList<>();
+        List<DoctorSchedule> doctorSchedules = new ArrayList<>();
         for (Date date : request.getMorningDates()) {
             dateCalendar = DateCommon.getCalendar(date);
             List<DoctorSchedule> doctorScheduleRange = createDoctorScheduleRange(

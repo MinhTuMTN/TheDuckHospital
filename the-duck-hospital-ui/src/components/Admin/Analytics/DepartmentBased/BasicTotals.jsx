@@ -4,6 +4,8 @@ import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import PatientPic from "../../../../assets/patient.png";
+import DoctorPic from "../../../../assets/doctor.png";
+import NursePic from "../../../../assets/nurse.png";
 
 const BoxStyle = styled(Paper)(({ theme }) => ({
   padding: "8px !important",
@@ -47,8 +49,14 @@ function BasicTotals(props) {
         }}
       >
         <img
-          src={PatientPic}
-          alt="patient"
+          src={
+            label === "Số Bác Sĩ"
+              ? DoctorPic
+              : label === "Số Điều Dưỡng"
+              ? NursePic
+              : PatientPic
+          }
+          alt="icon"
           style={{
             width: "4.5rem",
             height: "4.5rem",

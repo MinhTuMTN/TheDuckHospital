@@ -56,5 +56,5 @@ public interface MedicalExaminationRepository
 
 //    List<MedicalExaminationRecord> findByDeletedIsFalseAndState(MedicalExamState medicalExamState);
 
-    long countByDeletedIsFalseAndStateAndDoctorSchedule_Doctor(MedicalExamState medicalExamState, Doctor doctor);
+    long countByDeletedIsFalseAndStateInAndDoctorSchedule_Doctor(List<MedicalExamState> medicalExamStates, Doctor doctor);
 }
