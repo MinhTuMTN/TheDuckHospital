@@ -185,6 +185,7 @@ function AdmissionReceipt() {
               <Stack direction={"row"} spacing={1}>
                 {contacts.map((contact, index) => (
                   <Stack
+                    key={`contact-${index}`}
                     style={{
                       borderLeft: "2px solid #b6c2e4",
                       height: "60px",
@@ -197,6 +198,7 @@ function AdmissionReceipt() {
                     {contact.icon}
                     {contact.value.map((item, index) => (
                       <Typography
+                        key={`contact-name-${index}`}
                         variant="subtitle1"
                         fontSize={"13px"}
                         style={{ color: "#8997bd" }}
@@ -345,7 +347,7 @@ function AdmissionReceipt() {
                       "Thành tiền",
                     ].map((text, index) => (
                       <TableCell
-                        key={`header-${index}`}
+                        key={`table-cell-head-${index}`}
                         align={
                           index === 0 ? "center" : index > 1 ? "right" : "left"
                         }
@@ -373,7 +375,7 @@ function AdmissionReceipt() {
                   {invoice?.details?.map((service, index) => {
                     return (
                       <TableRow
-                        key={`details-${index}`}
+                        key={`service-id-${index}`}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
@@ -498,6 +500,7 @@ function AdmissionReceipt() {
             </TableContainer>
           </Grid>
           <Grid
+            item
             xs={12}
             style={{
               marginTop: "16px",

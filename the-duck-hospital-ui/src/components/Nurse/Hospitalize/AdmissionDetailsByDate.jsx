@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CardMedia,
   Grid,
   Stack,
   TextField,
@@ -328,13 +329,35 @@ function AdmissionDetailsByDate(props) {
                 paddingBottom: "20px",
               }}
             >
-              {medicalTests.map((item, index) => (
-                <MedicalInAdmissionDatails
-                  index={index}
-                  key={`medical-test-by-date-${index}`}
-                  medicalTest={item}
-                />
-              ))}
+              {medicalTests?.length !== 0 ? (
+                medicalTests.map((item, index) => (
+                  <MedicalInAdmissionDatails
+                    index={index}
+                    key={`medical-test-by-date-${index}`}
+                    medicalTest={item}
+                  />
+                ))
+              ) : (
+                <Stack
+                  direction={"column"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  <CardMedia
+                    component={"img"}
+                    src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1720179868/NoData_zd2mwa.jpg"
+                    alt="No_Data"
+                    sx={{
+                      width: "400px",
+                      height: "220px",
+                      objectFit: "contain",
+                    }}
+                  />
+                  <Typography marginTop={-2} fontSize={"14px"}>
+                    Không có yêu cầu xét nghiệm
+                  </Typography>
+                </Stack>
+              )}
             </Stack>
           </LayoutStyle>
         </Grid>

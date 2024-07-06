@@ -1,7 +1,7 @@
-import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import GroupsIcon from "@mui/icons-material/Groups";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
 import {
   Box,
   Button,
@@ -21,20 +21,12 @@ import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
-import TodayIcon from "@mui/icons-material/Today";
-import GroupsIcon from "@mui/icons-material/Groups";
-import BiotechIcon from "@mui/icons-material/Biotech";
 
 const sidebarItems = [
   {
     display: "Bệnh nhân",
     icon: <GroupsIcon />,
     to: "/doctor/doctor-bookings",
-  },
-  {
-    display: "Lịch trực",
-    icon: <TodayIcon />,
-    to: "/doctor/doctor-schedules",
   },
 ];
 
@@ -43,21 +35,6 @@ const technicianSidebarItems = [
     display: "Xét nghiệm",
     icon: <BiotechIcon />,
     to: "/doctor/doctor-test",
-  },
-];
-
-const headDoctorSidebarItems = [
-  {
-    display: "Danh sách ca trực",
-    icon: <PersonIcon />,
-    to: "/doctor/head-doctor/schedule-management",
-    label: "Quản lý ca trực",
-  },
-  {
-    display: "Tạo ca trực",
-    icon: <PersonIcon />,
-    to: "/doctor/head-doctor/schedule-management/create",
-    label: "Quản lý ca trực",
   },
 ];
 
@@ -89,8 +66,7 @@ const CustomListItemIcon = styled(ListItemIcon)(({ theme }) => ({
 function LeftNavBarDoctor(props) {
   const { open, onOpenClose } = props;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
-  const { fullName, setToken } = useAuth();
-  const theme = useTheme();
+  const { setToken } = useAuth();
   const navigate = useNavigate();
   const { role } = useAuth();
 
@@ -139,7 +115,9 @@ function LeftNavBarDoctor(props) {
               fontSize: "18px",
             }}
           >
-            {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
+            {role === "Doctor" || role === "HeadDoctor"
+              ? "Quản lý"
+              : "Bác sĩ xét nghiệm"}
           </Typography>
         </Box>
         <List>
@@ -162,114 +140,19 @@ function LeftNavBarDoctor(props) {
             </NavLink>
           ))}
         </List>
-
-        {role === "HeadDoctor" && (
-          <>
-            <Box
-              sx={{
-                justifyContent: "flex-start",
-                width: "100%",
-                paddingX: 2,
-                marginTop: 2,
-              }}
-            >
-              <Typography
-                sx={{
-                  textAlign: "left",
-                  textTransform: "uppercase",
-                  fontWeight: "bold",
-                  color: "#020222",
-                  fontSize: "18px",
-                }}
-              >
-                Trưởng khoa
-              </Typography>
-            </Box>
-            <List>
-              {headDoctorSidebarItems.map((item, index) => (
-                <NavLink
-                  key={`nav-bar-store-${index}`}
-                  style={{ textDecoration: "none" }}
-                  to={item.to}
-                  state={{ label: item.label }}
-                >
-                  <ListItem disablePadding key={item.section}>
-                    <CustomListItemButton>
-                      <CustomListItemIcon>{item.icon}</CustomListItemIcon>
-                      <ListItemText
-                        disableTypography
-                        style={{ fontSize: "16px" }}
-                        primary={item.display}
-                      />
-                    </CustomListItemButton>
-                  </ListItem>
-                </NavLink>
-              ))}
-            </List>
-          </>
-        )}
       </Box>
 
       <Stack
         direction={"column"}
         spacing={2}
         sx={{
+          position: "sticky",
           borderTop: "1px solid #e0e0e0",
           paddingX: 2,
           paddingY: 2.5,
           width: "100%",
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <CardMedia
-            component="img"
-            src="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1702377250/camel_ckn4py.png"
-            sx={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              padding: "5px",
-              border: "1px solid #c8c8c8",
-              boxShadow: "0px 0px 5px 0px #c8c8c8",
-            }}
-          />
-          <Stack
-            direction={"column"}
-            spacing={0}
-            sx={{
-              justifyContent: "flex-start",
-              width: "100%",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "12px",
-                color: "#8c8c8c",
-                textAlign: "left",
-              }}
-            >
-              {role === "Doctor" || role === "HeadDoctor" ? "Bác sĩ" : "Bác sĩ xét nghiệm"}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: "16px",
-                color: theme.palette.text.main,
-                textAlign: "left",
-                fontWeight: "500",
-              }}
-            >
-              {fullName}
-            </Typography>
-          </Stack>
-        </Stack>
-
         <Button
           variant="contained"
           sx={{

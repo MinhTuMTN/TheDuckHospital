@@ -9,25 +9,25 @@ import {
   FormGroup,
   IconButton,
   Stack,
+  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TextField,
   Typography,
   styled,
 } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect } from "react";
 import { searchMedicine } from "../../../services/doctor/MedicineServices";
-import { getMedicineUnit } from "../../../utils/medicineUtils";
-import { getScheduleSessionForMedicine } from "../../../utils/scheduleSessionUtils";
-import ModalMedication from "./ModalMedication";
-import { enqueueSnackbar } from "notistack";
 import {
   addTreatmenMedicines,
   deleteTreatmentMedicine,
 } from "../../../services/nurse/HospitalizeServices";
+import { getMedicineUnit } from "../../../utils/medicineUtils";
+import { getScheduleSessionForMedicine } from "../../../utils/scheduleSessionUtils";
+import ModalMedication from "./ModalMedication";
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   width: "34px",
@@ -146,12 +146,12 @@ function MedicationManagementInAdmission(props) {
         </Button>
       </Stack>
       <Box width={"100%"} marginTop={2}>
-        <TableContainer
+        <Table
           sx={{
             width: "100%",
           }}
         >
-          <TableHead sx={{ width: "100%", backgroundColor: "#ececec" }}>
+          <TableHead style={{ backgroundColor: "#ececec" }}>
             <TableRow sx={{ width: "100%" }}>
               <TableCell width={"5%"} align="center">
                 STT
@@ -247,7 +247,7 @@ function MedicationManagementInAdmission(props) {
               </TableRow>
             )}
           </TableBody>
-        </TableContainer>
+        </Table>
       </Box>
       <ModalMedication
         openModal={modalState === "ADD" || modalState === "EDIT"}

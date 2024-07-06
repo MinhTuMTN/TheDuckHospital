@@ -130,6 +130,7 @@ function MedicalExaminationRecord(props) {
       const response = await getMedicalRecord(medicalRecordId);
       if (response.success) {
         const data = response.data.data;
+        console.log(data);
         setInfo(data);
         setBasicsInfo(handleBasicsInfo(data.patient));
         setDateOfReExamination(dayjs(data.dateOfReExamination));
@@ -321,9 +322,12 @@ function MedicalExaminationRecord(props) {
                 variant="outlined"
                 id="outlined-basic"
                 label="Triệu chứng"
+                multiline
+                rows={2}
                 fullWidth
                 required
                 value={symptom}
+                autoComplete="off"
                 onChange={(e) => setSymptom(e.target.value)}
               />
               <CustomTextField
@@ -333,9 +337,43 @@ function MedicalExaminationRecord(props) {
                 label="Chuẩn đoán"
                 fullWidth
                 required
+                multiline
+                rows={4}
+                autoComplete="off"
                 value={diagnostic}
                 onChange={(e) => setDiagnostic(e.target.value)}
               />
+
+              <div>
+                <Accordion
+                  expanded={expanded === "panel1"}
+                  onChange={handleChange("panel1")}
+                >
+                  <AccordionSummary
+                    aria-controls="panel1d-content"
+                    id="panel1d-header"
+                  >
+                    <Typography>Thực hiện xét nghiệm</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <ListTestToDo patientInfo={info} />
+                  </AccordionDetails>
+                </Accordion>
+                <Accordion
+                  expanded={expanded === "panel2"}
+                  onChange={handleChange("panel2")}
+                >
+                  <AccordionSummary
+                    aria-controls="panel2d-content"
+                    id="panel2d-header"
+                  >
+                    <Typography>Toa thuốc</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Prescription patientInfo={info} diagnostic={diagnostic} />
+                  </AccordionDetails>
+                </Accordion>
+              </div>
 
               <Stack
                 direction={"row"}
@@ -370,37 +408,6 @@ function MedicalExaminationRecord(props) {
                   />
                 </LocalizationProvider>
               </Stack>
-
-              <div>
-                <Accordion
-                  expanded={expanded === "panel1"}
-                  onChange={handleChange("panel1")}
-                >
-                  <AccordionSummary
-                    aria-controls="panel1d-content"
-                    id="panel1d-header"
-                  >
-                    <Typography>Thực hiện xét nghiệm</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <ListTestToDo patientInfo={info} />
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion
-                  expanded={expanded === "panel2"}
-                  onChange={handleChange("panel2")}
-                >
-                  <AccordionSummary
-                    aria-controls="panel2d-content"
-                    id="panel2d-header"
-                  >
-                    <Typography>Toa thuốc</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Prescription patientInfo={info} diagnostic={diagnostic} />
-                  </AccordionDetails>
-                </Accordion>
-              </div>
               <Stack
                 direction={"row"}
                 justifyContent={"space-between"}

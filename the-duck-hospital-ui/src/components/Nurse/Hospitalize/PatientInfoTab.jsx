@@ -76,9 +76,18 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: theme.spacing(0),
 }));
 
+const getInitials = (name) => {
+  if (!name) return "";
+  const words = name.split(" ");
+  if (words.length >= 2) {
+    return words[0][0] + words[words.length - 1][0];
+  } else {
+    return name[0];
+  }
+};
+
 function PatientInfoTab(props) {
   const { selectedTab, setSelectedTab, data, generalInfo } = props;
-
   const [expanded, setExpanded] = React.useState("panel1");
 
   const handleChange = (panel) => (event, newExpanded) => {
@@ -135,7 +144,7 @@ function PatientInfoTab(props) {
                   fontSize={"35px"}
                   fontWeight={500}
                 >
-                  MH
+                  {getInitials(generalInfo?.patientName)}
                 </Typography>
               </Box>
             </CardMedia>
@@ -150,7 +159,7 @@ function PatientInfoTab(props) {
                 whiteSpace: "nowrap",
               }}
             >
-              {generalInfo?.patientName || "Nguyễn Thị Hồng"}
+              {generalInfo?.patientName}
             </Typography>
             <Typography
               color={appColors.textDarkGreen}
@@ -159,7 +168,7 @@ function PatientInfoTab(props) {
             >
               Mã bệnh nhân:{" "}
               <span style={{ letterSpacing: 0.5 }}>
-                {generalInfo?.patientCode || "BN001"}
+                {generalInfo?.patientCode}
               </span>
             </Typography>
             <Typography
@@ -169,7 +178,7 @@ function PatientInfoTab(props) {
               letterSpacing={"0.5px"}
               marginTop={"4px"}
             >
-              {`${getGender(generalInfo?.patientGender) || "Nữ"} - ${getAge(
+              {`${getGender(generalInfo?.patientGender)} - ${getAge(
                 generalInfo?.patientBirthDate
               )} tuổi`}
             </Typography>
@@ -254,6 +263,7 @@ function PatientInfoTab(props) {
             {data.map((item, index) =>
               index === 2 ? (
                 <Accordion
+                  key={`accordion-${index}`}
                   expanded={expanded === "panel1"}
                   onChange={handleChange("panel1")}
                 >
@@ -282,7 +292,7 @@ function PatientInfoTab(props) {
                   <AccordionDetails>
                     {item.menu.map((subItem, subIndex) => (
                       <ListItemButton
-                        key={subItem.id}
+                        key={`subitem-${subItem.id}`}
                         onClick={() => setSelectedTab(subItem.id)}
                         sx={{
                           py: 0,
@@ -318,7 +328,7 @@ function PatientInfoTab(props) {
                 </Accordion>
               ) : (
                 <ListItemButton
-                  key={item.label}
+                  key={`item-${index}`}
                   onClick={() => setSelectedTab(index)}
                   sx={{
                     py: 0,
