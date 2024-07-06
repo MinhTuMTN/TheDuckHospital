@@ -38,7 +38,7 @@ function BookingItem(props, ref) {
               position: "absolute",
               top: "-20px",
               width: "35px",
-              height: "35px", // Adjust the height as needed
+              height: "35px",
               backgroundColor: "#e8f2f7",
               borderRadius: "50%",
             },
@@ -48,7 +48,7 @@ function BookingItem(props, ref) {
               position: "absolute",
               top: "-20px",
               width: "35px",
-              height: "35px", // Adjust the height as needed
+              height: "35px",
               backgroundColor: "#e8f2f7",
               borderRadius: "50%",
             },

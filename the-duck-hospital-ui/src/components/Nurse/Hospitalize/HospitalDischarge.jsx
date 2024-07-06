@@ -50,7 +50,6 @@ function HospitalDischarge() {
       const newText =
         note.slice(0, cursorPosition) + "\n- " + note.slice(cursorPosition);
       setNote(newText);
-      // Đặt lại vị trí con trỏ sau khi thêm dấu gạch ngang
       setTimeout(() => {
         event.target.selectionStart = event.target.selectionEnd =
           cursorPosition + 3;

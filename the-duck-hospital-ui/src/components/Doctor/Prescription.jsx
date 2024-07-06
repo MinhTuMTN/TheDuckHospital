@@ -18,22 +18,21 @@ import {
   TableRow,
   TextField,
   Typography,
-  tableCellClasses,
 } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import { useAuth } from "../../auth/AuthProvider";
 import {
   addMedicine,
   deleteMedicine,
   getMedicineItems,
   searchMedicine,
 } from "../../services/doctor/MedicineServices";
-import { enqueueSnackbar } from "notistack";
-import { useParams } from "react-router-dom";
+import { getMedicineUnit } from "../../utils/medicineUtils";
 import FormatCurrency from "../General/FormatCurrency";
 import PrescriptionInvoice from "./PrescriptionInvoice";
-import { useAuth } from "../../auth/AuthProvider";
-import { useReactToPrint } from "react-to-print";
-import { getMedicineUnit } from "../../utils/medicineUtils";
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -41,16 +40,15 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#F4F6F8",
-    color: theme.palette.text.main,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-}));
+const cellStyle = {
+  padding: "12px 16px",
+  color: "#1C252E",
+};
+
+const headCellStyle = {
+  ...cellStyle,
+  backgroundColor: "#f4f6f8",
+};
 
 function Prescription(props) {
   const { patientInfo, diagnostic } = props;
@@ -74,8 +72,8 @@ function Prescription(props) {
 
   const [totalForOneMedicine, setTotalForOneMedicine] = useState(0);
   const [noteForOneMedicine, setNoteForOneMedicine] = useState("");
-  const [daysForOneMedicine, setDaysForOneMedicine] = useState(0);
-  const [medicineOneTime, setMedicineOneTime] = useState(0);
+  const [daysForOneMedicine, setDaysForOneMedicine] = useState();
+  const [medicineOneTime, setMedicineOneTime] = useState();
   const [selectedBuoi, setSelectedBuoi] = useState({
     sang: false,
     trua: false,
@@ -97,7 +95,6 @@ function Prescription(props) {
     setTotalForOneMedicine(total);
   }, [daysForOneMedicine, medicineOneTime, selectedBuoi]);
 
-  // Update the total whenever daysForOneMedicine, medicineOneTime, or selectedBuoi changes
   React.useEffect(() => {
     calculateTotal();
   }, [calculateTotal]);
@@ -193,12 +190,18 @@ function Prescription(props) {
         boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
       }}
     >
-      <Table sx={{ minWidth: 650 }} aria-label="caption table">
-        <caption style={{ width: "100%", textAlign: "right" }}>
+      <Table sx={{ minWidth: 650 }} padding="none" aria-label="caption table">
+        <caption
+          style={{
+            width: "100%",
+            textAlign: "right",
+            borderTop: "0.8px solid #dfdfdf",
+          }}
+        >
           {hiddenButtonAdd === false ? (
             <>
               <Button
-                variant="outlined"
+                variant="text"
                 sx={{
                   textTransform: "none",
                   mr: 1,
@@ -304,13 +307,13 @@ function Prescription(props) {
                     <Stack direction={"row"} alignItems={"center"} spacing={2}>
                       <CustomTextField
                         sx={{
-                          flex: 1,
+                          flex: 2,
                         }}
                         size="medium"
                         type="number"
                         variant="outlined"
-                        id="outlined-basic"
                         placeholder="Số ngày"
+                        autoComplete="off"
                         value={daysForOneMedicine}
                         onChange={(e) => setDaysForOneMedicine(e.target.value)}
                       />
@@ -321,8 +324,8 @@ function Prescription(props) {
                         size="medium"
                         type="number"
                         variant="outlined"
-                        id="outlined-basic"
                         placeholder="Liều lượng 1 buổi"
+                        autoComplete="off"
                         value={medicineOneTime}
                         onChange={(e) => setMedicineOneTime(e.target.value)}
                       />
@@ -412,42 +415,75 @@ function Prescription(props) {
           )}
         </caption>
 
-        <TableHead>
+        <TableHead style={headCellStyle}>
           <TableRow>
-            <StyledTableCell align="center" width={"5%"}>
-              #
-            </StyledTableCell>
-
-            <StyledTableCell align="left" width={"25%"}>
-              Tên thuốc
-            </StyledTableCell>
-            <StyledTableCell align="left" width={"35%"}>
-              Chỉ định sử dụng
-            </StyledTableCell>
-            <StyledTableCell align="right" width={"15%"}>
-              Số lượng
-            </StyledTableCell>
-            <StyledTableCell align="right" width={"15%"}>
-              Đơn giá
-            </StyledTableCell>
-            <StyledTableCell align="center" width={"5%"} />
+            {["#", "Tên thuốc", "Số lượng", "Đơn giá", ""].map(
+              (text, index) => (
+                <TableCell
+                  key={index}
+                  align={
+                    index === 0 || index === 4
+                      ? "center"
+                      : index > 1
+                      ? "right"
+                      : "left"
+                  }
+                  style={{
+                    ...cellStyle,
+                    width:
+                      index === 0
+                        ? "5%"
+                        : index === 1
+                        ? "55%"
+                        : index === 4
+                        ? "10%"
+                        : "15%",
+                    color: "#637381",
+                    fontSize: "14px",
+                  }}
+                >
+                  {text}
+                </TableCell>
+              )
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
           {prescriptionItems.map((item, index) => (
-            <TableRow key={item.prescriptionItemId}>
-              <TableCell align="center">
+            <TableRow
+              key={item.prescriptionItemId}
+              sx={{
+                "&:last-child td, &:last-child th": { border: 0 },
+              }}
+            >
+              <TableCell
+                component="th"
+                scope="row"
+                align="left"
+                style={cellStyle}
+              >
                 {index < 9 ? `0${index + 1}` : index + 1}
               </TableCell>
-              <TableCell align="left">{item.medicine?.medicineName}</TableCell>
-              <TableCell align="left">{item.dosageInstruction}</TableCell>
-              <TableCell align="right">
+
+              <TableCell align="left" style={{ ...cellStyle }}>
+                <Stack direction={"column"}>
+                  <Typography>{item.medicine?.medicineName}</Typography>
+                  <Typography variant="caption">
+                    {item.dosageInstruction}
+                  </Typography>
+                </Stack>
+              </TableCell>
+
+              <TableCell align="right" style={{ ...cellStyle }}>
                 x {item.quantity} {getMedicineUnit(item.medicine?.unit)}
               </TableCell>
-              <TableCell align="right">
-                <FormatCurrency amount={item.price} />
+              <TableCell align="right" style={{ ...cellStyle }}>
+                <FormatCurrency
+                  amount={item.price}
+                  showCurrencySymbol={false}
+                />
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" style={{ ...cellStyle }}>
                 <Stack direction={"row"} justifyContent={"center"}>
                   <IconButton
                     size="small"

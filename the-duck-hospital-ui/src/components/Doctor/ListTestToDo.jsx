@@ -251,6 +251,7 @@ function ListTestToDo(props) {
                   variant="outlined"
                   id="outlined-basic"
                   placeholder="Chỉ định thực hiện"
+                  autoComplete="off"
                   sx={{ width: "320px" }}
                   value={selectedTest.serviceNote}
                   onChange={(e) =>

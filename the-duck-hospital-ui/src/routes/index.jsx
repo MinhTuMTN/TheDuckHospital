@@ -386,10 +386,7 @@ function Router(props) {
         },
       ],
     },
-    // {
-    //   path: "/",
-    //   element: <ProtectedLayout forRole={["Admin"]} />,
-    //   children: [
+
     {
       path: "/admin",
       element: <AdminLayout />,
