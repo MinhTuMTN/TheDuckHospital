@@ -32,4 +32,9 @@ public interface IHospitalAdmissionServices {
             Nurse nurse,
             UUID hospitalAdmissionId
     );
+    void saveHospitalAdmission(HospitalAdmission hospitalAdmission);
+    boolean confirmDischarge(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    );
 }

@@ -19,6 +19,11 @@ public class Discharge {
 
     @Nationalized
     private String dischargeSummary;
+    @Nationalized
+    private String treatments;
+    @Nationalized
+    private String note;
+
     private Date dischargeDate;
     private Date reExaminationDate;
 

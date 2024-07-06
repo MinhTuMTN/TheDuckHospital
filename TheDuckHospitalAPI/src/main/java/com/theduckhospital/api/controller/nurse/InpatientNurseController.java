@@ -3,6 +3,7 @@ package com.theduckhospital.api.controller.nurse;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
+import com.theduckhospital.api.dto.request.nurse.UpdateDischargeDetails;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.services.IInpatientServices;
@@ -39,7 +40,6 @@ public class InpatientNurseController {
 
     @GetMapping("/treatment-room/{roomId}/patients")
     public ResponseEntity<?> getPatientsByRoom(
-            @RequestHeader("Authorization") String authorization,
             @RequestParam(value = "patientName", defaultValue = "") String patientName,
             @PathVariable("roomId") int roomId
     ) {
@@ -281,6 +281,60 @@ public class InpatientNurseController {
                                 hospitalizationId
                         )
                 )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/discharge")
+    public ResponseEntity<?> getDischargeDetails(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get discharge details successfully")
+                .data(inpatientServices
+                        .getDischargeDetails(
+                                authorization,
+                                hospitalizationId
+                        )
+                )
+                .build()
+        );
+    }
+
+    @PutMapping("/hospitalization/{hospitalizationId}/discharge")
+    public ResponseEntity<?> updateDischargeDetails(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestBody UpdateDischargeDetails request
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Update discharge details successfully")
+                .data(inpatientServices
+                        .updateDischargeDetails(
+                                authorization,
+                                hospitalizationId,
+                                request
+                        )
+                )
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/discharge-confirm")
+    public ResponseEntity<?> confirmDischarge(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Confirm discharge successfully")
+                .data(inpatientServices.confirmDischarge(authorization, hospitalizationId))
                 .build()
         );
     }

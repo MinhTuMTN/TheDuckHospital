@@ -2,13 +2,13 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
-import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
+import com.theduckhospital.api.dto.response.nurse.DischargeDetails;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
 import com.theduckhospital.api.entity.*;
@@ -31,6 +31,7 @@ public class InpatientServicesImpl implements IInpatientServices {
     private final IDoctorServices doctorServices;
     private final ITreatmentMedicineServices treatmentMedicineServices;
     private final IPaymentServices paymentServices;
+    private final IDischargeServices dischargeServices;
 
     public InpatientServicesImpl(
             NurseScheduleRepository nurseScheduleRepository,
@@ -41,8 +42,8 @@ public class InpatientServicesImpl implements IInpatientServices {
             IHospitalizationDetailServices hospitalizationDetailServices,
             IDoctorServices doctorServices,
             ITreatmentMedicineServices treatmentMedicineServices,
-            IPaymentServices paymentServices
-    ) {
+            IPaymentServices paymentServices,
+            IDischargeServices dischargeServices) {
         this.nurseScheduleRepository = nurseScheduleRepository;
         this.hospitalAdmissionServices = hospitalAdmissionServices;
         this.nurseServices = nurseServices;
@@ -52,6 +53,7 @@ public class InpatientServicesImpl implements IInpatientServices {
         this.doctorServices = doctorServices;
         this.treatmentMedicineServices = treatmentMedicineServices;
         this.paymentServices = paymentServices;
+        this.dischargeServices = dischargeServices;
     }
 
     @Override
@@ -375,5 +377,53 @@ public class InpatientServicesImpl implements IInpatientServices {
     @Override
     public HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(HospitalAdmission hospitalAdmission) {
         return paymentServices.getInvoicesOfHospitalAdmission(hospitalAdmission);
+    }
+
+    @Override
+    public DischargeDetails getDischargeDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+        Discharge discharge = dischargeServices
+                .getDischargeByHospitalAdmission(hospitalAdmission);
+        return new DischargeDetails(discharge);
+    }
+
+    @Override
+    public DischargeDetails updateDischargeDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UpdateDischargeDetails request
+    ) {
+        Nurse inpatientNurse = nurseServices.getNurseByToken(inpatientNurseAuthorization);
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurse,
+                        hospitalizationId
+                );
+
+        Discharge discharge = dischargeServices
+                .updateDischargeDetails(
+                        hospitalAdmission,
+                        request,
+                        inpatientNurse
+                );
+        return new DischargeDetails(discharge);
+    }
+
+    @Override
+    public boolean confirmDischarge(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    ) {
+        return hospitalAdmissionServices.confirmDischarge(
+                inpatientNurseAuthorization,
+                hospitalizationId
+        );
     }
 }

@@ -24,6 +24,7 @@ public class HospitalAdmissionResponse {
     private String provinceName;
     private String departmentName;
     private String roomName;
+    private boolean isDischargePaid;
 
     public HospitalAdmissionResponse(HospitalAdmission hospitalAdmission) {
         this.hospitalAdmissionId = hospitalAdmission.getHospitalAdmissionId();
@@ -32,6 +33,7 @@ public class HospitalAdmissionResponse {
 
         this.underlyingDisease = hospitalAdmission.getHistoryOfAllergy();
         this.allergy = hospitalAdmission.getHistoryOfAllergy();
+        this.isDischargePaid = hospitalAdmission.getPaidDischargeFee();
 
         Department department = hospitalAdmission.getDepartment();
         this.departmentName = department == null ? null : department.getDepartmentName();

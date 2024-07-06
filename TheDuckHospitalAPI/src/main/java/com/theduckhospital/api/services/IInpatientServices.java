@@ -5,6 +5,7 @@ import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
+import com.theduckhospital.api.dto.response.nurse.DischargeDetails;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
 import com.theduckhospital.api.entity.HospitalAdmission;
@@ -84,5 +85,18 @@ public interface IInpatientServices {
     );
     HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(
             HospitalAdmission hospitalAdmission
+    );
+    DischargeDetails getDischargeDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    );
+    DischargeDetails updateDischargeDetails(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UpdateDischargeDetails request
+    );
+    boolean confirmDischarge(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
     );
 }

@@ -8,6 +8,7 @@ import com.theduckhospital.api.entity.Nurse;
 import com.theduckhospital.api.entity.Room;
 import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.HospitalAdmissionRepository;
+import com.theduckhospital.api.services.IDischargeServices;
 import com.theduckhospital.api.services.IHospitalAdmissionServices;
 import com.theduckhospital.api.services.INurseServices;
 import com.theduckhospital.api.services.IRoomServices;
@@ -21,15 +22,17 @@ import java.util.UUID;
 public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices {
     private final IRoomServices roomServices;
     private final INurseServices nurseServices;
+    private final IDischargeServices dischargeServices;
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
 
     public HospitalAdmissionServicesImpl(
             IRoomServices roomServices,
             INurseServices nurseServices,
-            HospitalAdmissionRepository hospitalAdmissionRepository
+            IDischargeServices dischargeServices, HospitalAdmissionRepository hospitalAdmissionRepository
     ) {
         this.roomServices = roomServices;
         this.nurseServices = nurseServices;
+        this.dischargeServices = dischargeServices;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
     }
 
@@ -151,6 +154,40 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
         if (hospitalAdmission.getDepartment() != nurse.getDepartment())
             throw new BadRequestException("Permission denied", 403);
 
+        if (hospitalAdmission.getState() == HospitalAdmissionState.DISCHARGED)
+            throw new BadRequestException("Hospital admission is discharged", 10063);
+
         return hospitalAdmission;
+    }
+
+    @Override
+    public void saveHospitalAdmission(HospitalAdmission hospitalAdmission) {
+        hospitalAdmissionRepository.save(hospitalAdmission);
+    }
+
+    @Override
+    public boolean confirmDischarge(String inpatientNurseAuthorization, UUID hospitalizationId) {
+        HospitalAdmission hospitalAdmission = checkNursePermissionForHospitalAdmission(
+                inpatientNurseAuthorization,
+                hospitalizationId
+        );
+
+        if (hospitalAdmission.getState() == HospitalAdmissionState.DISCHARGED) {
+            return true;
+        }
+
+        boolean isPaid = dischargeServices.isPaidDischarge(hospitalAdmission);
+        if (!isPaid) {
+            throw new BadRequestException("Discharge fee is not paid", 400);
+        }
+
+        hospitalAdmission.setState(HospitalAdmissionState.DISCHARGED);
+        hospitalAdmissionRepository.save(hospitalAdmission);
+
+        Room room = hospitalAdmission.getRoom();
+        room.setBeingUsed(room.getBeingUsed() - 1);
+        roomServices.saveRoom(room);
+
+        return true;
     }
 }

@@ -236,7 +236,11 @@ function ChoosePatient() {
                   {patients.map((patient, index) => (
                     <TableRow
                       key={patient.patientCode}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleChoose(patient.hospitalAdmissionId)}
                     >
                       <TableCell
                         align="left"

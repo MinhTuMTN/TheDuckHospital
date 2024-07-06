@@ -2,23 +2,24 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
-import com.theduckhospital.api.entity.Discharge;
-import com.theduckhospital.api.entity.HospitalAdmission;
+import com.theduckhospital.api.constant.TransactionStatus;
+import com.theduckhospital.api.dto.request.nurse.UpdateDischargeDetails;
+import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.repository.DischargeRepository;
 import com.theduckhospital.api.services.IDischargeServices;
-import com.theduckhospital.api.services.IHospitalAdmissionServices;
+import com.theduckhospital.api.services.IDoctorServices;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class DischargeServicesImpl implements IDischargeServices {
     private final DischargeRepository dischargeRepository;
+    private final IDoctorServices doctorServices;
 
     public DischargeServicesImpl(
-            DischargeRepository dischargeRepository
-    ) {
+            DischargeRepository dischargeRepository,
+            IDoctorServices doctorServices) {
         this.dischargeRepository = dischargeRepository;
+        this.doctorServices = doctorServices;
     }
 
 
@@ -39,6 +40,38 @@ public class DischargeServicesImpl implements IDischargeServices {
         dischargeRepository.save(discharge);
 
         return discharge;
+    }
+
+    @Override
+    public Discharge updateDischargeDetails(
+            HospitalAdmission hospitalAdmission,
+            UpdateDischargeDetails request,
+            Nurse inpatientNurse
+    ) {
+        Discharge discharge = getDischargeByHospitalAdmission(hospitalAdmission);
+        discharge.setDischargeSummary(request.getDischargeSummary());
+        discharge.setTreatments(request.getTreatments());
+        discharge.setNote(request.getNote());
+        discharge.setReExaminationDate(DateCommon.getStarOfDay(
+                request.getReExaminationDate()
+        ));
+
+        Doctor doctor = doctorServices.getDoctorById(request.getDoctorId());
+        discharge.setDoctor(doctor);
+
+        discharge.setNurse(inpatientNurse);
+        dischargeRepository.save(discharge);
+
+        return discharge;
+    }
+
+    @Override
+    public boolean isPaidDischarge(HospitalAdmission hospitalAdmission) {
+        Discharge discharge = hospitalAdmission.getDischarge();
+        Transaction transaction = discharge.getTransaction();
+        return transaction != null
+                && transaction.getStatus() == TransactionStatus.SUCCESS
+                && hospitalAdmission.getPaidDischargeFee();
     }
 
     @Override
