@@ -391,7 +391,7 @@ public class InpatientServicesImpl implements IInpatientServices {
 
         // Advance Fee
         hospitalAdmissionInvoice.setAdvanceFee(
-                hospitalAdmissionInvoice.getAdvanceFee()
+                hospitalAdmission.getPaidFee()
         );
 
         // Total Fee

@@ -22,11 +22,22 @@ public class HospitalAdmissionResponse {
     private String wardName;
     private String districtName;
     private String provinceName;
+    private String departmentName;
+    private String roomName;
 
     public HospitalAdmissionResponse(HospitalAdmission hospitalAdmission) {
         this.hospitalAdmissionId = hospitalAdmission.getHospitalAdmissionId();
         this.hospitalAdmissionCode = hospitalAdmission.getHospitalAdmissionCode();
         this.admissionDate = hospitalAdmission.getAdmissionDate();
+
+        this.underlyingDisease = hospitalAdmission.getHistoryOfAllergy();
+        this.allergy = hospitalAdmission.getHistoryOfAllergy();
+
+        Department department = hospitalAdmission.getDepartment();
+        this.departmentName = department == null ? null : department.getDepartmentName();
+
+        Room room = hospitalAdmission.getRoom();
+        this.roomName = room == null ? null : room.getRoomName();
 
         PatientProfile patientProfile = hospitalAdmission.getPatientProfile();
         if (patientProfile == null) {
@@ -46,8 +57,5 @@ public class HospitalAdmissionResponse {
 
         Patient patient = patientProfile.getPatient();
         this.patientCode = patient == null ? null : patient.getPatientCode();
-
-        this.underlyingDisease = hospitalAdmission.getHistoryOfAllergy();
-        this.allergy = hospitalAdmission.getHistoryOfAllergy();
     }
 }

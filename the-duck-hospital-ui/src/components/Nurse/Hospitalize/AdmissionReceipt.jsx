@@ -15,10 +15,16 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import React, { useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { useReactToPrint } from "react-to-print";
 import FormatCurrency from "../../General/FormatCurrency";
+import { getDischargeInvoice } from "../../../services/nurse/HospitalizeServices";
+import { HospitalizationContext } from "../../../pages/Nurse/Hospitalization/HospitalizationDetails";
+import { enqueueSnackbar } from "notistack";
+import dayjs from "dayjs";
+import { getAge } from "../../../utils/getAgeUtils";
+import { getGender } from "../../../utils/genderUtils";
 
 const ViewStyle = styled(Grid)(({ theme }) => ({
   marginTop: "16px",
@@ -106,32 +112,32 @@ const contacts = [
   },
 ];
 
-const listServices = [
-  {
-    id: 1,
-    servicesName: "Phòng dịch vụ",
-    quantity: 5,
-    prices: 500000,
-  },
-  {
-    id: 2,
-    servicesName: "Truyền nước biển",
-    quantity: 2,
-    prices: 250000,
-  },
-  {
-    id: 3,
-    servicesName: "Paracetamol 500mg",
-    quantity: 10,
-    prices: 5000,
-  },
-];
-
 function AdmissionReceipt() {
+  const [invoice, setInvoice] = useState({});
+  const { generalInfo } = useContext(HospitalizationContext);
   const ref = useRef();
   const handlePrint = useReactToPrint({
     content: () => ref.current,
+    documentTitle: `${invoice?.paymentCode} - Biên lai viện phí - ${generalInfo?.patientName}`,
   });
+
+  useEffect(() => {
+    const handleGetInvoice = async () => {
+      const response = await getDischargeInvoice(
+        generalInfo?.hospitalAdmissionId
+      );
+      if (response.success) setInvoice(response.data.data);
+      else
+        enqueueSnackbar("Không thể lấy thông tin biên lai viện phí", {
+          variant: "error",
+        });
+    };
+
+    console.log(generalInfo?.hospitalAdmissionId);
+    if (generalInfo?.hospitalAdmissionId) {
+      handleGetInvoice();
+    }
+  }, [generalInfo?.hospitalAdmissionId]);
   return (
     <Box>
       <ViewStyle container>
@@ -240,7 +246,7 @@ function AdmissionReceipt() {
                   textTransform: "uppercase",
                 }}
               >
-                Tạ Thị Hồng Nhung
+                {generalInfo?.patientName}
               </ValueTypography>
             </Stack>
           </Grid>
@@ -253,19 +259,25 @@ function AdmissionReceipt() {
               >
                 Ngày sinh:
               </LableTypography>
-              <ValueTypography>01/01/2000</ValueTypography>
+              <ValueTypography>
+                {dayjs(generalInfo?.patientBirthDate).format("DD/MM/YYYY")}
+              </ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={5} marginTop={1}>
             <Stack direction={"row"} justifyContent={"end"}>
               <LableTypography>Tuổi:</LableTypography>
-              <ValueTypography>24</ValueTypography>
+              <ValueTypography>
+                {getAge(generalInfo?.patientBirthDate)}
+              </ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={3} marginTop={1}>
             <Stack direction={"row"} justifyContent={"end"}>
               <LableTypography>Giới tính:</LableTypography>
-              <ValueTypography>Nữ</ValueTypography>
+              <ValueTypography>
+                {getGender(generalInfo?.patientGender)}
+              </ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} marginTop={1}>
@@ -278,7 +290,7 @@ function AdmissionReceipt() {
                 Địa chỉ:
               </LableTypography>
               <ValueTypography>
-                123, Đường Điện Biên Phủ, Quận 1, Thành phố Hồ Chí Minh
+                {`${generalInfo?.streetName}, ${generalInfo?.wardName}, ${generalInfo?.districtName}, ${generalInfo?.provinceName}`}
               </ValueTypography>
             </Stack>
           </Grid>
@@ -291,7 +303,9 @@ function AdmissionReceipt() {
               >
                 Ngày vào viện:
               </LableTypography>
-              <ValueTypography>23/04/2023</ValueTypography>
+              <ValueTypography>
+                {dayjs(generalInfo?.admissionDate).format("DD/MM/YYYY")}
+              </ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={4} marginTop={1}>
@@ -303,7 +317,7 @@ function AdmissionReceipt() {
               >
                 Chuyên khoa:
               </LableTypography>
-              <ValueTypography>Tim mạch</ValueTypography>
+              <ValueTypography>{generalInfo?.departmentName}</ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={3} marginTop={1}>
@@ -315,7 +329,7 @@ function AdmissionReceipt() {
               >
                 Phòng nằm viện:
               </LableTypography>
-              <ValueTypography>A203</ValueTypography>
+              <ValueTypography>{generalInfo?.roomName}</ValueTypography>
             </Stack>
           </Grid>
           <Grid item xs={12} marginTop={3}>
@@ -331,7 +345,7 @@ function AdmissionReceipt() {
                       "Thành tiền",
                     ].map((text, index) => (
                       <TableCell
-                        key={index}
+                        key={`header-${index}`}
                         align={
                           index === 0 ? "center" : index > 1 ? "right" : "left"
                         }
@@ -356,11 +370,10 @@ function AdmissionReceipt() {
                 </TableHead>
 
                 <TableBody>
-                  {listServices.map((service, index) => {
-                    const total = service.quantity * service.prices;
+                  {invoice?.details?.map((service, index) => {
                     return (
                       <TableRow
-                        key={service.id}
+                        key={`details-${index}`}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
@@ -374,7 +387,7 @@ function AdmissionReceipt() {
                           {index + 1}
                         </TableCell>
                         <TableCell align="left" style={{ ...cellStyle }}>
-                          {service.servicesName}
+                          {service.serviceName}
                         </TableCell>
 
                         <TableCell align="right" style={cellStyle}>
@@ -385,7 +398,7 @@ function AdmissionReceipt() {
                           style={{ ...cellStyle, color: "#1C252E" }}
                         >
                           <FormatCurrency
-                            amount={service.prices}
+                            amount={service.unitPrice}
                             showCurrencySymbol={false}
                           />
                         </TableCell>
@@ -394,7 +407,7 @@ function AdmissionReceipt() {
                           style={{ ...cellStyle, color: "#1C252E" }}
                         >
                           <FormatCurrency
-                            amount={total}
+                            amount={service.total}
                             showCurrencySymbol={false}
                           />
                         </TableCell>
@@ -422,7 +435,7 @@ function AdmissionReceipt() {
                       }}
                     >
                       <FormatCurrency
-                        amount={7800000}
+                        amount={invoice?.provisionalFee}
                         showCurrencySymbol={false}
                       />
                     </TableCell>
@@ -447,7 +460,11 @@ function AdmissionReceipt() {
                         color: "#ff5630",
                       }}
                     >
-                      - 0
+                      -{" "}
+                      <FormatCurrency
+                        amount={invoice?.advanceFee}
+                        showCurrencySymbol={false}
+                      />
                     </TableCell>
                   </TableRow>
                   <TableRow style={{ backgroundColor: "#000000" }}>
@@ -471,7 +488,7 @@ function AdmissionReceipt() {
                       }}
                     >
                       <FormatCurrency
-                        amount={7800000}
+                        amount={invoice?.totalFee}
                         showCurrencySymbol={false}
                       />
                     </TableCell>
@@ -535,9 +552,9 @@ function AdmissionReceipt() {
                 >
                   Mã QR thanh toán
                 </Typography>
-                <QRCode value={"123456"} size={64} />
+                <QRCode value={invoice?.paymentCode || "ABC123"} size={64} />
                 <Typography fontSize={12} fontWeight={500}>
-                  123456
+                  {invoice?.paymentCode}
                 </Typography>
               </Stack>
             </Stack>
