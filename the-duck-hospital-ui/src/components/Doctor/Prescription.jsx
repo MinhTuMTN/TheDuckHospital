@@ -33,7 +33,7 @@ import {
 import { getMedicineUnit } from "../../utils/medicineUtils";
 import FormatCurrency from "../General/FormatCurrency";
 import PrescriptionInvoice from "./PrescriptionInvoice";
-
+import PropTypes from "prop-types";
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     padding: "4px 4px",
@@ -51,7 +51,7 @@ const headCellStyle = {
 };
 
 function Prescription(props) {
-  const { patientInfo, diagnostic } = props;
+  const { patientInfo, diagnostic, role } = props;
   const { fullName } = useAuth();
   const { medicalRecordId } = useParams();
   const [hiddenButtonAdd, setHidden] = React.useState(false);
@@ -109,7 +109,7 @@ function Prescription(props) {
     handleGetMedicine();
   }, [query]);
 
-  const handleAddMedicine = async () => {
+  const handleAddMedicine = async (role) => {
     let note = "";
 
     if (noteForOneMedicine) note = `${noteForOneMedicine}`;
@@ -155,16 +155,20 @@ function Prescription(props) {
       evening: selectedBuoi.toi,
     };
 
-    const response = await addMedicine(medicalRecordId, data);
-    if (response.success) {
-      setPrescriptionItems(response.data.data);
-      setHidden(false);
-      setMedicineOneTime("");
-      setSelectedMedicineId(null);
-      setTotalForOneMedicine("");
-      setNoteForOneMedicine("");
+    if (role === "doctor") {
+      const response = await addMedicine(medicalRecordId, data);
+      if (response.success) {
+        setPrescriptionItems(response.data.data);
+        setHidden(false);
+        setMedicineOneTime("");
+        setSelectedMedicineId(null);
+        setTotalForOneMedicine("");
+        setNoteForOneMedicine("");
+      } else {
+        enqueueSnackbar("Thêm thuốc thất bại", { variant: "error" });
+      }
     } else {
-      enqueueSnackbar("Thêm thuốc thất bại", { variant: "error" });
+      console.log("Role is not doctor");
     }
   };
 
@@ -392,7 +396,7 @@ function Prescription(props) {
                       width: "85%",
                     }}
                     onClick={() => {
-                      handleAddMedicine();
+                      handleAddMedicine(role);
                     }}
                   >
                     Thêm
@@ -517,5 +521,11 @@ function Prescription(props) {
     </TableContainer>
   );
 }
-
+Prescription.defaultProps = {
+  role: "doctor",
+};
+Prescription.propTypes = {
+  patientInfo: PropTypes.object,
+  role: PropTypes.string,
+};
 export default Prescription;

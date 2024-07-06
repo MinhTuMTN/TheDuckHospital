@@ -183,7 +183,11 @@ function HospitalizationDetails() {
             ) : selectedTab === 5 ? (
               <HospitalDischarge />
             ) : (
-              <PrescriptionHospitalDischarge />
+              <PrescriptionHospitalDischarge
+                info={generalInfo}
+                doctorName={""}
+                diagnostic={""}
+              />
             )}
           </Grid>
         </StyledGrid>

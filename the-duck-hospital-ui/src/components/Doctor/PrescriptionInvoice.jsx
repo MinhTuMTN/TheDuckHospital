@@ -175,6 +175,7 @@ function PrescriptionInvoice(props, ref) {
           <Stack direction={"row"} spacing={1}>
             {contacts.map((contact, index) => (
               <Stack
+                key={`invoice-${index}`}
                 style={{
                   borderLeft: "2px solid #b6c2e4",
                   height: "60px",
@@ -187,6 +188,7 @@ function PrescriptionInvoice(props, ref) {
                 {contact.icon}
                 {contact.value.map((item, index) => (
                   <Typography
+                    key={`contact-name-${index}`}
                     variant="subtitle1"
                     fontSize={"13px"}
                     style={{ color: "#8997bd" }}
@@ -387,6 +389,7 @@ function PrescriptionInvoice(props, ref) {
         </Table>
       </Grid>
       <Grid
+        item
         xs={12}
         style={{
           marginTop: "16px",
