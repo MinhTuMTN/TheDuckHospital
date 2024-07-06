@@ -76,6 +76,16 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: theme.spacing(0),
 }));
 
+const getInitials = (name) => {
+  if (!name) return "";
+  const words = name.split(" ");
+  if (words.length >= 2) {
+    return words[0][0] + words[words.length - 1][0];
+  } else {
+    return name[0];
+  }
+};
+
 function PatientInfoTab(props) {
   const { selectedTab, setSelectedTab, data, generalInfo } = props;
   const [expanded, setExpanded] = React.useState("panel1");
@@ -134,7 +144,7 @@ function PatientInfoTab(props) {
                   fontSize={"35px"}
                   fontWeight={500}
                 >
-                  MH
+                  {getInitials(generalInfo?.patientName)}
                 </Typography>
               </Box>
             </CardMedia>
