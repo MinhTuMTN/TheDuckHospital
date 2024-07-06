@@ -39,11 +39,10 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
         Department department = new Department();
         if(request.getServiceType() == ServiceType.MedicalExamination) {
             department = departmentServices.getDepartmentById(request.getDepartmentId());
-        }
-
-        List<MedicalService> medicalServices = medicalServiceRepository.findByDepartmentAndServiceType(department, ServiceType.MedicalExamination);
-        if (request.getServiceType() == ServiceType.MedicalExamination && !medicalServices.isEmpty()) {
-            throw new StatusCodeException("Department already has a medical examination service", 409);
+            List<MedicalService> medicalServices = medicalServiceRepository.findByDepartmentAndServiceType(department, ServiceType.MedicalExamination);
+            if (!medicalServices.isEmpty()) {
+                throw new StatusCodeException("Department already has a medical examination service", 409);
+            }
         }
 
         MedicalService medicalService = getMedicalService(request, department);
