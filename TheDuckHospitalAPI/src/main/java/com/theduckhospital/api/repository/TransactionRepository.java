@@ -55,7 +55,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     long countByPaymentMethod(String paymentMethod);
 
-    List<Transaction> findByCreatedAtBetweenAndPaymentTypeIn(Date startDate, Date endDate, List<PaymentType> paymentTypes);
+    List<Transaction> findByCreatedAtBetweenAndPaymentTypeInAndStatus(
+            Date startDate,
+            Date endDate,
+            List<PaymentType> paymentTypes,
+            TransactionStatus status
+    );
 
     Page<Transaction> findByCreatedAtBetweenAndAccountAndStatusOrderByCreatedAtDesc(
             Date startDate,

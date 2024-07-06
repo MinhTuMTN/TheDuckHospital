@@ -95,7 +95,9 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
         for (Doctor doctor : doctors) {
             long totalPatients = medicalExaminationRepository
-                    .countByDeletedIsFalseAndStateAndDoctorSchedule_Doctor(MedicalExamState.DONE, doctor);
+                    .countByDeletedIsFalseAndStateInAndDoctorSchedule_Doctor(
+                            Arrays.asList(MedicalExamState.DONE, MedicalExamState.PROCESSING),
+                            doctor);
 
 //            long totalPatients = medicalExaminationRecords.stream()
 //                    .filter(record -> record.getDoctorSchedule().getDoctor().getStaffId() == doctor.getStaffId())
@@ -103,6 +105,9 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
             topDoctors.add(new DoctorItemStatisticsResponse(doctor, totalPatients));
         }
+
+        topDoctors.sort(Comparator.comparingDouble(DoctorItemStatisticsResponse::getRating)
+                .thenComparingLong(DoctorItemStatisticsResponse::getTotalPatients).reversed());
 
         // Total patients
         long totalPatients = patientRepository.count();
@@ -128,10 +133,11 @@ public class StatisticsServicesImpl implements IStatisticsServices {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        List<Transaction> bookingAndTestTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+        List<Transaction> bookingAndTestTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST)
+                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST),
+                TransactionStatus.SUCCESS
         );
 
         Map<String, Double> totalAmountByDate = bookingAndTestTransactions.stream()
@@ -143,24 +149,26 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         Collectors.summingDouble(Transaction::getAmount)
                 ));
 
-        List<Transaction> testTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+        List<Transaction> testTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                List.of(PaymentType.MEDICAL_TEST)
+                List.of(PaymentType.MEDICAL_TEST),
+                TransactionStatus.SUCCESS
         );
 
         Map<String, Double> totalAmountMedicalTestByDate = testTransactions.stream()
-                .filter(t -> t.getPaymentType() == PaymentType.MEDICAL_TEST)
+//                .filter(t -> t.getPaymentType() == PaymentType.MEDICAL_TEST)
                 .collect(Collectors.groupingBy(
                         transaction -> dateFormat.format(transaction.getCreatedAt()),
                         LinkedHashMap::new,
                         Collectors.summingDouble(Transaction::getAmount)
                 ));
 
-        List<Transaction> bookingTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeIn(
+        List<Transaction> bookingTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                List.of(PaymentType.MEDICAL_TEST)
+                List.of(PaymentType.BOOKING),
+                TransactionStatus.SUCCESS
         );
 
         Map<String, Double> totalAmountBookingByDate = bookingTransactions.stream()
@@ -183,6 +191,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         for (String date : totalAmountByDate.keySet()) {
             labels.add(date.length() > 5 ? date.substring(0, 5) : date);
         }
+
         List<Double> values = totalAmountByDate.values()
                 .stream()
                 .map(amount -> Math.round(amount / 1000))

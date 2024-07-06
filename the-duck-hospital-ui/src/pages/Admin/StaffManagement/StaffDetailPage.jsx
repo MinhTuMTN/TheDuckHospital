@@ -84,8 +84,8 @@ function StaffDetailPage() {
   }, [staffId, dateSelected, isDoctor]);
 
   useEffect(() => {
-    handleGetSchedules();
-  }, [handleGetSchedules, dateSelected]);
+    if (staff?.role === "Bác sĩ") handleGetSchedules();
+  }, [handleGetSchedules, dateSelected, staff]);
 
   const handleGetStaff = useCallback(async () => {
     const response = await getStaffById(staffId);
@@ -167,8 +167,12 @@ function StaffDetailPage() {
             <Grid item xs={12} md={12} lg={10}>
               <Stack direction={"row"} alignItems={"center"} spacing={1}>
                 <img
-                  src={staff?.avatar}
-                  alt="doctor-avatar"
+                  src={
+                    staff?.avatar
+                      ? staff.avatar
+                      : "https://cdn.iconscout.com/icon/free/png-256/free-doctor-2349775-1955453.png"
+                  }
+                  alt={"staff-avatar"}
                   style={{
                     width: 100,
                     height: 100,
