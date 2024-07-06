@@ -52,12 +52,15 @@ public class DischargeServicesImpl implements IDischargeServices {
         discharge.setDischargeSummary(request.getDischargeSummary());
         discharge.setTreatments(request.getTreatments());
         discharge.setNote(request.getNote());
-        discharge.setReExaminationDate(DateCommon.getStarOfDay(
-                request.getReExaminationDate()
-        ));
+        discharge.setReExaminationDate(request.getReExaminationDate() != null
+                ? DateCommon.getStarOfDay(request.getReExaminationDate())
+                : null
+        );
 
-        Doctor doctor = doctorServices.getDoctorById(request.getDoctorId());
-        discharge.setDoctor(doctor);
+        if (request.getDoctorId() != null) {
+            Doctor doctor = doctorServices.getDoctorById(request.getDoctorId());
+            discharge.setDoctor(doctor);
+        }
 
         discharge.setNurse(inpatientNurse);
         dischargeRepository.save(discharge);
