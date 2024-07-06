@@ -77,4 +77,8 @@ public interface IInpatientServices {
     HospitalizationDetailResponse convertHospitalizationDetailDTO(
             HospitalizationDetail hospitalizationDetail
     );
+    HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    );
 }

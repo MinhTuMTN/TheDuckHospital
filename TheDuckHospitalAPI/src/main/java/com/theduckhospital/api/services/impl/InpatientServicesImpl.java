@@ -2,12 +2,10 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
-import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
-import com.theduckhospital.api.dto.request.nurse.DoctorDetails;
-import com.theduckhospital.api.dto.request.nurse.HospitalizationDetailResponse;
-import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
+import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.admin.RoomResponse;
 import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
@@ -20,10 +18,7 @@ import com.theduckhospital.api.services.*;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class InpatientServicesImpl implements IInpatientServices {
@@ -359,5 +354,68 @@ public class InpatientServicesImpl implements IInpatientServices {
             HospitalizationDetail hospitalizationDetail
     ) {
         return new HospitalizationDetailResponse(hospitalizationDetail);
+    }
+
+    @Override
+    public HospitalAdmissionInvoice getInvoicesOfHospitalAdmission(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    ) {
+        HospitalAdmissionInvoice hospitalAdmissionInvoice = new HospitalAdmissionInvoice();
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+        Date admissionDate = hospitalAdmission.getAdmissionDate();
+        Date today = DateCommon.getStarOfDay(
+                DateCommon.getToday()
+        );
+
+        // Room Fee
+        long days = DateCommon.getDaysBetween(admissionDate, today) + 1;
+        InvoiceDetails roomFee = new InvoiceDetails();
+        Room room = hospitalAdmission.getRoom();
+        roomFee.setServiceName(room.getRoomType()
+            == RoomType.TREATMENT_ROOM_STANDARD
+                ? "Phòng điều trị thường"
+                : "Phòng dịch vụ"
+        );
+        roomFee.setQuantity(days);
+        roomFee.setUnitPrice(hospitalAdmission.getRoomFee());
+        roomFee.setTotal(roomFee.getUnitPrice() * roomFee.getQuantity());
+
+        // Medicine Fee
+        List<InvoiceDetails> treatmentMedicineFees = treatmentMedicineServices
+                .getTreatmentMedicineInvoices(hospitalAdmission);
+
+        // Advance Fee
+        hospitalAdmissionInvoice.setAdvanceFee(
+                hospitalAdmissionInvoice.getAdvanceFee()
+        );
+
+        // Total Fee
+        double totalProvisionalFee = roomFee.getTotal() + treatmentMedicineFees.stream()
+                .mapToDouble(InvoiceDetails::getTotal)
+                .sum();
+
+        hospitalAdmissionInvoice.setGeneralInfo(new HospitalAdmissionResponse(hospitalAdmission));
+        hospitalAdmissionInvoice.setPaymentCode(
+                "DI" + hospitalAdmission.getHospitalAdmissionCode()
+                        .substring(2)
+        );
+        hospitalAdmissionInvoice.setProvisionalFee(totalProvisionalFee);
+        hospitalAdmissionInvoice.setAdvanceFee(
+                hospitalAdmissionInvoice.getAdvanceFee()
+        );
+        hospitalAdmissionInvoice.setTotalFee(
+                totalProvisionalFee - hospitalAdmissionInvoice.getAdvanceFee()
+        );
+
+        List<InvoiceDetails> details = new ArrayList<>(List.of(roomFee));
+        details.addAll(treatmentMedicineFees);
+        hospitalAdmissionInvoice.setDetails(details);
+
+        return hospitalAdmissionInvoice;
     }
 }

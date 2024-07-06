@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,5 +91,17 @@ public class DateCommon {
         startAndEndOfWeek.put("endOfWeek", endOfWeek);
 
         return startAndEndOfWeek;
+    }
+
+    public static long getDaysBetween(Date startDate, Date endDate) {
+        Calendar startCalendar = getCalendar(
+                DateCommon.getStarOfDay(startDate)
+        );
+        Calendar endCalendar = getCalendar(
+                DateCommon.getStarOfDay(endDate)
+        );
+
+        long diff = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
+        return Duration.ofMillis(diff).toDays();
     }
 }

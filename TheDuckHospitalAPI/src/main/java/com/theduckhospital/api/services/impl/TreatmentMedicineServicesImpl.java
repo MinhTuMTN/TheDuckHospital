@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
+import com.theduckhospital.api.dto.request.nurse.InvoiceDetails;
 import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.Medicine;
@@ -174,5 +175,27 @@ public class TreatmentMedicineServicesImpl implements ITreatmentMedicineServices
         return getTreatmentMedicinesByHospitalizationDetail(
                 treatmentMedicine.getHospitalizationDetail()
         );
+    }
+
+    @Override
+    public List<InvoiceDetails> getTreatmentMedicineInvoices(HospitalAdmission hospitalAdmission) {
+        List<Object[]> treatmentMedicines = treatmentMedicineRepository
+                .findTreatmentMedicineForInvoice(hospitalAdmission);
+
+        if (treatmentMedicines.isEmpty()) {
+            return List.of();
+        }
+
+        return treatmentMedicines
+                .stream()
+                .map(treatmentMedicine -> {
+                    InvoiceDetails invoiceDetails = new InvoiceDetails();
+                    invoiceDetails.setServiceName((String) treatmentMedicine[1]);
+                    invoiceDetails.setQuantity((Double) treatmentMedicine[2]);
+                    invoiceDetails.setUnitPrice((Double) treatmentMedicine[3]);
+                    invoiceDetails.setTotal((Double) treatmentMedicine[4]);
+                    return invoiceDetails;
+                })
+                .toList();
     }
 }

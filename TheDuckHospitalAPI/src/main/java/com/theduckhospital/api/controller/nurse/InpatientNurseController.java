@@ -266,6 +266,25 @@ public class InpatientNurseController {
         );
     }
 
+    @GetMapping("/hospitalization/{hospitalizationId}/invoices")
+    public ResponseEntity<?> getInvoicesOfHospitalAdmission(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get invoices of hospital admission successfully")
+                .data(inpatientServices
+                        .getInvoicesOfHospitalAdmission(
+                                authorization,
+                                hospitalizationId
+                        )
+                )
+                .build()
+        );
+    }
+
     @GetMapping("/medical-test-services")
     public ResponseEntity<?> getAllMedicalTestServices() {
         return ResponseEntity.ok(GeneralResponse.builder()

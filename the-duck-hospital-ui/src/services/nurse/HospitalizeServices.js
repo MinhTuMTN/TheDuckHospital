@@ -125,3 +125,7 @@ export const deleteTreatmentMedicine = (
 export const getDoctorInDepartment = () => {
   return get(`/inpatient-nurse/doctors`);
 };
+
+export const getDischargeInvoice = (hospitalizationId) => {
+  return get(`/inpatient-nurse/hospitalization/${hospitalizationId}/invoices`);
+};

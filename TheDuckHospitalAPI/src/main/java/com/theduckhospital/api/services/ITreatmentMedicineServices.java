@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
+import com.theduckhospital.api.dto.request.nurse.InvoiceDetails;
 import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.TreatmentMedicine;
@@ -24,5 +25,8 @@ public interface ITreatmentMedicineServices {
             HospitalAdmission hospitalAdmission,
             UUID treatmentMedicineId,
             boolean deleteFromTomorrow
+    );
+    List<InvoiceDetails> getTreatmentMedicineInvoices(
+            HospitalAdmission hospitalAdmission
     );
 }
