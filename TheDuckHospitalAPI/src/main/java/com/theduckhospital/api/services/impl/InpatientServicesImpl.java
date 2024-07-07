@@ -3,6 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.HospitalAdmissionState;
 import com.theduckhospital.api.constant.ScheduleType;
+import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
@@ -32,6 +33,8 @@ public class InpatientServicesImpl implements IInpatientServices {
     private final ITreatmentMedicineServices treatmentMedicineServices;
     private final IPaymentServices paymentServices;
     private final IDischargeServices dischargeServices;
+    private final IPrescriptionServices prescriptionServices;
+    private final IPrescriptionItemServices prescriptionItemServices;
 
     public InpatientServicesImpl(
             NurseScheduleRepository nurseScheduleRepository,
@@ -43,7 +46,7 @@ public class InpatientServicesImpl implements IInpatientServices {
             IDoctorServices doctorServices,
             ITreatmentMedicineServices treatmentMedicineServices,
             IPaymentServices paymentServices,
-            IDischargeServices dischargeServices) {
+            IDischargeServices dischargeServices, IPrescriptionServices prescriptionServices, IPrescriptionItemServices prescriptionItemServices) {
         this.nurseScheduleRepository = nurseScheduleRepository;
         this.hospitalAdmissionServices = hospitalAdmissionServices;
         this.nurseServices = nurseServices;
@@ -54,6 +57,8 @@ public class InpatientServicesImpl implements IInpatientServices {
         this.treatmentMedicineServices = treatmentMedicineServices;
         this.paymentServices = paymentServices;
         this.dischargeServices = dischargeServices;
+        this.prescriptionServices = prescriptionServices;
+        this.prescriptionItemServices = prescriptionItemServices;
     }
 
     @Override
@@ -425,5 +430,71 @@ public class InpatientServicesImpl implements IInpatientServices {
                 inpatientNurseAuthorization,
                 hospitalizationId
         );
+    }
+
+    @Override
+    public List<PrescriptionItem> addDischargeMedicines(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            AddMedicine request
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        Discharge discharge = dischargeServices
+                .getDischargeByHospitalAdmission(hospitalAdmission);
+
+        Prescription prescription = prescriptionServices
+                .getPrescription(discharge);
+        return prescriptionItemServices
+                .addMedicineToPrescription(prescription, request);
+    }
+
+    @Override
+    public List<PrescriptionItem> getDischargeMedicines(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        Discharge discharge = dischargeServices
+                .getDischargeByHospitalAdmission(hospitalAdmission);
+
+        Prescription prescription = prescriptionServices
+                .getPrescription(discharge);
+        return prescriptionItemServices
+                .getMedicinesByPrescription(prescription);
+    }
+
+    @Override
+    public List<PrescriptionItem> deleteDischargeMedicine(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UUID prescriptionItemId
+    ) {
+        HospitalAdmission hospitalAdmission = hospitalAdmissionServices
+                .checkNursePermissionForHospitalAdmission(
+                        inpatientNurseAuthorization,
+                        hospitalizationId
+                );
+
+        Discharge discharge = dischargeServices
+                .getDischargeByHospitalAdmission(hospitalAdmission);
+
+        Prescription prescription = prescriptionServices
+                .getPrescription(discharge);
+
+        return prescriptionItemServices
+                .deleteMedicineFromPrescription(
+                        prescription,
+                        prescriptionItemId
+                );
     }
 }

@@ -1,5 +1,6 @@
 package com.theduckhospital.api.controller.nurse;
 
+import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.UpdateDailyHospitalAdmissionDetails;
@@ -335,6 +336,50 @@ public class InpatientNurseController {
                 .statusCode(200)
                 .message("Confirm discharge successfully")
                 .data(inpatientServices.confirmDischarge(authorization, hospitalizationId))
+                .build()
+        );
+    }
+
+    @PostMapping("/hospitalization/{hospitalizationId}/discharge-medicines")
+    public ResponseEntity<?> addDischargeMedicines(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @RequestBody AddMedicine addMedicine
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Add discharge medicines successfully")
+                .data(inpatientServices.addDischargeMedicines(authorization, hospitalizationId, addMedicine))
+                .build()
+        );
+    }
+
+    @GetMapping("/hospitalization/{hospitalizationId}/discharge-medicines")
+    public ResponseEntity<?> getDischargeMedicines(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Get discharge medicines successfully")
+                .data(inpatientServices.getDischargeMedicines(authorization, hospitalizationId))
+                .build()
+        );
+    }
+
+    @DeleteMapping("/hospitalization/{hospitalizationId}/discharge-medicines/{prescriptionItemId}")
+    public ResponseEntity<?> deleteDischargeMedicine(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("hospitalizationId") UUID hospitalizationId,
+            @PathVariable("prescriptionItemId") UUID prescriptionItemId
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .message("Delete discharge medicine successfully")
+                .data(inpatientServices.deleteDischargeMedicine(authorization, hospitalizationId, prescriptionItemId))
                 .build()
         );
     }
