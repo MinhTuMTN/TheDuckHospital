@@ -134,7 +134,7 @@ function PrescriptionHospitalDischarge(props) {
           >
             Bác sĩ điều trị:
           </LableTypography>
-          {doctorName === "" ? (
+          {!doctorName ? (
             <ValueTypography
               fontWeight={"450 !important"}
               style={{

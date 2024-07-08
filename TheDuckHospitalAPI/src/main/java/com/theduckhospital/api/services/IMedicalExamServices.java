@@ -36,7 +36,11 @@ public interface IMedicalExamServices {
             NurseCreateBookingRequest request
     ) throws ParseException;
 
-    MedicalExaminationRecord acceptMedicalExamination(String authorization, UUID medicalExaminationId);
+    MedicalExaminationRecord acceptMedicalExamination(
+            String authorization,
+            UUID medicalExaminationId,
+            UUID doctorScheduleId
+    );
 
     DoctorMedicalRecordResponse doctorGetMedicalExamination(String authorization, UUID medicalExaminationId);
 

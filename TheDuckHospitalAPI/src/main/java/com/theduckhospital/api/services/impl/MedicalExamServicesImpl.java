@@ -45,6 +45,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
     private final IMedicalTestServices medicalTestServices;
     private final IPrescriptionServices prescriptionServices;
+    private final IScheduleDoctorServices scheduleDoctorServices;
     private final IPrescriptionItemServices prescriptionItemServices;
 
     public MedicalExamServicesImpl(
@@ -59,7 +60,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             HospitalAdmissionRepository hospitalAdmissionRepository,
             IMedicalTestServices medicalTestServices,
             IPrescriptionServices prescriptionServices,
-            IPrescriptionItemServices prescriptionItemServices
+            IScheduleDoctorServices scheduleDoctorServices, IPrescriptionItemServices prescriptionItemServices
     ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
@@ -68,6 +69,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.patientServices = patientServices;
         this.patientProfileRepository = patientProfileRepository;
         this.doctorServices = doctorServices;
+        this.scheduleDoctorServices = scheduleDoctorServices;
         this.prescriptionItemServices = prescriptionItemServices;
         this.accountServices = accountServices;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
@@ -166,11 +168,27 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     @Override
     public MedicalExaminationRecord acceptMedicalExamination(
             String authorization,
-            UUID medicalExaminationId
+            UUID medicalExaminationId,
+            UUID doctorScheduleId
     ) {
-        return updateStateMedicalExamRecord(
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetAnotherMedicalExamRecord(
                 authorization,
-                medicalExaminationId,
+                medicalExaminationId
+        );
+
+        DoctorSchedule doctorSchedule = scheduleDoctorServices
+                .getDoctorScheduleByIdForAccept(doctorScheduleId);
+
+        if (medicalExaminationRecord.getDoctorSchedule() != doctorSchedule) {
+            UUID previousDoctorScheduleId = medicalExaminationRecord.getDoctorSchedule().getDoctorScheduleId();
+            medicalExaminationRecord.setDoctorSchedule(doctorSchedule);
+            medicalExaminationRecord.setPreviousDoctorScheduleId(
+                    previousDoctorScheduleId
+            );
+        }
+
+        return updateStateMedicalExamRecord(
+                medicalExaminationRecord,
                 MedicalExamState.PROCESSING
         );
     }
@@ -378,9 +396,13 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
 
     @Override
     public MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId) {
-        return updateStateMedicalExamRecord(
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
                 authorization,
-                medicalExaminationId,
+                medicalExaminationId
+        );
+
+        return updateStateMedicalExamRecord(
+                medicalExaminationRecord,
                 MedicalExamState.DONE
         );
     }
@@ -479,15 +501,9 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     }
 
     private MedicalExaminationRecord updateStateMedicalExamRecord(
-            String authorization,
-            UUID medicalExaminationId,
+            MedicalExaminationRecord medicalExaminationRecord,
             MedicalExamState state
     ) {
-        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
-                authorization,
-                medicalExaminationId
-        );
-
         medicalExaminationRecord.setState(state);
         medicalExaminationRepository.save(medicalExaminationRecord);
 
@@ -514,6 +530,36 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 .equals(doctor.getStaffId())
         )
             throw new BadRequestException("You are not the doctor of this medical examination record");
+
+        return medicalExaminationRecord;
+    }
+
+    private MedicalExaminationRecord doctorGetAnotherMedicalExamRecord(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+
+        MedicalExaminationRecord medicalExaminationRecord = medicalExaminationRepository
+                .findById(medicalExaminationId)
+                .orElseThrow(() -> new NotFoundException("Medical Examination Record not found"));
+
+        if (medicalExaminationRecord.isDeleted())
+            throw new BadRequestException("Medical Examination Record is deleted");
+
+        if (!medicalExaminationRecord
+                .getDoctorSchedule()
+                .getDoctor()
+                .getDepartment()
+                .equals(doctor.getDepartment())
+        )
+            throw new BadRequestException("Department is not match");
+
+        Date today = DateCommon.getEndOfDay(DateCommon.getToday());
+        Date yesterday = DateCommon.getStarOfDay(DateCommon.getYesterday());
+        if (medicalExaminationRecord.getDoctorSchedule().getDate().before(yesterday) ||
+                medicalExaminationRecord.getDoctorSchedule().getDate().after(today))
+            throw new BadRequestException("Medical Examination Record is not in today or yesterday");
 
         return medicalExaminationRecord;
     }
