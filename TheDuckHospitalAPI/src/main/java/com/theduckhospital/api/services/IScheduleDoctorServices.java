@@ -87,4 +87,6 @@ public interface IScheduleDoctorServices {
             UUID doctorScheduleId,
             UpdateDoctorScheduleRequest request
     );
+    DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId);
+    DoctorSchedule getDoctorScheduleByIdForAccept(UUID doctorScheduleId);
 }

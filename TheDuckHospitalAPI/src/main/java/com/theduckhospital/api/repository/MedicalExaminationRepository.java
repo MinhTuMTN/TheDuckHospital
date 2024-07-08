@@ -20,13 +20,39 @@ public interface MedicalExaminationRepository
     Optional<MedicalExaminationRecord> findByBooking_BookingCodeAndDeletedIsFalse(
             String booking_bookingCode
     );
-
-    Page<MedicalExaminationRecord> findByDoctorScheduleAndDeletedIsFalseAndPatientProfile_FullNameContainingIgnoreCaseAndState(
+    @Query("SELECT m FROM MedicalExaminationRecord m " +
+            "WHERE m.deleted = false " +
+            "AND m.patientProfile.fullName LIKE CONCAT('%', :patientName, '%') " +
+            "AND (" +
+                "(m.doctorSchedule = :doctorSchedule AND m.state = :waitingState) " +
+                "OR (" +
+                    "m.doctorSchedule != :doctorSchedule " +
+                    "AND (m.state = :waitingState OR m.state = :processingState) " +
+                    "AND m.doctorSchedule.date BETWEEN :startDate AND :endDate" +
+                ")" +
+            ")"
+    )
+    Page<MedicalExaminationRecord> findWaitingAndAnotherScheduleExamRecord(
             DoctorSchedule doctorSchedule,
-            String patientProfile_fullName,
-            MedicalExamState state,
-            Pageable pageable);
-
+            String patientName,
+            MedicalExamState waitingState,
+            MedicalExamState processingState,
+            Date startDate,
+            Date endDate,
+            Pageable pageable
+    );
+    @Query("SELECT m FROM MedicalExaminationRecord m " +
+            "WHERE m.deleted = false " +
+            "AND m.patientProfile.fullName LIKE CONCAT('%', :patientName, '%') " +
+            "AND m.doctorSchedule = :doctorSchedule " +
+            "AND m.state = :processingState"
+    )
+    Page<MedicalExaminationRecord> findProcessingExamRecord(
+            DoctorSchedule doctorSchedule,
+            String patientName,
+            MedicalExamState processingState,
+            Pageable pageable
+    );
     long countByDoctorScheduleAndStateAndDeletedIsFalse(
             DoctorSchedule doctorSchedule,
             MedicalExamState state

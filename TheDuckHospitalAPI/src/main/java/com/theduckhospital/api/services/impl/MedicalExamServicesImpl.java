@@ -41,12 +41,12 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final MedicalExaminationRepository medicalExaminationRepository;
     private final IDoctorServices doctorServices;
     private final IPatientServices patientServices;
-    private final PrescriptionRepository prescriptionRepository;
-    private final PrescriptionItemRepository prescriptionItemRepository;
-    private final MedicineRepository medicineRepository;
     private final IAccountServices accountServices;
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
     private final IMedicalTestServices medicalTestServices;
+    private final IPrescriptionServices prescriptionServices;
+    private final IScheduleDoctorServices scheduleDoctorServices;
+    private final IPrescriptionItemServices prescriptionItemServices;
 
     public MedicalExamServicesImpl(
             IBookingServices bookingServices,
@@ -56,12 +56,11 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             IPatientServices patientServices,
             PatientProfileRepository patientProfileRepository,
             IDoctorServices doctorServices,
-            PrescriptionRepository prescriptionRepository,
-            PrescriptionItemRepository prescriptionItemRepository,
-            MedicineRepository medicineRepository,
             IAccountServices accountServices,
             HospitalAdmissionRepository hospitalAdmissionRepository,
-            IMedicalTestServices medicalTestServices
+            IMedicalTestServices medicalTestServices,
+            IPrescriptionServices prescriptionServices,
+            IScheduleDoctorServices scheduleDoctorServices, IPrescriptionItemServices prescriptionItemServices
     ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
@@ -70,12 +69,12 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.patientServices = patientServices;
         this.patientProfileRepository = patientProfileRepository;
         this.doctorServices = doctorServices;
-        this.prescriptionRepository = prescriptionRepository;
-        this.prescriptionItemRepository = prescriptionItemRepository;
-        this.medicineRepository = medicineRepository;
+        this.scheduleDoctorServices = scheduleDoctorServices;
+        this.prescriptionItemServices = prescriptionItemServices;
         this.accountServices = accountServices;
         this.hospitalAdmissionRepository = hospitalAdmissionRepository;
         this.medicalTestServices = medicalTestServices;
+        this.prescriptionServices = prescriptionServices;
     }
 
     @Override
@@ -169,11 +168,27 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     @Override
     public MedicalExaminationRecord acceptMedicalExamination(
             String authorization,
-            UUID medicalExaminationId
+            UUID medicalExaminationId,
+            UUID doctorScheduleId
     ) {
-        return updateStateMedicalExamRecord(
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetAnotherMedicalExamRecord(
                 authorization,
-                medicalExaminationId,
+                medicalExaminationId
+        );
+
+        DoctorSchedule doctorSchedule = scheduleDoctorServices
+                .getDoctorScheduleByIdForAccept(doctorScheduleId);
+
+        if (medicalExaminationRecord.getDoctorSchedule() != doctorSchedule) {
+            UUID previousDoctorScheduleId = medicalExaminationRecord.getDoctorSchedule().getDoctorScheduleId();
+            medicalExaminationRecord.setDoctorSchedule(doctorSchedule);
+            medicalExaminationRecord.setPreviousDoctorScheduleId(
+                    previousDoctorScheduleId
+            );
+        }
+
+        return updateStateMedicalExamRecord(
+                medicalExaminationRecord,
                 MedicalExamState.PROCESSING
         );
     }
@@ -256,7 +271,6 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         List<MedicalTest> medicalTests = medicalTestRepository.findByMedicalExaminationRecordAndDeletedIsFalse(
                 medicalExaminationRecord
         );
-//        List<MedicalTest> medicalTests = medicalExaminationRecord.getMedicalTest();
         Optional<MedicalTest> optional = medicalTestRepository.findById(medicalTestId);
         if (optional.isEmpty()) {
             throw new NotFoundException("Medical Test not found");
@@ -265,17 +279,6 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             medicalTest.setDeleted(true);
             medicalTestRepository.save(medicalTest);
         }
-//        MedicalTest medicalTest = medicalTests
-//                .stream()
-//                .filter(medicalTest1 -> medicalTest1
-//                        .getMedicalTestId()
-//                        .equals(medicalTestId)
-//                )
-//                .findFirst()
-//                .orElseThrow(() -> new NotFoundException("Medical Test not found"));
-//
-//        medicalTest.setDeleted(true);
-//        medicalTestRepository.save(medicalTest);
 
         return medicalTests.stream()
 //                .filter(medicalTest1 -> !medicalTest1.isDeleted())
@@ -331,54 +334,11 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 medicalExaminationId
         );
 
-        Prescription prescription = medicalExaminationRecord.getPrescription();
-        if (prescription == null) {
-            prescription = new Prescription();
-            prescription.setMedicalExaminationRecord(medicalExaminationRecord);
-            prescription.setPharmacist(null);
-            prescription.setPrescriptionItems(new ArrayList<>());
-            prescription.setTotalCost(0);
-
-            prescriptionRepository.save(prescription);
-        }
-
-        List<PrescriptionItem> prescriptionItems = prescription.getPrescriptionItems();
-        PrescriptionItem alreadyExist = prescriptionItems
-                .stream()
-                .filter(prescriptionItem1 ->
-                        prescriptionItem1
-                                .getMedicine()
-                                .getMedicineId() == request.getMedicineId()
-                        && !prescriptionItem1.isDeleted()
-                )
-                .findFirst()
-                .orElse(null);
-
-        if (alreadyExist != null) {
-            alreadyExist.setDeleted(true);
-            prescriptionItems.remove(alreadyExist);
-            prescriptionItemRepository.save(alreadyExist);
-
-            prescription.setTotalCost(
-                    prescription.getTotalCost() - alreadyExist.getTotalCost()
-            );
-        }
-
-        PrescriptionItem prescriptionItem = createPrescriptionItem(
+        Prescription prescription = prescriptionServices.getPrescription(medicalExaminationRecord);
+        return prescriptionItemServices.addMedicineToPrescription(
                 prescription,
                 request
         );
-        prescriptionItems.add(prescriptionItem);
-        prescription.setPrescriptionItems(prescriptionItems);
-
-        prescription.setTotalCost(
-                prescription.getTotalCost() + prescriptionItem.getTotalCost()
-        );
-        prescriptionRepository.save(prescription);
-
-        return prescriptionItems.stream()
-                .filter(prescriptionItem1 -> !prescriptionItem1.isDeleted())
-                .toList();
     }
 
     @Override
@@ -392,9 +352,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         if (prescription == null)
             return new ArrayList<>();
 
-        return prescription.getPrescriptionItems().stream().filter(
-                prescriptionItem -> !prescriptionItem.isDeleted()
-        ).toList();
+        return prescriptionItemServices.getMedicinesByPrescription(prescription);
     }
 
     @Override
@@ -408,27 +366,10 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         if (prescription == null)
             return new ArrayList<>();
 
-        List<PrescriptionItem> prescriptionItems = prescription.getPrescriptionItems();
-        PrescriptionItem prescriptionItem = prescriptionItems
-                .stream()
-                .filter(prescriptionItem1 -> prescriptionItem1
-                        .getPrescriptionItemId()
-                        .equals(prescriptionItemId)
-                )
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Prescription Item not found"));
-
-        prescriptionItem.setDeleted(true);
-        prescriptionItemRepository.save(prescriptionItem);
-
-        prescription.setTotalCost(
-                prescription.getTotalCost() - prescriptionItem.getTotalCost()
+        return prescriptionItemServices.deleteMedicineFromPrescription(
+                prescription,
+                prescriptionItemId
         );
-        prescriptionRepository.save(prescription);
-
-        return prescriptionItems.stream().filter(
-                prescriptionItem1 -> !prescriptionItem1.isDeleted()
-        ).toList();
     }
 
     @Override
@@ -455,9 +396,13 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
 
     @Override
     public MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId) {
-        return updateStateMedicalExamRecord(
+        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
                 authorization,
-                medicalExaminationId,
+                medicalExaminationId
+        );
+
+        return updateStateMedicalExamRecord(
+                medicalExaminationRecord,
                 MedicalExamState.DONE
         );
     }
@@ -555,54 +500,10 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         return hospitalAdmission;
     }
 
-    private PrescriptionItem createPrescriptionItem(
-            Prescription prescription,
-            AddMedicine request
-    ) {
-        Medicine medicine = medicineRepository.findById(
-                request.getMedicineId()
-        ).orElseThrow(() -> new NotFoundException("Medicine not found")
-        );
-
-        if (medicine.isDeleted())
-            throw new BadRequestException("Medicine is deleted");
-
-        PrescriptionItem prescriptionItem = new PrescriptionItem();
-        prescriptionItem.setPrescription(prescription);
-        prescriptionItem.setPrescriptionCode(prescription.getPrescriptionCode());
-        prescriptionItem.setMedicine(medicine);
-        prescriptionItem.setPrice(medicine.getPrice());
-        prescriptionItem.setQuantity(request.getQuantity());
-        prescriptionItem.setTotalCost(
-                medicine.getPrice() * request.getQuantity()
-        );
-
-        prescriptionItem.setTimesPerDay(request.getTimesPerDay());
-        prescriptionItem.setDays(request.getDays());
-        prescriptionItem.setQuantityPerTime(request.getQuantityPerTime());
-        prescriptionItem.setMorning(request.isMorning());
-        prescriptionItem.setNoon(request.isNoon());
-        prescriptionItem.setAfternoon(request.isAfternoon());
-        prescriptionItem.setEvening(request.isEvening());
-
-        prescriptionItem.setDosageInstruction(
-                request.getNote()
-        );
-        prescriptionItemRepository.save(prescriptionItem);
-
-        return prescriptionItem;
-    }
-
     private MedicalExaminationRecord updateStateMedicalExamRecord(
-            String authorization,
-            UUID medicalExaminationId,
+            MedicalExaminationRecord medicalExaminationRecord,
             MedicalExamState state
     ) {
-        MedicalExaminationRecord medicalExaminationRecord = doctorGetMedicalExamRecord(
-                authorization,
-                medicalExaminationId
-        );
-
         medicalExaminationRecord.setState(state);
         medicalExaminationRepository.save(medicalExaminationRecord);
 
@@ -629,6 +530,36 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 .equals(doctor.getStaffId())
         )
             throw new BadRequestException("You are not the doctor of this medical examination record");
+
+        return medicalExaminationRecord;
+    }
+
+    private MedicalExaminationRecord doctorGetAnotherMedicalExamRecord(
+            String authorization,
+            UUID medicalExaminationId
+    ) {
+        Doctor doctor = doctorServices.getDoctorByToken(authorization);
+
+        MedicalExaminationRecord medicalExaminationRecord = medicalExaminationRepository
+                .findById(medicalExaminationId)
+                .orElseThrow(() -> new NotFoundException("Medical Examination Record not found"));
+
+        if (medicalExaminationRecord.isDeleted())
+            throw new BadRequestException("Medical Examination Record is deleted");
+
+        if (!medicalExaminationRecord
+                .getDoctorSchedule()
+                .getDoctor()
+                .getDepartment()
+                .equals(doctor.getDepartment())
+        )
+            throw new BadRequestException("Department is not match");
+
+        Date today = DateCommon.getEndOfDay(DateCommon.getToday());
+        Date yesterday = DateCommon.getStarOfDay(DateCommon.getYesterday());
+        if (medicalExaminationRecord.getDoctorSchedule().getDate().before(yesterday) ||
+                medicalExaminationRecord.getDoctorSchedule().getDate().after(today))
+            throw new BadRequestException("Medical Examination Record is not in today or yesterday");
 
         return medicalExaminationRecord;
     }

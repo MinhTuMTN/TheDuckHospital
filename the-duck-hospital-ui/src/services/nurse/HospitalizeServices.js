@@ -146,3 +146,25 @@ export const confirmDischarge = (hospitalizationId) => {
     `/inpatient-nurse/hospitalization/${hospitalizationId}/discharge-confirm`
   );
 };
+
+export const addDischargeMedicine = (hospitalizationId, data) => {
+  return post(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/discharge-medicines`,
+    data
+  );
+};
+
+export const getDischargeMedicine = (hospitalizationId) => {
+  return get(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/discharge-medicines`
+  );
+};
+
+export const deleteDischargeMedicine = (
+  hospitalizationId,
+  dischargeMedicineId
+) => {
+  return del(
+    `/inpatient-nurse/hospitalization/${hospitalizationId}/discharge-medicines/${dischargeMedicineId}`
+  );
+};

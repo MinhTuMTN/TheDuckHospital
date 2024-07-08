@@ -1,5 +1,6 @@
 package com.theduckhospital.api.services;
 
+import com.theduckhospital.api.dto.request.doctor.AddMedicine;
 import com.theduckhospital.api.dto.request.doctor.CreateMedicalTest;
 import com.theduckhospital.api.dto.request.nurse.*;
 import com.theduckhospital.api.dto.response.PaginationResponse;
@@ -8,10 +9,7 @@ import com.theduckhospital.api.dto.response.doctor.DoctorMedicalTestResponse;
 import com.theduckhospital.api.dto.response.nurse.DischargeDetails;
 import com.theduckhospital.api.dto.response.nurse.HospitalAdmissionResponse;
 import com.theduckhospital.api.dto.response.nurse.InpatientPatientResponse;
-import com.theduckhospital.api.entity.HospitalAdmission;
-import com.theduckhospital.api.entity.HospitalizationDetail;
-import com.theduckhospital.api.entity.MedicalService;
-import com.theduckhospital.api.entity.TreatmentMedicine;
+import com.theduckhospital.api.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -98,5 +96,19 @@ public interface IInpatientServices {
     boolean confirmDischarge(
             String inpatientNurseAuthorization,
             UUID hospitalizationId
+    );
+    List<PrescriptionItem> addDischargeMedicines(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            AddMedicine request
+    );
+    List<PrescriptionItem> getDischargeMedicines(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId
+    );
+    List<PrescriptionItem> deleteDischargeMedicine(
+            String inpatientNurseAuthorization,
+            UUID hospitalizationId,
+            UUID prescriptionItemId
     );
 }

@@ -185,8 +185,8 @@ function HospitalizationDetails() {
             ) : (
               <PrescriptionHospitalDischarge
                 info={generalInfo}
-                doctorName={""}
-                diagnostic={""}
+                doctorName={generalInfo?.dischargeDoctorName}
+                diagnostic={generalInfo?.dischargeDiagnosis}
               />
             )}
           </Grid>

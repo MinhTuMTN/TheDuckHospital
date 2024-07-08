@@ -30,7 +30,6 @@ const ValueTypography = styled(Typography)(({ theme }) => ({
 
 function PrescriptionHospitalDischarge(props) {
   const { info, diagnostic, doctorName } = props;
-  console.log(diagnostic);
   return (
     <ViewStyle container>
       <Grid
@@ -135,7 +134,7 @@ function PrescriptionHospitalDischarge(props) {
           >
             Bác sĩ điều trị:
           </LableTypography>
-          {doctorName === "" ? (
+          {!doctorName ? (
             <ValueTypography
               fontWeight={"450 !important"}
               style={{
@@ -159,7 +158,7 @@ function PrescriptionHospitalDischarge(props) {
           >
             Chuẩn đoán:
           </LableTypography>
-          {diagnostic === "" ? (
+          {!diagnostic ? (
             <ValueTypography
               fontWeight={"450 !important"}
               style={{
@@ -179,6 +178,7 @@ function PrescriptionHospitalDischarge(props) {
         <Prescription
           patientInfo={info}
           diagnostic={diagnostic}
+          hospitalizationId={info?.hospitalAdmissionId}
           role={"nurse"}
         />
       </Grid>

@@ -83,6 +83,7 @@ function PrescriptionInvoice(props, ref) {
     prescriptionItems,
     diagnostic,
     prescriptionCode,
+    dischargeInfo,
   } = props;
 
   const contacts = [
@@ -224,7 +225,10 @@ function PrescriptionInvoice(props, ref) {
             marginTop: "0px",
           }}
         >
-          Mã hồ sơ: <strong>{patientInfo?.patient?.patientCode}</strong>
+          Mã hồ sơ:{" "}
+          <strong>
+            {patientInfo?.patient?.patientCode || dischargeInfo?.patientCode}
+          </strong>
         </Typography>
       </Stack>
       <Grid
@@ -253,7 +257,9 @@ function PrescriptionInvoice(props, ref) {
         <Grid item xs={12} sm={7}>
           <ContactItem
             title="Họ tên:"
-            content={patientInfo?.patient?.fullName}
+            content={
+              patientInfo?.patient?.fullName || dischargeInfo?.patientName
+            }
             titleMinWidth={"80px"}
             textTransformValue={"uppercase"}
           />
@@ -262,9 +268,10 @@ function PrescriptionInvoice(props, ref) {
         <Grid item xs={12} sm={3}>
           <ContactItem
             title="Ngày sinh:"
-            content={dayjs(patientInfo?.patient?.dateOfBirth).format(
-              "DD/MM/YYYY"
-            )}
+            content={dayjs(
+              patientInfo?.patient?.dateOfBirth ||
+                dischargeInfo?.patientBirthDate
+            ).format("DD/MM/YYYY")}
             justifyContent={"end"}
           />
         </Grid>
@@ -272,14 +279,20 @@ function PrescriptionInvoice(props, ref) {
         <Grid item xs={12} sm={2}>
           <ContactItem
             title="Giới tính:"
-            content={getGender(patientInfo?.patient?.gender)}
+            content={getGender(
+              patientInfo?.patient?.gender || dischargeInfo?.patientGender
+            )}
             justifyContent={"end"}
           />
         </Grid>
         <Grid item xs={12} marginTop={0}>
           <ContactItem
             title="Địa chỉ:"
-            content={`${patientInfo?.patient?.district} - ${patientInfo?.patient?.address}`}
+            content={`${
+              patientInfo?.patient?.district || dischargeInfo?.districtName
+            } - ${
+              patientInfo?.patient?.address || dischargeInfo?.provinceName
+            }`}
             titleMinWidth={"80px"}
           />
         </Grid>
@@ -396,11 +409,7 @@ function PrescriptionInvoice(props, ref) {
           padding: "16px 8px 12px 8px",
         }}
       >
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
+        <Stack direction={"row"} justifyContent={"space-between"}>
           <Stack direction={"column"} textAlign={"left"} flex={2}>
             <Stack
               direction={"column"}
@@ -411,6 +420,8 @@ function PrescriptionInvoice(props, ref) {
               <TypographyCustom fontWeight={500} fontSize={"14px !important"}>
                 Xác nhận của bác sĩ:
               </TypographyCustom>
+              <br />
+              <br />
               <br />
               <br />
               <TypographyCustom fontWeight={600} fontSize={"15px !important"}>
@@ -426,9 +437,9 @@ function PrescriptionInvoice(props, ref) {
             direction={"column"}
             sx={{
               display: "flex",
-              justifyContent: "center",
               alignItems: "center",
             }}
+            spacing={1}
           >
             <Typography
               fontSize={12}
@@ -440,7 +451,7 @@ function PrescriptionInvoice(props, ref) {
             >
               Mã QR thanh toán
             </Typography>
-            <QRCode value={prescriptionCode || ""} size={64} style={{}} />
+            <QRCode value={prescriptionCode || ""} size={96} style={{}} />
             <Typography fontSize={12} fontWeight={500}>
               {prescriptionCode}
             </Typography>

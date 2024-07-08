@@ -56,7 +56,10 @@ function ReceivePatients(props) {
   const navigate = useNavigate();
 
   const acceptPatient = async (medicalExaminationId) => {
-    const response = await acceptMedicalRecord(medicalExaminationId);
+    const response = await acceptMedicalRecord(
+      medicalExaminationId,
+      doctorScheduleId
+    );
     if (response.success) {
       enqueueSnackbar("Tiếp nhận bệnh nhân thành công", {
         variant: "success",
