@@ -351,7 +351,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     }
 
     @Override
-    public List<DoctorScheduleItemResponse> getDoctorTimeTable(String authorization) {
+    public DoctorScheduleListsResponse getDoctorTimeTable(String authorization) {
         Doctor doctor = doctorServices.getDoctorByToken(authorization);
 
         // Get all doctor schedules 1 month from head of month
@@ -362,7 +362,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         calendar.add(Calendar.MONTH, -2);
         Date startDate = calendar.getTime();
 
-        return doctorScheduleRepository
+        List<DoctorScheduleItemResponse> schedule = doctorScheduleRepository
                 .findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
                         doctor,
                         startDate,
@@ -370,6 +370,28 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 ).stream()
                 .map(DoctorScheduleItemResponse::new)
                 .toList();
+
+        List<DoctorScheduleItemResponse> examinationSchedule = doctorScheduleRepository
+                .findByDoctorAndDateBetweenAndDeletedIsFalseAndScheduleTypeOrderByDateAscScheduleSessionAsc(
+                        doctor,
+                        startDate,
+                        endDate,
+                        ScheduleType.EXAMINATION
+                ).stream()
+                .map(DoctorScheduleItemResponse::new)
+                .toList();
+
+        List<DoctorScheduleItemResponse> inpatientExaminationSchedule = doctorScheduleRepository
+                .findByDoctorAndDateBetweenAndDeletedIsFalseAndScheduleTypeOrderByDateAscScheduleSessionAsc(
+                        doctor,
+                        startDate,
+                        endDate,
+                        ScheduleType.INPATIENT_EXAMINATION
+                ).stream()
+                .map(DoctorScheduleItemResponse::new)
+                .toList();
+
+        return new DoctorScheduleListsResponse(schedule, examinationSchedule, inpatientExaminationSchedule);
     }
 
     private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {

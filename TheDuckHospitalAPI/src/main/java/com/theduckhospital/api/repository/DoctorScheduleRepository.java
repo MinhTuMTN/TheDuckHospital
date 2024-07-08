@@ -83,4 +83,7 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
             Doctor doctor, Date date, Date date2
     );
+    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseAndScheduleTypeOrderByDateAscScheduleSessionAsc(
+            Doctor doctor, Date date, Date date2, ScheduleType scheduleType
+    );
 }
