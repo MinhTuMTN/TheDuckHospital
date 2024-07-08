@@ -310,14 +310,32 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         DoctorSchedule doctorSchedule = doctorGetScheduleById(authorization, doctorScheduleId);
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<MedicalExaminationRecord> examinationRecords =
-                examinationRepository
-                        .findByDoctorScheduleAndDeletedIsFalseAndPatientProfile_FullNameContainingIgnoreCaseAndState(
-                                doctorSchedule,
-                                patientName,
-                                state,
-                                pageable
-                        );
+        Page<MedicalExaminationRecord> examinationRecords;
+        if (state == MedicalExamState.WAITING) {
+            Date today = DateCommon.getEndOfDay(DateCommon.getToday());
+            Date yesterday = DateCommon.getStarOfDay(DateCommon.getYesterday());
+
+            examinationRecords =
+                    examinationRepository
+                            .findWaitingAndAnotherScheduleExamRecord(
+                                    doctorSchedule,
+                                    patientName,
+                                    MedicalExamState.WAITING,
+                                    MedicalExamState.PROCESSING,
+                                    yesterday,
+                                    today,
+                                    pageable
+                            );
+        } else {
+            examinationRecords =
+                    examinationRepository
+                            .findProcessingExamRecord(
+                                    doctorSchedule,
+                                    patientName,
+                                    MedicalExamState.PROCESSING,
+                                    pageable
+                            );
+        }
 
         return PaginationResponse.builder()
                 .items(examinationRecords.stream()
@@ -372,7 +390,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 .toList();
     }
 
-    private DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) throws ParseException {
+    public DoctorSchedule getDoctorScheduleById(UUID doctorScheduleId) {
         DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
                 .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
 
@@ -387,6 +405,19 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         return doctorSchedule;
     }
+
+    @Override
+    public DoctorSchedule getDoctorScheduleByIdForAccept(UUID doctorScheduleId) {
+        DoctorSchedule doctorSchedule = doctorScheduleRepository.findById(doctorScheduleId)
+                .orElseThrow(() -> new BadRequestException("Doctor schedule not found"));
+
+        if (doctorSchedule.isDeleted()) {
+            throw new BadRequestException("Doctor schedule not found");
+        }
+
+        return doctorSchedule;
+    }
+
 
     private QueueBookingResponse getQueueBookingResponse(DoctorSchedule doctorSchedule) {
         int limit = 5;

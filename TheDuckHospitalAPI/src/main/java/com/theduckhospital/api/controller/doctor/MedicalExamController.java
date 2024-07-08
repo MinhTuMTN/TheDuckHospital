@@ -23,17 +23,23 @@ public class MedicalExamController {
         this.medicalExamServices = medicalExamServices;
     }
 
-    @PutMapping("/{medicalExaminationId}/accept")
+    @PutMapping("/{medicalExaminationId}/accept/{doctorScheduleId}")
     public ResponseEntity<?> acceptMedicalExamination(
             @RequestHeader("Authorization") String authorization,
-            @PathVariable("medicalExaminationId") UUID medicalExaminationId
+            @PathVariable("medicalExaminationId") UUID medicalExaminationId,
+            @PathVariable("doctorScheduleId") UUID doctorScheduleId
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Success")
                         .statusCode(200)
-                        .data(medicalExamServices.acceptMedicalExamination(authorization, medicalExaminationId))
+                        .data(medicalExamServices.
+                                acceptMedicalExamination(
+                                        authorization,
+                                        medicalExaminationId,
+                                        doctorScheduleId
+                                ))
                         .build()
         );
     }

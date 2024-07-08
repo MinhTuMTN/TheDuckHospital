@@ -40,6 +40,14 @@ public class DateCommon {
 //        return new Date();
     }
 
+    public static Date getYesterday() {
+        Date today = getToday();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DATE, -1);
+        return calendar.getTime();
+    }
+
     public static Calendar getCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
