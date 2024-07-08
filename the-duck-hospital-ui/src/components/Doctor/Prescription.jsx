@@ -34,6 +34,11 @@ import { getMedicineUnit } from "../../utils/medicineUtils";
 import FormatCurrency from "../General/FormatCurrency";
 import PrescriptionInvoice from "./PrescriptionInvoice";
 import PropTypes from "prop-types";
+import {
+  addDischargeMedicine,
+  deleteDischargeMedicine,
+  getDischargeMedicine,
+} from "../../services/nurse/HospitalizeServices";
 const CustomTextField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
     padding: "4px 4px",
@@ -51,7 +56,7 @@ const headCellStyle = {
 };
 
 function Prescription(props) {
-  const { patientInfo, diagnostic, role } = props;
+  const { patientInfo, diagnostic, role, hospitalizationId } = props;
   const { fullName } = useAuth();
   const { medicalRecordId } = useParams();
   const [hiddenButtonAdd, setHidden] = React.useState(false);
@@ -62,7 +67,12 @@ function Prescription(props) {
   const [prescriptionCode, setPrescriptionCode] = React.useState("");
 
   const handleDeleteRow = async (id) => {
-    const response = await deleteMedicine(medicalRecordId, id);
+    let response;
+    if (role === "doctor") {
+      response = await deleteMedicine(medicalRecordId, id);
+    } else {
+      response = await deleteDischargeMedicine(hospitalizationId, id);
+    }
     if (response.success) {
       setPrescriptionItems(response.data.data);
     } else {
@@ -155,33 +165,40 @@ function Prescription(props) {
       evening: selectedBuoi.toi,
     };
 
+    let response;
     if (role === "doctor") {
-      const response = await addMedicine(medicalRecordId, data);
-      if (response.success) {
-        setPrescriptionItems(response.data.data);
-        setHidden(false);
-        setMedicineOneTime("");
-        setSelectedMedicineId(null);
-        setTotalForOneMedicine("");
-        setNoteForOneMedicine("");
-      } else {
-        enqueueSnackbar("Thêm thuốc thất bại", { variant: "error" });
-      }
+      response = await addMedicine(medicalRecordId, data);
     } else {
-      console.log("Role is not doctor");
+      response = await addDischargeMedicine(hospitalizationId, data);
+    }
+
+    if (response.success) {
+      setPrescriptionItems(response.data.data);
+      setHidden(false);
+      setMedicineOneTime("");
+      setSelectedMedicineId(null);
+      setTotalForOneMedicine("");
+      setNoteForOneMedicine("");
+    } else {
+      enqueueSnackbar("Thêm thuốc thất bại", { variant: "error" });
     }
   };
 
   useEffect(() => {
     const handleGetPrescription = async () => {
-      const response = await getMedicineItems(medicalRecordId);
+      let response;
+      if (role === "doctor") {
+        response = await getMedicineItems(medicalRecordId);
+      } else {
+        response = await getDischargeMedicine(hospitalizationId);
+      }
       if (response.success) {
         setPrescriptionItems(response.data.data);
         setPrescriptionCode(response.data.data[0]?.prescriptionCode);
       }
     };
     handleGetPrescription();
-  }, [medicalRecordId]);
+  }, [medicalRecordId, role, hospitalizationId]);
 
   const componentRef = React.useRef();
   const handlePrint = useReactToPrint({
@@ -232,10 +249,15 @@ function Prescription(props) {
               >
                 <PrescriptionInvoice
                   ref={componentRef}
-                  patientInfo={patientInfo}
+                  patientInfo={role === "doctor" ? patientInfo : null}
+                  dischargeInfo={role === "nurse" ? patientInfo : null}
                   prescriptionItems={prescriptionItems}
                   prescriptionCode={prescriptionCode}
-                  doctorName={fullName}
+                  doctorName={
+                    role === "doctor"
+                      ? fullName
+                      : patientInfo?.dischargeDoctorName
+                  }
                   diagnostic={diagnostic}
                 />
               </Box>
@@ -260,6 +282,7 @@ function Prescription(props) {
                             option.unit
                           )})`
                         }
+                        disableClearable
                         isOptionEqualToValue={(option, value) =>
                           option.medicineId === value.medicineId
                         }

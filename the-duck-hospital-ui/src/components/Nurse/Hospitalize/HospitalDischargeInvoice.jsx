@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import { Language, Phone, PinDrop } from "@mui/icons-material";
 
-import { Box, CardMedia, Grid, Stack, Typography } from "@mui/material";
+import { CardMedia, Grid, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
+import PropTypes from "prop-types";
 import React from "react";
 import Barcode from "react-barcode";
-import { getAge } from "../../../utils/getAgeUtils";
-import PropTypes from "prop-types";
 import { getGender } from "../../../utils/genderUtils";
+import { getAge } from "../../../utils/getAgeUtils";
 
 const ValueTypography = styled(Typography)(({ theme }) => ({
   fontSize: "13px",

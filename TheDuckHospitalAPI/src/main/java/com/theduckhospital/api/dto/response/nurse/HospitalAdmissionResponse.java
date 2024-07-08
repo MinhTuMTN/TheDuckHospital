@@ -26,6 +26,9 @@ public class HospitalAdmissionResponse {
     private String roomName;
     private boolean isDischargePaid;
 
+    private String dischargeDoctorName;
+    private String dischargeDiagnosis;
+
     public HospitalAdmissionResponse(HospitalAdmission hospitalAdmission) {
         this.hospitalAdmissionId = hospitalAdmission.getHospitalAdmissionId();
         this.hospitalAdmissionCode = hospitalAdmission.getHospitalAdmissionCode();
@@ -40,6 +43,13 @@ public class HospitalAdmissionResponse {
 
         Room room = hospitalAdmission.getRoom();
         this.roomName = room == null ? null : room.getRoomName();
+
+        Discharge discharge = hospitalAdmission.getDischarge();
+        if (discharge != null) {
+            Doctor dischargeDoctor = discharge.getDoctor();
+            this.dischargeDoctorName = dischargeDoctor == null ? null : dischargeDoctor.getFullName();
+            this.dischargeDiagnosis = discharge.getDischargeSummary();
+        }
 
         PatientProfile patientProfile = hospitalAdmission.getPatientProfile();
         if (patientProfile == null) {
