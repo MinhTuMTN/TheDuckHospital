@@ -19,7 +19,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import CustomLink from "../../components/General/CustomLink";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VerifyInformationItem from "../../components/Customer/FindProfile/VerifyInformationItem";
-import { addPatientProfile } from "../../services/customer/PatientProfileServices";
+import {
+  addPatientProfile,
+  sendOTPPatientProfile,
+} from "../../services/customer/PatientProfileServices";
 import { enqueueSnackbar } from "notistack";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
@@ -47,10 +50,13 @@ function VerifyInformation(props) {
   const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+  const [sendOTP, setSendOTP] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const patientProfiles = useLocation().state?.patientProfiles;
   const [selectPatientProfileId, setSelectPatientProfileId] = useState("");
   const [phone, setPhone] = useState("");
+  const [otp, setOTP] = useState("");
 
   const breakcrumbs = [
     <CustomLink key={1} to="/">
@@ -66,14 +72,36 @@ function VerifyInformation(props) {
     color: "transparent",
   };
 
-  const handleAddPatientProfile = async () => {
-    const response = await addPatientProfile(selectPatientProfileId, phone);
+  const handleSendOTP = async () => {
+    setIsLoading(true);
+    const response = await sendOTPPatientProfile(selectPatientProfileId, phone);
+    setIsLoading(false);
+
     if (response.success) {
-      navigate("/user");
+      enqueueSnackbar("Mã OTP đã được gửi", {
+        variant: "success",
+      });
+      setSendOTP(true);
     } else {
       enqueueSnackbar("Số điện thoại không hợp lệ", {
         variant: "error",
       });
+    }
+  };
+  const handleAddPatientProfile = async () => {
+    setIsLoading(true);
+    const response = await addPatientProfile(selectPatientProfileId, otp);
+    setIsLoading(false);
+
+    if (response.success) {
+      navigate("/user");
+    } else {
+      enqueueSnackbar(
+        "Mã xác thực không hợp lệ. Vui lòng kiểm tra và thử lại",
+        {
+          variant: "error",
+        }
+      );
     }
   };
 
@@ -206,6 +234,19 @@ function VerifyInformation(props) {
               fullWidth
               variant="outlined"
             />
+
+            {sendOTP && (
+              <CustomTextField
+                margin="dense"
+                id="otp"
+                value={otp}
+                onChange={(e) => setOTP(e.target.value)}
+                autoComplete="off"
+                placeholder="Mã OTP"
+                fullWidth
+                variant="outlined"
+              />
+            )}
           </DialogContent>
           <DialogActions>
             <Button
@@ -217,7 +258,12 @@ function VerifyInformation(props) {
             >
               Huỷ
             </Button>
-            <Button onClick={handleAddPatientProfile}>Xác thực</Button>
+            <Button
+              onClick={sendOTP ? handleAddPatientProfile : handleSendOTP}
+              disabled={isLoading || phone.length !== 10}
+            >
+              {sendOTP ? "Xác nhận" : "Gửi mã OTP"}
+            </Button>
           </DialogActions>
         </Dialog>
       </React.Fragment>

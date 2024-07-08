@@ -22,10 +22,17 @@ export const findPatientProfileByPatientCode = (patientCode) => {
   });
 };
 
-export const addPatientProfile = (patientProfileId, phoneNumber) => {
-  return post(`/patients/patient-profiles/add-profile`, {
+export const sendOTPPatientProfile = (patientProfileId, phoneNumber) => {
+  return post(`/patients/patient-profiles/send-otp`, {
     patientProfileId,
     phoneNumber,
+  });
+};
+
+export const addPatientProfile = (patientProfileId, otp) => {
+  return post(`/patients/patient-profiles/add-profile`, {
+    patientProfileId,
+    otp,
   });
 };
 
