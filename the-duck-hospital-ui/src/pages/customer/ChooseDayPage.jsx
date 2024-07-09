@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  IconButton,
   Paper,
   Stack,
   Typography,
@@ -24,6 +25,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import InfoLine from "../../components/Customer/InfoLine";
 import CustomLink from "../../components/General/CustomLink";
 import { getTimeSlotById } from "../../utils/timeSlotUtils";
+import { Close } from "@mui/icons-material";
 
 const CustomTextBreakcrumb = styled(Typography)(({ theme }) => ({
   fontSize: "16px",
@@ -69,8 +71,9 @@ const Body = styled(Box)(({ theme }) => ({
 }));
 
 const CustomButtonChoosen = styled(Button)(({ theme, isactive }) => ({
-  borderRadius: "20px",
+  borderRadius: "12px",
   textTransform: "none",
+  boxShadow: "none",
   background:
     isactive === "true"
       ? "linear-gradient(to right, #42a5f5, #6fccea)"
@@ -79,11 +82,12 @@ const CustomButtonChoosen = styled(Button)(({ theme, isactive }) => ({
   display: "flex",
   flexBasis: "48%",
   margin: "4px 0",
-  border: "1px solid #3978b4",
+  border: "1px solid #e0e0e0",
 
   "&:hover": {
     backgroundImage: "linear-gradient(to right, #42a5f5, #6fccea)",
     color: "#fff !important",
+    boxShadow: "none",
   },
 }));
 
@@ -300,10 +304,34 @@ function ChooseDayPage(props) {
             <DialogTitle
               sx={{
                 borderBottom: "1px solid #e0e0e0",
-                paddingY: "8px",
+                paddingX: 0,
+                paddingY: 0,
               }}
             >
-              Chọn giờ khám bênh
+              <Stack
+                direction={"row"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                paddingX={"12px"}
+                paddingY={"10px"}
+              >
+                <Typography fontWeight={500} fontSize={"16px"}>
+                  {" "}
+                  Chọn giờ khám bệnh
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    handleConfirmationClose();
+                  }}
+                >
+                  <Close
+                    style={{
+                      fontSize: "22px",
+                    }}
+                  />
+                </IconButton>
+              </Stack>
             </DialogTitle>
             <DialogContent
               sx={{
@@ -326,7 +354,7 @@ function ChooseDayPage(props) {
                 />
 
                 <InfoLine
-                  lableName="Bác sĩ:"
+                  lableName="Bác sĩ khám:"
                   value={`${doctor.degree} ${doctor.doctorName}`}
                   urlImage="https://res.cloudinary.com/dsmvlvfy5/image/upload/v1701685343/stethoscope_ysrsda.png"
                 />
@@ -342,7 +370,7 @@ function ChooseDayPage(props) {
               </Stack>
 
               <Stack
-                direction={"row"}
+                direction={"column"}
                 spacing={1}
                 sx={{
                   marginTop: "8px",
@@ -352,8 +380,8 @@ function ChooseDayPage(props) {
                   <Stack key={schedule.doctorScheduleId}>
                     <Typography fontSize={14} fontWeight={500}>
                       {schedule.scheduleSession === "MORNING"
-                        ? "Buổi sáng"
-                        : "Buổi chiều"}
+                        ? "Buổi sáng:"
+                        : "Buổi chiều:"}
                     </Typography>
                     <Stack
                       direction={"row"}
@@ -387,7 +415,13 @@ function ChooseDayPage(props) {
                 ))}
               </Stack>
             </DialogContent>
-            <DialogActions>
+            <DialogActions
+              sx={{
+                borderTop: "1px solid #e0e0e0",
+                paddingX: "12px",
+                paddingY: "4px",
+              }}
+            >
               <Button onClick={handleConfirmationClose} color="error">
                 Hủy bỏ
               </Button>
