@@ -7,6 +7,7 @@ import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IRoomServices;
 import com.theduckhospital.api.services.IScheduleDoctorServices;
 import jakarta.validation.Valid;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -167,6 +168,27 @@ public class ScheduleHeadDoctorController {
                         .success(true)
                         .message("Get doctors successfully")
                         .data(scheduleDoctorServices.getActiveDoctorsInDepartment(authorizationHeader))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{doctorScheduleId}/active-doctors/{staffId}")
+    public ResponseEntity<?> getDoctorsInDepartmentHasNoScheduleOnDate(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable UUID doctorScheduleId,
+            @PathVariable UUID staffId,
+            @RequestParam boolean isExamination
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get doctors successfully")
+                        .data(scheduleDoctorServices.getDoctorsInDepartmentHasNoScheduleOnDate(
+                                authorizationHeader,
+                                doctorScheduleId,
+                                staffId,
+                                isExamination
+                        ))
                         .build()
         );
     }

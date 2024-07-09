@@ -13,7 +13,6 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +33,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     private final IMedicalServiceServices medicalServiceServices;
     private final IRoomServices roomServices;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final DoctorRepository doctorRepository;
     private final MedicalExaminationRepository examinationRepository;
     private final BookingRepository bookingRepository;
     private final ITimeSlotServices timeSlotServices;
@@ -51,7 +51,8 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             ITimeSlotServices timeSlotServices,
             NotificationRepository notificationRepository,
             AccountRepository accountRepository,
-            IFirebaseServices firebaseServices
+            IFirebaseServices firebaseServices,
+            DoctorRepository doctorRepository
     ) {
         this.doctorServices = doctorServices;
         this.medicalServiceServices = medicalServiceServices;
@@ -63,6 +64,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
         this.notificationRepository = notificationRepository;
         this.accountRepository = accountRepository;
         this.firebaseServices = firebaseServices;
+        this.doctorRepository = doctorRepository;
     }
 
     @Override
@@ -602,7 +604,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime());
 
-        ScheduleRoomItemResponse eveningSchedule =  getScheduleItemResponseByRoomAndSessionAndDate(
+        ScheduleRoomItemResponse eveningSchedule = getScheduleItemResponseByRoomAndSessionAndDate(
                 room,
                 EVENING,
                 startDateCalendar.getTime(),
@@ -622,7 +624,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
             ScheduleSession scheduleSession,
             Date startDate,
             Date endDate
-    ){
+    ) {
         DoctorSchedule schedule = doctorScheduleRepository
                 .findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
                         room,
@@ -861,10 +863,46 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         Department department = headDoctor.getDepartment();
 
-        List<Doctor> doctors = department.getDoctors();
-        doctors.removeIf(Staff::isDeleted);
+//        List<Doctor> doctors = department.getDoctors();
+//        doctors.removeIf(Staff::isDeleted);
 
-        return doctors;
+        return doctorRepository.findByDepartmentAndDeletedIsFalse(department);
+    }
+
+    @Override
+    public List<Doctor> getDoctorsInDepartmentHasNoScheduleOnDate(
+            String authorization,
+            UUID scheduleId,
+            UUID staffId,
+            boolean isExamination
+    ) {
+        Doctor headDoctor = getHeadDoctor(authorization);
+        Department department = headDoctor.getDepartment();
+
+        Optional<DoctorSchedule> optional = doctorScheduleRepository.findById(scheduleId);
+        if (optional.isEmpty()) {
+            throw new BadRequestException("Doctor schedule not found");
+        }
+        DoctorSchedule doctorSchedule = optional.get();
+
+        List<Doctor> activeDoctors;
+        if (isExamination) {
+            activeDoctors = doctorRepository.findActiveDoctorsForExamination(
+                    department,
+                    doctorSchedule.getDate(),
+                    doctorSchedule.getScheduleSession()
+            );
+        } else {
+            activeDoctors = doctorRepository.findActiveDoctorsForNonExamination(
+                    department,
+                    doctorSchedule.getDate(),
+                    ScheduleType.EXAMINATION,
+                    doctorSchedule.getScheduleSession(),
+                    staffId
+            );
+        }
+
+        return activeDoctors;
     }
 
     @Override

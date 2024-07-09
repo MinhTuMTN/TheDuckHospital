@@ -246,8 +246,6 @@ function ShiftListPage(props) {
                     setRefresh={setRefresh}
                     refresh={refresh}
                     valueDate={valueDate}
-                    selectedRow={selectedRow}
-                    treatmentRooms={treatmentRooms}
                   />
                 ) : (
                   <Stack
@@ -291,8 +289,6 @@ function ShiftListPage(props) {
                     setRefresh={setRefresh}
                     refresh={refresh}
                     valueDate={valueDate}
-                    selectedRow={selectedRow}
-                    treatmentRooms={treatmentRooms}
                   />
                 ) : (
                   <Stack
@@ -338,8 +334,6 @@ function ShiftListPage(props) {
                       setRefresh={setRefresh}
                       refresh={refresh}
                       valueDate={valueDate}
-                      selectedRow={selectedRow}
-                      treatmentRooms={treatmentRooms}
                     />
                   ) : (
                     <Stack
@@ -381,8 +375,6 @@ function ShiftListPage(props) {
                       setRefresh={setRefresh}
                       refresh={refresh}
                       valueDate={valueDate}
-                      selectedRow={selectedRow}
-                      treatmentRooms={treatmentRooms}
                     />
                   ) : (
                     <Stack

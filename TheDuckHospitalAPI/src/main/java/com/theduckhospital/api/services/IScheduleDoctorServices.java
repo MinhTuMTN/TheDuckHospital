@@ -79,6 +79,13 @@ public interface IScheduleDoctorServices {
 
     List<Doctor> getActiveDoctorsInDepartment(String authorization);
 
+    List<Doctor> getDoctorsInDepartmentHasNoScheduleOnDate(
+            String authorization,
+            UUID scheduleId,
+            UUID staffId,
+            boolean isExamination
+    );
+
     DoctorSchedule updateDoctorSchedule(
             String authorization,
             UUID doctorScheduleId,

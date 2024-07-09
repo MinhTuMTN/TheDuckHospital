@@ -248,6 +248,7 @@ function SchedulePage(props) {
                     <Stack sx={{ marginLeft: "30px" }}>
                       {selectedExamSchedules?.map((selectedSchedule, index) => (
                         <Stack
+                          key={`examination-schedule-${index}`}
                           direction={"column"}
                           justifyContent={"space-between"}
                           alignItems={"flex-start "}
@@ -258,23 +259,6 @@ function SchedulePage(props) {
                             justifyContent={"center"}
                             alignItems={"center"}
                           >
-                            {/* {selectedSchedule?.scheduleSession === "MORNING" ? (
-                              <WbSunnyOutlined
-                                sx={{
-                                  color: "#fff",
-                                  fontSize: "24px",
-                                  mr: 1,
-                                }}
-                              />
-                            ) : (
-                              <DarkModeOutlined
-                                sx={{
-                                  color: "#fff",
-                                  fontSize: "24px",
-                                  mr: 1,
-                                }}
-                              />
-                            )} */}
                             {
                               scheduleSessions.find(
                                 (session) =>
@@ -333,6 +317,7 @@ function SchedulePage(props) {
                       {selectedInpatientSchedules?.map(
                         (selectedSchedule, index) => (
                           <Stack
+                            key={`inpatient-schedule-${index}`}
                             direction={"column"}
                             justifyContent={"space-between"}
                             alignItems={"flex-start "}
