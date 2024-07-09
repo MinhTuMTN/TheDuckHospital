@@ -20,6 +20,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             DoctorSchedule doctorSchedule,
             int queueNumber
     );
+    @Query("SELECT MAX(b.queueNumber) " +
+            "FROM Booking b " +
+            "WHERE b.timeSlot.doctorSchedule = :doctorSchedule " +
+            "AND b.deleted = false"
+    )
+    long maxQueueNumberByDoctorSchedule(DoctorSchedule doctorSchedule);
     Optional<Booking> findByBookingCodeAndDeletedIsFalse(String bookingCode);
     Page<Booking> findBookingsByTimeSlot_DoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
             DoctorSchedule doctorSchedule,

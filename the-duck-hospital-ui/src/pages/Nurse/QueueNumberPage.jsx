@@ -113,9 +113,7 @@ function QueueNumberPage(props) {
                 fontSize: 20,
                 fontWeight: "normal",
               }}
-            >{` (${
-              data?.maxQueueNumber - data?.currentQueueNumber
-            } người còn lại)`}</span>
+            >{` (${data?.leftQueueNumber} người còn lại)`}</span>
           </Typography>
           <Button
             variant="contained"
