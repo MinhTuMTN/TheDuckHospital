@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../auth/AuthProvider";
 import { DoctorContext } from "../../../auth/DoctorProvider";
 import { getTodaySchedule } from "../../../services/doctor/DoctorScheduleServices";
 import { CustomMenuItem, CustomMenuItemLogOut } from "./PatientMenuList";
