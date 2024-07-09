@@ -4,8 +4,12 @@ export const createBooking = (data) => {
   return post("/booking", data);
 };
 
-export const getBookings = () => {
-  return get("/booking");
+export const getBookings = (patientProfileId, page) => {
+  return get("/booking/by-profile", {
+    patientProfileId,
+    page,
+    limit: 5,
+  });
 };
 
 export const getBookingById = (id) => {

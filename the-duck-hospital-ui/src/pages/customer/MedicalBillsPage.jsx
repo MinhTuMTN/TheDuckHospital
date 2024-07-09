@@ -1,23 +1,69 @@
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  MenuItem,
+  Pagination,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-import React, { useEffect } from "react";
-import MedicalBillProfileItem from "../../components/Customer/MedicalBill/MedicalBillProfileItem";
-import { getBookings } from "../../services/customer/BookingServices";
+import React, { useCallback, useEffect } from "react";
+import MedicalBillItem from "../../components/Customer/MedicalBill/MedicalBillItem";
 import SearchNotFound from "../../components/Nurse/SearchNotFound";
+import { getBookings } from "../../services/customer/BookingServices";
+import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
 
 function MedicalBillsPage(props) {
-  const [bookings, setBookings] = React.useState([]);
+  const [bookingData, setBookingData] = React.useState({});
+  const [selectedProfile, setSelectedProfile] = React.useState("");
+  const [profiles, setProfiles] = React.useState([]);
+  const [pagination, setPagination] = React.useState({
+    page: 1,
+    totalPages: 2,
+  });
+
+  const handleChange = (event) => {
+    setSelectedProfile(event.target.value);
+    setPagination({ ...pagination, page: 1 });
+  };
+
+  const handleGetBooking = useCallback(async () => {
+    const response = await getBookings(selectedProfile, pagination.page - 1);
+    if (response.success) {
+      const data = response.data.data;
+      setBookingData(data.items[0]);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: data.totalPages,
+      }));
+    } else
+      enqueueSnackbar("Lấy danh sách phiếu khám bệnh thất bại", {
+        variant: "error",
+      });
+  }, [selectedProfile, pagination.page]);
+
   useEffect(() => {
-    const handleGetBookings = async () => {
-      const response = await getBookings();
-      if (response.success) setBookings(response.data.data);
-      else
-        enqueueSnackbar("Lỗi lấy dữ liệu phiếu khám bệnh", {
+    const handleGetProfiles = async () => {
+      const response = await getAllPatientProfiles();
+      if (response.success) {
+        const data = response.data.data;
+        if (data.length > 0) {
+          setSelectedProfile(data[0].patientProfileId);
+        }
+        setProfiles(data);
+      } else
+        enqueueSnackbar("Lấy danh sách hồ sơ bệnh nhân thất bại", {
           variant: "error",
         });
     };
-    handleGetBookings();
+
+    handleGetProfiles();
   }, []);
+
+  useEffect(() => {
+    if (selectedProfile) handleGetBooking();
+  }, [selectedProfile, handleGetBooking]);
+
   return (
     <Box
       py={4}
@@ -27,22 +73,52 @@ function MedicalBillsPage(props) {
       }}
       sx={{ width: "100%" }}
     >
-      <Typography variant="h6" fontSize={22}>
-        Phiếu khám bệnh
-      </Typography>
+      <Stack direction={"row"} justifyContent={"space-between"}>
+        <Typography variant="h6" fontSize={22}>
+          Phiếu khám bệnh
+        </Typography>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={selectedProfile}
+          placeholder="Chọn hồ sơ bệnh nhân"
+          size="small"
+          sx={{ minWidth: 300 }}
+          onChange={handleChange}
+        >
+          {profiles?.map((profile) => (
+            <MenuItem
+              key={profile.patientProfileId}
+              value={profile.patientProfileId}
+            >
+              {profile.fullName}
+            </MenuItem>
+          ))}
+        </Select>
+      </Stack>
 
       <Box mt={2}>
-        {bookings.map((booking, index) => (
-          <MedicalBillProfileItem
-            key={`medical-bill-${index}`}
-            booking={booking}
-          />
+        {bookingData?.bookings?.map((item) => (
+          <MedicalBillItem key={`${item.bookingId}`} item={item} />
         ))}
 
-        {bookings?.length === 0 && (
+        {bookingData?.bookings?.length === 0 && (
           <SearchNotFound text="Không có phiếu khám bệnh nào" />
         )}
       </Box>
+
+      <Stack alignItems={"flex-end"}>
+        <Pagination
+          count={pagination.totalPages}
+          page={pagination.page}
+          onChange={(e, page) => {
+            setPagination({ ...pagination, page });
+            console.log(page);
+          }}
+          showFirstButton
+          showLastButton
+        />
+      </Stack>
     </Box>
   );
 }
