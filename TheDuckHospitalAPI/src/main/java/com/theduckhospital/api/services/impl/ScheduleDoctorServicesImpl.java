@@ -221,10 +221,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
     public QueueBookingResponse increaseQueueNumber(UUID doctorScheduleId) throws ParseException {
         DoctorSchedule doctorSchedule = getDoctorScheduleById(doctorScheduleId);
 
-        long maxQueueNumber = bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
-                doctorSchedule,
-                -1
-        );
+        long maxQueueNumber = bookingRepository.maxQueueNumberByDoctorSchedule(doctorSchedule);
         int newQueueNumber = Math.min(doctorSchedule.getQueueNumber() + 5, (int) maxQueueNumber);
         doctorSchedule.setQueueNumber(newQueueNumber);
         doctorScheduleRepository.save(doctorSchedule);
@@ -457,14 +454,18 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                         doctorSchedule.getQueueNumber(),
                         pageable
                 );
-        long maxQueueNumber = bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
+        long maxQueueNumber = bookingRepository.maxQueueNumberByDoctorSchedule(
+                doctorSchedule
+        );
+        long leftQueueNumber = bookingRepository.countByTimeSlot_DoctorScheduleAndDeletedIsFalseAndQueueNumberGreaterThan(
                 doctorSchedule,
-                -1
+                doctorSchedule.getQueueNumber()
         );
 
         return new QueueBookingResponse(
                 doctorSchedule,
                 maxQueueNumber,
+                leftQueueNumber,
                 bookings.getContent().stream()
                         .sorted(Comparator.comparingInt(Booking::getQueueNumber))
                         .toList()
