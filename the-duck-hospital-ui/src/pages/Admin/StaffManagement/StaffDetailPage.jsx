@@ -17,12 +17,12 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
-import ScheduleTable from "../../../components/Admin/ScheduleTable";
 import {
   getDateHasDoctorSchedule,
   getSchedulesByStaffIdAndDate,
 } from "../../../services/admin/DoctorScheduleServices";
 import PatientChart from "../../../components/Admin/StaffManagement/PatientChart";
+import ScheduleStaffTable from "../../../components/Admin/StaffManagement/ScheduleStaffTable";
 
 const paperStyle = {
   marginTop: 4,
@@ -282,7 +282,7 @@ function StaffDetailPage() {
                           </LocalizationProvider>
                         </Stack>
                       </BoxStyle>
-                      {schedules && <ScheduleTable items={schedules} />}
+                      {schedules && <ScheduleStaffTable items={schedules} />}
                     </Stack>
                   </Stack>
                 </Grid>

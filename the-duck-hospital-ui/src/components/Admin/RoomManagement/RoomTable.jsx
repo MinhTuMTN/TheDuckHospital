@@ -102,7 +102,12 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.departmentName ? row.departmentName : "Đang cập nhật"}
+            {row.departmentName
+              ? row.departmentName
+              : row.roomType?.startsWith("EXAMINATION") ||
+                row.roomType?.startsWith("TREATMENT")
+              ? "Chưa cập nhật"
+              : "Không thuộc khoa"}
           </CustomText>
         </TableCell>
         <TableCell align="right">
