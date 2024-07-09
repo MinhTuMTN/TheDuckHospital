@@ -321,6 +321,7 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                     examinationRepository
                             .findWaitingAndAnotherScheduleExamRecord(
                                     doctorSchedule,
+                                    doctorSchedule.getMedicalService(),
                                     patientName,
                                     MedicalExamState.WAITING,
                                     MedicalExamState.PROCESSING,

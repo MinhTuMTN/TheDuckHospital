@@ -28,12 +28,14 @@ public interface MedicalExaminationRepository
                 "OR (" +
                     "m.doctorSchedule != :doctorSchedule " +
                     "AND (m.state = :waitingState OR m.state = :processingState) " +
+                    "AND m.doctorSchedule.medicalService = :medicalService " +
                     "AND m.doctorSchedule.date BETWEEN :startDate AND :endDate" +
                 ")" +
             ")"
     )
     Page<MedicalExaminationRecord> findWaitingAndAnotherScheduleExamRecord(
             DoctorSchedule doctorSchedule,
+            MedicalService medicalService,
             String patientName,
             MedicalExamState waitingState,
             MedicalExamState processingState,
