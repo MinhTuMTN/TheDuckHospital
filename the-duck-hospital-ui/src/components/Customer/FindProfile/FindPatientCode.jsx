@@ -35,11 +35,17 @@ function FindPatientCode(props) {
   const handleSearchPatientProfile = async () => {
     const response = await findPatientProfileByPatientCode(patientCode);
     if (response.success) {
+      if (response.data.data.length === 0) {
+        enqueueSnackbar("Không tìm thấy hồ sơ bệnh nhân", {
+          variant: "error",
+        });
+        return;
+      }
       navigate("/verify-information", {
         state: { patientProfiles: response.data.data },
       });
     } else {
-      enqueueSnackbar("Không tìm thấy bệnh nhân", {
+      enqueueSnackbar("Không tìm thấy hồ sơ bệnh nhân", {
         variant: "error",
       });
     }

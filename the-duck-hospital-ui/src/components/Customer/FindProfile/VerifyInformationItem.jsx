@@ -40,6 +40,7 @@ function VerifyInformationItem(props) {
           title={"Địa chỉ:"}
           value={`${profile.streetName}, ${profile?.ward?.wardName}, ${profile?.district?.districtName}, ${profile?.province?.provinceName}`}
           icon={<PlaceIcon />}
+          alignItems={"flex-start"}
         />
         <RowInfo
           title={"Số điện thoại:"}

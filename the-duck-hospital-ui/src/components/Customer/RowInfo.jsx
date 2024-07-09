@@ -7,9 +7,10 @@ RowInfo.propTypes = {
   value: PropTypes.string,
 };
 function RowInfo(props) {
+  const { icon, title, value, alignItems } = props;
   const isName = props.title.toLowerCase().includes("họ và tên");
   return (
-    <Stack direction={"row"} alignItems={"center"}>
+    <Stack direction={"row"} alignItems={alignItems ? alignItems : "center"}>
       <Box
         display="flex"
         alignItems="center"
@@ -19,7 +20,7 @@ function RowInfo(props) {
           xs: 2,
         }}
       >
-        {props.icon}
+        {icon}
         <Typography
           marginLeft={1}
           sx={{
@@ -27,7 +28,7 @@ function RowInfo(props) {
             textAlign: "left",
           }}
         >
-          {props.title}
+          {title}
         </Typography>
       </Box>
       <Typography
@@ -44,7 +45,7 @@ function RowInfo(props) {
           textTransform: isName ? "uppercase" : "none",
         }}
       >
-        {props.value}
+        {value}
       </Typography>
     </Stack>
   );
