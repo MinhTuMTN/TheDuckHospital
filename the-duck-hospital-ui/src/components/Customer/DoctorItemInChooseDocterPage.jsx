@@ -1,20 +1,14 @@
 import { CardMedia, Stack, Typography } from "@mui/material";
 import React from "react";
 import FormatCurrency from "../General/FormatCurrency";
+import dayjs from "dayjs";
 
-const days = [
-  "",
-  "Chủ nhật",
-  "Thứ 2",
-  "Thứ 3",
-  "Thứ 4",
-  "Thứ 5",
-  "Thứ 6",
-  "Thứ 7",
-];
+const days = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
 
 const getSchedule = (doctor) => {
   let schedule = "";
+
+  // Sort doctor schedule by dayOfWeek and scheduleSession
   doctor.doctorSchedules?.sort((a, b) => {
     if (a.dayOfWeek > b.dayOfWeek) return 1;
     if (a.dayOfWeek < b.dayOfWeek) return -1;
@@ -29,18 +23,20 @@ const getSchedule = (doctor) => {
     scheduleSession: "",
   };
   doctor.doctorSchedules?.forEach((item) => {
+    const dayOfWeek = dayjs(item.date).get("day");
     if (
       item.scheduleSession === previousSchedule.scheduleSession &&
-      item.dayOfWeek === previousSchedule.dayOfWeek
+      dayOfWeek === previousSchedule.dayOfWeek
     )
       return;
+
     if (item.scheduleSession === "MORNING") {
-      schedule += `Sáng ${days[item.dayOfWeek]}, `;
+      schedule += `Sáng ${days[dayOfWeek]}, `;
     } else {
-      schedule += `Chiều ${days[item.dayOfWeek]}, `;
+      schedule += `Chiều ${days[dayOfWeek]}, `;
     }
 
-    previousSchedule.dayOfWeek = item.dayOfWeek;
+    previousSchedule.dayOfWeek = dayOfWeek;
     previousSchedule.scheduleSession = item.scheduleSession;
   });
   return schedule;

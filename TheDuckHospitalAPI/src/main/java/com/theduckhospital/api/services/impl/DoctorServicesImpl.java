@@ -2,6 +2,7 @@ package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.dto.response.DoctorItemResponse;
 import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.RatingItemResponse;
@@ -9,10 +10,7 @@ import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.dto.response.doctor.HeadDoctorResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.NotFoundException;
-import com.theduckhospital.api.repository.AccountRepository;
-import com.theduckhospital.api.repository.DoctorRepository;
-import com.theduckhospital.api.repository.MedicalExaminationRepository;
-import com.theduckhospital.api.repository.RatingRepository;
+import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IDoctorServices;
@@ -29,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class DoctorServicesImpl implements IDoctorServices {
     private final DoctorRepository doctorRepository;
+    private final DoctorScheduleRepository doctorScheduleRepository;
     private final MedicalExaminationRepository medicalExaminationRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccountRepository accountRepository;
@@ -37,13 +36,14 @@ public class DoctorServicesImpl implements IDoctorServices {
 
     public DoctorServicesImpl(
             DoctorRepository doctorRepository,
-            JwtTokenProvider jwtTokenProvider,
+            DoctorScheduleRepository doctorScheduleRepository, JwtTokenProvider jwtTokenProvider,
             AccountRepository accountRepository,
             RatingRepository ratingRepository,
             IDepartmentServices departmentServices,
             MedicalExaminationRepository medicalExaminationRepository
     ) {
         this.doctorRepository = doctorRepository;
+        this.doctorScheduleRepository = doctorScheduleRepository;
         this.jwtTokenProvider = jwtTokenProvider;
         this.accountRepository = accountRepository;
         this.departmentServices = departmentServices;
@@ -134,55 +134,55 @@ public class DoctorServicesImpl implements IDoctorServices {
             int page,
             int limit
     ) {
-        Pageable pageable = Pageable.ofSize(limit).withPage(page - 1);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Department department = departmentId == null
+                ? null
+                : departmentServices.getDepartmentById(departmentId);
+        String departmentName = department == null
+                ? ""
+                : department.getDepartmentName();
+        Page<Doctor> doctors = doctorRepository
+                .findDoctorsForBooking(
+                        fullName,
+                        degree,
+                        departmentName,
+                        DateCommon.getToday(),
+                        ScheduleType.EXAMINATION,
+                        pageable
+                );
 
-        Department department = null;
-        if (departmentId != null) {
-            department = departmentServices.getDepartmentById(departmentId);
+        List<DoctorItemResponse> results = new ArrayList<>();
+        AtomicInteger removeCount = new AtomicInteger();
+        for (Doctor doctor : doctors.getContent()) {
+            List<DoctorSchedule> doctorSchedules = doctorScheduleRepository
+                    .findValidSchedulesForBooking(
+                            doctor,
+                            DateCommon.getStarOfDay(DateCommon.getToday()),
+                            ScheduleType.EXAMINATION
+                    );
+
+            if (doctorSchedules.isEmpty()) {
+                removeCount.getAndIncrement();
+            } else {
+                doctor.setDoctorSchedules(doctorSchedules);
+
+                double price = doctorSchedules.get(0)
+                                .getMedicalService()
+                                        .getPrice();
+                results.add(new DoctorItemResponse(doctor, doctorSchedules, price));
+            }
         }
 
-        Page<Doctor> doctors;
+        int totalElements = (int) doctors.getTotalElements() - removeCount.get();
+        int totalPages = (int) Math.ceil((double) totalElements / limit);
 
-        if (degree == null)
-            doctors = doctorRepository
-                    .findDoctorsWithoutDegree(
-                            fullName, department == null ? "" : department.getDepartmentName(),
-                            DateCommon.getStarOfDay(DateCommon.getToday()),
-                            pageable
-                    );
-        else
-            doctors = doctorRepository
-                    .findDoctorsByDegree(
-                            fullName, degree,
-                            department == null ? "" : department.getDepartmentName(),
-                            DateCommon.getStarOfDay(DateCommon.getToday()),
-                            pageable
-                    );
-
-        List<DoctorItemResponse> doctorItemResponses = new ArrayList<>();
-        AtomicInteger remove = new AtomicInteger();
-        doctors.forEach(doctor -> {
-            List<DoctorSchedule> doctorSchedules = doctor.getDoctorSchedules();
-            doctorSchedules.removeIf(doctorSchedule -> doctorSchedule.isDeleted()
-                    || doctorSchedule.getDate().before(DateCommon.getToday())
-            );
-            if (doctorSchedules.isEmpty()) {
-                remove.getAndIncrement();
-                return;
-            }
-            doctorItemResponses.add(new DoctorItemResponse(doctor));
-        });
-
-        // Recalculate total pages
-        int totalPages = (int) Math.ceil((double) (doctors.getTotalElements() - remove.get()) / limit);
-        int totalItems = (int) (doctors.getTotalElements() - remove.get());
 
         return PaginationResponse.builder()
                 .totalPages(totalPages)
-                .totalItems(totalItems)
+                .totalItems(totalElements)
                 .page(page)
                 .limit(limit)
-                .items(doctorItemResponses)
+                .items(results)
                 .build();
     }
 

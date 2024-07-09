@@ -6,6 +6,7 @@ import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import com.theduckhospital.api.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -20,7 +21,6 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             Date date,
             ScheduleSession scheduleSession
     );
-
     DoctorSchedule findByRoomAndScheduleSessionAndDateBetweenAndDeletedIsFalse(
             Room room,
             ScheduleSession scheduleSession,
@@ -32,13 +32,11 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             Room room,
             Date date
     );
-
     Optional<DoctorSchedule> findByDoctorAndDateAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
             Date date,
             ScheduleSession scheduleSession
     );
-
     List<DoctorSchedule> findByDoctorAndScheduleSessionAndDeletedIsFalse(
             Doctor doctor,
             ScheduleSession scheduleSession
@@ -82,5 +80,17 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     List<DoctorSchedule> findByDoctorAndDateAndDeletedIsFalseOrderByScheduleSessionAsc(Doctor doctor, Date date);
     List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseOrderByDateAscScheduleSessionAsc(
             Doctor doctor, Date date, Date date2
+    );
+    @Query("SELECT ds FROM  DoctorSchedule ds " +
+            "WHERE ds.doctor = :doctor " +
+            "AND ds.date >= :today " +
+            "AND ds.deleted = false " +
+            "AND ds.scheduleType = :examinationType " +
+            "ORDER BY ds.date ASC, ds.scheduleSession ASC"
+    )
+    List<DoctorSchedule> findValidSchedulesForBooking(
+            Doctor doctor,
+            Date today,
+            ScheduleType examinationType
     );
 }
