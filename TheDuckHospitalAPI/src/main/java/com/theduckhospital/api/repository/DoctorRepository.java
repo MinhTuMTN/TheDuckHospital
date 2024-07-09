@@ -1,6 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.Degree;
+import com.theduckhospital.api.constant.ScheduleSession;
 import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.Department;
 import com.theduckhospital.api.entity.Doctor;
@@ -44,36 +45,29 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
             ScheduleType examinationType,
             Pageable pageable
     );
-    @Query("SELECT d " +
-            "FROM Doctor d " +
-            "WHERE d.deleted = false " +
-            "AND d.department.departmentName LIKE %:departmentName% " +
-            "AND d.degree = :degree " +
-            "AND d.fullName LIKE %:fullName% " +
-            "AND (SELECT COUNT(ds) FROM DoctorSchedule ds WHERE ds.doctor = d AND ds.date > :today) > 0"
-    )
-    Page<Doctor> findDoctorsByDegree(
-            String fullName,
-            Degree degree,
-            String departmentName,
-            Date today,
-            Pageable pageable
-    );
     List<Doctor> findAllByHeadOfDepartmentIsTrue();
     @Query(value = "SELECT d FROM Doctor d WHERE d.department.departmentId = :departmentId ORDER BY d.rating DESC LIMIT 5")
     List<Doctor> findTop5DoctorsByDepartment(@Param("departmentId") int departmentId);
-    @Query("SELECT d " +
-            "FROM Doctor d " +
-            "WHERE d.deleted = false " +
-            "AND d.department.departmentName LIKE %:departmentName% " +
-            "AND d.fullName LIKE %:fullName% " +
-            "AND (SELECT COUNT(ds) FROM DoctorSchedule ds WHERE ds.doctor = d AND ds.date > :today) > 0"
-    )
-    Page<Doctor> findDoctorsWithoutDegree(
-            String fullName,
-            String departmentName,
-            Date today,
-            Pageable pageable
+    List<Doctor> findByDepartmentAndDeletedIsFalse(Department department);
+    @Query("SELECT d FROM Doctor d WHERE d.department = :department AND " +
+            "d.deleted = false AND " +
+            "NOT EXISTS (SELECT ds FROM DoctorSchedule ds WHERE ds.doctor = d AND " +
+            "ds.date = :date AND ds.scheduleSession = :scheduleSession)")
+    List<Doctor> findActiveDoctorsForExamination(
+            Department department,
+            Date date,
+            ScheduleSession scheduleSession
+    );
+    @Query("SELECT d FROM Doctor d WHERE d.department = :department AND " +
+            "d.deleted = false AND " +
+            "d.staffId != :staffId AND NOT EXISTS (SELECT ds FROM DoctorSchedule ds WHERE ds.doctor = d AND " +
+            "ds.date = :date AND ds.scheduleType = :scheduleType AND ds.scheduleSession = :scheduleSession)")
+    List<Doctor> findActiveDoctorsForNonExamination(
+            Department department,
+            Date date,
+            ScheduleType scheduleType,
+            ScheduleSession scheduleSession,
+            UUID staffId
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
     List<Doctor> findDoctorsByDepartmentAndDeletedIsFalse(Department department);

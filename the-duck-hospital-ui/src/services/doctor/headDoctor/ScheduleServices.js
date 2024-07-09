@@ -41,9 +41,12 @@ export const getDateHasSchedule = (params) => {
 };
 
 export const getActiveDoctors = () => {
-    return get("/head-doctor/schedules/active-doctors");
+    return get(`/head-doctor/schedules/active-doctors`);
 };
 
+export const getDoctorsInDepartmentHasNoScheduleOnDate = (doctorScheduleId, staffId, params) => {
+    return get(`/head-doctor/schedules/${doctorScheduleId}/active-doctors/${staffId}`, params);
+};
 export const updateDoctorSchedule = (doctorScheduleId, data) => {
     return put(`/head-doctor/schedules/${doctorScheduleId}`, data);
 };

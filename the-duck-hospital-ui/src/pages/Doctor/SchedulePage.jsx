@@ -1,5 +1,10 @@
 import { useTheme } from "@emotion/react";
-import { DarkModeOutlined, WbSunnyOutlined } from "@mui/icons-material";
+import {
+  DarkModeOutlined,
+  LensOutlined,
+  WbSunnyOutlined,
+  WbTwilightOutlined,
+} from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -15,11 +20,79 @@ import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { getTimeTable } from "../../services/doctor/DoctorScheduleServices";
 
+const scheduleSessions = [
+  {
+    key: "MORNING",
+    value: "Buổi sáng",
+    icon: (
+      <WbTwilightOutlined
+        sx={{
+          color: "#fff",
+          fontSize: "24px",
+          mr: 1,
+        }}
+      />
+    ),
+  },
+  {
+    key: "AFTERNOON",
+    value: "Buổi chiều",
+    icon: (
+      <WbSunnyOutlined
+        sx={{
+          color: "#fff",
+          fontSize: "24px",
+          mr: 1,
+        }}
+      />
+    ),
+  },
+  {
+    key: "Evening",
+    value: "Buổi tối",
+    icon: (
+      <DarkModeOutlined
+        sx={{
+          color: "#fff",
+          fontSize: "24px",
+          mr: 1,
+        }}
+      />
+    ),
+  },
+  {
+    key: "night",
+    value: "Buổi khuya",
+    icon: (
+      <LensOutlined
+        sx={{
+          color: "#fff",
+          fontSize: "24px",
+          mr: 1,
+        }}
+      />
+    ),
+  },
+];
+
+const ScrollView = ({ children, height = "300px" }) => {
+  const scrollViewStyle = {
+    height,
+    overflowY: "scroll",
+    paddingBottom: 20,
+  };
+
+  return <div style={scrollViewStyle}>{children}</div>;
+};
+
 function SchedulePage(props) {
   const theme = useTheme();
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [doctorShedules, setDoctorShedules] = React.useState([]);
   const [selectedSchedules, setSelectedSchedules] = React.useState([]);
+  const [selectedExamSchedules, setSelectedExamSchedules] = React.useState([]);
+  const [selectedInpatientSchedules, setSelectedInpatientSchedules] =
+    React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(dayjs());
 
   useEffect(() => {
@@ -32,7 +105,7 @@ function SchedulePage(props) {
 
   const handleShouldDisableDate = (date) => {
     const day = dayjs(date).format("DD/MM/YYYY");
-    const isDisable = doctorShedules?.some(
+    const isDisable = doctorShedules?.schedule?.some(
       (doctorShedule) => dayjs(doctorShedule.date).format("DD/MM/YYYY") === day
     );
     return !isDisable;
@@ -40,10 +113,20 @@ function SchedulePage(props) {
 
   useEffect(() => {
     const day = dayjs(selectedDate).format("DD/MM/YYYY");
-    const schedules = doctorShedules?.filter(
+    const schedules = doctorShedules?.schedule?.filter(
       (doctorShedule) => dayjs(doctorShedule.date).format("DD/MM/YYYY") === day
     );
+    const examSchedules = doctorShedules?.examinationSchedule?.filter(
+      (doctorShedule) => dayjs(doctorShedule.date).format("DD/MM/YYYY") === day
+    );
+    const inpatientSchedules =
+      doctorShedules?.inpatientExaminationSchedule?.filter(
+        (doctorShedule) =>
+          dayjs(doctorShedule.date).format("DD/MM/YYYY") === day
+      );
     setSelectedSchedules(schedules);
+    setSelectedExamSchedules(examSchedules);
+    setSelectedInpatientSchedules(inpatientSchedules);
   }, [doctorShedules, selectedDate]);
 
   return (
@@ -136,7 +219,9 @@ function SchedulePage(props) {
                 textAlign: "center",
               }}
             >
-              {dayjs(selectedSchedules[0]?.date).format("DD")}
+              {selectedSchedules === undefined
+                ? dayjs().format("DD")
+                : dayjs(selectedSchedules[0]?.date).format("DD")}
             </Typography>
             <Typography
               variant="body1"
@@ -148,71 +233,156 @@ function SchedulePage(props) {
                 textTransform: "uppercase",
               }}
             >
-              Tháng {dayjs(selectedSchedules[0]?.date).format("MM")}
+              Tháng{" "}
+              {selectedSchedules === undefined
+                ? dayjs().format("MM")
+                : dayjs(selectedSchedules[0]?.date).format("MM")}
             </Typography>
-            <Stack>
-              {selectedSchedules?.map((selectedSchedule, index) => (
-                <Stack
-                  direction={"column"}
-                  justifyContent={"space-between"}
-                  alignItems={"flex-start "}
-                  sx={{ p: 2, order: index + 2 }}
-                >
-                  <Stack
-                    direction={"row"}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                  >
-                    {selectedSchedule?.scheduleSession === "MORNING" ? (
-                      <WbSunnyOutlined
+            <ScrollView>
+              <Stack>
+                {selectedExamSchedules?.length > 0 && (
+                  <>
+                    <Typography sx={{ color: "#fff", marginLeft: "20px" }}>
+                      - Trực phòng khám:
+                    </Typography>
+                    <Stack sx={{ marginLeft: "30px" }}>
+                      {selectedExamSchedules?.map((selectedSchedule, index) => (
+                        <Stack
+                          key={`examination-schedule-${index}`}
+                          direction={"column"}
+                          justifyContent={"space-between"}
+                          alignItems={"flex-start "}
+                          sx={{ p: 2, order: index + 2 }}
+                        >
+                          <Stack
+                            direction={"row"}
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                          >
+                            {
+                              scheduleSessions.find(
+                                (session) =>
+                                  session.key ===
+                                  selectedSchedule?.scheduleSession
+                              )?.icon
+                            }
+                            <Typography sx={{ color: "#fff" }}>
+                              {
+                                scheduleSessions.find(
+                                  (session) =>
+                                    session.key ===
+                                    selectedSchedule?.scheduleSession
+                                )?.value
+                              }
+                            </Typography>
+                          </Stack>
+                          <Typography sx={{ color: "#fff" }}>
+                            Phòng {selectedSchedule?.roomName}
+                          </Typography>
+                          <Typography sx={{ color: "#fff" }}>
+                            {selectedSchedule?.serviceName}
+                          </Typography>
+                        </Stack>
+                      ))}
+                      <Divider
                         sx={{
-                          color: "#fff",
-                          fontSize: "24px",
-                          mr: 1,
+                          backgroundColor: "#fff",
+                          display:
+                            selectedExamSchedules?.length > 1 ? "" : "none",
+                          order: 2,
+                          width: "90%",
                         }}
+                        variant="middle"
                       />
-                    ) : (
-                      <DarkModeOutlined
+                    </Stack>
+                    {selectedInpatientSchedules?.length > 0 && (
+                      <Divider
                         sx={{
-                          color: "#fff",
-                          fontSize: "24px",
-                          mr: 1,
+                          backgroundColor: "#fff",
+                          width: "90%",
+                          marginBottom: "10px",
                         }}
+                        variant="middle"
                       />
                     )}
-                    <Typography sx={{ color: "#fff" }}>
-                      Buổi{" "}
-                      {selectedSchedule?.scheduleSession === "MORNING"
-                        ? "sáng"
-                        : "chiều"}
+                  </>
+                )}
+
+                {selectedInpatientSchedules?.length > 0 && (
+                  <>
+                    <Typography sx={{ color: "#fff", marginLeft: "20px" }}>
+                      - Trực nội trú:
                     </Typography>
-                  </Stack>
-                  <Typography sx={{ color: "#fff" }}>
-                    Phòng {selectedSchedule?.roomName}
-                  </Typography>
-                  <Typography sx={{ color: "#fff" }}>
-                    {selectedSchedule?.serviceName}
-                  </Typography>
-                </Stack>
-              ))}
-              <Divider
-                sx={{
-                  backgroundColor: "#fff",
-                  display: selectedSchedules?.length > 1 ? "" : "none",
-                  order: 2,
-                }}
-                variant="middle"
-              />
-            </Stack>
+                    <Stack sx={{ marginLeft: "30px" }}>
+                      {selectedInpatientSchedules?.map(
+                        (selectedSchedule, index) => (
+                          <Stack
+                            key={`inpatient-schedule-${index}`}
+                            direction={"column"}
+                            justifyContent={"space-between"}
+                            alignItems={"flex-start "}
+                            sx={{ p: 2, order: index + 2 }}
+                          >
+                            <Stack
+                              direction={"row"}
+                              justifyContent={"center"}
+                              alignItems={"center"}
+                            >
+                              {
+                                scheduleSessions.find(
+                                  (session) =>
+                                    session.key ===
+                                    selectedSchedule?.scheduleSession
+                                )?.icon
+                              }
+                              <Typography sx={{ color: "#fff" }}>
+                                {
+                                  scheduleSessions.find(
+                                    (session) =>
+                                      session.key ===
+                                      selectedSchedule?.scheduleSession
+                                  )?.value
+                                }
+                              </Typography>
+                            </Stack>
+                            <Typography sx={{ color: "#fff" }}>
+                              Phòng {selectedSchedule?.roomName}
+                            </Typography>
+                            <Typography sx={{ color: "#fff" }}>
+                              {selectedSchedule?.serviceName}
+                            </Typography>
+                          </Stack>
+                        )
+                      )}
+                      <Divider
+                        sx={{
+                          backgroundColor: "#fff",
+                          display:
+                            selectedInpatientSchedules?.length > 1
+                              ? ""
+                              : "none",
+                          order: 2,
+                          width: "80%",
+                        }}
+                        variant="middle"
+                      />
+                    </Stack>
+                  </>
+                )}
+              </Stack>
+            </ScrollView>
             <Typography
               sx={{
                 color: "#fff",
                 textAlign: "center",
                 fontSize: "14px",
                 position: "absolute",
-                bottom: 10,
+                bottom: 0,
                 left: "0",
                 right: "0",
+                backgroundColor: "normal1.main",
+                paddingBottom: "10px",
+                borderRadius: "12px",
               }}
             >
               Vui lòng liên hệ trưởng khoa để thay đổi lịch khám

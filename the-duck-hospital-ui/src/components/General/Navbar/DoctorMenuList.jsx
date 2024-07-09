@@ -167,7 +167,7 @@ function DoctorMenuList(props) {
         {role === "HeadDoctor" && (
           <CustomMenuItem
             onClick={() => {
-              navigate("/doctor/head-doctor/schedule-management/create");
+              navigate("/doctor/doctor-schedules/schedule-management/create");
               onClose();
             }}
           >

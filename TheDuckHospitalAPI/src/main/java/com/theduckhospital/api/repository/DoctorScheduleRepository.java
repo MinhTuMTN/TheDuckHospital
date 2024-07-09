@@ -92,5 +92,8 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
             Doctor doctor,
             Date today,
             ScheduleType examinationType
+    );        
+    List<DoctorSchedule> findByDoctorAndDateBetweenAndDeletedIsFalseAndScheduleTypeOrderByDateAscScheduleSessionAsc(
+            Doctor doctor, Date date, Date date2, ScheduleType scheduleType
     );
 }
