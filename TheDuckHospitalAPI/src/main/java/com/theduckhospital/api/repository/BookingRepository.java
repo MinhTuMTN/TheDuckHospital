@@ -97,4 +97,9 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             @Param("endDate") Date endDate,
             @Param("transactionStatus") TransactionStatus transactionStatus,
             @Param("departmentId") int departmentId);
+
+    Page<Booking> findByPatientProfileAndDeletedIsFalseOrderByTimeSlot_DateDesc(
+            PatientProfile patientProfile,
+            Pageable pageable
+    );
 }

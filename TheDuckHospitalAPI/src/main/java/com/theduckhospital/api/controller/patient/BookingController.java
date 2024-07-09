@@ -70,13 +70,37 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<?> getBookings(
-            @RequestHeader(name = "Authorization") String token
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam(name = "patientProfileId", required = false) UUID patientProfileId
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get booking successfully")
-                        .data(bookingServices.getBookings(token))
+                        .data(bookingServices.getBookings(
+                                token
+                        ))
+                        .build()
+        );
+    }
+
+    @GetMapping("/by-profile")
+    public ResponseEntity<?> getBookingsByProfile(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestParam(name = "patientProfileId", required = false) UUID patientProfileId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "limit", required = false, defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(
+                GeneralResponse.builder()
+                        .success(true)
+                        .message("Get booking successfully")
+                        .data(bookingServices.getBookingsByProfile(
+                                token,
+                                patientProfileId,
+                                page,
+                                limit
+                        ))
                         .build()
         );
     }

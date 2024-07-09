@@ -4,6 +4,7 @@ import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.response.AccountBookingResponse;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PaymentResponse;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.Booking;
@@ -16,6 +17,12 @@ import java.util.UUID;
 public interface IBookingServices {
     PaymentResponse createBookingAndPayment(String token, BookingRequest request, String origin);
     List<AccountBookingResponse> getBookings(String token);
+    PaginationResponse getBookingsByProfile(
+            String token,
+            UUID patientProfileId,
+            int page,
+            int limit
+    );
     MedicalRecordItemResponse getBooking(String token, UUID bookingId);
     NurseBookingItemResponse checkBooking(String bookingCode, int roomId) throws ParseException;
     Booking bookingIsValid(String bookingCode, int roomId) throws ParseException;

@@ -3,10 +3,7 @@ package com.theduckhospital.api.services.impl;
 import com.theduckhospital.api.constant.*;
 import com.theduckhospital.api.dto.request.BookingRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
-import com.theduckhospital.api.dto.response.AccountBookingResponse;
-import com.theduckhospital.api.dto.response.BookingItemResponse;
-import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
-import com.theduckhospital.api.dto.response.PaymentResponse;
+import com.theduckhospital.api.dto.response.*;
 import com.theduckhospital.api.dto.response.nurse.NurseBookingItemResponse;
 import com.theduckhospital.api.entity.*;
 import com.theduckhospital.api.error.BadRequestException;
@@ -17,6 +14,9 @@ import com.theduckhospital.api.repository.PatientProfileRepository;
 import com.theduckhospital.api.repository.TimeSlotRepository;
 import com.theduckhospital.api.repository.TransactionRepository;
 import com.theduckhospital.api.services.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class BookingServicesImpl implements IBookingServices {
     private final IPaymentServices paymentServices;
     private final IAccountServices accountServices;
     private final ITimeSlotServices timeSlotServices;
-    private final PasswordEncoder passwordEncoder;
+    private final IPatientProfileServices profileServices;
 
     public BookingServicesImpl(
             BookingRepository bookingRepository,
@@ -50,7 +50,8 @@ public class BookingServicesImpl implements IBookingServices {
             IPaymentServices paymentServices,
             IAccountServices accountServices,
             ITimeSlotServices timeSlotServices,
-            PasswordEncoder passwordEncoder) {
+            IPatientProfileServices profileServices
+    ) {
         this.bookingRepository = bookingRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.transactionRepository = transactionRepository;
@@ -61,7 +62,7 @@ public class BookingServicesImpl implements IBookingServices {
         this.paymentServices = paymentServices;
         this.accountServices = accountServices;
         this.timeSlotServices = timeSlotServices;
-        this.passwordEncoder = passwordEncoder;
+        this.profileServices = profileServices;
     }
 
     @Override
@@ -158,28 +159,54 @@ public class BookingServicesImpl implements IBookingServices {
             throw new BadRequestException(e.getMessage(), 400);
         }
     }
+    @Override
+    public PaginationResponse getBookingsByProfile(
+            String token,
+            UUID patientProfileId,
+            int page,
+            int limit
+    ) {
+        PatientProfile patientProfile = profileServices
+                .getPatientProfileById(
+                        token,
+                        patientProfileId
+                );
+
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Booking> bookingPage = bookingRepository
+                .findByPatientProfileAndDeletedIsFalseOrderByTimeSlot_DateDesc(
+                        patientProfile,
+                        pageable
+                );
+        List<Booking> bookings = bookingPage.getContent();
+        AccountBookingResponse response = new AccountBookingResponse();
+        response.setFullName(patientProfile.getFullName());
+        response.setBookings(bookings.stream().map(BookingItemResponse::new).toList());
+        response.setPatientProfileId(patientProfile.getPatientProfileId());
+
+        return PaginationResponse
+                .builder()
+                .limit(limit)
+                .page(page)
+                .totalItems((int) bookingPage.getTotalElements())
+                .totalPages(bookingPage.getTotalPages())
+                .items(List.of(response))
+                .build();
+    }
 
     @Override
     public List<AccountBookingResponse> getBookings(String token) {
         List<AccountBookingResponse> responses = new ArrayList<>();
+
         Account account = accountServices.findAccountByToken(token);
-
-        List<PatientProfile> patientProfile = account.getPatientProfile();
-
-        for (PatientProfile profile : patientProfile) {
-            List<Booking> bookings = profile.getBookings().stream()
-                    .filter(booking -> !booking.isDeleted())
-                    .toList().stream()
-                    .sorted((b1, b2) -> {
-                        if (b1.getTimeSlot().getDate().after(b2.getTimeSlot().getDate()))
-                            return 1;
-                        else if (b1.getTimeSlot().getDate().before(b2.getTimeSlot().getDate()))
-                            return -1;
-                        else
-                            return 0;
-                    })
-                    .toList()
-                    .stream().limit(30).toList();
+        List<PatientProfile> patientProfiles = account.getPatientProfile();
+        for (PatientProfile profile : patientProfiles) {
+            Pageable pageable = PageRequest.of(0, 15);
+            List<Booking> bookings = bookingRepository
+                    .findByPatientProfileAndDeletedIsFalseOrderByTimeSlot_DateDesc(
+                            profile,
+                            pageable
+                    ).getContent();
 
             if (bookings.isEmpty())
                 continue;
