@@ -13,30 +13,33 @@ InfoLine.prototype = {
 
 function InfoLine(props) {
   return (
-    <Stack direction={"row"} spacing={1}>
+    <Stack direction={"row"} spacing={1} alignItems={"center"}>
       <CardMedia
         component="img"
         image={props.urlImage}
         sx={{
-          width: "20px",
-          height: "20px",
+          width: "15px",
+          height: "15px",
         }}
       />
 
-      {props.lableName && <Typography>{props.lableName}</Typography>}
+      {props.lableName && (
+        <Typography fontSize={"14px"}>{props.lableName}</Typography>
+      )}
 
       {props.dateBooking && (
         <span
           style={{
             color: "#f34312",
             fontWeight: "bold",
+            fontSize: "14px",
           }}
         >
           {dayjs(props.dateBooking).format("DD/MM/YYYY")}
         </span>
       )}
 
-      {props.value && <Typography>{props.value}</Typography>}
+      {props.value && <Typography fontSize={"14px"}>{props.value}</Typography>}
 
       {props.lableTime && (
         <Typography
@@ -44,6 +47,7 @@ function InfoLine(props) {
             color: "#0b5394",
             marginLeft: "0",
             fontWeight: "bold",
+            fontSize: "14px",
           }}
         >
           {props.lableTime}
