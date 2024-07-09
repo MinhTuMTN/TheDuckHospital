@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.request.doctor.UpdateMedicalRecord;
 import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
+import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientHistoryMedicalRecord;
 import com.theduckhospital.api.dto.response.PatientHistoryRecordDetails;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
@@ -25,6 +26,7 @@ import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.StatusCodeException;
 import com.theduckhospital.api.repository.*;
 import com.theduckhospital.api.services.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
     private final MedicalExaminationRepository medicalExaminationRepository;
     private final IDoctorServices doctorServices;
     private final IPatientServices patientServices;
+    private final IPatientProfileServices profileServices;
     private final IAccountServices accountServices;
     private final HospitalAdmissionRepository hospitalAdmissionRepository;
     private final IMedicalTestServices medicalTestServices;
@@ -56,11 +59,12 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
             IPatientServices patientServices,
             PatientProfileRepository patientProfileRepository,
             IDoctorServices doctorServices,
-            IAccountServices accountServices,
+            IPatientProfileServices profileServices, IAccountServices accountServices,
             HospitalAdmissionRepository hospitalAdmissionRepository,
             IMedicalTestServices medicalTestServices,
             IPrescriptionServices prescriptionServices,
-            IScheduleDoctorServices scheduleDoctorServices, IPrescriptionItemServices prescriptionItemServices
+            IScheduleDoctorServices scheduleDoctorServices,
+            IPrescriptionItemServices prescriptionItemServices
     ) {
         this.bookingServices = bookingServices;
         this.bookingRepository = bookingRepository;
@@ -69,6 +73,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         this.patientServices = patientServices;
         this.patientProfileRepository = patientProfileRepository;
         this.doctorServices = doctorServices;
+        this.profileServices = profileServices;
         this.scheduleDoctorServices = scheduleDoctorServices;
         this.prescriptionItemServices = prescriptionItemServices;
         this.accountServices = accountServices;
@@ -436,6 +441,43 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         }
 
         return patientHistoryMedicalRecords;
+    }
+
+    @Override
+    public PaginationResponse patientGetMedicalRecordsByProfile(
+            String authorization,
+            UUID patientProfileId,
+            int page,
+            int limit
+    ) {
+        PatientProfile patientProfile = profileServices
+                .getPatientProfileById(
+                        authorization,
+                        patientProfileId
+                );
+        Pageable pageable = PageRequest.of(page, limit);
+
+        Page<MedicalExaminationRecord> recordPage = medicalExaminationRepository
+                .findByPatientProfileAndDeletedIsFalseAndStateOrderByDoctorSchedule_CreatedDateDesc(
+                        patientProfile,
+                        MedicalExamState.DONE,
+                        pageable
+                );
+
+        PatientHistoryMedicalRecord result = new PatientHistoryMedicalRecord(
+                patientProfile.getFullName(),
+                recordPage.getContent()
+        );
+        int totalPage = recordPage.getTotalPages();
+        int totalElement = (int) recordPage.getTotalElements();
+
+        return PaginationResponse.builder()
+                .page(page)
+                .limit(limit)
+                .totalPages(totalPage)
+                .totalItems(totalElement)
+                .items(List.of(result))
+                .build();
     }
 
     @Override

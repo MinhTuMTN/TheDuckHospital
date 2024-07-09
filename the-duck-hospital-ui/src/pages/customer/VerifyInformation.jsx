@@ -83,7 +83,7 @@ function VerifyInformation(props) {
       });
       setSendOTP(true);
     } else {
-      enqueueSnackbar("Số điện thoại không hợp lệ", {
+      enqueueSnackbar("Số điện thoại không chính xác", {
         variant: "error",
       });
     }

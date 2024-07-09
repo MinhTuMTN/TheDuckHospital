@@ -218,7 +218,7 @@ function ReceivePatients(props) {
                   </TableCell>
                   <TableCell align="right">{row.patientAddress}</TableCell>
                   <TableCell align="center">
-                    {row.state === "WAITING" ? (
+                    {status === "WAITING" ? (
                       <IconButton
                         size="small"
                         sx={{
