@@ -1,24 +1,69 @@
-import { Box, Typography } from "@mui/material";
-import React, { useEffect } from "react";
-import HistoryRecord from "../../components/Customer/History/HistoryRecord";
-import { getHistoryMedicalRecord } from "../../services/customer/MedicalRecordServices";
+import {
+  Box,
+  MenuItem,
+  Pagination,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { enqueueSnackbar } from "notistack";
+import React, { useCallback, useEffect } from "react";
+import HistoryRecordItem from "../../components/Customer/History/HistoryRecordItem";
 import SearchNotFound from "../../components/Nurse/SearchNotFound";
+import { getHistoryMedicalRecord } from "../../services/customer/MedicalRecordServices";
+import { getAllPatientProfiles } from "../../services/customer/PatientProfileServices";
 
 function PaymentHistoryPage(props) {
-  const [historyRecords, setHistoryRecords] = React.useState([]);
+  const [historyRecordData, setHistoryRecordData] = React.useState([]);
+  const [selectedProfile, setSelectedProfile] = React.useState("");
+  const [profiles, setProfiles] = React.useState([]);
+  const [pagination, setPagination] = React.useState({
+    page: 1,
+    totalPages: 2,
+  });
+
+  const handleChange = (event) => {
+    setSelectedProfile(event.target.value);
+    setPagination({ ...pagination, page: 1 });
+  };
+  const handleGetHistoryRecords = useCallback(async () => {
+    const response = await getHistoryMedicalRecord(
+      selectedProfile,
+      pagination.page - 1
+    );
+    if (response.success) {
+      const data = response.data.data;
+      setHistoryRecordData(data.items[0]);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: data.totalPages,
+      }));
+    } else
+      enqueueSnackbar("Lấy dữ liệu lịch sử khám bệnh thất bại", {
+        variant: "error",
+      });
+  }, [selectedProfile, pagination.page]);
+
   useEffect(() => {
-    const handleGetHistoryRecords = async () => {
-      const response = await getHistoryMedicalRecord();
-      if (response) {
-        setHistoryRecords(response.data.data);
-      } else {
-        enqueueSnackbar("Lấy dữ liệu lịch sử khám bệnh thất bại", {
+    if (selectedProfile) handleGetHistoryRecords();
+  }, [selectedProfile, handleGetHistoryRecords]);
+
+  useEffect(() => {
+    const handleGetProfiles = async () => {
+      const response = await getAllPatientProfiles();
+      if (response.success) {
+        const data = response.data.data;
+        if (data.length > 0) {
+          setSelectedProfile(data[0].patientProfileId);
+        }
+        setProfiles(data);
+      } else
+        enqueueSnackbar("Lấy danh sách hồ sơ bệnh nhân thất bại", {
           variant: "error",
         });
-      }
     };
-    handleGetHistoryRecords();
+
+    handleGetProfiles();
   }, []);
   return (
     <Box
@@ -29,22 +74,54 @@ function PaymentHistoryPage(props) {
       }}
       sx={{ width: "100%" }}
     >
-      <Typography variant="h6" fontSize={22}>
-        Lịch sử khám bệnh
-      </Typography>
+      <Stack direction={"row"} justifyContent={"space-between"}>
+        <Typography variant="h6" fontSize={22}>
+          Lịch sử khám bệnh
+        </Typography>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={selectedProfile}
+          placeholder="Chọn hồ sơ bệnh nhân"
+          size="small"
+          sx={{ minWidth: 300 }}
+          onChange={handleChange}
+        >
+          {profiles?.map((profile) => (
+            <MenuItem
+              key={profile.patientProfileId}
+              value={profile.patientProfileId}
+            >
+              {profile.fullName}
+            </MenuItem>
+          ))}
+        </Select>
+      </Stack>
 
       <Box mt={2}>
-        {historyRecords?.map((history, index) => (
-          <HistoryRecord
-            key={`history-record-${index}`}
-            historyRecord={history}
-          />
+        {historyRecordData?.items?.map((item) => (
+          <HistoryRecordItem key={`${item.medicalRecordId}`} item={item} />
         ))}
 
-        {historyRecords?.length === 0 && (
-          <SearchNotFound text="Không có lịch sử khám bệnh nào" />
+        {historyRecordData?.items?.length === 0 && (
+          <Box py={5}>
+            <SearchNotFound text="Không có lịch sử khám bệnh nào" />
+          </Box>
         )}
       </Box>
+
+      <Stack alignItems={"flex-end"}>
+        <Pagination
+          count={pagination.totalPages}
+          page={pagination.page}
+          onChange={(e, page) => {
+            setPagination({ ...pagination, page });
+            console.log(page);
+          }}
+          showFirstButton
+          showLastButton
+        />
+      </Stack>
     </Box>
   );
 }

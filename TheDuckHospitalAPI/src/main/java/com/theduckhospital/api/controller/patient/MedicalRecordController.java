@@ -30,6 +30,26 @@ public class MedicalRecordController {
         );
     }
 
+    @GetMapping("/by-profile")
+    public ResponseEntity<?> getMedicalRecordsByProfile(
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam("patientProfileId") UUID patientProfileId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .success(true)
+                .message("Get medical records by profile successfully")
+                .data(medicalExamServices.patientGetMedicalRecordsByProfile(
+                        authorization,
+                        patientProfileId,
+                        page,
+                        limit
+                ))
+                .build()
+        );
+    }
+
     @GetMapping("/{medicalRecordId}")
     public ResponseEntity<?> getMedicalRecordDetails(
             @RequestHeader("Authorization") String authorization,

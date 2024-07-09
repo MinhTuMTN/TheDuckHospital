@@ -8,6 +8,7 @@ import com.theduckhospital.api.dto.request.nurse.NonPatientMedicalExamRequest;
 import com.theduckhospital.api.dto.request.nurse.NurseCreateBookingRequest;
 import com.theduckhospital.api.dto.request.nurse.PatientMedicalExamRequest;
 import com.theduckhospital.api.dto.response.MedicalRecordItemResponse;
+import com.theduckhospital.api.dto.response.PaginationResponse;
 import com.theduckhospital.api.dto.response.PatientHistoryMedicalRecord;
 import com.theduckhospital.api.dto.response.PatientHistoryRecordDetails;
 import com.theduckhospital.api.dto.response.admin.MedicalRecordResponse;
@@ -26,22 +27,18 @@ public interface IMedicalExamServices {
     MedicalExaminationRecord createNonPatientMedicalExamRecord(
             NonPatientMedicalExamRequest request
     ) throws ParseException;
-
     MedicalExaminationRecord createPatientMedicalExamRecord(
             PatientMedicalExamRequest request
     ) throws ParseException;
-
     List<MedicalRecordResponse> getMedicalRecordsByPatientProfile(UUID patientProfileId);
     MedicalRecordItemResponse counterNurseCreateBookingAndMedicalRecord(
             NurseCreateBookingRequest request
     ) throws ParseException;
-
     MedicalExaminationRecord acceptMedicalExamination(
             String authorization,
             UUID medicalExaminationId,
             UUID doctorScheduleId
     );
-
     DoctorMedicalRecordResponse doctorGetMedicalExamination(String authorization, UUID medicalExaminationId);
 
     List<DoctorMedicalTestResponse> doctorCreateMedicalTest(String authorization, UUID medicalExaminationId, CreateMedicalTest request) throws ParseException;
@@ -67,6 +64,12 @@ public interface IMedicalExamServices {
     MedicalExaminationRecord completeMedicalExamination(String authorization, UUID medicalExaminationId);
 
     List<PatientHistoryMedicalRecord> patientGetMedicalRecords(String authorization);
+    PaginationResponse patientGetMedicalRecordsByProfile(
+            String authorization,
+            UUID patientProfileId,
+            int page,
+            int limit
+    );
 
     PatientHistoryRecordDetails patientGetMedicalRecordDetails(String authorization, UUID medicalRecordId);
     HospitalAdmission doctorHospitalAdmission(
