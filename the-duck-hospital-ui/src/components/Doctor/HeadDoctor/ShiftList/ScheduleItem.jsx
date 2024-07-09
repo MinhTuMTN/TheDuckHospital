@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import FormatDate from "../../../General/FormatDate";
 import {
   deleteDoctorSchedule,
-  getActiveDoctors,
+  getDoctorsInDepartmentHasNoScheduleOnDate,
   updateDoctorSchedule,
 } from "../../../../services/doctor/headDoctor/ScheduleServices";
 import { enqueueSnackbar } from "notistack";
@@ -49,14 +49,7 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function ScheduleItem(props) {
-  const {
-    schedule,
-    setRefresh,
-    refresh,
-    valueDate,
-    selectedRow,
-    treatmentRooms,
-  } = props;
+  const { schedule, setRefresh, refresh, valueDate } = props;
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [editDoctorSchedule, setEditDoctorSchedule] = useState({
@@ -76,11 +69,15 @@ function ScheduleItem(props) {
   };
 
   const getDoctorsInDepartment = useCallback(async () => {
-    const response = await getActiveDoctors();
+    const response = await getDoctorsInDepartmentHasNoScheduleOnDate(
+      schedule?.doctorScheduleId,
+      schedule?.doctor?.staffId,
+      { isExamination: schedule?.scheduleType === "EXAMINATION" }
+    );
     if (response.success) {
       setDoctors(response.data.data);
     }
-  }, []);
+  }, [schedule]);
 
   useEffect(() => {
     getDoctorsInDepartment();
@@ -270,10 +267,8 @@ function ScheduleItem(props) {
         <CustomButton
           variant="contained"
           disabled={
-            (dayjs(valueDate).isSame(currentDay, "day") ||
-              dayjs(valueDate).isBefore(currentDay, "day")) ||
-            treatmentRooms?.find((room) => room.roomId === selectedRow) ===
-              undefined
+            dayjs(valueDate).isSame(currentDay, "day") ||
+            dayjs(valueDate).isBefore(currentDay, "day")
           }
           sx={{
             background: "linear-gradient(to right, #42a5f5, #6fccea)",
@@ -286,7 +281,7 @@ function ScheduleItem(props) {
           onClick={() => {
             setEditDoctorSchedule((prev) => ({
               ...prev,
-              selectedDoctor: schedule.doctor.staffId,
+              selectedDoctor: "",
             }));
             setOpenDialogForm(true);
           }}
@@ -321,7 +316,11 @@ function ScheduleItem(props) {
         }}
       >
         <Stack direction="row" width={"30rem"} mt={3} spacing={1}>
-          <Box style={{ width: "60%" }}>
+          <Box
+            style={{
+              width: schedule?.scheduleType !== "EXAMINATION" ? "100%" : "60%",
+            }}
+          >
             <CustomTypography
               variant="body1"
               style={{
@@ -369,58 +368,60 @@ function ScheduleItem(props) {
                 )}
             </FormControl>
           </Box>
-          <Box
-            style={{
-              width: "40%",
-            }}
-          >
-            <CustomTypography
-              variant="body1"
+          {schedule?.scheduleType === "EXAMINATION" && (
+            <Box
               style={{
-                color:
+                width: "40%",
+              }}
+            >
+              <CustomTypography
+                variant="body1"
+                style={{
+                  color:
+                    (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                      editDoctorSchedule.slot === 0) &&
+                    updateButtonClicked
+                      ? "red"
+                      : "",
+                }}
+              >
+                Số lượng chỗ
+              </CustomTypography>
+              <CustomTextField
+                type="number"
+                autoFocus
+                autoComplete="off"
+                InputProps={{ inputProps: { min: schedule.numberOfBookings } }}
+                value={
+                  editDoctorSchedule.slot
+                    ? editDoctorSchedule.slot.toString()
+                    : schedule.numberOfBookings.toString()
+                }
+                onChange={(e) => {
+                  setEditDoctorSchedule((prev) => ({
+                    ...prev,
+                    slot:
+                      e.target.value &&
+                      parseInt(e.target.value) >= schedule.numberOfBookings
+                        ? parseInt(e.target.value)
+                        : schedule.numberOfBookings,
+                  }));
+                }}
+                required
+                error={
                   (editDoctorSchedule.slot < schedule.numberOfBookings ||
                     editDoctorSchedule.slot === 0) &&
                   updateButtonClicked
-                    ? "red"
-                    : "",
-              }}
-            >
-              Số lượng chỗ
-            </CustomTypography>
-            <CustomTextField
-              type="number"
-              autoFocus
-              autoComplete="off"
-              InputProps={{ inputProps: { min: schedule.numberOfBookings } }}
-              value={
-                editDoctorSchedule.slot
-                  ? editDoctorSchedule.slot.toString()
-                  : schedule.numberOfBookings.toString()
-              }
-              onChange={(e) => {
-                setEditDoctorSchedule((prev) => ({
-                  ...prev,
-                  slot:
-                    e.target.value &&
-                    parseInt(e.target.value) >= schedule.numberOfBookings
-                      ? parseInt(e.target.value)
-                      : schedule.numberOfBookings,
-                }));
-              }}
-              required
-              error={
-                (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                  editDoctorSchedule.slot === 0) &&
-                updateButtonClicked
-              }
-              helperText={
-                (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                  editDoctorSchedule.slot === 0) &&
-                updateButtonClicked &&
-                "Số lượng chỗ không hợp lệ"
-              }
-            />
-          </Box>
+                }
+                helperText={
+                  (editDoctorSchedule.slot < schedule.numberOfBookings ||
+                    editDoctorSchedule.slot === 0) &&
+                  updateButtonClicked &&
+                  "Số lượng chỗ không hợp lệ"
+                }
+              />
+            </Box>
+          )}
         </Stack>
       </DialogForm>
     </Stack>

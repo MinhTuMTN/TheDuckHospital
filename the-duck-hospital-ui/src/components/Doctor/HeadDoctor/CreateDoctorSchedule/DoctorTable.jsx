@@ -530,45 +530,49 @@ function DoctorTable(props) {
                 value={doctorSchedule.doctorName}
                 disabled
                 required
-                style={{
-                  width: "60%",
+                sx={{
+                  width: roomType === "EXAMINATION_ROOM" ? "60%" : "100%",
                 }}
               />
-              <CustomTextField
-                type="number"
-                label="Số lượt khám trong một giờ"
-                autoFocus
-                autoComplete="off"
-                style={{ width: "40%" }}
-                InputProps={{ inputProps: { min: 1 } }}
-                value={
-                  doctorSchedule.slot ? doctorSchedule.slot.toString() : "0"
-                }
-                onChange={(e) => {
-                  setDoctorSchedule((prev) => ({
-                    ...prev,
-                    slot:
-                      e.target.value && parseInt(e.target.value) >= 0
-                        ? parseInt(e.target.value)
-                        : 0,
-                  }));
-                }}
-                required
-                error={doctorSchedule.slot === 0 && addButtonClicked}
-                helperText={
-                  doctorSchedule.slot === 0 &&
-                  addButtonClicked &&
-                  "Số lượng khám trong một giờ phải lớn hơn 0"
-                }
-              />
+              {roomType === "EXAMINATION_ROOM" && (
+                <CustomTextField
+                  type="number"
+                  label="Số lượt khám trong một giờ"
+                  autoFocus
+                  autoComplete="off"
+                  style={{ width: "40%" }}
+                  InputProps={{ inputProps: { min: 1 } }}
+                  value={
+                    doctorSchedule.slot ? doctorSchedule.slot.toString() : "0"
+                  }
+                  onChange={(e) => {
+                    setDoctorSchedule((prev) => ({
+                      ...prev,
+                      slot:
+                        e.target.value && parseInt(e.target.value) >= 0
+                          ? parseInt(e.target.value)
+                          : 0,
+                    }));
+                  }}
+                  required
+                  error={doctorSchedule.slot === 0 && addButtonClicked}
+                  helperText={
+                    doctorSchedule.slot === 0 &&
+                    addButtonClicked &&
+                    "Số lượng khám trong một giờ phải lớn hơn 0"
+                  }
+                />
+              )}
             </Stack>
-            <CustomTypography
-              style={{ width: "100%", marginTop: 8 }}
-              color={"#8e8e8e"}
-            >
-              Trong một buổi khám sẽ có tổng cộng {doctorSchedule.slot * 4}{" "}
-              người có thể đăng ký online
-            </CustomTypography>
+            {roomType === "EXAMINATION_ROOM" && (
+              <CustomTypography
+                style={{ width: "100%", marginTop: 8 }}
+                color={"#8e8e8e"}
+              >
+                Trong một buổi khám sẽ có tổng cộng {doctorSchedule.slot * 4}{" "}
+                người có thể đăng ký online
+              </CustomTypography>
+            )}
 
             <Stack style={{ width: "50%" }}>
               <FormControl>
