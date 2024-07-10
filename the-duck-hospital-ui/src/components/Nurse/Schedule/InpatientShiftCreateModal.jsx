@@ -265,7 +265,11 @@ function InpatientShiftCreateModal(props) {
       }
 
       days.forEach((day) => {
-        if (disableInvalidMorningDate(day)) return;
+        if (
+          disableInvalidMorningDate(day) ||
+          day.isBefore(dayjs().startOf("D"))
+        )
+          return;
         handleOnChangeCalendar(day);
       });
     };

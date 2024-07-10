@@ -30,9 +30,10 @@ public class ScheduledTask {
     }
 
     private void cancelBookingExpired() {
+        System.out.println("Checking and cancelling expired bookings...");
         List<Booking> expiredBookings = bookingRepository
                 .findExpiredBookings(
-                        DateCommon.getToday()
+                        DateCommon.getStarOfDay(DateCommon.getToday())
                 );
 
         expiredBookings.forEach(booking -> {
