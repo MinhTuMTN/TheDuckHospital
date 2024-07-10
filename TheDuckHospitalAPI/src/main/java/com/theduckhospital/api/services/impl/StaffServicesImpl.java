@@ -15,7 +15,6 @@ import com.theduckhospital.api.services.IDepartmentServices;
 import com.theduckhospital.api.services.IMSGraphServices;
 import com.theduckhospital.api.services.IStaffServices;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +28,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
