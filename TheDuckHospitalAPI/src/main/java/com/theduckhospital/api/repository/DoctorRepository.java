@@ -60,14 +60,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     );
     @Query("SELECT d FROM Doctor d WHERE d.department = :department AND " +
             "d.deleted = false AND " +
-            "d.staffId != :staffId AND NOT EXISTS (SELECT ds FROM DoctorSchedule ds WHERE ds.doctor = d AND " +
+            "NOT EXISTS (SELECT ds FROM DoctorSchedule ds WHERE ds.doctor = d AND " +
             "ds.date = :date AND ds.scheduleType = :scheduleType AND ds.scheduleSession = :scheduleSession)")
     List<Doctor> findActiveDoctorsForNonExamination(
             Department department,
             Date date,
             ScheduleType scheduleType,
-            ScheduleSession scheduleSession,
-            UUID staffId
+            ScheduleSession scheduleSession
     );
     long countByDepartmentAndDeletedIsFalse(Department department);
     List<Doctor> findDoctorsByDepartmentAndDeletedIsFalse(Department department);

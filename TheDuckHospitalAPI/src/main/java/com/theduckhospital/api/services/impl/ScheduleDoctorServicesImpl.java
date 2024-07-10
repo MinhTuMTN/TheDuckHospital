@@ -894,13 +894,14 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
                     doctorSchedule.getDate(),
                     doctorSchedule.getScheduleSession()
             );
+            Doctor doctor = doctorServices.getDoctorById(staffId);
+            activeDoctors.add(doctor);
         } else {
             activeDoctors = doctorRepository.findActiveDoctorsForNonExamination(
                     department,
                     doctorSchedule.getDate(),
                     ScheduleType.EXAMINATION,
-                    doctorSchedule.getScheduleSession(),
-                    staffId
+                    doctorSchedule.getScheduleSession()
             );
         }
 
@@ -940,12 +941,21 @@ public class ScheduleDoctorServicesImpl implements IScheduleDoctorServices {
 
         DoctorSchedule doctorSchedule = scheduleOptional.get();
 
-        if (request.getSlot() == 0 || request.getSlot() < calculateNumberOfBookings(doctorSchedule)) {
-            throw new BadRequestException("Invalid Slot");
+        if (doctorSchedule.getScheduleType() == ScheduleType.EXAMINATION &&
+                (request.getSlotPerHour() == 0 || request.getSlotPerHour() * 4 < doctorSchedule.getSlot())) {
+            throw new BadRequestException("Invalid Slot Per Hour");
         }
 
         doctorSchedule.setDoctor(doctor);
-        doctorSchedule.setSlot(request.getSlot());
+        if(doctorSchedule.getScheduleType() == ScheduleType.EXAMINATION) {
+            doctorSchedule.setSlot(request.getSlotPerHour() * 4);
+            List<TimeSlot> timeSlots = new ArrayList<>();
+            for(TimeSlot timeSlot: doctorSchedule.getTimeSlots()){
+                timeSlot.setMaxSlot(request.getSlotPerHour());
+                timeSlots.add(timeSlot);
+            }
+            doctorSchedule.setTimeSlots(timeSlots);
+        }
         return doctorScheduleRepository.save(doctorSchedule);
     }
 }

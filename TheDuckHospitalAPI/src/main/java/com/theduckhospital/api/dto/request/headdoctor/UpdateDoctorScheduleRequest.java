@@ -11,8 +11,7 @@ import java.util.UUID;
 public class UpdateDoctorScheduleRequest {
     @NotNull(message = "Doctor ID is required")
     private UUID staffId;
-    @NotNull(message = "Slot is required")
-    private Integer slot;
+    private Integer slotPerHour;
     @NotNull(message = "Schedule date is required")
     private Date date;
 }
