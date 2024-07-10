@@ -256,7 +256,7 @@ function AdmissionDetailsByDate(props) {
                 ? "Đang lưu..."
                 : `Cập nhật lần cuối lúc: ${dayjs(info.updatedAt).format(
                     "HH:mm - DD/MM/YYYY"
-                  )} (BS. Nguyễn Thị Hồng)`}
+                  )}`}
             </Typography>
           </Stack>
         </Grid>
