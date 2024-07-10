@@ -116,7 +116,10 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         CompletableFuture.runAsync(() -> {
             try {
                 MedicalTest medicalTest = getMedicalTestById(medicalTestId);
+                System.out.println(medicalTest.getQueueNumber());
                 String url = cloudinaryServices.uploadFile(file);
+
+                System.out.println(url);
                 medicalTest.setResultFileUrl(url);
                 medicalTest.setTestResult(testResult);
 
@@ -342,7 +345,7 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         if (roomPage.getContent().isEmpty())
             throw new NotFoundException("Laboratory Room not found");
         Room laboratoryRoom = roomPage.getContent().get(0);
-        int currentQueueNumber = laboratoryRoom.getMedicalTestQueueNumber();
+        int currentQueueNumber = laboratoryRoom.getMedicalTestQueueNumberMax();
         medicalTest.setQueueNumber(
                 currentQueueNumber + 1
         );

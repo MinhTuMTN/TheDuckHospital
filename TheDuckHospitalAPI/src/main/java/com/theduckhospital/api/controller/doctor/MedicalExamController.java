@@ -174,7 +174,7 @@ public class MedicalExamController {
     }
 
     @DeleteMapping("/{medicalExaminationId}/medical-test/{medicalTestId}")
-    public ResponseEntity<?> getMedicalTests(
+    public ResponseEntity<?> deleteMedicalTest(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("medicalExaminationId") UUID medicalExaminationId,
             @PathVariable("medicalTestId") UUID medicalTestId

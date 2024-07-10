@@ -22,6 +22,7 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             "JOIN MedicalExaminationRecord mer ON mt.medicalExaminationRecord = mer " +
             "JOIN Patient p ON mer.patient = p " +
             "where mt.room = :room " +
+            "AND mt.deleted = false " +
             "AND p.fullName  LIKE CONCAT('%', :search, '%') " +
             "AND mt.state = :state"
     )

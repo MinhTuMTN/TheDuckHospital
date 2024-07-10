@@ -258,6 +258,7 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
         );
 
         return medicalExaminationRecord.getMedicalTest().stream()
+                .filter(medicalTest -> !medicalTest.isDeleted())
                 .map(DoctorMedicalTestResponse::new)
                 .toList();
     }
@@ -273,14 +274,21 @@ public class MedicalExamServicesImpl implements IMedicalExamServices {
                 medicalExaminationId
         );
 
-        List<MedicalTest> medicalTests = medicalTestRepository.findByMedicalExaminationRecordAndDeletedIsFalse(
-                medicalExaminationRecord
-        );
+        List<MedicalTest> medicalTests = medicalTestRepository
+                .findByMedicalExaminationRecordAndDeletedIsFalse(
+                        medicalExaminationRecord
+                );
         Optional<MedicalTest> optional = medicalTestRepository.findById(medicalTestId);
         if (optional.isEmpty()) {
             throw new NotFoundException("Medical Test not found");
         } else {
             MedicalTest medicalTest = optional.get();
+
+            Transaction transaction = medicalTest.getTransaction();
+            if (transaction != null && transaction.getStatus() == TransactionStatus.SUCCESS) {
+                throw new BadRequestException("Medical Test has been paid");
+            }
+            
             medicalTest.setDeleted(true);
             medicalTestRepository.save(medicalTest);
         }
