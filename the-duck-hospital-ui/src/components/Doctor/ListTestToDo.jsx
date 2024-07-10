@@ -226,7 +226,15 @@ function ListTestToDo(props) {
             </Button>
           ) : (
             <>
-              <Stack direction={"row"} justifyContent={"space-between"}>
+              <Stack
+                direction={"row"}
+                justifyContent={"space-between"}
+                sx={{
+                  "& .MuiAutocomplete-option": {
+                    textAlign: "start",
+                  },
+                }}
+              >
                 <Autocomplete
                   size="medium"
                   disablePortal
@@ -241,7 +249,9 @@ function ListTestToDo(props) {
                       service: newValue,
                     });
                   }}
-                  sx={{ width: "300px" }}
+                  sx={{
+                    width: "300px",
+                  }}
                   renderInput={(params) => (
                     <TextField {...params} placeholder="Xét nghiệm" />
                   )}
