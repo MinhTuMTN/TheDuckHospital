@@ -264,13 +264,13 @@ function ScheduleItem(props) {
       >
         <CustomButton
           variant="contained"
-          disabled={schedule.numberOfBookings > 0}
+          disabled={schedule.numberOfBookings > 0 || dayjs(valueDate).isBefore(currentDay, "day")}
           sx={{
-            backgroundColor: "rgba(253, 57, 122, 0.229)",
+            background: "linear-gradient(to right, rgba(253, 57, 122, 0.229), rgba(232, 106, 148, 0.229))",
             color: "#fd397a",
             width: "35%",
             "&:hover": {
-              backgroundColor: "rgba(253, 57, 122, 0.229)",
+              background: "linear-gradient(to right, rgba(253, 57, 122, 0.229), rgba(232, 106, 148, 0.229))",
             },
           }}
           onClick={() => setDeleteDialog(true)}
