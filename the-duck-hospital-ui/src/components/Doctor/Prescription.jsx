@@ -56,7 +56,9 @@ const headCellStyle = {
 };
 
 function Prescription(props) {
-  const { patientInfo, diagnostic, role, hospitalizationId } = props;
+  const { patientInfo, diagnostic, role, hospitalizationId, disableButton } =
+    props;
+  console.log(disableButton);
   const { fullName } = useAuth();
   const { medicalRecordId } = useParams();
   const [hiddenButtonAdd, setHidden] = React.useState(false);
@@ -222,6 +224,7 @@ function Prescription(props) {
           {hiddenButtonAdd === false ? (
             <>
               <Button
+                disabled={disableButton ? disableButton : false}
                 variant="text"
                 sx={{
                   textTransform: "none",
@@ -229,7 +232,9 @@ function Prescription(props) {
                   display: prescriptionItems.length > 0 ? "" : "none",
                 }}
                 color="normal2"
-                onClick={handlePrint}
+                onClick={() => {
+                  handlePrint();
+                }}
               >
                 In toa thuốc
               </Button>
@@ -550,5 +555,8 @@ Prescription.defaultProps = {
 Prescription.propTypes = {
   patientInfo: PropTypes.object,
   role: PropTypes.string,
+  diagnostic: PropTypes.string,
+  hospitalizationId: PropTypes.string,
+  disableButton: PropTypes.bool,
 };
 export default Prescription;
