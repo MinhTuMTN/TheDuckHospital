@@ -12,13 +12,17 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RoomDetail from "../../../components/Admin/RoomManagement/RoomDetail";
-import ScheduleTable from "../../../components/Admin/ScheduleTable";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getRoomById } from "../../../services/admin/RoomServices";
-import { getDateHasDoctorScheduleRoom, getSchedulesByRoomIdAndDate } from "../../../services/admin/DoctorScheduleServices";
+import {
+  getDateHasDoctorScheduleRoom,
+  getSchedulesByRoomIdAndDate,
+} from "../../../services/admin/DoctorScheduleServices";
+import ExamRoomScheduleTable from "../../../components/Admin/RoomManagement/ExamRoomScheduleTable";
+import InpatientRoomScheduleTable from "../../../components/Admin/RoomManagement/InpatientRoomScheduleTable";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -62,7 +66,7 @@ function RoomDetailPage() {
   }, [handleGetRoom]);
 
   const handleGetSchedules = useCallback(async () => {
-    let date = dateSelected.format("YYYY/MM/DD")
+    let date = dateSelected.format("YYYY/MM/DD");
     const response = await getSchedulesByRoomIdAndDate({
       roomId: roomId,
       date: date,
@@ -92,13 +96,11 @@ function RoomDetailPage() {
       const response = await getDateHasDoctorScheduleRoom(roomId);
       if (response.success) {
         setDateSchedule(
-          response.data.data.map(
-            (date) => dayjs(date).format("YYYY/MM/DD")
-          )
+          response.data.data.map((date) => dayjs(date).format("YYYY/MM/DD"))
         );
       }
     };
-   
+
     handleGetDateHasSchedule();
   }, [roomId]);
 
@@ -181,48 +183,54 @@ function RoomDetailPage() {
             </Grid>
           </Grid>
 
-          <Grid container>
-            <Grid item xs={12}>
-              <Stack
-                component={Paper}
-                elevation={3}
-                sx={{
-                  marginTop: 4,
-                  borderRadius: "15px",
-                }}
-                spacing={"2px"}
-              >
+          {(room.roomType?.startsWith("EXAMINATION") ||
+            room.roomType?.startsWith("TREATMENT")) && (
+            <Grid container>
+              <Grid item xs={12}>
                 <Stack
+                  component={Paper}
+                  elevation={3}
                   sx={{
+                    marginTop: 4,
                     borderRadius: "15px",
-                    paddingTop: 1,
                   }}
+                  spacing={"2px"}
                 >
-                  <BoxStyle>
-                    <Stack direction={"row"}>
-                      <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
-                      <LocalizationProvider
-                        dateAdapter={AdapterDayjs}
-                        adapterLocale="en-gb"
-                      >
-                        <CustomDatePicker
-                          label="Ngày làm việc"
-                          value={dayjs(dateSelected)}
-                          shouldDisableDate={disableDateNotHasSchedule}
-                          onChange={(newDate) => {
-                            setDateSelected(newDate);
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Stack>
-                  </BoxStyle>
-                  {schedules &&
-                    <ScheduleTable items={schedules} />
-                  }
+                  <Stack
+                    sx={{
+                      borderRadius: "15px",
+                      paddingTop: 1,
+                    }}
+                  >
+                    <BoxStyle>
+                      <Stack direction={"row"}>
+                        <TieuDe sx={{ mt: 1 }}>Lịch làm việc</TieuDe>
+                        <LocalizationProvider
+                          dateAdapter={AdapterDayjs}
+                          adapterLocale="en-gb"
+                        >
+                          <CustomDatePicker
+                            label="Ngày làm việc"
+                            value={dayjs(dateSelected)}
+                            shouldDisableDate={disableDateNotHasSchedule}
+                            onChange={(newDate) => {
+                              setDateSelected(newDate);
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Stack>
+                    </BoxStyle>
+                    {schedules && room.roomType?.startsWith("EXAMINATION") && (
+                      <ExamRoomScheduleTable items={schedules} />
+                    )}
+                    {schedules && room.roomType?.startsWith("TREATMENT") && (
+                      <InpatientRoomScheduleTable items={schedules} />
+                    )}
+                  </Stack>
                 </Stack>
-              </Stack>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
         </Stack>
       </Stack>
     </Box>

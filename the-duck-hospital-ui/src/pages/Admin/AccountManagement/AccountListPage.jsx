@@ -43,8 +43,8 @@ const roleOptions = [
     name: "Thu ngân",
   },
   {
-    value: "PHARMACIST",
-    name: "Dược sĩ",
+    value: "SUPPORT_AGENT",
+    name: "Hỗ trợ viên",
   },
   {
     value: "LABORATORY_TECHNICIAN",

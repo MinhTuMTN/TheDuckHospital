@@ -41,7 +41,6 @@ function AccountDetailPage() {
     handleGetAccount();
   }, [handleGetAccount]);
 
-
   return (
     <Box
       sx={{
@@ -66,7 +65,9 @@ function AccountDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/account-management") }}
+              onClick={() => {
+                navigate("/admin/account-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -83,28 +84,44 @@ function AccountDetailPage() {
           </Stack>
           <Grid container>
             <Grid item xs={12} md={12} lg={10}>
-              <Stack direction={"column"}>
-                <Typography
-                  variant="h4"
-                  fontWeight={600}
+              <Stack direction={"row"} alignItems={"center"} spacing={1}>
+                <img
+                  src={
+                    account?.avatar
+                      ? account.avatar
+                      : "https://cdn.iconscout.com/icon/free/png-256/free-user-1648810-1401302.png?f=webp"
+                  }
+                  alt={"account-avatar"}
                   style={{
-                    textTransform: "uppercase",
-                    fontSize: ["1.5rem", "2rem"],
+                    width: 100,
+                    height: 100,
+                    objectFit: "contain",
+                    borderRadius: "50%",
                   }}
-                >
-                  {account.fullName}
-                </Typography>
-                <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                />
+                <Stack direction={"column"}>
                   <Typography
-                    variant="body1"
-                    fontWeight={450}
+                    variant="h4"
+                    fontWeight={600}
                     style={{
-                      fontSize: "14px",
+                      textTransform: "uppercase",
+                      fontSize: ["1.5rem", "2rem"],
                     }}
                   >
-                    user_id:
+                    {account.fullName}
                   </Typography>
-                  <UserId>{account.userId}</UserId>
+                  <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={450}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                    >
+                      user_id:
+                    </Typography>
+                    <UserId>{account.userId}</UserId>
+                  </Stack>
                 </Stack>
               </Stack>
             </Grid>
@@ -127,7 +144,7 @@ function AccountDetailPage() {
               </Stack>
             </Grid>
           </Grid>
-          {account.patientProfiles?.length > 0 &&
+          {account.patientProfiles?.length > 0 && (
             <Grid container>
               <Grid item xs={12}>
                 <Stack
@@ -146,7 +163,8 @@ function AccountDetailPage() {
                   />
                 </Stack>
               </Grid>
-            </Grid>}
+            </Grid>
+          )}
         </Stack>
       </Stack>
     </Box>

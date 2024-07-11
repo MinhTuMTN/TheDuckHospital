@@ -13,6 +13,7 @@ import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IStatisticsServices;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -136,11 +137,11 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Transaction> bookingAndTestTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST),
+                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST, PaymentType.ADVANCE_FEE),
                 TransactionStatus.SUCCESS
         );
 
-        Map<String, Double> totalAmountByDate = bookingAndTestTransactions.stream()
+        LinkedHashMap<String, Double> totalAmountByDate = bookingAndTestTransactions.stream()
 //                .filter(t -> t.getPaymentType() == PaymentType.BOOKING || t.getPaymentType() == PaymentType.MEDICAL_TEST)
                 .sorted(Comparator.comparing(Transaction::getCreatedAt))
                 .collect(Collectors.groupingBy(
@@ -167,7 +168,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Transaction> bookingTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                List.of(PaymentType.BOOKING),
+                Arrays.asList(PaymentType.BOOKING, PaymentType.ADVANCE_FEE),
                 TransactionStatus.SUCCESS
         );
 
@@ -187,32 +188,32 @@ public class StatisticsServicesImpl implements IStatisticsServices {
             totalAmountBookingByDateFiltered.put(date, totalAmountBookingByDate.getOrDefault(date, 0.0));
         }
 
-        List<String> labels = new ArrayList<>();
-        for (String date : totalAmountByDate.keySet()) {
-            labels.add(date.length() > 5 ? date.substring(0, 5) : date);
-        }
+        List<String> labels = getLabelsRevenueStatistics(totalAmountByDate);
 
-        List<Double> values = totalAmountByDate.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
+        List<Double> values = getValuesRevenueStatistics(totalAmountByDate);
 
-        List<Double> bookingValues = totalAmountBookingByDateFiltered.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
+        List<Double> bookingValues = getValuesRevenueStatistics(totalAmountBookingByDateFiltered);
 
-        List<Double> testValues = totalAmountMedicalTestByDateFiltered.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
+        List<Double> testValues = getValuesRevenueStatistics(totalAmountMedicalTestByDateFiltered);
 
         return new RevenueStatisticsResponse(values, bookingValues, testValues, labels);
     }
 
+    private List<String> getLabelsRevenueStatistics(LinkedHashMap<String, Double> totalAmount){
+        List<String> labels = new ArrayList<>();
+        for (String date : totalAmount.keySet()) {
+            labels.add(date.length() > 5 ? date.substring(0, 5) : date);
+        }
+        return labels;
+    }
+
+    private List<Double> getValuesRevenueStatistics(LinkedHashMap<String, Double> linkedHashMap){
+        return linkedHashMap.values()
+                .stream()
+                .map(amount -> Math.round(amount / 1000))
+                .map(Long::doubleValue)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public RevenueStatisticsByDepartmentResponse getRevenueStatisticsByDepartment(
@@ -279,45 +280,64 @@ public class StatisticsServicesImpl implements IStatisticsServices {
                         LinkedHashMap::new,
                         Collectors.summingDouble(Transaction::getAmount)
                 ));
+//        LinkedHashMap<String, Double> totalAdmissionAmountFiltered = new LinkedHashMap<>();
+//        LinkedHashMap<String, Double> totalExaminationAmountFiltered = new LinkedHashMap<>();
+//        for (String date : totalAmountAdmissionByDateAndDepartment.keySet()
+//        ) {
+//            totalAmountExaminationByDateAndDepartment.put(date, totalAmountExaminationByDateAndDepartment.getOrDefault(date, 0.0));
+//        }
+//        for (String date : totalAmountExaminationByDateAndDepartment.keySet()
+//        ) {
+//            totalExaminationAmountFiltered.put(date, totalAmountExaminationByDateAndDepartment.getOrDefault(date, 0.0));
+//        }
+//        for (String date : totalExaminationAmountFiltered.keySet()
+//        ) {
+//            totalAdmissionAmountFiltered.put(date, totalAmountAdmissionByDateAndDepartment.getOrDefault(date, 0.0));
+//        }
+
+        Map<Date, String> dateMap = new TreeMap<>();
+        for (String dateStr : totalAmountAdmissionByDateAndDepartment.keySet()) {
+            try {
+                Date date = dateFormat.parse(dateStr);
+                dateMap.put(date, dateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (String dateStr : totalAmountExaminationByDateAndDepartment.keySet()) {
+            try {
+                Date date = dateFormat.parse(dateStr);
+                dateMap.put(date, dateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
         LinkedHashMap<String, Double> totalAdmissionAmountFiltered = new LinkedHashMap<>();
         LinkedHashMap<String, Double> totalExaminationAmountFiltered = new LinkedHashMap<>();
-        for (String date : totalAmountExaminationByDateAndDepartment.keySet()
-        ) {
-            totalExaminationAmountFiltered.put(date, totalAmountExaminationByDateAndDepartment.getOrDefault(date, 0.0));
-        }
-        for (String date : totalExaminationAmountFiltered.keySet()
-        ) {
-            totalAdmissionAmountFiltered.put(date, totalAmountAdmissionByDateAndDepartment.getOrDefault(date, 0.0));
-        }
-
         LinkedHashMap<String, Double> totalAmount = new LinkedHashMap<>();
-        for (String date : totalAmountExaminationByDateAndDepartment.keySet()
-        ) {
-            totalAmount.put(date, totalExaminationAmountFiltered.getOrDefault(date, 0.0)
-                    + totalAdmissionAmountFiltered.getOrDefault(date, 0.0));
-        }
-        List<String> labels = new ArrayList<>();
-        for (String date : totalExaminationAmountFiltered.keySet()) {
-            labels.add(date.length() > 5 ? date.substring(0, 5) : date);
-        }
-        List<Double> values = totalAmount.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
 
-        List<Double> examinationValues = totalExaminationAmountFiltered.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
+        for (String dateStr : dateMap.values()) {
+            totalExaminationAmountFiltered.put(dateStr, totalAmountExaminationByDateAndDepartment.getOrDefault(
+                    dateStr, 0.0
+            ));
 
-        List<Double> admissionValues = totalAdmissionAmountFiltered.values()
-                .stream()
-                .map(amount -> Math.round(amount / 1000))
-                .map(Long::doubleValue)
-                .collect(Collectors.toList());
+            totalAdmissionAmountFiltered.put(dateStr, totalAmountAdmissionByDateAndDepartment.getOrDefault(
+                    dateStr, 0.0
+            ));
+
+            totalAmount.put(dateStr, totalExaminationAmountFiltered.getOrDefault(dateStr, 0.0)
+                    + totalAdmissionAmountFiltered.getOrDefault(dateStr, 0.0));
+        }
+
+        List<String> labels = getLabelsRevenueStatistics(totalAmount);
+
+        List<Double> values = getValuesRevenueStatistics(totalAmount);
+
+        List<Double> examinationValues = getValuesRevenueStatistics(totalExaminationAmountFiltered);
+
+        List<Double> admissionValues = getValuesRevenueStatistics(totalAdmissionAmountFiltered);
 
         return new RevenueStatisticsByDepartmentResponse(values, examinationValues, admissionValues, labels);
     }

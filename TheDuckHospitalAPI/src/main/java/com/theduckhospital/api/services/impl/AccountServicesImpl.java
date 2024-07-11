@@ -21,6 +21,7 @@ import com.theduckhospital.api.security.JwtTokenProvider;
 import com.theduckhospital.api.services.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -356,22 +357,25 @@ public class AccountServicesImpl implements IAccountServices {
             List<Boolean> accountStatus
     ) {
         boolean hasPatientRole = accountRole == null || accountRole.isEmpty() || accountRole.contains(PATIENT);
-        List<String> classes = RoleCommon.getStringClassesByRoles(accountRole);
-
         Pageable pageable = PageRequest.of(page, limit);
-        Page<Account> accounts = hasPatientRole ?
-                accountRepository.findAccount(
-                        search,
-                        accountStatus,
-                        classes,
-                        pageable
-                ) :
-                accountRepository.findAccountWithoutPatient(
-                        search,
-                        accountStatus,
-                        classes,
-                        pageable
-                );
+        Page<Account> accounts;
+        if(hasPatientRole){
+            List<String> classes = RoleCommon.getStringClassesByRoles(accountRole);
+            accounts = accountRepository.findAccount(
+                    search,
+                    accountStatus,
+                    classes,
+                    pageable
+                    );
+        } else {
+            List<Class<? extends Staff>> classes = RoleCommon.getClassesByRoles(accountRole);
+            accounts = accountRepository.findAccountWithoutPatient(
+                    search,
+                    accountStatus,
+                    classes,
+                    pageable
+            );
+        }
 
         List<AccountResponse> response = new ArrayList<>();
         for (Account account : accounts.getContent()) {

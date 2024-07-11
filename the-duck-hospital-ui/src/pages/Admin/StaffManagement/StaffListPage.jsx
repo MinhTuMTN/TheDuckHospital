@@ -87,12 +87,12 @@ const roleOptions = [
     name: "Thu ngân",
   },
   {
-    value: "PHARMACIST",
-    name: "Dược sĩ",
-  },
-  {
     value: "LABORATORY_TECHNICIAN",
     name: "Bác sĩ xét nghiệm",
+  },
+  {
+    value: "SUPPORT_AGENT",
+    name: "Hỗ trợ viên",
   },
 ];
 
@@ -129,7 +129,7 @@ function StaffListPage(props) {
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [departmentsFilter, setDepartmentsFilter] = useState([]);
+  // const [departmentsFilter, setDepartmentsFilter] = useState([]);
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -174,16 +174,16 @@ function StaffListPage(props) {
     }
   };
 
-  const [selectedDepartments, setSelectedDepartments] = useState([]);
-  const handleChangeDepartmentsFilter = (event) => {
-    if (event.target.checked) {
-      setSelectedDepartments((prev) => [...prev, parseInt(event.target.value)]);
-    } else {
-      setSelectedDepartments((prev) =>
-        prev.filter((item) => item !== parseInt(event.target.value))
-      );
-    }
-  };
+  // const [selectedDepartments, setSelectedDepartments] = useState([]);
+  // const handleChangeDepartmentsFilter = (event) => {
+  //   if (event.target.checked) {
+  //     setSelectedDepartments((prev) => [...prev, parseInt(event.target.value)]);
+  //   } else {
+  //     setSelectedDepartments((prev) =>
+  //       prev.filter((item) => item !== parseInt(event.target.value))
+  //     );
+  //   }
+  // };
 
   const [selectedStatus, setSelectedStatus] = useState([]);
   const handleChangeStatusFilter = (event) => {
@@ -199,7 +199,8 @@ function StaffListPage(props) {
   const handleGetDepartments = useCallback(async () => {
     const response = await getAllDepartments();
     if (response.success) {
-      setDepartmentsFilter(response.data.data);
+      setDepartments(response.data.data);
+      // setDepartmentsFilter(response.data.data);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   }, []);
   useEffect(() => {
@@ -214,7 +215,7 @@ function StaffListPage(props) {
       limit: limit,
       staffRole: selectedRole,
       staffStatus: selectedStatus,
-      departmentIds: selectedDepartments
+      // departmentIds: selectedDepartments
     });
 
     if (filterButtonClicked) {
@@ -234,7 +235,7 @@ function StaffListPage(props) {
     limit,
     selectedStatus,
     selectedRole,
-    selectedDepartments,
+    // selectedDepartments,
     buttonClicked,
     filterButtonClicked,
   ]);
@@ -243,12 +244,13 @@ function StaffListPage(props) {
     handleGetStaffs();
   }, [handleGetStaffs]);
 
-  const handleGetDepartment = async () => {
-    const response = await getAllDepartments();
-    if (response.success) {
-      setDepartments(response.data.data);
-    } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
-  };
+  // const handleGetDepartments = async () => {
+  //   const response = await getAllDepartments();
+  //   if (response.success) {
+  //     setDepartments(response.data.data);
+  //     setDepartmentsFilter(response.data.data)
+  //   } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
+  // };
 
   const handleCreateStaff = async () => {
     // console.log(staff.nurseType);
@@ -351,7 +353,6 @@ function StaffListPage(props) {
                     departmentId: "",
                     nurseType: null,
                   });
-                  handleGetDepartment();
                   setOpenDialogForm(true);
                 }}
               >
@@ -376,21 +377,20 @@ function StaffListPage(props) {
                 }}
               />
               <Box py={2} px={3}>
-                {selectedRole.length === 0 &&
-                  selectedStatus.length === 0 &&
-                  selectedDepartments.length === 0 && (
-                    <TextField
-                      disabled
-                      variant="standard"
-                      fullWidth
-                      size="medium"
-                      InputProps={{
-                        disableUnderline: true,
-                        fontSize: "14px",
-                      }}
-                      placeholder="Không có bộ lọc nào được chọn"
-                    />
-                  )}
+                {selectedRole.length === 0 && selectedStatus.length === 0 && (
+                  // selectedDepartments.length === 0 && (
+                  <TextField
+                    disabled
+                    variant="standard"
+                    fullWidth
+                    size="medium"
+                    InputProps={{
+                      disableUnderline: true,
+                      fontSize: "14px",
+                    }}
+                    placeholder="Không có bộ lọc nào được chọn"
+                  />
+                )}
                 <Stack direction="row" spacing={1}>
                   {selectedRole.map((item, index) => (
                     <Chip
@@ -404,7 +404,7 @@ function StaffListPage(props) {
                       }
                     />
                   ))}
-                  {selectedDepartments.map((item, index) => (
+                  {/* {selectedDepartments.map((item, index) => (
                     <Chip
                       color="primary"
                       label={
@@ -419,7 +419,7 @@ function StaffListPage(props) {
                         )
                       }
                     />
-                  ))}
+                  ))} */}
                   {selectedStatus.map((item, index) => (
                     <Chip
                       color="warning"
@@ -449,13 +449,13 @@ function StaffListPage(props) {
                   selectedValues={selectedRole}
                   onChange={handleChangeRoleFilter}
                 />
-                <StaffFilter
+                {/* <StaffFilter
                   label={"Khoa"}
                   isDepartmentFilter={true}
                   options={departmentsFilter}
                   selectedValues={selectedDepartments}
                   onChange={handleChangeDepartmentsFilter}
-                />
+                /> */}
                 <StaffFilter
                   label={"Trạng thái"}
                   options={statusOptions}

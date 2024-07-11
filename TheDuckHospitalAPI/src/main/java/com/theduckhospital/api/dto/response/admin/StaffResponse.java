@@ -62,6 +62,8 @@ public class StaffResponse {
             this.role = "Dược sĩ";
         } else if (staff instanceof LaboratoryTechnician) {
             this.role = "Bác sĩ xét nghiệm";
+        } else if (staff instanceof SupportAgent) {
+            this.role = "Hỗ trợ viên";
         } else {
             this.role = "Quản lý";
         }

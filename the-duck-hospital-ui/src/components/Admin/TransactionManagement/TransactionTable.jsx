@@ -24,24 +24,50 @@ import { useNavigate } from "react-router-dom";
 import FormatCurrency from "../../General/FormatCurrency";
 import FormatDate from "../../General/FormatDate";
 
+const paymentTypes = [
+  {
+    value: "BOOKING",
+    name: "Đặt khám",
+  },
+  {
+    value: "MEDICAL_TEST",
+    name: "Xét nghiệm",
+  },
+  {
+    value: "TOP_UP",
+    name: "Nạp tiền ví",
+  },
+  {
+    value: "REFUND",
+    name: "Hoàn tiền",
+  },
+  {
+    value: "ADVANCE_FEE",
+    name: "Tạm ứng",
+  },
+  {
+    value: "DISCHARGE",
+    name: "Xuất viện",
+  },
+];
 
 const transactionStatus = [
   {
     status: "PENDING",
     label: "Chờ xử lý",
-    color: "template.normal2"
+    color: "template.normal2",
   },
   {
     status: "SUCCESS",
     label: "Thành công",
-    color: "#00C58D"
+    color: "#00C58D",
   },
   {
     status: "FAILED",
     label: "Thất bại",
-    color: "#c52700"
+    color: "#c52700",
   },
-]
+];
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -95,7 +121,15 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.userName}
+            {row.paymentType === "BOOKING"
+              ? row.userName
+              : row.paymentType === "MEDICAL_TEST"
+              ? row.medicalTestResponse?.patientProfile?.fullName
+              : row.paymentType === "TOP_UP" || row.paymentType === "REFUND"
+              ? row.accountUserName
+              : row.paymentType === "ADVANCE_FEE"
+              ? row.patientName
+              : "Đang cập nhật"}
           </CustomText>
         </TableCell>
         <TableCell align="right">
@@ -109,6 +143,23 @@ function Row(props) {
             }}
           >
             <FormatCurrency amount={row.amount} />
+          </CustomText>
+        </TableCell>
+        <TableCell align="center">
+          <CustomText
+            variant="body1"
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: maxWidth,
+            }}
+          >
+            {
+              paymentTypes.find(
+                (paymentType) => paymentType.value === row.paymentType
+              )?.name
+            }
           </CustomText>
         </TableCell>
         <TableCell align="center">
@@ -142,10 +193,13 @@ function Row(props) {
             <CircleIcon
               sx={{
                 fontSize: 10,
-                color: (transactionStatus.find(s => s.status === row.status).color),
+                color: transactionStatus.find((s) => s.status === row.status)
+                  .color,
               }}
             />
-            <CustomText>{transactionStatus.find(s => s.status === row.status).label}</CustomText>
+            <CustomText>
+              {transactionStatus.find((s) => s.status === row.status).label}
+            </CustomText>
           </Stack>
         </TableCell>
         <TableCell align="center">
@@ -184,7 +238,9 @@ function Row(props) {
                         textAlign: "left",
                       }}
                       onClick={(e) => {
-                        navigate(`/admin/transaction-management/${row.transactionId}`);
+                        navigate(
+                          `/admin/transaction-management/${row.transactionId}`
+                        );
                       }}
                     >
                       Xem
@@ -198,7 +254,9 @@ function Row(props) {
                 <IconButton
                   color="black"
                   onClick={(e) => {
-                    navigate(`/admin/transaction-management/${row.transactionId}`);
+                    navigate(
+                      `/admin/transaction-management/${row.transactionId}`
+                    );
                   }}
                 >
                   <InfoOutlinedIcon color="black" />
@@ -233,51 +291,38 @@ function TransactionTable(props) {
               }}
             >
               <TableRow>
-                <TableCell style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Tài khoản
                   </CustomText>
                 </TableCell>
-                <TableCell align="right" style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell align="right" style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Tổng thanh toán
                   </CustomText>
                 </TableCell>
+                <TableCell align="right" style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
+                    Loại thanh toán
+                  </CustomText>
+                </TableCell>
                 <TableCell align="center" style={{ width: "15%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Phương thức
                   </CustomText>
                 </TableCell>
-                <TableCell align="center" style={{ width: "20%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                <TableCell align="center" style={{ width: "15%" }}>
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Ngày tạo
                   </CustomText>
                 </TableCell>
                 <TableCell style={{ width: "15%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Trạng thái
                   </CustomText>
                 </TableCell>
                 <TableCell align="center" style={{ width: "10%" }}>
-                  <CustomText
-                    style={{ fontWeight: "500" }}
-                    color={"#101828"}
-                  >
+                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Tùy chọn
                   </CustomText>
                 </TableCell>

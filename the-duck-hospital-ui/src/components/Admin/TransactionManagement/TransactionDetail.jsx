@@ -1,11 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Box,
-  Chip,
-  Grid,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, Grid, Stack, Typography } from "@mui/material";
 import React from "react";
 import FormatDate from "../../General/FormatDate";
 import FormatCurrency from "../../General/FormatCurrency";
@@ -14,17 +8,44 @@ const transactionStatus = [
   {
     status: "PENDING",
     label: "Chờ xử lý",
-    color: "info"
+    color: "info",
   },
   {
     status: "SUCCESS",
     label: "Thành công",
-    color: "success"
+    color: "success",
   },
   {
     status: "FAILED",
     label: "Thất bại",
-    color: "error"
+    color: "error",
+  },
+];
+
+const paymentTypes = [
+  {
+    value: "BOOKING",
+    name: "Đặt khám",
+  },
+  {
+    value: "MEDICAL_TEST",
+    name: "Xét nghiệm",
+  },
+  {
+    value: "TOP_UP",
+    name: "Nạp tiền ví",
+  },
+  {
+    value: "REFUND",
+    name: "Hoàn tiền",
+  },
+  {
+    value: "ADVANCE_FEE",
+    name: "Tạm ứng",
+  },
+  {
+    value: "DISCHARGE",
+    name: "Xuất viện",
   },
 ];
 
@@ -57,8 +78,12 @@ const NoiDung = styled(Typography)(({ theme }) => ({
 
 function TransactionDetail(props) {
   const { transaction } = props;
-  const statusColor = transactionStatus.find(s => s.status === transaction.status)?.color;
-  const statusLabel = transactionStatus.find(s => s.status === transaction.status)?.label;
+  const statusColor = transactionStatus.find(
+    (s) => s.status === transaction.status
+  )?.color;
+  const statusLabel = transactionStatus.find(
+    (s) => s.status === transaction.status
+  )?.label;
 
   return (
     <Stack
@@ -74,6 +99,43 @@ function TransactionDetail(props) {
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
+            <TieuDeCot>Loại thanh toán</TieuDeCot>
+          </Grid>
+          <Grid item xs={8} md={9}>
+            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+              <NoiDung>
+                {
+                  paymentTypes.find(
+                    (paymentType) =>
+                      paymentType.value === transaction.paymentType
+                  )?.name
+                }
+              </NoiDung>
+            </Stack>
+          </Grid>
+        </Grid>
+      </BoxStyle>
+
+      {transaction?.paymentType === "MEDICAL_TEST" && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Loại xét nghiệm</TieuDeCot>
+            </Grid>
+            <Grid item xs={8} md={9}>
+              <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+                <NoiDung>
+                  {transaction?.medicalTestResponse?.serviceName}
+                </NoiDung>
+              </Stack>
+            </Grid>
+          </Grid>
+        </BoxStyle>
+      )}
+
+      <BoxStyle>
+        <Grid container>
+          <Grid item xs={4} md={3}>
             <TieuDeCot>Phương thức</TieuDeCot>
           </Grid>
           <Grid item xs={8} md={9}>
@@ -83,7 +145,8 @@ function TransactionDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      {transaction.bankCode &&
+
+      {transaction.bankCode && transaction.paymentMethod !== "CASH" && (
         <BoxStyle>
           <Grid container>
             <Grid item xs={4} md={3}>
@@ -95,7 +158,24 @@ function TransactionDetail(props) {
               </Stack>
             </Grid>
           </Grid>
-        </BoxStyle>}
+        </BoxStyle>
+      )}
+
+      {transaction.paymentType === "REFUND" && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Lý do hoàn tiền</TieuDeCot>
+            </Grid>
+            <Grid item xs={8} md={9}>
+              <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
+                <NoiDung>{transaction.refundedBooking?.refundReason}</NoiDung>
+              </Stack>
+            </Grid>
+          </Grid>
+        </BoxStyle>
+      )}
+
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
@@ -103,7 +183,9 @@ function TransactionDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatCurrency amount={transaction.amount} /></NoiDung>
+            <NoiDung>
+              <FormatCurrency amount={transaction.amount} />
+            </NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -114,7 +196,9 @@ function TransactionDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung><FormatDate dateTime={transaction.createdAt} /></NoiDung>
+            <NoiDung>
+              <FormatDate dateTime={transaction.createdAt} />
+            </NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>
@@ -129,13 +213,13 @@ function TransactionDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-              <Chip
-                color={statusColor}
-                label={statusLabel}
-                sx={{
-                  fontSize: "14px"
-                }}
-              />
+            <Chip
+              color={statusColor}
+              label={statusLabel}
+              sx={{
+                fontSize: "14px",
+              }}
+            />
           </Grid>
         </Grid>
       </BoxStyle>

@@ -3,6 +3,7 @@ package com.theduckhospital.api.dto.response.admin;
 import com.theduckhospital.api.constant.Degree;
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.ScheduleSession;
+import com.theduckhospital.api.constant.ScheduleType;
 import com.theduckhospital.api.entity.DoctorSchedule;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class DoctorScheduleRoomResponse {
     private UUID doctorScheduleId;
     private ScheduleSession scheduleSession;
+    private ScheduleType scheduleType;
     private int dayOfWeek;
     private String doctorName;
     private Gender doctorGender;
@@ -31,6 +33,7 @@ public class DoctorScheduleRoomResponse {
     public DoctorScheduleRoomResponse(DoctorSchedule schedule, long numberOfBookings) {
         this.doctorScheduleId = schedule.getDoctorScheduleId();
         this.scheduleSession = schedule.getScheduleSession();
+        this.scheduleType = schedule.getScheduleType();
         this.dayOfWeek = schedule.getDayOfWeek();
         this.doctorName = schedule.getDoctor().getFullName();
         this.doctorGender = schedule.getDoctor().getGender();

@@ -14,6 +14,8 @@ import { useCallback, useEffect, useState } from "react";
 import { getTransactionById } from "../../../services/admin/TransactionServices";
 import TransactionDetail from "../../../components/Admin/TransactionManagement/TransactionDetail";
 import BookingTransactionTable from "../../../components/Admin/TransactionManagement/BookingTransactionTable";
+import AdmissionDetail from "../../../components/Admin/TransactionManagement/AdmissionDetail";
+import DischargeDetail from "../../../components/Admin/TransactionManagement/DischargeDetail";
 
 const PatientId = styled(Typography)(({ theme }) => ({
   backgroundColor: "#d6d7db",
@@ -65,7 +67,9 @@ function TransactionDetailPage() {
               padding="0"
               margin="0"
               color="#111927"
-              onClick={() => { navigate("/admin/transaction-management") }}
+              onClick={() => {
+                navigate("/admin/transaction-management");
+              }}
             >
               <ArrowBackIosIcon />
             </IconButton>
@@ -91,7 +95,16 @@ function TransactionDetailPage() {
                     fontSize: ["1.5rem", "2rem"],
                   }}
                 >
-                  {transaction.userName}
+                  {transaction.paymentType === "BOOKING"
+                    ? transaction.userName
+                    : transaction.paymentType === "MEDICAL_TEST"
+                    ? transaction.medicalTestResponse?.patientProfile?.fullName
+                    : transaction.paymentType === "TOP_UP" ||
+                      transaction.paymentType === "REFUND"
+                    ? transaction.accountUserName
+                    : transaction.paymentType === "ADVANCE_FEE"
+                    ? transaction.patientName
+                    : "Đang cập nhật"}
                 </Typography>
                 <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography
@@ -123,7 +136,48 @@ function TransactionDetailPage() {
               </Stack>
             </Grid>
           </Grid>
-          <BookingTransactionTable bookings={transaction.bookings} />
+
+          {transaction.paymentType === "ADVANCE_FEE" && (
+            <>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Stack
+                    component={Paper}
+                    elevation={3}
+                    sx={{
+                      marginTop: 4,
+                      borderRadius: "15px",
+                    }}
+                    spacing={"2px"}
+                  >
+                    <AdmissionDetail transaction={transaction} />
+                  </Stack>
+                </Grid>
+              </Grid>
+
+              {transaction.discharge && transaction.discharge?.doctor && (
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Stack
+                      component={Paper}
+                      elevation={3}
+                      sx={{
+                        marginTop: 4,
+                        borderRadius: "15px",
+                      }}
+                      spacing={"2px"}
+                    >
+                      <DischargeDetail discharge={transaction?.discharge} />
+                    </Stack>
+                  </Grid>
+                </Grid>
+              )}
+            </>
+          )}
+
+          {transaction.paymentType === "BOOKING" && (
+            <BookingTransactionTable bookings={transaction.bookings} />
+          )}
         </Stack>
       </Stack>
     </Box>

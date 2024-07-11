@@ -54,13 +54,25 @@ function ScheduleItem(props) {
   const [doctors, setDoctors] = useState([]);
   const [editDoctorSchedule, setEditDoctorSchedule] = useState({
     selectedDoctor: "",
-    slot: 1,
+    slotPerHour: null,
   });
   const [updateButtonClicked, setUpdateButtonClicked] = useState(false);
   const [openDialogForm, setOpenDialogForm] = useState(false);
   const currentDay = dayjs();
 
   const handleDeleteSchedule = async () => {
+    if (schedule.numberOfBookings > 0) {
+      enqueueSnackbar("Lịch trực đã có người đặt khám", { variant: "error" });
+      return;
+    }
+
+    if (dayjs(valueDate).isBefore(currentDay, "day")) {
+      enqueueSnackbar("Không thể vô hiệu hóa lịch trực trong quá khứ", {
+        variant: "error",
+      });
+      return;
+    }
+
     const response = await deleteDoctorSchedule(schedule.doctorScheduleId);
     if (response.success) {
       enqueueSnackbar("Xóa lịch trực thành công", { variant: "success" });
@@ -80,6 +92,14 @@ function ScheduleItem(props) {
   }, [schedule]);
 
   useEffect(() => {
+    if (openDialogForm)
+      setEditDoctorSchedule((prev) => ({
+        ...prev,
+        selectedDoctor: schedule?.doctor.staffId,
+      }));
+  }, [openDialogForm, schedule]);
+
+  useEffect(() => {
     getDoctorsInDepartment();
   }, [getDoctorsInDepartment]);
 
@@ -92,10 +112,11 @@ function ScheduleItem(props) {
     }
 
     if (
-      editDoctorSchedule.slot < schedule.numberOfBookings ||
-      editDoctorSchedule.slot === 0
+      (editDoctorSchedule.slotPerHour * 4 < schedule.slot ||
+        editDoctorSchedule.slotPerHour === 0) &&
+      schedule?.scheduleType === "EXAMINATION"
     ) {
-      enqueueSnackbar("Số chỗ phải lớn hơn lượng đặt hiện tại và lớn hơn 0", {
+      enqueueSnackbar("Số chỗ phải lớn hơn số lượng cũ", {
         variant: "error",
       });
       return;
@@ -113,7 +134,7 @@ function ScheduleItem(props) {
 
     const response = await updateDoctorSchedule(schedule.doctorScheduleId, {
       staffId: editDoctorSchedule.selectedDoctor,
-      slot: editDoctorSchedule.slot,
+      slotPerHour: editDoctorSchedule.slotPerHour,
       date: dayjs(valueDate).format("YYYY-MM-DD"),
     });
     if (response.success) {
@@ -213,34 +234,38 @@ function ScheduleItem(props) {
         </Typography>
       </Stack>
 
-      <Stack direction="row" justifyContent="space-between">
-        <Stack direction="row" spacing={1}>
-          <BookmarkAddedOutlinedIcon />
-          <Typography
-            sx={{
-              fontSize: "20px",
-              fontWeight: 600,
-            }}
-          >
-            Đặt trước
-          </Typography>
-        </Stack>
-        <Typography>{schedule.numberOfBookings}</Typography>
-      </Stack>
-      <Stack direction="row" justifyContent="space-between">
-        <Stack direction="row" spacing={1}>
-          <EventAvailableOutlinedIcon />
-          <Typography
-            sx={{
-              fontSize: "20px",
-              fontWeight: 600,
-            }}
-          >
-            Chỗ còn lại
-          </Typography>
-        </Stack>
-        <Typography>{schedule.slot - schedule.numberOfBookings}</Typography>
-      </Stack>
+      {schedule?.scheduleType === "EXAMINATION" && (
+        <>
+          <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" spacing={1}>
+              <BookmarkAddedOutlinedIcon />
+              <Typography
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: 600,
+                }}
+              >
+                Đặt trước
+              </Typography>
+            </Stack>
+            <Typography>{schedule.numberOfBookings}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" spacing={1}>
+              <EventAvailableOutlinedIcon />
+              <Typography
+                sx={{
+                  fontSize: "20px",
+                  fontWeight: 600,
+                }}
+              >
+                Chỗ còn lại
+              </Typography>
+            </Stack>
+            <Typography>{schedule.slot - schedule.numberOfBookings}</Typography>
+          </Stack>
+        </>
+      )}
       <Stack
         spacing={1}
         direction={"row"}
@@ -251,13 +276,18 @@ function ScheduleItem(props) {
       >
         <CustomButton
           variant="contained"
-          disabled={schedule.numberOfBookings > 0}
+          disabled={
+            schedule.numberOfBookings > 0 ||
+            dayjs(valueDate).isBefore(currentDay, "day")
+          }
           sx={{
-            backgroundColor: "rgba(253, 57, 122, 0.229)",
+            background:
+              "linear-gradient(to right, rgba(253, 57, 122, 0.229), rgba(232, 106, 148, 0.229))",
             color: "#fd397a",
             width: "35%",
             "&:hover": {
-              backgroundColor: "rgba(253, 57, 122, 0.229)",
+              background:
+                "linear-gradient(to right, rgba(253, 57, 122, 0.229), rgba(232, 106, 148, 0.229))",
             },
           }}
           onClick={() => setDeleteDialog(true)}
@@ -378,8 +408,8 @@ function ScheduleItem(props) {
                 variant="body1"
                 style={{
                   color:
-                    (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                      editDoctorSchedule.slot === 0) &&
+                    (editDoctorSchedule.slotPerHour * 4 < schedule.slot ||
+                      editDoctorSchedule.slotPerHour === 0) &&
                     updateButtonClicked
                       ? "red"
                       : "",
@@ -391,31 +421,33 @@ function ScheduleItem(props) {
                 type="number"
                 autoFocus
                 autoComplete="off"
-                InputProps={{ inputProps: { min: schedule.numberOfBookings } }}
+                InputProps={{
+                  inputProps: { min: schedule.numberOfBookings / 4 },
+                }}
                 value={
-                  editDoctorSchedule.slot
-                    ? editDoctorSchedule.slot.toString()
-                    : schedule.numberOfBookings.toString()
+                  editDoctorSchedule.slotPerHour
+                    ? editDoctorSchedule.slotPerHour.toString()
+                    : (schedule.slot / 4).toString()
                 }
                 onChange={(e) => {
                   setEditDoctorSchedule((prev) => ({
                     ...prev,
-                    slot:
+                    slotPerHour:
                       e.target.value &&
-                      parseInt(e.target.value) >= schedule.numberOfBookings
+                      parseInt(e.target.value) * 4 >= schedule.slot
                         ? parseInt(e.target.value)
-                        : schedule.numberOfBookings,
+                        : schedule.slot / 4,
                   }));
                 }}
                 required
                 error={
-                  (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                    editDoctorSchedule.slot === 0) &&
+                  (editDoctorSchedule.slotPerHour * 4 < schedule.slot ||
+                    editDoctorSchedule.slotPerHour === 0) &&
                   updateButtonClicked
                 }
                 helperText={
-                  (editDoctorSchedule.slot < schedule.numberOfBookings ||
-                    editDoctorSchedule.slot === 0) &&
+                  (editDoctorSchedule.slotPerHour * 4 < schedule.slot ||
+                    editDoctorSchedule.slotPerHour === 0) &&
                   updateButtonClicked &&
                   "Số lượng chỗ không hợp lệ"
                 }
@@ -423,6 +455,18 @@ function ScheduleItem(props) {
             </Box>
           )}
         </Stack>
+        {schedule?.scheduleType === "EXAMINATION" && (
+          <CustomTypography
+            style={{ width: "100%", marginTop: 8 }}
+            color={"#8e8e8e"}
+          >
+            Trong một buổi khám sẽ có tổng cộng{" "}
+            {editDoctorSchedule.slotPerHour
+              ? editDoctorSchedule.slotPerHour * 4
+              : schedule.slot}{" "}
+            người có thể đăng ký online
+          </CustomTypography>
+        )}
       </DialogForm>
     </Stack>
   );

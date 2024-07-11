@@ -365,77 +365,79 @@ public class StaffServicesImpl implements IStaffServices {
             int page,
             int limit,
             List<Role> staffRole,
-            List<Integer> departmentIds,
+//            List<Integer> departmentIds,
             List<Boolean> staffStatus
     ) {
         List<Class<? extends Staff>> classes = RoleCommon.getClassesByRoles(staffRole);
 
         Pageable pageable = PageRequest.of(page, limit);
-        Page<? extends Staff> staffs = null;
-        List<Staff> staffList = new ArrayList<>();
-        List<Staff> staffListFiltered = new ArrayList<>();
+        Page<Staff> staffs = staffRepository
+                .findStaffPage(search, staffStatus, classes, pageable);
 
         List<StaffResponse> response = new ArrayList<>();
-        if (departmentIds == null || departmentIds.isEmpty()) {
-            staffs = staffRepository
-                    .findStaffPage(search, staffStatus, classes, pageable);
-        } else {
-            if (classes.contains(Doctor.class) && classes.contains(Nurse.class)) {
-//                List<Class<? extends Staff>> newClasses = RoleCommon.getClassesByRoles(Arrays.asList(Role.DOCTOR, Role.NURSE));
-
-                List<Class<? extends Staff>> newClasses = new ArrayList<>(classes);
-                newClasses.clear();
-                newClasses.add(Doctor.class);
-                newClasses.add(Nurse.class);
-                List<Staff> list = staffRepository
-                        .findStaffList(search, staffStatus, newClasses);
-
-                Map<Integer, Boolean> departmentIdMap = new HashMap<>();
-                departmentIds.forEach(departmentId -> departmentIdMap.put(departmentId, true));
-
-                staffList = list.parallelStream()
-                        .filter(staff -> {
-                            int departmentId = getDepartmentIdByRole(staff);
-                            return departmentIdMap.containsKey(departmentId);
-                        })
-                        .collect(Collectors.toList());
-
+        for (Staff staff : staffs.getContent()) {
+            response.add(new StaffResponse(staff));
+        }
+//        if (departmentIds == null || departmentIds.isEmpty()) {
+//            staffs = staffRepository
+//                    .findStaffPage(search, staffStatus, classes, pageable);
+//        } else {
+//            if (classes.contains(Doctor.class) && classes.contains(Nurse.class)) {
+////                List<Class<? extends Staff>> newClasses = RoleCommon.getClassesByRoles(Arrays.asList(Role.DOCTOR, Role.NURSE));
 //
-//                staffList = list.stream()
-//                        .filter(staff -> departmentIds.contains(staff instanceof Doctor ?
-//                                ((Doctor) staff).getDepartment() == null ?
-//                                        -1 :
-//                                        ((Doctor) staff).getDepartment().getDepartmentId() :
-//                                ((Nurse) staff).getDepartment() == null ?
-//                                        -1 :
-//                                        ((Nurse) staff).getDepartment().getDepartmentId()))
-//                        .toList();
-                staffListFiltered = staffList.subList(page * limit, page * limit + limit);
-                for (Staff staff : staffListFiltered) {
-                    response.add(new StaffResponse(staff));
-                }
-
-            } else if (classes.contains(Doctor.class)) {
-                Page<Doctor> doctors = doctorRepository.findDoctor(search, staffStatus, departmentIds, pageable);
-                staffs = doctors.map(doctor -> (Staff) doctor);
-            } else if (classes.contains(Nurse.class)) {
-                Page<Nurse> nurses = nurseRepository.findNurse(search, staffStatus, departmentIds, pageable);
-                staffs = nurses.map(nurse -> (Staff) nurse);
-            }
-        }
-//        Page<Staff> staffs = staffRepository
-//                .findStaff(search, staffStatus, classes, pageable);
-
-
-        if (staffs != null) {
-            for (Staff staff : staffs.getContent()) {
-                response.add(new StaffResponse(staff));
-            }
-        }
-
+//                List<Class<? extends Staff>> newClasses = new ArrayList<>(classes);
+//                newClasses.clear();
+//                newClasses.add(Doctor.class);
+//                newClasses.add(Nurse.class);
+//                List<Staff> list = staffRepository
+//                        .findStaffList(search, staffStatus, newClasses);
+//
+//                Map<Integer, Boolean> departmentIdMap = new HashMap<>();
+//                departmentIds.forEach(departmentId -> departmentIdMap.put(departmentId, true));
+//
+//                staffList = list.parallelStream()
+//                        .filter(staff -> {
+//                            int departmentId = getDepartmentIdByRole(staff);
+//                            return departmentIdMap.containsKey(departmentId);
+//                        })
+//                        .collect(Collectors.toList());
+//
+////
+////                staffList = list.stream()
+////                        .filter(staff -> departmentIds.contains(staff instanceof Doctor ?
+////                                ((Doctor) staff).getDepartment() == null ?
+////                                        -1 :
+////                                        ((Doctor) staff).getDepartment().getDepartmentId() :
+////                                ((Nurse) staff).getDepartment() == null ?
+////                                        -1 :
+////                                        ((Nurse) staff).getDepartment().getDepartmentId()))
+////                        .toList();
+//                staffListFiltered = staffList.subList(page * limit, page * limit + limit);
+//                for (Staff staff : staffListFiltered) {
+//                    response.add(new StaffResponse(staff));
+//                }
+//
+//            } else if (classes.contains(Doctor.class)) {
+//                Page<Doctor> doctors = doctorRepository.findDoctor(search, staffStatus, departmentIds, pageable);
+//                staffs = doctors.map(doctor -> (Staff) doctor);
+//            } else if (classes.contains(Nurse.class)) {
+//                Page<Nurse> nurses = nurseRepository.findNurse(search, staffStatus, departmentIds, pageable);
+//                staffs = nurses.map(nurse -> (Staff) nurse);
+//            }
+//        }
+////        Page<Staff> staffs = staffRepository
+////                .findStaff(search, staffStatus, classes, pageable);
+//
+//
+//        if (staffs != null) {
+//            for (Staff staff : staffs.getContent()) {
+//                response.add(new StaffResponse(staff));
+//            }
+//        }
+//
         return new FilteredStaffsResponse(
                 response,
-                (int) (staffs == null ? staffList.isEmpty() ? 0 : staffList.size() : staffs.getTotalElements()),
+                (int) (staffs.getTotalElements()),
                 page,
                 limit
         );

@@ -149,18 +149,18 @@ public class DepartmentServicesImpl implements IDepartmentServices {
     }
 
     @Override
-    public List<DepartmentResponse> getAllDepartments() {
-        List<DepartmentResponse> departments = new ArrayList<>();
+    public List<Department> getAllDepartments() {
+//        List<DepartmentResponse> departments = new ArrayList<>();
 
-        for (Department department : departmentRepository.findAll()) {
+//        for (Department department : departmentRepository.findAll()) {
 //            Doctor headDoctor = department.getDoctors().stream()
 //                    .filter(Doctor::isHeadOfDepartment)
 //                    .findFirst()
 //                    .orElse(null);
-            departments.add(new DepartmentResponse(department, null, null));
-        }
+//            departments.add(new DepartmentResponse(department, null, null));
+//        }
 
-        return departments;
+        return departmentRepository.findAll();
     }
 
     @Override
