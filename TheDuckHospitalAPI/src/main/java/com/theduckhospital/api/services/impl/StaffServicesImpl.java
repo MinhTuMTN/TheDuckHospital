@@ -230,6 +230,13 @@ public class StaffServicesImpl implements IStaffServices {
         }
         staff.setDateOfBirth(dateOfBirth);
 
+        Account account = staff.getAccount();
+        if (account != null) {
+            account.setFullName(request.getFullName());
+            account.setPhoneNumber(request.getPhoneNumber());
+            accountRepository.save(account);
+        }
+
         if (request.getAvatar() != null) {
             updateAvatarAsync(staffId, request.getAvatar().getBytes());
         }

@@ -305,6 +305,7 @@ function NurseSchedulePage() {
                 paddingLeft: 15,
                 flex: 1,
               }}
+              overflow={"auto"}
             >
               {selectedSchedule.map((schedule) => (
                 <Stack

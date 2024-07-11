@@ -83,7 +83,7 @@ public interface DoctorScheduleRepository extends JpaRepository<DoctorSchedule, 
     );
     @Query("SELECT ds FROM  DoctorSchedule ds " +
             "WHERE ds.doctor = :doctor " +
-            "AND ds.date >= :today " +
+            "AND ds.date > :today " +
             "AND ds.deleted = false " +
             "AND ds.scheduleType = :examinationType " +
             "ORDER BY ds.date ASC, ds.scheduleSession ASC"

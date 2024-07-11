@@ -79,7 +79,7 @@ public class HospitalAdmissionServicesImpl implements IHospitalAdmissionServices
                 : Fee.VIP_ROOM_FEE
         );
         hospitalAdmission.setNurse(nurse);
-        hospitalAdmission.setAdmissionDate(DateCommon.getStarOfDay(DateCommon.getToday()));
+        hospitalAdmission.setAdmissionDate(DateCommon.getToday());
         hospitalAdmission.setState(HospitalAdmissionState.BEING_TREATED);
         hospitalAdmissionRepository.save(hospitalAdmission);
 
