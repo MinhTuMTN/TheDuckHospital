@@ -136,7 +136,7 @@ function RevenueChartDepartment(props) {
         <TieuDe>Biểu đồ doanh thu theo ngày</TieuDe>
       </BoxStyle>
       <BoxStyle>
-        {labels && labels.length > 0 && (
+        {totalData && totalData.length > 0 && (
           <>
             <MixedChart
               labels={labels}

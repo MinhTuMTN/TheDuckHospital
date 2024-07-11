@@ -48,6 +48,29 @@ const paymentOptions = [
   },
 ];
 
+const typeOptions = [
+  {
+    value: "BOOKING",
+    name: "Đặt khám",
+  },
+  {
+    value: "MEDICAL_TEST",
+    name: "Xét nghiệm",
+  },
+  {
+    value: "TOP_UP",
+    name: "Nạp tiền ví",
+  },
+  {
+    value: "REFUND",
+    name: "Hoàn tiền",
+  },
+  {
+    value: "ADVANCE_FEE",
+    name: "Tạm ứng",
+  }
+];
+
 function TransactionListPage(props) {
   const [filterButtonClicked, setFilterButtonClicked] = useState(true);
   const [pageChange, setPageChange] = useState(false);
@@ -89,20 +112,41 @@ function TransactionListPage(props) {
     }
   };
 
+  const [selectedType, setSelectedType] = useState([]);
+  const handleChangeTypeFilter = (event) => {
+    if (event.target.checked) {
+      setSelectedType((prev) => [...prev, event.target.value]);
+    } else {
+      setSelectedType((prev) =>
+        prev.filter((item) => item !== event.target.value)
+      );
+    }
+  };
+
   const handleGetTransactions = useCallback(async () => {
     if (!filterButtonClicked) return;
     let allPaymentMethod = [];
     let allStatus = [];
+    let allType = [];
     if (selectedPayment.length === 0)
       allPaymentMethod = ["VNPAY", "MOMO", "WALLET", "CASH"];
     if (selectedStatus.length === 0)
       allStatus = ["PENDING", "SUCCESS", "FAILED"];
+    if (selectedType.length === 0)
+      allType = [
+        "BOOKING",
+        "MEDICAL_TEST",
+        "TOP_UP",
+        "REFUND",
+        "ADVANCE_FEE"
+      ];
     const response = await getPaginationTransactions({
       page: pageChange ? page - 1 : 0,
       limit: limit,
       transactionPayment:
         allPaymentMethod.length === 0 ? selectedPayment : allPaymentMethod,
       transactionStatus: allStatus.length === 0 ? selectedStatus : allStatus,
+      paymentTypes: allType.length === 0 ? selectedType : allType,
     });
     if (response.success) {
       setTransactions(response.data.data.transactions);
@@ -117,6 +161,7 @@ function TransactionListPage(props) {
     limit,
     selectedStatus,
     selectedPayment,
+    selectedType,
     filterButtonClicked,
     pageChange,
   ]);
@@ -153,7 +198,8 @@ function TransactionListPage(props) {
               <Stack direction="row" spacing={1}>
                 <Box py={2} px={3} width="90%">
                   {selectedPayment.length === 0 &&
-                    selectedStatus.length === 0 && (
+                    selectedStatus.length === 0 &&
+                    selectedType.length === 0 && (
                       <TextField
                         disabled
                         variant="standard"
@@ -195,6 +241,18 @@ function TransactionListPage(props) {
                         }
                       />
                     ))}
+                    {selectedType.map((item, index) => (
+                      <Chip
+                        color="warning"
+                        label={typeOptions.find((i) => i.value === item)?.name}
+                        key={index}
+                        onDelete={() =>
+                          setSelectedType((prev) =>
+                            prev.filter((i) => i !== item)
+                          )
+                        }
+                      />
+                    ))}
                   </Stack>
                 </Box>
                 <Button
@@ -229,6 +287,12 @@ function TransactionListPage(props) {
                   options={statusOptions}
                   selectedValues={selectedStatus}
                   onChange={handleChangeStatusFilter}
+                />
+                <TransactionFilter
+                  label={"Loại thanh toán"}
+                  options={typeOptions}
+                  selectedValues={selectedType}
+                  onChange={handleChangeTypeFilter}
                 />
               </Stack>
               <TransactionTable

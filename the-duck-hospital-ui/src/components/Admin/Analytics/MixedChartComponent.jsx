@@ -42,13 +42,13 @@ export const MixedChart = (props) => {
       },
       {
         type: "bar",
-        label: "Khám",
+        label: "Khám bệnh",
         backgroundColor: "rgb(255, 99, 132)",
         data: booking,
       },
       {
         type: "bar",
-        label: "Xét nghiệm",
+        label: "Điều trị",
         backgroundColor: "rgb(75, 192, 192)",
         data: test,
       },

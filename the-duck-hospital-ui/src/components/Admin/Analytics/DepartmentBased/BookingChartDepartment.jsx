@@ -1,15 +1,16 @@
 import styled from "@emotion/styled";
 import { Box, Stack, Typography } from "@mui/material";
-import { LineChart } from "@mui/x-charts";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
 import React, { useCallback, useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
-import {
-  getBookingStatisticsByDepartment,
-} from "../../../../services/admin/StatisticsServices";
+import { getBookingStatisticsByDepartment } from "../../../../services/admin/StatisticsServices";
+import { Line } from "react-chartjs-2";
+import { Chart, Filler } from "chart.js";
+
+Chart.register(Filler);
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   borderBottom: "1px solid #E0E0E0",
@@ -62,7 +63,7 @@ function BookingChartDepartment(props) {
   }, [statisticRequest, departmentId]);
 
   useEffect(() => {
-   if (departmentId !==  null && departmentId !== undefined) handleStatistics();
+    if (departmentId !== null && departmentId !== undefined) handleStatistics();
   }, [handleStatistics, departmentId]);
 
   return (
@@ -135,14 +136,21 @@ function BookingChartDepartment(props) {
         <TieuDe>Biểu đồ lượt đặt khám theo ngày</TieuDe>
       </BoxStyle>
       <BoxStyle>
-        {labels && labels.length > 0 && (
+        {data && data.length > 0 && (
           <>
-            <LineChart
-              xAxis={[{ scaleType: "point", data: labels }]}
-              series={[{ data: data, label: "Đặt khám" }]}
-              height={350}
-              sx={{
-                padding: "1.6rem",
+            <Line
+              data={{
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Đặt khám",
+                    data: data,
+                    fill: true,
+                    backgroundColor: "#a0e4ff59",
+                    borderColor: "#43b0e3",
+                    tension: 0.3,
+                  },
+                ],
               }}
             />
           </>
