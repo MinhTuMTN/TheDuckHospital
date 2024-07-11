@@ -24,10 +24,20 @@ ChartJS.register(
 );
 
 export const MixedChart = (props) => {
+  const { labels, total, booking, test, isGeneral = true } = props;
+
   const options = {
     responsive: true,
+    scales: {
+      y: {
+        ticks: {
+          callback: function(value, index, values) {
+            return value.toLocaleString() + 'k';
+          }
+        }
+      }
+    }
   };
-  const {labels, total, booking, test} = props;
 
   const data = {
     labels: labels,
@@ -42,17 +52,18 @@ export const MixedChart = (props) => {
       },
       {
         type: "bar",
-        label: "Khám bệnh",
+        label: isGeneral ? "Khám và điều trị" : "Khám bệnh",
         backgroundColor: "rgb(255, 99, 132)",
         data: booking,
       },
       {
         type: "bar",
-        label: "Điều trị",
+        label: isGeneral ? "Xét nghiệm" : "Điều trị",
         backgroundColor: "rgb(75, 192, 192)",
         data: test,
       },
     ],
+    options: options,
   };
 
   return <Chart type="bar" options={options} data={data} />;

@@ -137,7 +137,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Transaction> bookingAndTestTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST),
+                Arrays.asList(PaymentType.BOOKING, PaymentType.MEDICAL_TEST, PaymentType.ADVANCE_FEE),
                 TransactionStatus.SUCCESS
         );
 
@@ -168,7 +168,7 @@ public class StatisticsServicesImpl implements IStatisticsServices {
         List<Transaction> bookingTransactions = transactionRepository.findByCreatedAtBetweenAndPaymentTypeInAndStatus(
                 startDateCalendar.getTime(),
                 endDateCalendar.getTime(),
-                List.of(PaymentType.BOOKING),
+                Arrays.asList(PaymentType.BOOKING, PaymentType.ADVANCE_FEE),
                 TransactionStatus.SUCCESS
         );
 

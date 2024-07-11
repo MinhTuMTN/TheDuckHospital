@@ -139,6 +139,7 @@ function RevenueChartDepartment(props) {
         {totalData && totalData.length > 0 && (
           <>
             <MixedChart
+              isGeneral={false}
               labels={labels}
               total={totalData}
               booking={examinationData}
