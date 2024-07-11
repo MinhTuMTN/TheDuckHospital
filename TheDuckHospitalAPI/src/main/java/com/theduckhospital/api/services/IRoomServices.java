@@ -54,4 +54,5 @@ public interface IRoomServices {
             String authorization,
             RoomType roomType
     );
+    void resetLaboratoryRoom();
 }
