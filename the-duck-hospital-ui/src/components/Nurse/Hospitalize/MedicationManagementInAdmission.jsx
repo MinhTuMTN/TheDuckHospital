@@ -39,7 +39,14 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 function MedicationManagementInAdmission(props) {
-  const { treatmentMedicines, onChange, date, hospitalizationId } = props;
+  const {
+    treatmentMedicines,
+    onChange,
+    date,
+    hospitalizationId,
+    isNotTodayOrYesterday,
+    handleAlertNotTodayOrYesterday = () => {},
+  } = props;
   const [medicines, setMedicines] = React.useState([]);
   const [medicineQuery, setMedicineQuery] = React.useState("");
 
@@ -125,6 +132,11 @@ function MedicationManagementInAdmission(props) {
         </Typography>
         <Button
           onClick={() => {
+            if (isNotTodayOrYesterday) {
+              handleAlertNotTodayOrYesterday();
+              return;
+            }
+
             setModalState("ADD");
             setSelectedMedication({
               medicineId: "",
@@ -221,6 +233,10 @@ function MedicationManagementInAdmission(props) {
                     <Stack direction={"row"} spacing={0.5}>
                       <StyledIconButton
                         onClick={() => {
+                          if (isNotTodayOrYesterday) {
+                            handleAlertNotTodayOrYesterday();
+                            return;
+                          }
                           setSelectedMedication(medication);
                           setModalState("EDIT");
                         }}
@@ -229,6 +245,10 @@ function MedicationManagementInAdmission(props) {
                       </StyledIconButton>
                       <StyledIconButton
                         onClick={() => {
+                          if (isNotTodayOrYesterday) {
+                            handleAlertNotTodayOrYesterday();
+                            return;
+                          }
                           setSelectedMedication(medication);
                           setModalState("DELETE");
                         }}

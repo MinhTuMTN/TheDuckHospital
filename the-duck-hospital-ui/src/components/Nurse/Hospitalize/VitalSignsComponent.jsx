@@ -31,7 +31,14 @@ const modalStyle = {
   justifyContent: "center",
 };
 const VitalSignsComponent = (props) => {
-  const { heartRate, bloodPressure, temperature, onChange = () => {} } = props;
+  const {
+    heartRate,
+    bloodPressure,
+    temperature,
+    onChange = () => {},
+    isNotTodayOrYesterday,
+    handleAlertNotTodayOrYesterday = () => {},
+  } = props;
   const [changeInfo, setChangeInfo] = React.useState({
     heartRate: heartRate,
     bloodPressure: bloodPressure,
@@ -132,7 +139,13 @@ const VitalSignsComponent = (props) => {
       </Stack>
 
       <Button
-        onClick={() => setOpenModal(true)}
+        onClick={() => {
+          if (isNotTodayOrYesterday) {
+            handleAlertNotTodayOrYesterday();
+          } else {
+            setOpenModal(true);
+          }
+        }}
         sx={{
           position: "absolute",
           bottom: "8px",

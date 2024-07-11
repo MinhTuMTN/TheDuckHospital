@@ -6,6 +6,7 @@ import com.theduckhospital.api.entity.Doctor;
 import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.Nurse;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.repository.HospitalizationDetailRepository;
 import com.theduckhospital.api.services.IDoctorServices;
 import com.theduckhospital.api.services.IHospitalizationDetailServices;
@@ -51,6 +52,12 @@ public class HospitalizationDetailServicesImpl implements IHospitalizationDetail
             UpdateDailyHospitalAdmissionDetails request
     ) {
         Date hospitalizationDate = DateCommon.getStarOfDay(request.getDate());
+        if (DateCommon.isNotTodayOrYesterday(
+                hospitalizationDate
+        )) {
+            throw new BadRequestException("Invalid date");
+        }
+
         Optional<HospitalizationDetail> optional = hospitalizationDetailRepository
                 .findByHospitalAdmissionAndHospitalizationDate(
                         hospitalAdmission,

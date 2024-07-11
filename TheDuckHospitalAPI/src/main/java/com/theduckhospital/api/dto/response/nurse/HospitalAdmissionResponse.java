@@ -34,7 +34,7 @@ public class HospitalAdmissionResponse {
         this.hospitalAdmissionCode = hospitalAdmission.getHospitalAdmissionCode();
         this.admissionDate = hospitalAdmission.getAdmissionDate();
 
-        this.underlyingDisease = hospitalAdmission.getHistoryOfAllergy();
+        this.underlyingDisease = hospitalAdmission.getUnderlyingDisease();
         this.allergy = hospitalAdmission.getHistoryOfAllergy();
         this.isDischargePaid = hospitalAdmission.getPaidDischargeFee();
 

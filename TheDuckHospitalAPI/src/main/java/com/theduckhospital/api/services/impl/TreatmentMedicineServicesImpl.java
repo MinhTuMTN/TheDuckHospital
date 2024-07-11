@@ -1,17 +1,20 @@
 package com.theduckhospital.api.services.impl;
 
+import com.theduckhospital.api.constant.DateCommon;
 import com.theduckhospital.api.dto.request.nurse.CreateTreatmentMedicineRequest;
 import com.theduckhospital.api.dto.request.nurse.InvoiceDetails;
 import com.theduckhospital.api.entity.HospitalAdmission;
 import com.theduckhospital.api.entity.HospitalizationDetail;
 import com.theduckhospital.api.entity.Medicine;
 import com.theduckhospital.api.entity.TreatmentMedicine;
+import com.theduckhospital.api.error.BadRequestException;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.TreatmentMedicineRepository;
 import com.theduckhospital.api.services.IMedicineServices;
 import com.theduckhospital.api.services.ITreatmentMedicineServices;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -160,12 +163,19 @@ public class TreatmentMedicineServicesImpl implements ITreatmentMedicineServices
                         treatmentMedicineId,
                         hospitalAdmission
                 );
-
         if (treatmentMedicineOptional.isEmpty()) {
             throw new NotFoundException("Treatment medicine not found");
         }
 
         TreatmentMedicine treatmentMedicine = treatmentMedicineOptional.get();
+
+        Date hospitalizationDate = treatmentMedicine.getHospitalizationDetail().getHospitalizationDate();
+        if (DateCommon.isNotTodayOrYesterday(hospitalizationDate)) {
+            throw new BadRequestException(
+                    "Cannot delete treatment medicine of the day before yesterday"
+            );
+        }
+
         if (deleteFromTomorrow) {
             treatmentMedicine.setDeleteFromTomorrow(true);
         } else {

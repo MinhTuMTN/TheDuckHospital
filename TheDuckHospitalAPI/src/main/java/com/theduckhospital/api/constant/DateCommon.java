@@ -112,4 +112,11 @@ public class DateCommon {
         long diff = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
         return Duration.ofMillis(diff).toDays();
     }
+
+    public static boolean isNotTodayOrYesterday(Date date) {
+        Date today = DateCommon.getEndOfDay(getToday());
+        Date yesterday = DateCommon.getStarOfDay(getYesterday());
+
+        return date.compareTo(today) > 0 || date.compareTo(yesterday) < 0;
+    }
 }
