@@ -87,7 +87,9 @@
     "forgotPassword": "Forgot password",
     "enterPhone": "Please enter your email or phone number to reset your password",
     "email": "Email or phone number",
-    "resetPassword": "Reset password"
+    "resetPassword": "Reset password",
+    "changePasswordSuccess": "Change password success",
+    "changePasswordFail": "Change password fail"
   },
   "verifyPhoneScreen": {
     "title": "Verify Phone Number",
