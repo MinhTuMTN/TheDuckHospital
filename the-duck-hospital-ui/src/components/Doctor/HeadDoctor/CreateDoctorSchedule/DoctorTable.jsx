@@ -69,8 +69,9 @@ const Content = styled(Typography)(({ theme }) => ({
 }));
 
 const CustomTypography = styled(Typography)(({ theme }) => ({
-  fontSize: "14px !important",
+  fontSize: "17px !important",
   marginBottom: "2px !important",
+  fontWeight: "500 !important",
 }));
 
 const CustomTextField = styled(TextField)(({ theme }) => ({
@@ -523,7 +524,7 @@ function DoctorTable(props) {
             setScheduleType("EXAMINATION");
           }}
         >
-          <Stack width={"30rem"} mt={3} spacing={4}>
+          <Stack width={"30rem"} mt={3} spacing={1}>
             <Stack direction="row" spacing={2} flexWrap={true}>
               <CustomTextField
                 label="Bác sĩ"
@@ -565,18 +566,24 @@ function DoctorTable(props) {
               )}
             </Stack>
             {roomType === "EXAMINATION_ROOM" && (
-              <CustomTypography
-                style={{ width: "100%", marginTop: 8 }}
+              <Typography
+                variant="caption"
+                style={{ width: "100%", marginTop: 4 }}
                 color={"#8e8e8e"}
               >
                 Trong một buổi khám sẽ có tổng cộng {doctorSchedule.slot * 4}{" "}
                 người có thể đăng ký online
-              </CustomTypography>
+              </Typography>
             )}
 
-            <Stack style={{ width: "50%" }}>
-              <FormControl>
-                <CustomTypography variant="body1">Loại phòng</CustomTypography>
+            <Stack
+              style={{ width: "100%" }}
+              direction={"row"}
+              alignItems={"center"}
+              spacing={2}
+            >
+              <CustomTypography variant="body1">Loại phòng: </CustomTypography>
+              <FormControl di>
                 <RadioGroup
                   defaultValue="EXAMINATION_ROOM"
                   value={roomType}
@@ -650,7 +657,13 @@ function DoctorTable(props) {
               </FormControl>
             </Box>
 
-            <Stack spacing={2} direction="row">
+            <Stack
+              spacing={2}
+              direction="row"
+              style={{
+                display: "none",
+              }}
+            >
               <Box width="100%">
                 <CustomTypography
                   variant="body1"

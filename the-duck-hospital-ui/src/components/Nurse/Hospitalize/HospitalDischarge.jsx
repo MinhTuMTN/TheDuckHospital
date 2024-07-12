@@ -173,9 +173,9 @@ function HospitalDischarge() {
             dischargeDate: data.dischargeDate,
             reExaminationDate: dayjs(data.reExaminationDate),
             isReExamination: data.reExaminationDate !== null,
-            doctorId: data.doctorId,
-            doctorName: data.doctorName,
-            doctorDegree: data.doctorDegree,
+            doctorId: data.doctorId || "",
+            doctorName: data.doctorName || "",
+            doctorDegree: data.doctorDegree || "",
           };
         });
       } else {
@@ -473,10 +473,10 @@ function HospitalDischarge() {
             </ButtonCustom>
             <Box>
               <ButtonCustom
-                disabled={generalInfo?.dischargePaid}
+                disabled={!generalInfo?.dischargePaid}
                 variant="text"
                 style={{
-                  color: generalInfo?.dischargePaid ? "#c3c3c3" : "#000092",
+                  color: !generalInfo?.dischargePaid ? "#c3c3c3" : "#000092",
                 }}
                 endIcon={<Print />}
                 onClick={() => {
