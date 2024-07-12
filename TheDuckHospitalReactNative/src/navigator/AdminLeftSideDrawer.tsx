@@ -13,7 +13,7 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {appColors} from '../constants/appColors';
 import RoomListScreen from '../screens/admin/RoomManagementScreen/RoomListScreen';
-import TransactionListScreen from '../screens/admin/TransactionManagementScreen/TransactionListScreen';
+// import TransactionListScreen from '../screens/admin/TransactionManagementScreen/TransactionListScreen';
 import PatientListScreen from '../screens/admin/PatientManagementScreen/PatientListScreen';
 import ServiceListScreen from '../screens/admin/ServiceManagementScreen/ServiceListScreen';
 import {ActivitySquare, BarChart3, LogOut, Users} from 'lucide-react-native';
@@ -191,7 +191,7 @@ function AdminLeftSideDrawer() {
           ),
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Quản lý thanh toán"
         component={TransactionListScreen}
         options={{
@@ -204,7 +204,7 @@ function AdminLeftSideDrawer() {
             />
           ),
         }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 }

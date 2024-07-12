@@ -84,10 +84,10 @@ public class MedicalServiceServicesImpl implements IMedicalServiceServices {
     ) {
         List<Department> departments = departmentRepository.findByDepartmentNameContaining(search);
 
-        List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingOrDepartmentInAndServiceTypeIn(
+        List<MedicalService> services = medicalServiceRepository.findByServiceNameContainingAndServiceTypeInOrDepartmentIn(
                 search,
-                departments,
-                serviceTypes
+                serviceTypes,
+                departments
         );
 
 //        List<MedicalService> filteredServices = services.stream()
