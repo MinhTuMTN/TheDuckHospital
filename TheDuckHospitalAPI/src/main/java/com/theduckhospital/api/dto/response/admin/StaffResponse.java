@@ -35,7 +35,7 @@ public class StaffResponse {
         this.identityNumber = staff.getIdentityNumber();
         this.dateOfBirth = staff.getDateOfBirth();
         this.gender = staff.getGender().ordinal();
-        this.email = staff.getAccount().getEmail();
+        this.email = staff.getAccount() == null ? "Chưa cập nhật" : staff.getAccount().getEmail();
         this.deleted = staff.isDeleted();
         this.avatar = staff.getAvatar();
 

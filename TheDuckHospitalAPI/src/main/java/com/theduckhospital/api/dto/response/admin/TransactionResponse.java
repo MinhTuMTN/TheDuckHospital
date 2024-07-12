@@ -32,7 +32,7 @@ public class TransactionResponse {
         this.userName = !bookings.isEmpty() ? bookings.get(0).getPatientProfile().getFullName() : "";
         this.accountUserName =
                 transaction.getPaymentType() == PaymentType.TOP_UP || transaction.getPaymentType() == PaymentType.REFUND ?
-                        transaction.getAccount().getFullName() : "";
+                        transaction.getAccount() == null ? "Chưa cập nhật" : transaction.getAccount().getFullName() : "";
         this.amount = transaction.getAmount();
         this.paymentType = transaction.getPaymentType();
         this.status = transaction.getStatus();

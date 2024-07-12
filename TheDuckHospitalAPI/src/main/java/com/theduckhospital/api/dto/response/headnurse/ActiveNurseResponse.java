@@ -23,7 +23,7 @@ public class ActiveNurseResponse {
         this.phoneNumber = nurse.getPhoneNumber();
         this.department = nurse.getDepartment();
         this.nurseType = nurse.getNurseType();
-        this.email = nurse.getAccount().getEmail();
+        this.email = nurse.getAccount() == null ? "Chưa cập nhật" : nurse.getAccount().getEmail();
         this.avatar = nurse.getAvatar();
     }
 }

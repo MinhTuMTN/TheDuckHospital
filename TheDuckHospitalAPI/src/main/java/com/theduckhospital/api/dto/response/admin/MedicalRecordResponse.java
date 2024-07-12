@@ -28,7 +28,9 @@ public class MedicalRecordResponse {
         this.roomName = record.getDoctorSchedule().getRoom().getRoomName();
         this.departmentName = record.getDoctorSchedule().getRoom().getDepartment().getDepartmentName();
         this.doctor = record.getDoctorSchedule().getDoctor();
-        this.doctorEmail = record.getDoctorSchedule().getDoctor().getAccount().getEmail();
+        this.doctorEmail = record.getDoctorSchedule().getDoctor().getAccount() == null ?
+                "Chưa cập nhật" :
+                doctor.getAccount().getEmail();
         this.doctorSchedule = new DoctorScheduleRoomResponse(record.getDoctorSchedule(), 0);
 
         Prescription prescription = record.getPrescription();
