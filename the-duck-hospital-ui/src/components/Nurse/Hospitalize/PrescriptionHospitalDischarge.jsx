@@ -180,6 +180,7 @@ function PrescriptionHospitalDischarge(props) {
           diagnostic={diagnostic}
           hospitalizationId={info?.hospitalAdmissionId}
           role={"nurse"}
+          disableButton={!info?.dischargePaid}
         />
       </Grid>
     </ViewStyle>
