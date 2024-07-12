@@ -16,14 +16,11 @@ import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {ButtonGroup} from '@gluestack-ui/themed';
 import SelectDropdown from 'react-native-select-dropdown';
 import {
-  addDoctorToDepartment,
   addNurseToDepartment,
-  getDoctorWithoutDepartment,
   getNurseWithoutDepartment,
 } from '../../../services/departmentServices';
 
-interface AddStaffDialogComponentProps {
-  isDoctor: boolean;
+interface AddNurseDialogComponentProps {
   departmentId: number;
   modalVisible?: boolean;
   refreshList: boolean;
@@ -31,9 +28,8 @@ interface AddStaffDialogComponentProps {
   setModalVisible?: (modalVisible: boolean) => void;
 }
 
-const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
+const AddNurseDialogComponent = (props: AddNurseDialogComponentProps) => {
   const {
-    isDoctor,
     departmentId,
     refreshList,
     modalVisible,
@@ -44,7 +40,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
   const [loading, setLoading] = useState(false);
   const [staff, setStaff] = useState({
     staffId: '',
-    fullName: isDoctor ? 'Chọn bác sĩ' : 'Chọn điều dưỡng',
+    fullName: 'Chọn điều dưỡng',
   });
   const [isFirstClick, setIsFirstClick] = useState(true);
 
@@ -54,7 +50,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
       setIsFirstClick(true);
       setStaff({
         staffId: '',
-        fullName: isDoctor ? 'Chọn bác sĩ' : 'Chọn điều dưỡng',
+        fullName: 'Chọn điều dưỡng',
       });
     }
   };
@@ -63,9 +59,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
     if (isFirstClick) setIsFirstClick(false);
     if (staff === null || staff.staffId === '') return;
     setLoading(true);
-    const response = isDoctor
-      ? await addDoctorToDepartment(departmentId, staff.staffId)
-      : await addNurseToDepartment(departmentId, staff.staffId);
+    const response = await addNurseToDepartment(departmentId, staff.staffId);
     setLoading(false);
     if (response.success) {
       setStaffs(response.data.data);
@@ -78,9 +72,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
 
   React.useEffect(() => {
     const handleGetStaffWithoutDepartment = async () => {
-      const response = isDoctor
-        ? await getDoctorWithoutDepartment(departmentId)
-        : await getNurseWithoutDepartment(departmentId);
+      const response = await getNurseWithoutDepartment(departmentId);
       if (response.success) {
         setStaffs(response.data.data);
       } else {
@@ -104,13 +96,9 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
         <View style={styles.modalView}>
           <FlexComponent style={styles.modalHeader}>
             <FlexComponent style={{flexDirection: 'row', alignItems: 'center'}}>
-              <FontistoIcon
-                name={isDoctor ? 'doctor' : 'nurse'}
-                size={24}
-                color={appColors.white}
-              />
+              <FontistoIcon name={'nurse'} size={24} color={appColors.white} />
               <TextComponent style={styles.headerText}>
-                {isDoctor ? `Thêm bác sĩ vào khoa` : `Thêm điều dưỡng vào khoa`}
+                {`Thêm điều dưỡng vào khoa`}
               </TextComponent>
             </FlexComponent>
             <Pressable onPress={closeModal}>
@@ -122,7 +110,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
 
           <ScrollView style={styles.modalBody}>
             <TextComponent bold style={styles.labelText}>
-              {isDoctor ? `Bác sĩ*` : `Điều dưỡng*`}
+              {`Điều dưỡng*`}
             </TextComponent>
             <SelectDropdown
               data={staffs}
@@ -156,13 +144,11 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
                 return (
                   <View style={styles.dropdownBtnChildStyle}>
                     <FontistoIcon
-                      name={isDoctor ? 'doctor' : 'nurse'}
+                      name={'nurse'}
                       color={appColors.black}
                       size={24}
                     />
-                    <Text style={styles.dropdownBtnTxt}>
-                      {selectedItem ? selectedItem.fullName : staff.fullName}
-                    </Text>
+                    <Text style={styles.dropdownBtnTxt}>{staff.fullName}</Text>
                   </View>
                 );
               }}
@@ -177,7 +163,7 @@ const AddStaffDialogComponent = (props: AddStaffDialogComponentProps) => {
                     marginTop: 10,
                   },
                 ]}>
-                {isDoctor ? `Cần chọn bác sĩ` : `Cần chọn điều dưỡng`}
+                {`Cần chọn điều dưỡng`}
               </TextComponent>
             )}
           </ScrollView>
@@ -279,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddStaffDialogComponent;
+export default AddNurseDialogComponent;
