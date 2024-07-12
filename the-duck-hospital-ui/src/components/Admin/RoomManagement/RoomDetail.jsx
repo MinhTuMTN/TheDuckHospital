@@ -275,19 +275,22 @@ function RoomDetail(props) {
           </Grid>
         </Grid>
       </BoxStyle>
-      <BoxStyle>
-        <Grid container>
-          <Grid item xs={4} md={3}>
-            <TieuDeCot>Tên khoa</TieuDeCot>
-          </Grid>
+      {(room.roomType?.startsWith("EXAMINATION") ||
+        room.roomType?.startsWith("TREATMENT")) && (
+        <BoxStyle>
+          <Grid container>
+            <Grid item xs={4} md={3}>
+              <TieuDeCot>Tên khoa</TieuDeCot>
+            </Grid>
 
-          <Grid item xs={8} md={9}>
-            <NoiDung>
-              {room.departmentName ? room.departmentName : "Đang cập nhật"}
-            </NoiDung>
+            <Grid item xs={8} md={9}>
+              <NoiDung>
+                {room.departmentName ? room.departmentName : "Chưa cập nhật"}
+              </NoiDung>
+            </Grid>
           </Grid>
-        </Grid>
-      </BoxStyle>
+        </BoxStyle>
+      )}
       <BoxStyle>
         <Grid container>
           <Grid item xs={4} md={3}>
@@ -332,7 +335,9 @@ function RoomDetail(props) {
           </Grid>
 
           <Grid item xs={8} md={9}>
-            <NoiDung>{room.description}</NoiDung>
+            <NoiDung>
+              {room.description ? room.description : "Chưa cập nhật"}
+            </NoiDung>
           </Grid>
         </Grid>
       </BoxStyle>

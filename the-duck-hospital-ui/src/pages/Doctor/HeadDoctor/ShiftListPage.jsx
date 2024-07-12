@@ -86,7 +86,8 @@ function ShiftListPage(props) {
   const theme = useTheme();
   const [valueDate, setValueDate] = useState(dayjs());
   const isFullScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [totalItems, setTotalItems] = useState(0);
+  const [totalExaminationRooms, setTotalExaminationRooms] = useState(0);
+  const [totalTreatmentRooms, setTotalTreatmentRooms] = useState(0);
   const [examinationLimit, setExaminationLimit] = useState(5);
   const [examinationPage, setExaminationPage] = useState(1);
   const [treatmentLimit, setTreatmentLimit] = useState(5);
@@ -116,7 +117,7 @@ function ShiftListPage(props) {
       if (response.data.data.rooms.length > 0) {
         setSelectedRow(response.data.data.rooms[0].roomId);
       }
-      setTotalItems(response.data.data.total);
+      setTotalExaminationRooms(response.data.data.total);
       setExaminationPage(response.data.data.page + 1);
       setExaminationLimit(response.data.data.limit);
     }
@@ -139,7 +140,7 @@ function ShiftListPage(props) {
       ) {
         setSelectedRow(response.data.data.rooms[0].roomId);
       }
-      setTotalItems(response.data.data.total);
+      setTotalTreatmentRooms(response.data.data.total);
       setTreatmentPage(response.data.data.page + 1);
       setTreatmentLimit(response.data.data.limit);
     }
@@ -434,7 +435,7 @@ function ShiftListPage(props) {
                   justifyContent: "center",
                   marginTop: "10px",
                 }}
-                count={totalItems}
+                count={totalExaminationRooms}
                 onPageChange={handleExaminationPageChange}
                 page={examinationPage - 1}
                 rowsPerPage={examinationLimit}
@@ -475,7 +476,7 @@ function ShiftListPage(props) {
                   justifyContent: "center",
                   marginTop: "10px",
                 }}
-                count={totalItems}
+                count={totalTreatmentRooms}
                 onPageChange={handleTreatmentPageChange}
                 page={treatmentPage - 1}
                 rowsPerPage={treatmentLimit}

@@ -1,14 +1,7 @@
-import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
   Box,
-  Button,
-  IconButton,
   Paper,
-  Popover,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +11,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 const CustomText = styled(Typography)(({ theme }) => ({
   fontSize: "14px !important",
@@ -52,19 +45,6 @@ const scheduleSessions = [
 
 function Row(props) {
   const { row } = props;
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const maxWidth = useCustomMediaQuery();
 
@@ -153,79 +133,12 @@ function Row(props) {
             {row.queueNumber}
           </CustomText>
         </TableCell>
-        <TableCell align="center">
-          <>
-            {isSmallScreen ? (
-              // Hiển thị cho màn hình nhỏ
-              <>
-                <IconButton
-                  color="black"
-                  aria-describedby={id}
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon color="black" />
-                </IconButton>
-                <Popover
-                  id={id}
-                  open={open}
-                  anchorEl={anchorEl}
-                  onClose={handleClose}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                >
-                  <Stack direction={"column"}>
-                    <Button
-                      variant="text"
-                      size="medium"
-                      sx={{
-                        paddingX: 2,
-                        paddingY: 1,
-                        textAlign: "left",
-                      }}
-                      // onClick={(e) => {
-                      //   navigate(`/admin/product-management/${row.productId}`, {
-                      //     state: {
-                      //       id: row.productId,
-                      //     },
-                      //   });
-                      // }}
-                    >
-                      Xem
-                    </Button>
-                  </Stack>
-                </Popover>
-              </>
-            ) : (
-              // Hiển thị cho màn hình vừa và lớn
-              <>
-                <IconButton
-                  color="black"
-                  // onClick={(e) => {
-                  //   navigate(`/admin/product-management/${row.productId}`, {
-                  //     state: {
-                  //       id: row.productId,
-                  //     },
-                  //   });
-                  // }}
-                >
-                  <InfoOutlinedIcon color="black" />
-                </IconButton>
-              </>
-            )}
-          </>
-        </TableCell>
       </TableRow>
     </React.Fragment>
   );
 }
 
-function ScheduleTable(props) {
+function ExamRoomScheduleTable(props) {
   const { items } = props;
 
   return (
@@ -265,19 +178,14 @@ function ScheduleTable(props) {
                     Đặt trước
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "10%" }}>
+                <TableCell style={{ width: "15%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Chỗ còn lại
                   </CustomText>
                 </TableCell>
-                <TableCell style={{ width: "10%" }}>
+                <TableCell style={{ width: "15%" }}>
                   <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
                     Số hiện tại
-                  </CustomText>
-                </TableCell>
-                <TableCell align="center" style={{ width: "10%" }}>
-                  <CustomText style={{ fontWeight: "500" }} color={"#101828"}>
-                    Tùy chọn
                   </CustomText>
                 </TableCell>
               </TableRow>
@@ -294,8 +202,8 @@ function ScheduleTable(props) {
   );
 }
 
-ScheduleTable.propTypes = {
+ExamRoomScheduleTable.propTypes = {
   items: PropTypes.array,
 };
 
-export default ScheduleTable;
+export default ExamRoomScheduleTable;

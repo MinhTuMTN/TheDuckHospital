@@ -100,7 +100,7 @@ function Row(props) {
               maxWidth: maxWidth,
             }}
           >
-            {row.identityNumber}
+            {row.identityNumber ? row.identityNumber : "Chưa cập nhật"}
           </CustomText>
         </TableCell>
         <TableCell align="right">

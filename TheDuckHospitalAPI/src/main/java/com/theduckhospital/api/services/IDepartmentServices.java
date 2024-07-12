@@ -16,7 +16,7 @@ public interface IDepartmentServices {
     Department updateDepartment(int departmentId, UpdateDepartmentRequest request);
     boolean deleteDepartment(int departmentId);
     Department restoreDepartment(int departmentId);
-    List<DepartmentResponse> getAllDepartments();
+    List<Department> getAllDepartments();
     List<Department> getAllActiveDepartments();
     List<Doctor> getActiveDoctorsDepartment(int departmentId);
     List<Nurse> getActiveNursesDepartment(int departmentId);

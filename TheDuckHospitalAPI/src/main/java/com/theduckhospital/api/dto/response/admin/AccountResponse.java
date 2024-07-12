@@ -19,6 +19,7 @@ public class AccountResponse {
     private List<PatientProfile> patientProfiles;
     private boolean headOfDepartment;
     private boolean deleted;
+    private String avatar;
 
     public AccountResponse(Account account) {
         this.userId = account.getUserId();
@@ -26,6 +27,7 @@ public class AccountResponse {
         this.phoneNumber = account.getPhoneNumber();
         this.email = account.getEmail();
         this.deleted = account.isDeleted();
+        this.avatar = account.getAvatar();
 
         Staff staff = account.getStaff();
         if (staff != null) {
@@ -49,6 +51,8 @@ public class AccountResponse {
                 this.role = "Dược sĩ";
             } else if (staff instanceof LaboratoryTechnician) {
                 this.role = "Bác sĩ xét nghiệm";
+            } else if (staff instanceof SupportAgent) {
+                this.role = "Hỗ trợ viên";
             } else {
                 this.role = "Quản lý";
             }

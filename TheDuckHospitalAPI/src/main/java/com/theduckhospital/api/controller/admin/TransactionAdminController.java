@@ -1,6 +1,7 @@
 package com.theduckhospital.api.controller.admin;
 
 import com.theduckhospital.api.constant.PaymentMethod;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.GeneralResponse;
 import com.theduckhospital.api.services.ITransactionServices;
@@ -26,7 +27,8 @@ public class TransactionAdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
             @RequestParam(required = false) List<String> transactionPayment,
-            @RequestParam(required = false) List<TransactionStatus> transactionStatus
+            @RequestParam(required = false) List<TransactionStatus> transactionStatus,
+            @RequestParam(required = false) List<PaymentType> paymentTypes
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
@@ -37,7 +39,8 @@ public class TransactionAdminController {
                                         page,
                                         limit,
                                         transactionPayment,
-                                        transactionStatus
+                                        transactionStatus,
+                                        paymentTypes
                                 )).build()
         );
     }

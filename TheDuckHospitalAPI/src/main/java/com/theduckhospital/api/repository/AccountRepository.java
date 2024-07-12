@@ -27,12 +27,12 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
                     "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
                     "WHERE a.deleted IN ?2 " +
                     "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
-                    "AND a.staff_id IS NULL OR s.dtype IN ?3",
+                    "AND (a.staff_id IS NULL OR s.dtype IN ?3)",
             countQuery = "SELECT COUNT(a.user_id) FROM account a " +
                     "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
                     "WHERE a.deleted IN ?2 " +
                     "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
-                    "AND a.staff_id IS NULL OR s.dtype IN ?3",
+                    "AND (a.staff_id IS NULL OR s.dtype IN ?3)",
             nativeQuery = true
     )
     Page<Account> findAccount(
@@ -42,23 +42,59 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
             Pageable pageable
     );
 
+//    @Query(
+//            value = "SELECT a FROM Account a " +
+//                    "LEFT JOIN Staff s ON a.staff.staffId = s.staffId " +
+//                    "WHERE a.deleted IN :deleted " +
+//                    "AND a.fullName LIKE %:fullName% " +
+//                    "AND (a.staff_id IS NULL OR TYPE(a.staff) IN :staffClasses)",
+//            countQuery = "SELECT COUNT(a.userId) FROM Account a " +
+//                    "LEFT JOIN Staff s ON a.staff.staffId = s.staffId " +
+//                    "WHERE a.deleted IN :deleted " +
+//                    "AND a.fullName LIKE %:fullName% " +
+//                    "AND (a.a.staff_id IS NULL OR TYPE(a.staff) IN :staffClasses)"
+//    )
+//    Page<Account> findAccount(
+//            String fullName,
+//            List<Boolean> deleted,
+//            List<Class<? extends Staff>> staffClasses,
+//            Pageable pageable
+//    );
+
+//    @Query(
+//            value = "SELECT a.* FROM account a " +
+//                    "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
+//                    "WHERE a.deleted IN ?2 " +
+//                    "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
+//                    "AND s.dtype IN ?3",
+//            countQuery = "SELECT COUNT(a.user_id) FROM account a " +
+//                    "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
+//                    "WHERE a.deleted IN ?2 " +
+//                    "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
+//                    "AND s.dtype IN ?3",
+//            nativeQuery = true
+//    )
+//    Page<Account> findAccountWithoutPatient(
+//            String fullName,
+//            List<Boolean> deleted,
+//            List<String> staffClasses,
+//            Pageable pageable
+//    );
+
     @Query(
-            value = "SELECT a.* FROM account a " +
-                    "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
-                    "WHERE a.deleted IN ?2 " +
-                    "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
-                    "AND s.dtype IN ?3",
-            countQuery = "SELECT COUNT(a.user_id) FROM account a " +
-                    "LEFT JOIN staff s ON a.staff_id = s.staff_id " +
-                    "WHERE a.deleted IN ?2 " +
-                    "AND a.full_name LIKE CONCAT('%', ?1, '%') " +
-                    "AND s.dtype IN ?3",
-            nativeQuery = true
+            value = "SELECT a FROM Account a " +
+                    "WHERE a.deleted IN :deleted " +
+                    "AND a.fullName LIKE %:fullName% " +
+                    "AND TYPE(a.staff) IN :staffClasses",
+            countQuery = "SELECT COUNT(a.userId) FROM Account a " +
+                    "WHERE a.deleted IN :deleted " +
+                    "AND a.fullName LIKE %:fullName% " +
+                    "AND TYPE(a.staff) IN :staffClasses"
     )
     Page<Account> findAccountWithoutPatient(
             String fullName,
             List<Boolean> deleted,
-            List<String> staffClasses,
+            List<Class<? extends Staff>> staffClasses,
             Pageable pageable
     );
 }

@@ -1,10 +1,7 @@
 package com.theduckhospital.api.repository;
 
 import com.theduckhospital.api.constant.TransactionStatus;
-import com.theduckhospital.api.entity.Booking;
-import com.theduckhospital.api.entity.Department;
-import com.theduckhospital.api.entity.DoctorSchedule;
-import com.theduckhospital.api.entity.PatientProfile;
+import com.theduckhospital.api.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,12 +17,15 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             DoctorSchedule doctorSchedule,
             int queueNumber
     );
+
+    Optional<Booking> findByRefundedTransactionId(UUID transactionId);
+
     @Query("SELECT MAX(b.queueNumber) " +
             "FROM Booking b " +
             "WHERE b.timeSlot.doctorSchedule = :doctorSchedule " +
             "AND b.deleted = false"
     )
-    long maxQueueNumberByDoctorSchedule(DoctorSchedule doctorSchedule);
+    Long maxQueueNumberByDoctorSchedule(DoctorSchedule doctorSchedule);
     Optional<Booking> findByBookingCodeAndDeletedIsFalse(String bookingCode);
     Page<Booking> findBookingsByTimeSlot_DoctorScheduleAndQueueNumberLessThanEqualAndDeletedIsFalseOrderByQueueNumberDesc(
             DoctorSchedule doctorSchedule,

@@ -1,6 +1,7 @@
 package com.theduckhospital.api.services;
 
 import com.theduckhospital.api.constant.PaymentMethod;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.admin.FilteredTransactionsResponse;
 import com.theduckhospital.api.dto.response.admin.TransactionResponse;
@@ -15,7 +16,8 @@ public interface ITransactionServices {
             int page,
             int limit,
             List<String> transactionPayment,
-            List<TransactionStatus> transactionStatus
+            List<TransactionStatus> transactionStatus,
+            List<PaymentType> paymentTypes
     );
     TransactionResponse getTransactionByIdAdmin(UUID transactionId);
 }

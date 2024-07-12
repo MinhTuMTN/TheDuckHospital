@@ -435,4 +435,18 @@ public class RoomServicesImpl implements IRoomServices {
                 .map(TreatmentRoomDetailsResponse::new)
                 .toList();
     }
+
+    @Override
+    public void resetLaboratoryRoom() {
+        System.out.println("Reset laboratory room");
+        List<Room> rooms = roomRepository.findByRoomTypeInAndDeletedIsFalse(
+                List.of(RoomType.LABORATORY_ROOM_ADMISSION, RoomType.LABORATORY_ROOM_NORMAL)
+        );
+        for (Room room : rooms) {
+            room.setMedicalTestQueueNumber(0);
+            room.setMedicalTestQueueNumberMax(0);
+        }
+
+        roomRepository.saveAll(rooms);
+    }
 }

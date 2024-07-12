@@ -110,7 +110,13 @@ function MedicalInAdmissionDatails(props) {
             height={"100%"}
             paddingX={3}
           >
-            <CustomButton disabled={!medicalTest?.result} size="small">
+            <CustomButton
+              disabled={!medicalTest?.result}
+              size="small"
+              onClick={() => {
+                window.open(medicalTest?.result, "_blank");
+              }}
+            >
               <DownloadOutlined
                 sx={{
                   fontSize: "20px",

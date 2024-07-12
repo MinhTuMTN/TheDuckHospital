@@ -89,14 +89,14 @@ public class StaffAdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
             @RequestParam(required = false) List<Role> staffRole,
-            @RequestParam(required = false) List<Integer> departmentIds,
+//            @RequestParam(required = false) List<Integer> departmentIds,
             @RequestParam(defaultValue = "false, true") List<Boolean> staffStatus
     ) {
         return ResponseEntity.ok(
                 GeneralResponse.builder()
                         .success(true)
                         .message("Get filtered staffs pagination successfully")
-                        .data(staffServices.getPaginationFilteredStaffs(search, page, limit, staffRole, departmentIds, staffStatus))
+                        .data(staffServices.getPaginationFilteredStaffs(search, page, limit, staffRole, staffStatus))
                         .build()
         );
     }

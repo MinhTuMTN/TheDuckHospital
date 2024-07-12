@@ -113,8 +113,8 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
     @Query(
             value = "SELECT ds FROM NurseSchedule ns, DoctorSchedule ds "+
                     "WHERE ns.nurse = :nurse " +
-                    "AND ns.dayOfWeek = :dayOfWeek " +
                     "AND ds.date = :date " +
+                    "AND ds.deleted = false "+
                     "AND ns.scheduleSession = ds.scheduleSession " +
                     "AND ns.room = ds.room " +
                     "AND ns.scheduleType = :scheduleType " +
@@ -122,7 +122,6 @@ public interface NurseScheduleRepository extends JpaRepository<NurseSchedule, UU
     )
     List<DoctorSchedule> findTodayExaminationSchedules(
             Nurse nurse,
-            int dayOfWeek,
             Date date,
             ScheduleType scheduleType
     );

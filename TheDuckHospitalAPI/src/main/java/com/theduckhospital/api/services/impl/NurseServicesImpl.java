@@ -223,7 +223,12 @@ public class NurseServicesImpl implements INurseServices {
         Nurse nurse = getNurseByToken(authorization);
 
         if (nurse.getNurseType() == NurseType.CLINICAL_NURSE) {
-            return nurse.getNurseSchedules();
+            return nurse.getNurseSchedules()
+                    .stream()
+                    .filter(
+                            nurseSchedule -> !nurseSchedule.isDeleted()
+                            && nurseSchedule.getScheduleType() == ScheduleType.EXAMINATION
+                    ).toList();
         } else if (nurse.getNurseType() == NurseType.INPATIENT_NURSE) {
             if (month == null || year == null) {
                 throw new BadRequestException("Month and year are required");
@@ -360,7 +365,6 @@ public class NurseServicesImpl implements INurseServices {
         List<DoctorSchedule> doctorSchedules = nurseScheduleRepository
                 .findTodayExaminationSchedules(
                         nurse,
-                        DateCommon.getCalendar(today).get(Calendar.DAY_OF_WEEK),
                         today,
                         ScheduleType.EXAMINATION
                 );

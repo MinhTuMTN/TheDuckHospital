@@ -19,9 +19,10 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    Page<Transaction> findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
+    Page<Transaction> findByPaymentMethodInAndStatusInAndPaymentTypeInOrderByCreatedAtDesc(
             List<String> transactionPayment,
             List<TransactionStatus> transactionStatus,
+            List<PaymentType> paymentTypes,
             Pageable pageable
     );
 
@@ -48,9 +49,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             @Param("transactionStatus") List<TransactionStatus> transactionStatus,
             Pageable pageable);
 
-    List<Transaction> findByPaymentMethodInAndStatusInAndBookingsIsNotEmpty(
+    List<Transaction> findByPaymentMethodInAndStatusInAndPaymentTypeInOrderByCreatedAtDesc(
             List<String> transactionPayment,
-            List<TransactionStatus> transactionStatus
+            List<TransactionStatus> transactionStatus,
+            List<PaymentType> paymentTypes
     );
 
     long countByPaymentMethod(String paymentMethod);

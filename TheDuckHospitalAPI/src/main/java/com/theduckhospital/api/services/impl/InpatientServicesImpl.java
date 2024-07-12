@@ -307,6 +307,10 @@ public class InpatientServicesImpl implements IInpatientServices {
                 hospitalizationId,
                 DateCommon.getStarOfDay(request.getDate())
         );
+        Date hospitalizationDate = hospitalizationDetail.getHospitalizationDate();
+        if (DateCommon.isNotTodayOrYesterday(hospitalizationDate)) {
+            throw new BadRequestException("Cannot create treatment medicine of the day before yesterday", 400);
+        }
 
         return treatmentMedicineServices
                 .createTreatmentMedicinesByHospitalizationDetail(

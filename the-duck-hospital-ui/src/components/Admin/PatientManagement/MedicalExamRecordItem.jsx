@@ -15,14 +15,13 @@ import FormatCurrency from "../../General/FormatCurrency";
 const scheduleSessions = [
   {
     value: "MORNING",
-    label: "Buổi sáng"
+    label: "Buổi sáng",
   },
   {
     value: "AFTERNOON",
-    label: "Buổi chiều"
+    label: "Buổi chiều",
   },
 ];
-
 
 const medicineUnit = [
   {
@@ -53,7 +52,9 @@ const MuiAccordion = styled(Accordion)(({ theme }) => ({
   border: "1.5px solid grey",
   "&.Mui-expanded": {
     border: `2px solid ${theme.palette.template.normal2}`,
-    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} ${theme.spacing(1.2)} ${theme.spacing(1.2)}`,
+    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} ${theme.spacing(
+      1.2
+    )} ${theme.spacing(1.2)}`,
   },
 }));
 
@@ -66,8 +67,7 @@ const MuiAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
   },
 }));
 
-const MuiAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
-}));
+const MuiAccordionDetails = styled(AccordionDetails)(({ theme }) => ({}));
 
 function MedicalExamRecordItem(props) {
   const { item, panel, expanded, handleChange } = props;
@@ -85,14 +85,14 @@ function MedicalExamRecordItem(props) {
       expanded={expanded === panel}
       onChange={handleChange(panel)}
       sx={{
-        '&:before': {
-          display: 'none',
+        "&:before": {
+          display: "none",
         },
-        '&:last-child': {
-          borderRadius: theme.spacing(1.2)
+        "&:last-child": {
+          borderRadius: theme.spacing(1.2),
         },
-        '&:first-of-type': {
-          borderRadius: theme.spacing(1.2)
+        "&:first-of-type": {
+          borderRadius: theme.spacing(1.2),
         },
       }}
     >
@@ -107,7 +107,7 @@ function MedicalExamRecordItem(props) {
             <Typography
               style={{
                 fontWeight: "600",
-                fontSize: "18px"
+                fontSize: "18px",
               }}
             >
               Bác sĩ: {item.doctor?.fullName}
@@ -116,23 +116,32 @@ function MedicalExamRecordItem(props) {
               <Typography
                 style={{
                   fontSize: "16px",
-                  textDecoration: "underline"
+                  textDecoration: "underline",
                 }}
               >
                 Ngày khám
               </Typography>
               <Stack direction="row" spacing={0.5}>
-                <Typography
-                  style={{ fontSize: "16px", }}
-                >
-                  {`: ${scheduleSessions.find(session =>
-                    session.value === item.doctorSchedule?.scheduleSession)?.label}`}
+                <Typography style={{ fontSize: "16px" }}>
+                  {`: ${
+                    scheduleSessions.find(
+                      (session) =>
+                        session.value === item.doctorSchedule?.scheduleSession
+                    )
+                      ? scheduleSessions.find(
+                          (session) =>
+                            session.value ===
+                            item.doctorSchedule?.scheduleSession
+                        ).label
+                      : "Buổi sáng"
+                  }`}
                 </Typography>
-                <Typography
-                  style={{ fontSize: "16px", }}
-                >
-                  {"- Thứ " + item.doctorSchedule?.dayOfWeek + " (" +
-                    dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY") + ")"}
+                <Typography style={{ fontSize: "16px" }}>
+                  {"- Thứ " +
+                    item.doctorSchedule?.dayOfWeek +
+                    " (" +
+                    dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY") +
+                    ")"}
                 </Typography>
               </Stack>
             </Stack>
@@ -143,10 +152,11 @@ function MedicalExamRecordItem(props) {
               fontSize: "18px",
             }}
           >
-            {
-              item.state === "DONE" ? "Hoàn thành" :
-                item.state === "PROCESSING" ? "Đang khám" : "Đang chờ"
-            }
+            {item.state === "DONE"
+              ? "Hoàn thành"
+              : item.state === "PROCESSING"
+              ? "Đang khám"
+              : "Đang chờ"}
           </Typography>
         </Stack>
       </MuiAccordionSummary>
@@ -159,7 +169,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "20%"
+                    width: "20%",
                   }}
                 >
                   Bác sĩ:
@@ -167,7 +177,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "80%"
+                    width: "80%",
                   }}
                 >
                   {item.doctor?.fullName}
@@ -178,7 +188,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "20%"
+                    width: "20%",
                   }}
                 >
                   Chuyên khoa:
@@ -186,7 +196,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "80%"
+                    width: "80%",
                   }}
                 >
                   {item.departmentName}
@@ -197,7 +207,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "20%"
+                    width: "20%",
                   }}
                 >
                   Số điện thoại:
@@ -205,7 +215,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "80%"
+                    width: "80%",
                   }}
                 >
                   {item.doctor?.phoneNumber}
@@ -216,7 +226,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "20%"
+                    width: "20%",
                   }}
                 >
                   Email:
@@ -224,7 +234,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "80%"
+                    width: "80%",
                   }}
                 >
                   {item.doctorEmail}
@@ -238,7 +248,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "30%"
+                    width: "30%",
                   }}
                 >
                   Phòng:
@@ -246,7 +256,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "70%"
+                    width: "70%",
                   }}
                 >
                   {item.roomName}
@@ -257,7 +267,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "30%"
+                    width: "30%",
                   }}
                 >
                   Khoa:
@@ -265,7 +275,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "70%"
+                    width: "70%",
                   }}
                 >
                   {item.departmentName}
@@ -276,7 +286,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "30%"
+                    width: "30%",
                   }}
                 >
                   Triệu chứng:
@@ -284,7 +294,7 @@ function MedicalExamRecordItem(props) {
                 <Typography
                   style={{
                     fontSize: "16px",
-                    width: "70%"
+                    width: "70%",
                   }}
                 >
                   {item.symptom ? item.symptom : "Đang cập nhật"}
@@ -295,7 +305,7 @@ function MedicalExamRecordItem(props) {
                   style={{
                     fontWeight: "600",
                     fontSize: "16px",
-                    width: "30%"
+                    width: "30%",
                   }}
                   color="peach.main"
                 >
@@ -310,13 +320,13 @@ function MedicalExamRecordItem(props) {
               </Stack>
             </BorderTextBox>
           </Stack>
-          {item.prescription !== null && item.prescription.length > 0 &&
+          {item.prescription !== null && item.prescription.length > 0 && (
             <BorderTextBox label="Toa thuốc">
               <Stack
                 direction="row"
                 spacing={2}
                 style={{
-                  borderBottom: "1px solid #dadada"
+                  borderBottom: "1px solid #dadada",
                 }}
               >
                 <Typography
@@ -333,7 +343,7 @@ function MedicalExamRecordItem(props) {
                     fontWeight: 600,
                     fontSize: "17px",
                     width: "10%",
-                    textAlign: "center"
+                    textAlign: "center",
                   }}
                 >
                   Số lượng
@@ -343,7 +353,7 @@ function MedicalExamRecordItem(props) {
                     fontWeight: 600,
                     fontSize: "17px",
                     width: "20%",
-                    textAlign: "right"
+                    textAlign: "right",
                   }}
                 >
                   Đơn giá
@@ -353,7 +363,7 @@ function MedicalExamRecordItem(props) {
                     fontWeight: 600,
                     fontSize: "17px",
                     width: "20%",
-                    textAlign: "right"
+                    textAlign: "right",
                   }}
                 >
                   Tổng tiền
@@ -364,14 +374,14 @@ function MedicalExamRecordItem(props) {
                   direction="row"
                   spacing={2}
                   sx={{
-                    mt: 1
+                    mt: 1,
                   }}
                   key={index}
                 >
                   <Typography
                     style={{
                       fontSize: "16px",
-                      width: "50%"
+                      width: "50%",
                     }}
                   >
                     {item.medicine.medicineName}
@@ -380,18 +390,25 @@ function MedicalExamRecordItem(props) {
                     style={{
                       fontSize: "16px",
                       width: "10%",
-                      textAlign: "center"
+                      textAlign: "center",
                     }}
                   >
                     {`x${item.quantity}` +
-                      ` ${medicineUnit.find(unit => unit.value === item.medicine.unit) ?
-                        medicineUnit.find(unit => unit.value === item.medicine.unit).label : ""}`}
+                      ` ${
+                        medicineUnit.find(
+                          (unit) => unit.value === item.medicine.unit
+                        )
+                          ? medicineUnit.find(
+                              (unit) => unit.value === item.medicine.unit
+                            ).label
+                          : ""
+                      }`}
                   </Typography>
                   <Typography
                     style={{
                       fontSize: "16px",
                       width: "20%",
-                      textAlign: "right"
+                      textAlign: "right",
                     }}
                   >
                     <FormatCurrency amount={item.medicine.price} />
@@ -400,12 +417,15 @@ function MedicalExamRecordItem(props) {
                     style={{
                       fontSize: "16px",
                       width: "20%",
-                      textAlign: "right"
+                      textAlign: "right",
                     }}
                   >
-                    <FormatCurrency amount={item.medicine.price * item.quantity} />
+                    <FormatCurrency
+                      amount={item.medicine.price * item.quantity}
+                    />
                   </Typography>
-                </Stack>))}
+                </Stack>
+              ))}
               {/* <Stack
                 direction="row"
                 spacing={2}
@@ -454,7 +474,7 @@ function MedicalExamRecordItem(props) {
                 spacing={2}
                 sx={{
                   mt: 1,
-                  borderTop: "1px solid #dadada"
+                  borderTop: "1px solid #dadada",
                 }}
               >
                 <Typography
@@ -481,7 +501,8 @@ function MedicalExamRecordItem(props) {
                   <FormatCurrency amount={item.price} />
                 </Typography>
               </Stack>
-            </BorderTextBox>}
+            </BorderTextBox>
+          )}
         </Stack>
       </MuiAccordionDetails>
     </MuiAccordion>

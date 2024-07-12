@@ -16,7 +16,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 import { useTheme } from "@emotion/react";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import useDebounce from "../../../hooks/useDebounce";
 import MedicalInAdmissionDatails from "./MedicalInAdmissionDatails";
 import VitalSignsComponent from "./VitalSignsComponent";
@@ -57,6 +63,18 @@ function AdmissionDetailsByDate(props) {
   const [vitalSignEdit, setVitalSignEdit] = useState(false);
   const [saving, setSaving] = useState(false);
   const [date, setDate] = useState(dayjs());
+  const isNotTodayOrYesterday = useMemo(() => {
+    return (
+      date.format("YYYY-MM-DD") !== dayjs().format("YYYY-MM-DD") &&
+      date.format("YYYY-MM-DD") !==
+        dayjs().subtract(1, "day").format("YYYY-MM-DD")
+    );
+  }, [date]);
+  const handleAlertNotTodayOrYesterday = useCallback(() => {
+    enqueueSnackbar("Chỉ được cập nhật thông tin hôm nay hoặc hôm qua", {
+      variant: "error",
+    });
+  }, []);
   const [info, setInfo] = useState({
     bloodPressure: 100,
     heartRate: 140,
@@ -292,6 +310,8 @@ function AdmissionDetailsByDate(props) {
             bloodPressure={info.bloodPressure}
             temperature={info.temperature}
             onChange={handleSignOfVitalityChange}
+            isNotTodayOrYesterday={isNotTodayOrYesterday}
+            handleAlertNotTodayOrYesterday={handleAlertNotTodayOrYesterday}
           />
         </Grid>
         <Grid
@@ -376,7 +396,13 @@ function AdmissionDetailsByDate(props) {
             Triệu chứng và diễn biến bệnh
           </Typography>
           <Button
-            onClick={() => setIsEdit(true)}
+            onClick={() => {
+              if (isNotTodayOrYesterday) {
+                handleAlertNotTodayOrYesterday();
+                return;
+              }
+              setIsEdit(true);
+            }}
             color={isEdit ? "warning" : "info"}
             style={{
               textTransform: "none",
@@ -494,6 +520,8 @@ function AdmissionDetailsByDate(props) {
           onChange={setTreatmentMedicines}
           hospitalizationId={generalInfo?.hospitalAdmissionId}
           date={date}
+          isNotTodayOrYesterday={isNotTodayOrYesterday}
+          handleAlertNotTodayOrYesterday={handleAlertNotTodayOrYesterday}
         />
       </LayoutStyle>
     </Box>

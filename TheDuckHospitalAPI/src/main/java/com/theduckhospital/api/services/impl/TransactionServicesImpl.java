@@ -1,10 +1,12 @@
 package com.theduckhospital.api.services.impl;
 
 import com.theduckhospital.api.constant.PaymentMethod;
+import com.theduckhospital.api.constant.PaymentType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.dto.response.admin.*;
 import com.theduckhospital.api.entity.Account;
 import com.theduckhospital.api.entity.Booking;
+import com.theduckhospital.api.entity.MedicalTest;
 import com.theduckhospital.api.entity.Transaction;
 import com.theduckhospital.api.error.NotFoundException;
 import com.theduckhospital.api.repository.BookingRepository;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,7 +71,8 @@ public class TransactionServicesImpl implements ITransactionServices {
             int page,
             int limit,
             List<String> transactionPayment,
-            List<TransactionStatus> transactionStatus
+            List<TransactionStatus> transactionStatus,
+            List<PaymentType> paymentTypes
     ) {
 //        String cashMethod = "";
 //        boolean hasCashMethod = false;
@@ -101,23 +105,36 @@ public class TransactionServicesImpl implements ITransactionServices {
 //                pageable
 //        ) :
                 transactionRepository
-                        .findByPaymentMethodInAndStatusInAndBookingsIsNotEmptyOrderByCreatedAtDesc(
+                        .findByPaymentMethodInAndStatusInAndPaymentTypeInOrderByCreatedAtDesc(
                                 transactionPayment,
                                 transactionStatus,
+                                paymentTypes,
                                 pageable
                         );
 //                null;
 
         List<TransactionResponse> filteredTransactions = new ArrayList<>();
+        List<Booking> bookings;
+        List<BookingResponse> bookingResponses = new ArrayList<>();
+        Booking refundedBooking = null;
         for (Transaction transaction : transactionPage.getContent()) {
-            List<Booking> bookings = transaction.getBookings();
-            List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
+            if(transaction.getPaymentType() == PaymentType.BOOKING) {
+                bookings = transaction.getBookings();
+                bookingResponses = getBookingResponseList(bookings);
+            } else if(transaction.getPaymentType() == PaymentType.REFUND){
+                Optional<Booking> optionalBooking = bookingRepository.findByRefundedTransactionId(transaction.getTransactionId());
+                refundedBooking = optionalBooking.orElse(null);
+            }
 
-            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses));
+            filteredTransactions.add(new TransactionResponse(transaction, bookingResponses, refundedBooking));
         }
 
         List<Transaction> transaction = transactionRepository
-                .findByPaymentMethodInAndStatusInAndBookingsIsNotEmpty(transactionPayment, transactionStatus);
+                .findByPaymentMethodInAndStatusInAndPaymentTypeInOrderByCreatedAtDesc(
+                        transactionPayment,
+                        transactionStatus,
+                        paymentTypes
+                );
 
         return new FilteredTransactionsResponse(filteredTransactions, transaction.size(), page, limit);
     }
@@ -150,7 +167,8 @@ public class TransactionServicesImpl implements ITransactionServices {
 
         List<Booking> bookings = transaction.getBookings();
         List<BookingResponse> bookingResponses = getBookingResponseList(bookings);
-
-        return new TransactionResponse(transaction, bookingResponses);
+        Optional<Booking> optionalBooking = bookingRepository.findByRefundedTransactionId(transaction.getTransactionId());
+        Booking refundedBooking = optionalBooking.orElse(null);
+        return new TransactionResponse(transaction, bookingResponses, refundedBooking);
     }
 }
