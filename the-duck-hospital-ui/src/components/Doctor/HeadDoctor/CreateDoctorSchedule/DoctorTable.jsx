@@ -207,7 +207,9 @@ function DoctorTable(props) {
 
     if (
       !scheduleSelected.morning.checked &&
-      !scheduleSelected.afternoon.checked
+      !scheduleSelected.afternoon.checked &&
+      !scheduleSelected.evening.checked &&
+      !scheduleSelected.night.checked
     ) {
       enqueueSnackbar("Cần chọn ít nhất 1 buổi để tạo ca trực", {
         variant: "error",
@@ -217,7 +219,9 @@ function DoctorTable(props) {
 
     if (
       highlightedMorningDays.length <= 0 &&
-      highlightedAfternoonDays.length <= 0
+      highlightedAfternoonDays.length <= 0 &&
+      highlightedEveningDays.length <= 0 &&
+      highlightedNightDays.length <= 0
     ) {
       enqueueSnackbar("Cần chọn ít nhất 1 ngày để tạo ca trực", {
         variant: "error",
