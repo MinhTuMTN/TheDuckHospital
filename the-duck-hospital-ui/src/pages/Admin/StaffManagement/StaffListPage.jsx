@@ -259,6 +259,15 @@ function StaffListPage(props) {
     setIsLoading(true);
 
     if (
+      selectedFile === null ||
+      !selectedFile?.name.match(/\.(jpg|jpeg|png)$/i)
+    ) {
+      enqueueSnackbar("Ảnh đại diện không hợp lệ", { variant: "error" });
+      setIsLoading(false);
+      return;
+    }
+
+    if (
       staff.fullName?.trim() === "" ||
       staff.email?.trim() === "" ||
       staff.phoneNumber?.trim() === "" ||
@@ -270,12 +279,36 @@ function StaffListPage(props) {
       return;
     }
 
+    if (
+      staff.identityNumber?.trim().length !== 12 &&
+      staff.identityNumber?.trim().length !== 9
+    ) {
+      enqueueSnackbar("CCCD/CMND không hợp lệ", { variant: "error" });
+      setIsLoading(false);
+      return;
+    }
+
+    if (staff.phoneNumber?.trim().length !== 10) {
+      enqueueSnackbar("Số điện thoại không hợp lệ", { variant: "error" });
+      setIsLoading(false);
+      return;
+    }
+
     if (staff.role?.trim() === "DOCTOR") {
       if (staff.degree === null || staff.departmentId === "") {
         enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
         setIsLoading(false);
         return;
       }
+    }
+
+    if (
+      !staff.email?.trim().endsWith("@theduckhospital.onmicrosoft.com") ||
+      staff.email?.trim().startsWith("@theduckhospital.onmicrosoft.com")
+    ) {
+      enqueueSnackbar("Địa chỉ email không hợp lệ", { variant: "error" });
+      setIsLoading(false);
+      return;
     }
 
     const formData = new FormData();
@@ -504,6 +537,7 @@ function StaffListPage(props) {
             departmentId: "",
             nurseType: null,
           });
+          setSelectedFile(null);
         }}
         onOk={handleCreateStaff}
         open={openDialogForm}
@@ -524,6 +558,7 @@ function StaffListPage(props) {
             departmentId: "",
             nurseType: null,
           });
+          setSelectedFile(null);
         }}
       >
         <Stack width={"30rem"} mt={1} spacing={3}>
@@ -552,6 +587,17 @@ function StaffListPage(props) {
               type="text"
               value={selectedFile ? selectedFile.name : ""}
               disabled
+              error={
+                (selectedFile === null ||
+                  !selectedFile?.name.match(/\.(jpg|jpeg|png|gif)$/i)) &&
+                addButtonClicked
+              }
+              helperText={
+                (selectedFile === null ||
+                  !selectedFile?.name.match(/\.(jpg|jpeg|png|gif)$/i)) &&
+                addButtonClicked &&
+                "Ảnh đại diện không hợp lệ"
+              }
               InputProps={{
                 endAdornment: (
                   <IconButton component="label">
@@ -588,6 +634,7 @@ function StaffListPage(props) {
           />
           <Stack direction={"row"} spacing={2}>
             <MuiTextFeild
+              type={"number"}
               label="Số điện thoại"
               value={staff.phoneNumber}
               autoComplete="off"
@@ -599,14 +646,20 @@ function StaffListPage(props) {
                 }));
               }}
               required
-              error={staff.phoneNumber?.trim() === "" && addButtonClicked}
+              error={
+                (staff.phoneNumber?.trim() === "" ||
+                  staff.phoneNumber?.trim().length !== 10) &&
+                addButtonClicked
+              }
               helperText={
-                staff.phoneNumber?.trim() === "" &&
+                (staff.phoneNumber?.trim() === "" ||
+                  staff.phoneNumber?.trim().length !== 10) &&
                 addButtonClicked &&
-                "Số điện thoại không được để trống"
+                "Số điện thoại không hợp lệ"
               }
             />
             <MuiTextFeild
+              type={"number"}
               label="CCCD"
               value={staff.identityNumber}
               autoComplete="off"
@@ -618,11 +671,18 @@ function StaffListPage(props) {
                 }));
               }}
               required
-              error={staff.identityNumber?.trim() === "" && addButtonClicked}
+              error={
+                (staff.identityNumber?.trim() === "" ||
+                  (staff.identityNumber?.trim().length !== 12 &&
+                    staff.identityNumber?.trim().length !== 9)) &&
+                addButtonClicked
+              }
               helperText={
-                staff.identityNumber?.trim() === "" &&
+                (staff.identityNumber?.trim() === "" ||
+                  (staff.identityNumber?.trim().length !== 12 &&
+                    staff.identityNumber?.trim().length !== 9)) &&
                 addButtonClicked &&
-                "CCCD không được để trống"
+                "CCCD/CMND không hợp lệ"
               }
             />
           </Stack>
@@ -692,11 +752,26 @@ function StaffListPage(props) {
               }));
             }}
             required
-            error={staff.email?.trim() === "" && addButtonClicked}
+            error={
+              (staff.email?.trim() === "" ||
+                !staff.email
+                  ?.trim()
+                  .endsWith("@theduckhospital.onmicrosoft.com") ||
+                staff.email
+                  ?.trim()
+                  .startsWith("@theduckhospital.onmicrosoft.com")) &&
+              addButtonClicked
+            }
             helperText={
-              staff.email?.trim() === "" &&
+              (staff.email?.trim() === "" ||
+                !staff.email
+                  ?.trim()
+                  .endsWith("@theduckhospital.onmicrosoft.com") ||
+                staff.email
+                  ?.trim()
+                  .startsWith("@theduckhospital.onmicrosoft.com")) &&
               addButtonClicked &&
-              "Email không được để trống"
+              "Email không hợp lệ"
             }
           />
           <Box>

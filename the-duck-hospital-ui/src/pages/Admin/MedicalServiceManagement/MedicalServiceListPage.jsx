@@ -15,7 +15,10 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import styled from "@emotion/styled";
 import DialogForm from "../../../components/General/DialogForm";
 import { enqueueSnackbar } from "notistack";
-import { addService, getPaginationServices } from "../../../services/admin/MedicalServiceServices";
+import {
+  addService,
+  getPaginationServices,
+} from "../../../services/admin/MedicalServiceServices";
 import SearchServiceList from "../../../components/Admin/MedicalServiceManagment/SearchServiceList";
 import MedicalServiceTable from "../../../components/Admin/MedicalServiceManagment/MedicalServiceTable";
 import { getDepartmentsWithoutServices } from "../../../services/admin/DepartmentServices";
@@ -46,11 +49,7 @@ const serviceTypes = [
     value: "MedicalTest",
     label: "Dịch vụ xét nghiệm",
   },
-  {
-    value: "Other",
-    label: "Dịch vụ khác",
-  },
-]
+];
 
 function MedicalServiceListPage(props) {
   const [search, setSearch] = useState("");
@@ -106,7 +105,7 @@ function MedicalServiceListPage(props) {
     if (event.key === "Enter" && event.target === document.activeElement) {
       setEnterPressed(true);
     }
-  }
+  };
 
   const handleGetDepartment = async () => {
     const response = await getDepartmentsWithoutServices();
@@ -123,7 +122,8 @@ function MedicalServiceListPage(props) {
       return;
     }
 
-    if (medicalService.serviceType === "MedicalTest" &&
+    if (
+      medicalService.serviceType === "MedicalTest" &&
       medicalService.serviceName === ""
     ) {
       enqueueSnackbar("Tên dịch vụ không được để trống", { variant: "error" });
@@ -135,18 +135,26 @@ function MedicalServiceListPage(props) {
       return;
     }
 
-    if (medicalService.serviceType === "MedicalExamination" &&
-      (medicalService.departmentId === "" || medicalService.departmentId === null)
+    if (
+      medicalService.serviceType === "MedicalExamination" &&
+      (medicalService.departmentId === "" ||
+        medicalService.departmentId === null)
     ) {
       enqueueSnackbar("Khoa không được để trống", { variant: "error" });
       return;
     }
 
     const response = await addService({
-      serviceName: medicalService.serviceType === "MedicalTest" ? medicalService.serviceName : "",
+      serviceName:
+        medicalService.serviceType === "MedicalTest"
+          ? medicalService.serviceName
+          : "",
       serviceType: medicalService.serviceType,
       price: medicalService.price,
-      departmentId: medicalService.serviceType === "MedicalExamination" ? medicalService.departmentId : null,
+      departmentId:
+        medicalService.serviceType === "MedicalExamination"
+          ? medicalService.departmentId
+          : null,
     });
     if (response.success) {
       enqueueSnackbar("Thêm dịch vụ thành công!", { variant: "success" });
@@ -248,13 +256,19 @@ function MedicalServiceListPage(props) {
             <CustomTypography
               variant="body1"
               style={{
-                color: medicalService.serviceType === "" && addButtonClicked ? "red" : "",
+                color:
+                  medicalService.serviceType === "" && addButtonClicked
+                    ? "red"
+                    : "",
               }}
             >
               Loại dịch vụ
             </CustomTypography>
 
-            <FormControl fullWidth error={medicalService.serviceType === "" && addButtonClicked}>
+            <FormControl
+              fullWidth
+              error={medicalService.serviceType === "" && addButtonClicked}
+            >
               <Select
                 value={medicalService.serviceType}
                 onChange={(e) =>
@@ -281,11 +295,13 @@ function MedicalServiceListPage(props) {
                 ))}
               </Select>
               {medicalService.serviceType === "" && addButtonClicked && (
-                <FormHelperText>Loại dịch vụ không được để trống</FormHelperText>
+                <FormHelperText>
+                  Loại dịch vụ không được để trống
+                </FormHelperText>
               )}
             </FormControl>
           </Box>
-          {medicalService.serviceType === "MedicalExamination" ?
+          {medicalService.serviceType === "MedicalExamination" ? (
             <>
               <MuiTextFeild
                 type="number"
@@ -293,7 +309,9 @@ function MedicalServiceListPage(props) {
                 autoFocus
                 autoComplete="off"
                 InputProps={{ inputProps: { min: 1000 } }}
-                value={medicalService.price ? medicalService.price.toString() : "0"}
+                value={
+                  medicalService.price ? medicalService.price.toString() : "0"
+                }
                 onChange={(e) => {
                   setMedicalService((prev) => ({
                     ...prev,
@@ -303,7 +321,8 @@ function MedicalServiceListPage(props) {
                 required
                 error={medicalService.price === 0 && addButtonClicked}
                 helperText={
-                  medicalService.price === 0 && addButtonClicked &&
+                  medicalService.price === 0 &&
+                  addButtonClicked &&
                   "Giá dịch vụ phải lớn hơn 0"
                 }
               />
@@ -311,13 +330,19 @@ function MedicalServiceListPage(props) {
                 <CustomTypography
                   variant="body1"
                   style={{
-                    color: medicalService.departmentId === "" && addButtonClicked ? "red" : "",
+                    color:
+                      medicalService.departmentId === "" && addButtonClicked
+                        ? "red"
+                        : "",
                   }}
                 >
                   Khoa
                 </CustomTypography>
 
-                <FormControl fullWidth error={medicalService.departmentId === "" && addButtonClicked}>
+                <FormControl
+                  fullWidth
+                  error={medicalService.departmentId === "" && addButtonClicked}
+                >
                   <Select
                     value={medicalService.departmentId}
                     onChange={(e) =>
@@ -348,7 +373,8 @@ function MedicalServiceListPage(props) {
                   )}
                 </FormControl>
               </Box>
-            </> :
+            </>
+          ) : (
             <>
               <MuiTextFeild
                 label="Tên dịch vụ"
@@ -364,7 +390,8 @@ function MedicalServiceListPage(props) {
                 required
                 error={medicalService.serviceName === "" && addButtonClicked}
                 helperText={
-                  medicalService.serviceName === "" && addButtonClicked &&
+                  medicalService.serviceName === "" &&
+                  addButtonClicked &&
                   "Tên dịch vụ không được để trống"
                 }
               />
@@ -374,7 +401,9 @@ function MedicalServiceListPage(props) {
                 autoFocus
                 autoComplete="off"
                 InputProps={{ inputProps: { min: 1000 } }}
-                value={medicalService.price ? medicalService.price.toString() : "0"}
+                value={
+                  medicalService.price ? medicalService.price.toString() : "0"
+                }
                 onChange={(e) => {
                   setMedicalService((prev) => ({
                     ...prev,
@@ -384,12 +413,13 @@ function MedicalServiceListPage(props) {
                 required
                 error={medicalService.price === 0 && addButtonClicked}
                 helperText={
-                  medicalService.price === 0 && addButtonClicked &&
+                  medicalService.price === 0 &&
+                  addButtonClicked &&
                   "Giá dịch vụ phải lớn hơn 0"
                 }
               />
             </>
-          }
+          )}
         </Stack>
       </DialogForm>
     </>
