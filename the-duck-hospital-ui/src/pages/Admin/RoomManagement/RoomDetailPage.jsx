@@ -101,8 +101,12 @@ function RoomDetailPage() {
       }
     };
 
-    handleGetDateHasSchedule();
-  }, [roomId]);
+    if (
+      room.roomType?.startsWith("EXAMINATION") ||
+      room.roomType?.startsWith("TREATMENT")
+    )
+      handleGetDateHasSchedule();
+  }, [room, roomId]);
 
   function disableDateNotHasSchedule(date) {
     return !dateSchedule?.includes(date.format("YYYY/MM/DD"));

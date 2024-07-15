@@ -86,6 +86,12 @@ function MedicalTestRecord(props) {
       enqueueSnackbar("Vui lòng nhập đầy đủ thông tin", { variant: "error" });
       return;
     }
+    if (!selectedFile?.name.match(/\.(pdf)$/i)) {
+      enqueueSnackbar("Tập tin báo cáo xét nghiệm không hợp lệ", {
+        variant: "error",
+      });
+      return;
+    }
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("testResult", testResult);
@@ -210,11 +216,26 @@ function MedicalTestRecord(props) {
                   type="text"
                   value={selectedFile ? selectedFile.name : ""}
                   disabled
+                  error={
+                    selectedFile === null ||
+                    !selectedFile?.name.match(/\.(pdf)$/i)
+                  }
+                  helperText={
+                    (selectedFile === null ||
+                      !selectedFile?.name.match(/\.(pdf)$/i)) &&
+                    completeButtonClicked &&
+                    "Vui lòng chọn kết quả xét nghiệm"
+                  }
                   InputProps={{
                     endAdornment: (
                       <IconButton component="label">
                         <FileUploadOutlined />
-                        <input type="file" hidden onChange={handleFileChange} />
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          hidden
+                          onChange={handleFileChange}
+                        />
                       </IconButton>
                     ),
                   }}

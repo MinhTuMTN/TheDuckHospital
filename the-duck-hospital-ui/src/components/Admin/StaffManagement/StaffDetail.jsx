@@ -159,8 +159,36 @@ function StaffDetail(props) {
   const handleUpdateStaff = async () => {
     setUpdateButtonClicked(true);
 
-    if (staffEdit.fullName?.trim() === "") {
-      enqueueSnackbar("Tên nhân viên không được để trống", {
+    if (
+      staffEdit.fullName?.trim() === "" ||
+      staffEdit.phoneNumber?.trim() === "" ||
+      staffEdit.identityNumber?.trim() === ""
+    ) {
+      enqueueSnackbar("Thông tin nhân viên không được để trống", {
+        variant: "error",
+      });
+      return;
+    }
+
+    if (staffEdit.phoneNumber?.trim().length !== 10) {
+      enqueueSnackbar("Số điện thoại không hợp lệ", {
+        variant: "error",
+      });
+      return;
+    }
+
+    if (staffEdit.avatar === null || staffEdit.avatar === "") {
+      enqueueSnackbar("Ảnh đại diện không hợp lệ", {
+        variant: "error",
+      });
+      return;
+    }
+
+    if (
+      staffEdit.identityNumber?.trim().length !== 12 &&
+      staffEdit.identityNumber?.trim().length !== 9
+    ) {
+      enqueueSnackbar("CCCD/CMND không hợp lệ", {
         variant: "error",
       });
       return;
@@ -500,6 +528,7 @@ function StaffDetail(props) {
           />
           <Stack direction={"row"} spacing={2}>
             <MuiTextFeild
+              type="number"
               label="Số điện thoại"
               value={staffEdit.phoneNumber ? staffEdit.phoneNumber : ""}
               autoComplete="off"
@@ -512,15 +541,19 @@ function StaffDetail(props) {
               }}
               required
               error={
-                staffEdit.phoneNumber?.trim() === "" && updateButtonClicked
+                (staffEdit.phoneNumber?.trim() === "" ||
+                  staffEdit.phoneNumber?.trim().length !== 10) &&
+                updateButtonClicked
               }
               helperText={
-                staffEdit.phoneNumber?.trim() === "" &&
+                (staffEdit.phoneNumber?.trim() === "" ||
+                  staffEdit.phoneNumber?.trim().length !== 10) &&
                 updateButtonClicked &&
-                "Số điện thoại không được để trống"
+                "Số điện thoại không hợp lệ"
               }
             />
             <MuiTextFeild
+              type="number"
               label="CCCD"
               value={staffEdit.identityNumber ? staffEdit.identityNumber : ""}
               autoComplete="off"
@@ -533,12 +566,17 @@ function StaffDetail(props) {
               }}
               required
               error={
-                staffEdit.identityNumber?.trim() === "" && updateButtonClicked
+                (staffEdit.identityNumber?.trim() === "" ||
+                  (staffEdit.identityNumber?.trim().length !== 12 &&
+                    staffEdit.identityNumber?.trim().length !== 9)) &&
+                updateButtonClicked
               }
               helperText={
-                staffEdit.identityNumber?.trim() === "" &&
+                (staffEdit.identityNumber?.trim() === "" ||
+                  (staffEdit.identityNumber?.trim().length !== 12 &&
+                    staffEdit.identityNumber?.trim().length !== 9)) &&
                 updateButtonClicked &&
-                "CCCD không được để trống"
+                "CCCD/CMND không hợp lệ"
               }
             />
           </Stack>
