@@ -184,14 +184,21 @@ public class WalletServicesImpl implements IWalletServices {
                 PaymentType.TOP_UP, 0,
                 PaymentType.MEDICAL_TEST, 0,
                 PaymentType.REFUND, 0,
-                PaymentType.BOOKING, 0
+                PaymentType.BOOKING, 0,
+                PaymentType.ADVANCE_FEE, 0
         ));
 
-        for (Transaction transaction : transactions)
+        for (Transaction transaction : transactions) {
+            // Check if payment type is not in the map
+            if (!paymentTypeCount.containsKey(transaction.getPaymentType())) {
+                continue;
+            }
+            
             paymentTypeCount.put(
                     transaction.getPaymentType(),
                     paymentTypeCount.get(transaction.getPaymentType()) + 1
             );
+        }
 
         List<TransactionInfoResponse> transactionInfoResponses = transactions.stream()
                 .map(TransactionInfoResponse::new)

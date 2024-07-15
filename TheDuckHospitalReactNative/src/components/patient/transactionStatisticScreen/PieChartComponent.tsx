@@ -31,9 +31,19 @@ const PieChartComponent = (props: PieChartComponentProps) => {
 
   const renderLegend = useMemo(() => {
     const paymentType =
-      status === 0 ? ['TOP_UP', 'REFUND'] : ['BOOKING', 'MEDICAL_TEST'];
+      status === 0
+        ? ['TOP_UP', 'REFUND']
+        : ['BOOKING', 'MEDICAL_TEST', 'ADVANCE_FEE'];
     return (
-      <FlexComponent direction="row" columnGap={8}>
+      <FlexComponent
+        direction="column"
+        columnGap={8}
+        style={{
+          width: '100%',
+          justifyContent: 'flex-start',
+          flexWrap: 'wrap',
+          rowGap: 8,
+        }}>
         {paymentType.map((item, index) => {
           return (
             <FlexComponent
@@ -61,7 +71,12 @@ const PieChartComponent = (props: PieChartComponentProps) => {
     let tempPieData: any[] = [];
     if (dataChart && dataChart.length > 0) {
       const incomePaymentType = ['TOP_UP', 'REFUND'];
-      const outcomePaymentType = ['BOOKING', 'MEDICAL_TEST'];
+      const outcomePaymentType = [
+        'BOOKING',
+        'MEDICAL_TEST',
+        'ADVANCE_FEE',
+        'DISCHARGE',
+      ];
 
       const paymentType = status === 0 ? incomePaymentType : outcomePaymentType;
       dataChart.forEach(item => {

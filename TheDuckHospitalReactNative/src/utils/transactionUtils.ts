@@ -11,6 +11,10 @@ export const getTransactionType = (type: string, lang: 'en' | 'vi' = 'vi') => {
       return lang === 'vi' ? 'Nạp tiền' : 'Top up';
     case 'REFUND':
       return lang === 'vi' ? 'Hoàn tiền' : 'Refund';
+    case 'ADVANCE_FEE':
+      return lang === 'vi' ? 'Tạm ứng viện phí' : 'Advance fee';
+    case 'DISCHARGE':
+      return lang === 'vi' ? 'Thanh toán ra viện' : 'Discharge';
     default:
       return lang === 'vi' ? 'Khác' : 'Other';
   }
@@ -26,6 +30,10 @@ export const getTransactionAmount = (type: string, amount: number) => {
       return `+ ${formatCurrency(amount.toString() || '0')} VND`;
     case 'REFUND':
       return `+ ${formatCurrency(amount.toString() || '0')} VND`;
+    case 'ADVANCE_FEE':
+      return `- ${formatCurrency(amount.toString() || '0')} VND`;
+    case 'DISCHARGE':
+      return `- ${formatCurrency(amount.toString() || '0')} VND`;
     default:
       return `+ ${formatCurrency(amount.toString() || '0')} VND`;
   }
@@ -41,6 +49,10 @@ export const getTransactionColor = (type: string) => {
       return '#009FFF';
     case 'REFUND':
       return '#FFA5BA';
+    case 'ADVANCE_FEE':
+      return '#f62060';
+    case 'DISCHARGE':
+      return '#34f782';
     default:
       return '#FFA5BA';
   }
