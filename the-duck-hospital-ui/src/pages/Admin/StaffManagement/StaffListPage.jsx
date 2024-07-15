@@ -288,7 +288,10 @@ function StaffListPage(props) {
       return;
     }
 
-    if (staff.phoneNumber?.trim().length !== 10) {
+    if (
+      staff.phoneNumber?.trim().length !== 10 ||
+      !staff.phoneNumber?.startsWith("0")
+    ) {
       enqueueSnackbar("Số điện thoại không hợp lệ", { variant: "error" });
       setIsLoading(false);
       return;
@@ -648,12 +651,14 @@ function StaffListPage(props) {
               required
               error={
                 (staff.phoneNumber?.trim() === "" ||
-                  staff.phoneNumber?.trim().length !== 10) &&
+                  staff.phoneNumber?.trim().length !== 10 ||
+                  !staff.phoneNumber?.startsWith("0")) &&
                 addButtonClicked
               }
               helperText={
                 (staff.phoneNumber?.trim() === "" ||
-                  staff.phoneNumber?.trim().length !== 10) &&
+                  staff.phoneNumber?.trim().length !== 10 ||
+                  !staff.phoneNumber?.startsWith("0")) &&
                 addButtonClicked &&
                 "Số điện thoại không hợp lệ"
               }
