@@ -17,10 +17,10 @@ public interface MedicalServiceRepository extends JpaRepository<MedicalService, 
     List<MedicalService> getByServiceTypeAndDeletedIsFalse(ServiceType serviceType);
 
     //    List<MedicalService> findByServiceNameContainingOrDepartmentIn(String serviceName, List<Department> departmentList);
-    List<MedicalService> findByServiceNameContainingOrDepartmentInAndServiceTypeIn(
+    List<MedicalService> findByServiceNameContainingAndServiceTypeInOrDepartmentIn(
             String serviceName,
-            List<Department> departments,
-            List<ServiceType> serviceTypes
+            List<ServiceType> serviceTypes,
+            List<Department> departments
     );
 
     List<MedicalService> findByServiceTypeAndDeletedIsFalseOrderByServiceName(ServiceType serviceType);

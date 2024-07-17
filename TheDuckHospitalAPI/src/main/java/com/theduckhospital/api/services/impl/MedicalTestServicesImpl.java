@@ -24,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -58,6 +57,20 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         this.patientServices = patientServices;
         this.roomServices = roomServices;
         this.roomRepository = roomRepository;
+    }
+
+    @NotNull
+    private static List<MedicalTestResultResponse> getMedicalTestResultResponses(List<MedicalTest> medicalTests) {
+        List<MedicalTestResultResponse> medicalTestResultList = new ArrayList<>();
+        for (MedicalTest test : medicalTests) {
+            MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
+                    test.getMedicalExaminationRecord().getDoctorSchedule().getDoctor(),
+                    test.getLaboratoryTechnician(),
+                    test.getMedicalService(),
+                    test);
+            medicalTestResultList.add(medicalTestResultResponse);
+        }
+        return medicalTestResultList;
     }
 
     @Override
@@ -191,35 +204,21 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
             String sort,
             int serviceId
     ) {
-        Calendar fromDateCalendar = DateCommon.getCalendar(fromDate);
-        Calendar toDateCalendar = DateCommon.getCalendar(DateCommon.getEndOfDay(toDate));
+        Date fromDateCalendar = DateCommon.getStarOfDay(fromDate);
+        Date toDateCalendar = DateCommon.getEndOfDay(toDate);
 
         Patient patient = patientServices.findPatientByPatientCode(patientCode);
 
         List<MedicalTest> medicalTests = patient.getMedicalExaminationRecords().stream()
                 .flatMap(record -> record.getMedicalTest().stream())
-                .filter(test -> test.getDate().compareTo(fromDateCalendar.getTime()) >= 0 &&
-                        test.getDate().compareTo(toDateCalendar.getTime()) <= 0)
+                .filter(test -> test.getDate().compareTo(fromDateCalendar) >= 0 &&
+                        test.getDate().compareTo(toDateCalendar) <= 0)
                 .filter(test -> (serviceId == -1 || test.getMedicalService().getServiceId() == serviceId))
                 .sorted(sort.equals("ASC") ? Comparator.comparing(MedicalTest::getDate) :
                         Comparator.comparing(MedicalTest::getDate).reversed())
                 .toList();
 
         return getMedicalTestResultResponses(medicalTests);
-    }
-
-    @NotNull
-    private static List<MedicalTestResultResponse> getMedicalTestResultResponses(List<MedicalTest> medicalTests) {
-        List<MedicalTestResultResponse> medicalTestResultList = new ArrayList<>();
-        for (MedicalTest test : medicalTests) {
-            MedicalTestResultResponse medicalTestResultResponse = new MedicalTestResultResponse(
-                    test.getMedicalExaminationRecord().getDoctorSchedule().getDoctor(),
-                    test.getLaboratoryTechnician(),
-                    test.getMedicalService(),
-                    test);
-            medicalTestResultList.add(medicalTestResultResponse);
-        }
-        return medicalTestResultList;
     }
 
     @Override
@@ -231,8 +230,8 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         }
 
         return roomServices.getRoomsByType(
-                List.of(roomType)
-        ).stream()
+                        List.of(roomType)
+                ).stream()
                 .map(LabRoomResponse::new)
                 .toList();
     }
@@ -247,15 +246,22 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
     ) {
         Room room = getLabRoomById(roomId);
 
+        System.out.println(room.getRoomName());
         Pageable pageable = PageRequest.of(page, size);
-        Page<MedicalTest> medicalTests = medicalTestRepository
-                .findByRoomAndStateAndDeletedIsFalseOrderByQueueNumber(
+        Page<MedicalTest> medicalTests = room.getRoomType() == RoomType.LABORATORY_ROOM_NORMAL ?
+                medicalTestRepository.findByRoomAndStateAndDeletedIsFalseOrderByQueueNumber(
+                        room,
+                        search,
+                        state,
+                        pageable
+                ) : medicalTestRepository.findAdmissionTestByRoomAndStateAndDeletedIsFalseOrderByQueueNumber(
                         room,
                         search,
                         state,
                         pageable
                 );
 
+        System.out.println(medicalTests.getContent().size() > 0 ? medicalTests.getContent().get(0).getMedicalService().getServiceName() : null);
         List<SearchMedicalTestResponse> searchMedicalTestResponses = new ArrayList<>();
         for (MedicalTest medicalTest : medicalTests.getContent()) {
             SearchMedicalTestResponse medicalTestResponse = new SearchMedicalTestResponse(
@@ -375,10 +381,10 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                     .getMedicalServiceById(serviceId);
             return medicalTestRepository
                     .findByHospitalAdmissionAndMedicalServiceAndDeletedIsFalseOrderByDateDesc(
-                    hospitalAdmission,
-                    medicalService,
-                    pageable
-            );
+                            hospitalAdmission,
+                            medicalService,
+                            pageable
+                    );
         }
         return medicalTestRepository.findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
                 hospitalAdmission,

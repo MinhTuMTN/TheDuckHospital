@@ -25,6 +25,6 @@ public class ActiveDoctorResponse {
         if (doctor.getDepartment() != null) {
             this.medicalServices = doctor.getDepartment().getMedicalServices();
         }
-        this.email = doctor.getAccount().getEmail();
+        this.email = doctor.getAccount() == null ? "Chưa cập nhật" : doctor.getAccount().getEmail();
     }
 }

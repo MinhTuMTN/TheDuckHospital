@@ -32,6 +32,23 @@ public interface MedicalTestRepository extends JpaRepository<MedicalTest, UUID> 
             MedicalTestState state,
             Pageable pageable
     );
+
+    @Query(value = "SELECT mt FROM MedicalTest mt " +
+            "JOIN HospitalAdmission ha ON mt.hospitalAdmission = ha " +
+            "JOIN MedicalExaminationRecord mer ON ha.medicalExaminationRecord = mer " +
+            "JOIN Patient p ON mer.patient = p " +
+            "where mt.room = :room " +
+            "AND mt.deleted = false " +
+            "AND p.fullName  LIKE CONCAT('%', :search, '%') " +
+            "AND mt.state = :state"
+    )
+    Page<MedicalTest> findAdmissionTestByRoomAndStateAndDeletedIsFalseOrderByQueueNumber(
+            Room room,
+            String search,
+            MedicalTestState state,
+            Pageable pageable
+    );
+
     List<MedicalTest> findByMedicalExaminationRecordAndDeletedIsFalse(MedicalExaminationRecord medicalExaminationRecord);
     Page<MedicalTest> findByHospitalAdmissionAndDeletedIsFalseOrderByDateDesc(
             HospitalAdmission hospitalAdmission,

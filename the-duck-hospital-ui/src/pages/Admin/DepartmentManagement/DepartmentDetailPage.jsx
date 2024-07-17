@@ -89,6 +89,7 @@ function DepartmentDetailPage() {
         variant: "success",
       });
       setOpenPopup(false);
+      handleGetAllDoctorsNotInDepartment();
       handleGetDepartment();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
@@ -100,6 +101,7 @@ function DepartmentDetailPage() {
         variant: "success",
       });
       setOpenPopupNurse(false);
+      handleGetAllNursesNotInDepartment();
       handleGetDepartment();
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
@@ -212,6 +214,7 @@ function DepartmentDetailPage() {
                   handleGetAllDoctorsNotInDepartment={
                     handleGetAllDoctorsNotInDepartment
                   }
+                  handleGetDepartment={handleGetDepartment}
                   departmentId={departmentId}
                   departmentName={department.departmentName}
                 />
@@ -236,6 +239,7 @@ function DepartmentDetailPage() {
                   handleGetAllNursesNotInDepartment={
                     handleGetAllNursesNotInDepartment
                   }
+                  handleGetDepartment={handleGetDepartment}
                   departmentId={departmentId}
                   departmentName={department.departmentName}
                 />

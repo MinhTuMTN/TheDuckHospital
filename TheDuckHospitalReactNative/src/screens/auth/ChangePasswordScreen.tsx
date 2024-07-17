@@ -17,12 +17,14 @@ import {useNavigation} from '@react-navigation/native';
 import LoginRequireComponent from '../../components/LoginRequireComponent';
 import FormControlComponent from '../../components/FormControlComponent';
 import {useTranslation} from 'react-i18next';
+import {useToast} from '../../hooks/ToastProvider';
 
 const ChangePasswordScreen = () => {
   const navigation = useNavigation();
   const [showOldPassword, setShowOldPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
   const {t} = useTranslation();
 
@@ -34,17 +36,24 @@ const ChangePasswordScreen = () => {
     });
 
   const validatePassword = useCallback((password: string) => {
-    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*d)(?=.*W).{8,}$/;
+    // Regex for password validation
+    // Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character:
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
     return regex.test(password);
   }, []);
-
+  const toast = useToast();
   const handleChangePassword = async () => {
     if (error) return;
+    setIsLoading(true);
     const respone = await changePasswordWithOldPassword(password);
+    setIsLoading(false);
     if (respone.success) {
+      toast.showToast(t('forgotPasswordScreen.changePasswordSuccess'));
       navigation.goBack();
     } else {
-      console.log(respone);
+      toast.showToast(t('forgotPasswordScreen.changePasswordFail'));
     }
   };
   return (
@@ -139,7 +148,9 @@ const ChangePasswordScreen = () => {
                 errorMessage={
                   password.newPassword === ''
                     ? t('forgotPassword.blankNewPassword')
-                    : t('forgotPassword.passwordLengthError')
+                    : !validatePassword(password.newPassword)
+                    ? t('forgotPassword.passwordLengthError')
+                    : ''
                 }
                 variant="underlined"
                 startIcon={
@@ -223,6 +234,8 @@ const ChangePasswordScreen = () => {
                   textTransform: 'uppercase',
                   fontWeight: 'bold',
                 }}
+                isLoading={isLoading}
+                loadingColor={appColors.white}
                 backgroundColor={appColors.primaryDark}>
                 {t('forgotPassword.change')}
               </ButtonComponent>

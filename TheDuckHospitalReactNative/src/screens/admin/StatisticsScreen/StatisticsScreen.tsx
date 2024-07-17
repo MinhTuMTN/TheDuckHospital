@@ -53,6 +53,13 @@ function StatisticsScreen() {
     },
     {
       value: 0,
+      color: '#ff00b7',
+      gradientCenterColor: '#ff6dd6',
+      text: '',
+      label: '',
+    },
+    {
+      value: 0,
       color: '#93FCF8',
       gradientCenterColor: '#3BE9DE',
       text: '',

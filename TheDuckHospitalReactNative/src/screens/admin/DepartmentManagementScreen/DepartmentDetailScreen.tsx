@@ -15,21 +15,32 @@ import {Info} from 'lucide-react-native';
 import {useRoute} from '@react-navigation/native';
 import {getDepartmentById} from '../../../services/departmentServices';
 import StaffDepartmentItemComponent from '../../../components/admin/departmentManagementScreen/StaffDepartmentItemComponent';
-import HeadDepartmentAlertDialogComponent from '../../../components/admin/departmentManagementScreen/HeadDepartmentAlertDialogComponent';
-import AddStaffDialogComponent from '../../../components/admin/departmentManagementScreen/AddStaffDialogComponent';
 import {Text} from '@gluestack-ui/themed';
 import {GestureHandlerRootView, ScrollView} from 'react-native-gesture-handler';
+import AddNurseDialogComponent from '../../../components/admin/departmentManagementScreen/AddNurseDialogComponent';
+import AddDoctorDialogComponent from '../../../components/admin/departmentManagementScreen/AddDoctorDialogComponent';
+import HeadDoctorAlertDialogComponentComponent from '../../../components/admin/departmentManagementScreen/HeadDoctorAlertDialogComponent';
+import HeadNurseAlertDialogComponent from '../../../components/admin/departmentManagementScreen/HeadNurseAlertDialogComponent';
 
 function DepartmentDetailScreen() {
   const route = useRoute();
   const {departmentId} = route.params as {departmentId: number};
-  const [department, setDepartment] = useState<any>();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [department, setDepartment] = useState<any>({
+    headNurse: null,
+    headNurseId: null,
+    headNurseName: null,
+    headDoctor: null,
+    headDoctorId: null,
+    headDoctorName: null,
+  });
+  const [nurseModalVisible, setNurseModalVisible] = useState(false);
+  const [doctorModalVisible, setDoctorModalVisible] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showHeadDepartmentAlertDialog, setShowHeadDepartmentAlertDialog] =
+  const [showHeadDoctorAlertDialog, setShowHeadDoctorAlertDialog] =
     useState(false);
-  const [isDoctor, setIsDoctor] = useState(false);
+  const [showHeadNurseAlertDialog, setShowHeadNurseAlertDialog] =
+    useState(false);
 
   useEffect(() => {
     const handleGetDepartmentDetail = async () => {
@@ -90,8 +101,7 @@ function DepartmentDetailScreen() {
                         fontSize={16}
                         color={appColors.darkRed}
                         onPress={() => {
-                          setShowHeadDepartmentAlertDialog(true);
-                          setIsDoctor(true);
+                          setShowHeadDoctorAlertDialog(true);
                         }}>{` (Xóa)`}</Text>
                     ) : (
                       // <ButtonComponent
@@ -133,8 +143,7 @@ function DepartmentDetailScreen() {
                         fontSize={16}
                         color={appColors.darkRed}
                         onPress={() => {
-                          setShowHeadDepartmentAlertDialog(true);
-                          setIsDoctor(false);
+                          setShowHeadNurseAlertDialog(true);
                         }}>{` (Xóa)`}</Text>
                     ) : (
                       // <ButtonComponent
@@ -157,7 +166,7 @@ function DepartmentDetailScreen() {
                   </FlexComponent>
                 </FlexComponent>
 
-                <FlexComponent style={styles.departmentInfoContainer}>
+                {/* <FlexComponent style={styles.departmentInfoContainer}>
                   <TextComponent bold fontSize={18} style={{flex: 0.45}}>
                     Mô tả:
                   </TextComponent>
@@ -166,7 +175,7 @@ function DepartmentDetailScreen() {
                       ? department?.description
                       : 'Chưa cập nhật'}
                   </TextComponent>
-                </FlexComponent>
+                </FlexComponent> */}
               </ScrollView>
             </GestureHandlerRootView>
           </ContainerComponent>
@@ -181,8 +190,7 @@ function DepartmentDetailScreen() {
           <ButtonComponent
             containerStyles={styles.addButtonContainer}
             onPress={() => {
-              setModalVisible(!modalVisible);
-              setIsDoctor(true);
+              setDoctorModalVisible(!doctorModalVisible);
             }}>
             <FlexComponent style={styles.buttonContent}>
               <TextComponent
@@ -236,8 +244,7 @@ function DepartmentDetailScreen() {
           <ButtonComponent
             containerStyles={styles.addButtonContainer}
             onPress={() => {
-              setModalVisible(!modalVisible);
-              setIsDoctor(false);
+              setNurseModalVisible(!nurseModalVisible);
             }}>
             <FlexComponent style={styles.buttonContent}>
               <TextComponent
@@ -282,21 +289,32 @@ function DepartmentDetailScreen() {
         </SafeAreaView>
       )}
 
-      <AddStaffDialogComponent
-        isDoctor={isDoctor}
+      <AddNurseDialogComponent
         refreshList={refreshList}
         setRefreshList={setRefreshList}
         departmentId={department?.departmentId}
-        setModalVisible={setModalVisible}
-        modalVisible={modalVisible}
+        setModalVisible={setNurseModalVisible}
+        modalVisible={nurseModalVisible}
       />
 
-      <HeadDepartmentAlertDialogComponent
-        isDoctor={isDoctor}
-        staffId={isDoctor ? department?.headDoctorId : department?.headNurseId}
-        setDepartmentDetail={setDepartment}
-        setShowAlertDialog={setShowHeadDepartmentAlertDialog}
-        showAlertDialog={showHeadDepartmentAlertDialog}
+      <AddDoctorDialogComponent
+        refreshList={refreshList}
+        setRefreshList={setRefreshList}
+        departmentId={department?.departmentId}
+        setModalVisible={setDoctorModalVisible}
+        modalVisible={doctorModalVisible}
+      />
+
+      <HeadDoctorAlertDialogComponentComponent
+        staffId={department?.headDoctorId}
+        setShowAlertDialog={setShowHeadDoctorAlertDialog}
+        showAlertDialog={showHeadDoctorAlertDialog}
+      />
+
+      <HeadNurseAlertDialogComponent
+        staffId={department?.headNurseId}
+        setShowAlertDialog={setShowHeadNurseAlertDialog}
+        showAlertDialog={showHeadNurseAlertDialog}
       />
     </ContainerComponent>
   );
@@ -316,7 +334,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailContainer: {
-    flex: 0.35,
+    flex: 0.25,
     paddingTop: 0,
     justifyContent: 'space-around',
     paddingLeft: 40,

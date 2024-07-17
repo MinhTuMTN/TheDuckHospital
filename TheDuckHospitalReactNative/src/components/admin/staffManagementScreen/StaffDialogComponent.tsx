@@ -172,7 +172,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
               : nurseTypes.find(
                   nurseType => nurseType.value === staff.nurseType,
                 )
-            : undefined,
+            : {value: 'null', label: 'Không'},
         );
         setDepartment(staff.department);
         setSelectedImage({
@@ -221,7 +221,7 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
         'departmentId',
         department?.departmentId ? department?.departmentId : -1,
       );
-      // formData.append('avatar', selectedImage);
+      formData.append('avatar', selectedImage);
       formData.append(
         'nurseType',
         nurseType?.value === 'null' ? '' : nurseType?.value,
@@ -272,7 +272,10 @@ const StaffDialogComponent = (props: StaffDialogComponentProps) => {
         department ? department.departmentId : '',
       );
       formData.append('avatar', selectedImage);
-      formData.append('nurseType', nurseType?.value);
+      formData.append(
+        'nurseType',
+        nurseType?.value === 'null' ? '' : nurseType?.value,
+      );
       // const data = {
       //   fullName: name,
       //   phoneNumber: phoneNumber,

@@ -71,7 +71,7 @@ function useCustomMediaQuery() {
 }
 
 function Row(props) {
-  const { row, departmentId, departmentName } = props;
+  const { row, departmentId, departmentName, handleGetDepartment } = props;
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -97,6 +97,7 @@ function Row(props) {
       enqueueSnackbar("Xóa bác sĩ khỏi khoa thành công", {
         variant: "success",
       });
+      handleGetDepartment();
       navigate(0);
     } else enqueueSnackbar("Đã có lỗi xảy ra", { variant: "error" });
   };
@@ -281,6 +282,7 @@ function DoctorTable(props) {
     setOpenPopup,
     handleGetAllDoctorsNotInDepartment,
     departmentId,
+    handleGetDepartment,
     departmentName,
   } = props;
 
@@ -373,6 +375,7 @@ function DoctorTable(props) {
                     <Row
                       key={index}
                       row={row}
+                      handleGetDepartment={handleGetDepartment}
                       departmentId={departmentId}
                       departmentName={departmentName}
                     />

@@ -111,8 +111,8 @@ function StaffDetailPage() {
       }
     };
 
-    handleGetDateHasSchedule();
-  }, [staffId]);
+    if (isDoctor) handleGetDateHasSchedule();
+  }, [staffId, isDoctor]);
 
   function disableDateNotHasSchedule(date) {
     return !dateSchedule?.includes(date.format("YYYY/MM/DD"));

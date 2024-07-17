@@ -2,6 +2,7 @@ package com.theduckhospital.api.dto.response.doctor;
 
 import com.theduckhospital.api.constant.Gender;
 import com.theduckhospital.api.constant.MedicalTestState;
+import com.theduckhospital.api.constant.RoomType;
 import com.theduckhospital.api.constant.TransactionStatus;
 import com.theduckhospital.api.entity.MedicalExaminationRecord;
 import com.theduckhospital.api.entity.MedicalTest;
@@ -31,7 +32,9 @@ public class SearchMedicalTestResponse {
     ) {
         this.medicalTestId = medicalTest.getMedicalTestId();
 
-        Patient patientProfile = examinationRecord.getPatient();
+        Patient patientProfile = medicalTest.getRoom().getRoomType() == RoomType.LABORATORY_ROOM_NORMAL ?
+                examinationRecord.getPatient() :
+                medicalTest.getHospitalAdmission().getMedicalExaminationRecord().getPatient();
         this.patientName = patientProfile.getFullName();
         this.patientGender = patientProfile.getGender();
         this.patientDateOfBirth = patientProfile.getDateOfBirth();

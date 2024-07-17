@@ -70,12 +70,7 @@ function ServiceListScreen() {
     )
       return;
 
-    let serviceTypes: string[] = [];
-    if (selected === 'All') {
-      serviceTypes = ['MedicalExamination', 'MedicalTest'];
-    } else {
-      serviceTypes = [selected];
-    }
+    let serviceTypes: string[] = ['MedicalExamination', 'MedicalTest'];
 
     setIsLoadingAPI(true);
     const response = await getPaginationMedicalServices(
@@ -179,7 +174,7 @@ function ServiceListScreen() {
           containerStyle={{
             paddingLeft: 20,
             marginRight: 10,
-            flex: 0.88,
+            flex: 1,
           }}
           inputContainerStyle={{
             backgroundColor: appColors.white,
@@ -194,83 +189,83 @@ function ServiceListScreen() {
           onChangeText={handleChangedText}
         />
 
-        <ContainerComponent style={styles.filterIcon}>
-          <Popover
-            isVisible={showPopover}
-            onRequestClose={() => setShowPopover(false)}
-            backgroundStyle={{opacity: 0}}
-            popoverStyle={{height: 80, width: 400}}
-            arrowSize={{width: 0, height: 0}}
-            from={
-              <TouchableOpacity onPress={() => setShowPopover(true)}>
-                <Filter size={22} color={appColors.black} />
-              </TouchableOpacity>
-            }>
-            <FlexComponent style={styles.filterContainer}>
-              <ButtonComponent
-                containerStyles={
-                  selected === 'All' ? styles.selectedButton : styles.button
-                }
-                onPress={() => {
-                  setSelected('All');
-                  console.log(selected);
-                  setShowPopover(false);
-                  handleResetList();
-                }}>
-                <TextComponent
-                  style={
-                    selected === 'All'
-                      ? styles.selectedButtonText
-                      : styles.buttonText
-                  }>
-                  Tất cả
-                </TextComponent>
-              </ButtonComponent>
-              <ButtonComponent
-                containerStyles={
+        {/* <ContainerComponent style={styles.filterIcon}>
+        <Popover
+          isVisible={showPopover}
+          onRequestClose={() => setShowPopover(false)}
+          backgroundStyle={{opacity: 0}}
+          popoverStyle={{height: 80, width: 400}}
+          arrowSize={{width: 0, height: 0}}
+          from={
+            <TouchableOpacity onPress={() => setShowPopover(true)}>
+              <Filter size={22} color={appColors.black} />
+            </TouchableOpacity>
+          }>
+          <FlexComponent style={styles.filterContainer}>
+            <ButtonComponent
+              containerStyles={
+                selected === 'All' ? styles.selectedButton : styles.button
+              }
+              onPress={() => {
+                setSelected('All');
+                console.log(selected);
+                setShowPopover(false);
+                handleResetList();
+              }}>
+              <TextComponent
+                style={
+                  selected === 'All'
+                    ? styles.selectedButtonText
+                    : styles.buttonText
+                }>
+                Tất cả
+              </TextComponent>
+            </ButtonComponent>
+            <ButtonComponent
+              containerStyles={
+                selected === 'MedicalExamination'
+                  ? styles.selectedButton
+                  : styles.button
+              }
+              onPress={() => {
+                setSelected('MedicalExamination');
+                console.log(selected);
+                setShowPopover(false);
+                handleResetList();
+              }}>
+              <TextComponent
+                style={
                   selected === 'MedicalExamination'
-                    ? styles.selectedButton
-                    : styles.button
-                }
-                onPress={() => {
-                  setSelected('MedicalExamination');
-                  console.log(selected);
-                  setShowPopover(false);
-                  handleResetList();
-                }}>
-                <TextComponent
-                  style={
-                    selected === 'MedicalExamination'
-                      ? styles.selectedButtonText
-                      : styles.buttonText
-                  }>
-                  Khám
-                </TextComponent>
-              </ButtonComponent>
-              <ButtonComponent
-                containerStyles={
+                    ? styles.selectedButtonText
+                    : styles.buttonText
+                }>
+                Khám
+              </TextComponent>
+            </ButtonComponent>
+            <ButtonComponent
+              containerStyles={
+                selected === 'MedicalTest'
+                  ? styles.selectedButton
+                  : styles.button
+              }
+              onPress={() => {
+                setSelected('MedicalTest');
+                console.log(selected);
+                setShowPopover(false);
+                handleResetList();
+              }}>
+              <TextComponent
+                style={
                   selected === 'MedicalTest'
-                    ? styles.selectedButton
-                    : styles.button
-                }
-                onPress={() => {
-                  setSelected('MedicalTest');
-                  console.log(selected);
-                  setShowPopover(false);
-                  handleResetList();
-                }}>
-                <TextComponent
-                  style={
-                    selected === 'MedicalTest'
-                      ? styles.selectedButtonText
-                      : styles.buttonText
-                  }>
-                  Xét nghiệm
-                </TextComponent>
-              </ButtonComponent>
-            </FlexComponent>
-          </Popover>
-        </ContainerComponent>
+                    ? styles.selectedButtonText
+                    : styles.buttonText
+                }>
+                Xét nghiệm
+              </TextComponent>
+            </ButtonComponent>
+          </FlexComponent>
+        </Popover>
+      </ContainerComponent> */}
       </ContainerComponent>
 
       {(!isKeyboardVisible || isEditing) && (

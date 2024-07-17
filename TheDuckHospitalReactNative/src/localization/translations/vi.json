@@ -92,7 +92,9 @@
     "forgotPassword": "Quên mật khẩu",
     "enterPhone": "Vui lòng nhập email hoặc số điện thoại của bạn để đặt lại mật khẩu",
     "email": "Email hoặc số điện thoại",
-    "resetPassword": "Đặt lại mật khẩu"
+    "resetPassword": "Đặt lại mật khẩu",
+    "changePasswordSuccess": "Đổi mật khẩu thành công",
+    "changePasswordFail": "Đổi mật khẩu thất bại"
   },
   "verifyPhoneScreen": {
     "title": "Xác thực số điện thoại",

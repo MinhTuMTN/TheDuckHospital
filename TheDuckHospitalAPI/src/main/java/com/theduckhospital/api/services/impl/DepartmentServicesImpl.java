@@ -79,7 +79,7 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         if (request.getHeadNurseId() != null) {
             Nurse headNurse = getHeadNurse(department);
 //            Optional<Nurse> nurseOptional = nurseRepository.findByDepartmentAndHeadOfDepartmentIsTrue(department);
-            if(headNurse != null){
+            if (headNurse != null) {
 //                Nurse nurse = nurseOptional.get();
                 headNurse.setHeadOfDepartment(false);
                 nurseRepository.save(headNurse);
@@ -105,7 +105,7 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         department.setDeleted(true);
 
         List<MedicalService> medicalServices = department.getMedicalServices();
-        if(!medicalServices.isEmpty()) {
+        if (!medicalServices.isEmpty()) {
             medicalServices.forEach(service -> {
                 service.setDeleted(true);
                 medicalServiceRepository.save(service);
@@ -113,15 +113,25 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         }
 
         List<Doctor> doctors = department.getDoctors();
-        if(!doctors.isEmpty()) {
+        if (!doctors.isEmpty()) {
             doctors.forEach(doctor -> {
                 doctor.setDepartment(null);
+                if (doctor.isHeadOfDepartment()) doctor.setHeadOfDepartment(false);
                 doctorRepository.save(doctor);
             });
         }
 
+        List<Nurse> nurses = department.getNurses();
+        if (!nurses.isEmpty()) {
+            nurses.forEach(nurse -> {
+                nurse.setDepartment(null);
+                if (nurse.isHeadOfDepartment()) nurse.setHeadOfDepartment(false);
+                nurseRepository.save(nurse);
+            });
+        }
+
         List<Room> rooms = department.getRooms();
-        if(!rooms.isEmpty()) {
+        if (!rooms.isEmpty()) {
             rooms.forEach(room -> {
                 room.setDepartment(null);
                 roomRepository.save(room);
@@ -138,7 +148,7 @@ public class DepartmentServicesImpl implements IDepartmentServices {
         department.setDeleted(false);
 
         List<MedicalService> medicalServices = department.getMedicalServices();
-        if(!medicalServices.isEmpty()) {
+        if (!medicalServices.isEmpty()) {
             medicalServices.forEach(service -> {
                 service.setDeleted(false);
                 medicalServiceRepository.save(service);
