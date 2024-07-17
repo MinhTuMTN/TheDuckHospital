@@ -2,10 +2,11 @@ import styled from "@emotion/styled";
 import PhoneAndroidOutlinedIcon from "@mui/icons-material/PhoneAndroidOutlined";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
-import BookmarkAddedOutlinedIcon from "@mui/icons-material/BookmarkAddedOutlined";
+// import BookmarkAddedOutlinedIcon from "@mui/icons-material/BookmarkAddedOutlined";
+import VaccinesIcon from "@mui/icons-material/Vaccines";
 import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
 import WcOutlinedIcon from "@mui/icons-material/WcOutlined";
-import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+// import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import {
   Box,
   Button,
@@ -238,19 +239,19 @@ function ScheduleItem(props) {
         <>
           <Stack direction="row" justifyContent="space-between">
             <Stack direction="row" spacing={1}>
-              <BookmarkAddedOutlinedIcon />
+              <VaccinesIcon />
               <Typography
                 sx={{
                   fontSize: "20px",
                   fontWeight: 600,
                 }}
               >
-                Đặt trước
+                Đặt khám
               </Typography>
             </Stack>
             <Typography>{schedule.numberOfBookings}</Typography>
           </Stack>
-          <Stack direction="row" justifyContent="space-between">
+          {/* <Stack direction="row" justifyContent="space-between">
             <Stack direction="row" spacing={1}>
               <EventAvailableOutlinedIcon />
               <Typography
@@ -263,7 +264,7 @@ function ScheduleItem(props) {
               </Typography>
             </Stack>
             <Typography>{schedule.slot - schedule.numberOfBookings}</Typography>
-          </Stack>
+          </Stack> */}
         </>
       )}
       <Stack
