@@ -137,11 +137,20 @@ function MedicalExamRecordItem(props) {
                   }`}
                 </Typography>
                 <Typography style={{ fontSize: "16px" }}>
-                  {"- Thứ " +
-                    item.doctorSchedule?.dayOfWeek +
-                    " (" +
-                    dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY") +
-                    ")"}
+                  {
+                    item.doctorSchedule?.dayOfWeek === 1
+                      ? `- Chủ nhật (${dayjs(item.doctorSchedule?.date).format(
+                          "DD/MM/YYYY"
+                        )})`
+                      : `- Thứ ${item.doctorSchedule?.dayOfWeek} (${dayjs(
+                          item.doctorSchedule?.date
+                        ).format("DD/MM/YYYY")})`
+                    // "- Thứ " +
+                    //   item.doctorSchedule?.dayOfWeek +
+                    //   " (" +
+                    //   dayjs(item.doctorSchedule?.date).format("DD/MM/YYYY") +
+                    //   ")"
+                  }
                 </Typography>
               </Stack>
             </Stack>

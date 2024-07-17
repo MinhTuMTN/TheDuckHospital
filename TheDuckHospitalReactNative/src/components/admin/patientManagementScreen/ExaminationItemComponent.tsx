@@ -47,7 +47,11 @@ const ExaminationItemComponent = (props: ExaminationItemComponentProps) => {
                     item.doctorSchedule.scheduleType === 'MORNING'
                       ? 'Buổi sáng'
                       : 'Buổi chiều'
-                  } - Thứ ${item.doctorSchedule.dayOfWeek}`}</TextComponent>
+                  } - ${
+                    item.doctorSchedule.dayOfWeek === 1
+                      ? 'Chủ nhật'
+                      : `Thứ ${item.doctorSchedule.dayOfWeek}`
+                  }`}</TextComponent>
                   <TextComponent fontSize={16}>
                     {formatDate(item.doctorSchedule.date)}
                   </TextComponent>

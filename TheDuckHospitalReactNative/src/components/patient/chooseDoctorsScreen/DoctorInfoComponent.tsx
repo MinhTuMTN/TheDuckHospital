@@ -47,9 +47,9 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
     let dayOfWeekString = '';
     dayOfWeeks.forEach((day: number, index: number) => {
       if (index === dayOfWeeks.length - 1) {
-        dayOfWeekString += `Thứ ${day}`;
+        dayOfWeekString += day === 1 ? 'Chủ nhật' : `Thứ ${day}`;
       } else {
-        dayOfWeekString += `Thứ ${day}, `;
+        dayOfWeekString += day === 1 ? 'Chủ nhật, ' : `Thứ ${day}, `;
       }
     });
     setDayOfWeek(dayOfWeekString);
