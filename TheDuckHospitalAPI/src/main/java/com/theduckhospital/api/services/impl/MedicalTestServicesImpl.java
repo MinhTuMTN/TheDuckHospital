@@ -115,6 +115,10 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
         MedicalTest medicalTest = getMedicalTestById(medicalTestId);
         MedicalExaminationRecord examinationRecord = medicalTest.getMedicalExaminationRecord();
 
+        if(examinationRecord == null) {
+            examinationRecord = medicalTest.getHospitalAdmission().getMedicalExaminationRecord();
+        }
+
         return new MedicalTestRecordResponse(examinationRecord, medicalTest);
     }
 
@@ -261,7 +265,6 @@ public class MedicalTestServicesImpl implements IMedicalTestServices {
                         pageable
                 );
 
-        System.out.println(medicalTests.getContent().size() > 0 ? medicalTests.getContent().get(0).getMedicalService().getServiceName() : null);
         List<SearchMedicalTestResponse> searchMedicalTestResponses = new ArrayList<>();
         for (MedicalTest medicalTest : medicalTests.getContent()) {
             SearchMedicalTestResponse medicalTestResponse = new SearchMedicalTestResponse(
