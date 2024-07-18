@@ -38,6 +38,7 @@ export function DoctorScheduleItem(props) {
     <Box
       sx={{
         display: "flex",
+        flex: 1,
         flexDirection: "column",
         padding: "8px",
         width: "50%",
