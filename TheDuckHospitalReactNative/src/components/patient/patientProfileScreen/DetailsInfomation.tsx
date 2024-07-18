@@ -218,8 +218,8 @@ const DetailsInfomation = (props: DetailsInfomationProps) => {
                 });
               }}
               error={
-                editProfile.email.length > 0 &&
-                !editProfile.email.includes('@theduckhospital.onmicrosoft.com')
+                editProfile.email?.length > 0 &&
+                !editProfile.email?.includes('@theduckhospital.onmicrosoft.com')
               }
               errorMessage={'Địa chỉ không hợp lệ'}
               inputContainerStyle={styles.inputContainer}

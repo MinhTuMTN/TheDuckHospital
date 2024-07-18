@@ -52,8 +52,8 @@ const AvatarProfile = (props: AvatarProfileProps) => {
       return;
 
     if (
-      editProfile.email.length > 0 &&
-      !editProfile.email.includes('@theduckhospital.onmicrosoft.com')
+      editProfile.email?.length > 0 &&
+      !editProfile.email?.includes('@theduckhospital.onmicrosoft.com')
     )
       return;
 
@@ -116,8 +116,8 @@ const AvatarProfile = (props: AvatarProfileProps) => {
         <TouchableOpacity
           disabled={
             editProfile.fullPhoneNumber.length !== 10 ||
-            (editProfile.email.length > 0 &&
-              !editProfile.email.includes(
+            (editProfile.email?.length > 0 &&
+              !editProfile.email?.includes(
                 '@theduckhospital.onmicrosoft.com',
               )) ||
             !editProfile.fullPhoneNumber.startsWith('0') ||
@@ -133,8 +133,8 @@ const AvatarProfile = (props: AvatarProfileProps) => {
             size={30}
             color={
               editProfile.fullPhoneNumber.length !== 10 ||
-              (editProfile.email.length > 0 &&
-                !editProfile.email.includes(
+              (editProfile.email?.length > 0 &&
+                !editProfile.email?.includes(
                   '@theduckhospital.onmicrosoft.com',
                 )) ||
               !editProfile.fullPhoneNumber.startsWith('0') ||
