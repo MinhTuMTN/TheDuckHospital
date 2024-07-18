@@ -1,26 +1,17 @@
+import { Chart as ChartJS, registerables } from "chart.js";
 import React from "react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  PointElement,
-} from "chart.js";
 import { Chart } from "react-chartjs-2";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
+  // CategoryScale,
+  // LinearScale,
+  // BarElement,
+  // LineElement,
+  // PointElement,
+  // Title,
+  // Tooltip,
+  // Legend
+  ...registerables
 );
 
 export const MixedChart = (props) => {
@@ -31,12 +22,12 @@ export const MixedChart = (props) => {
     scales: {
       y: {
         ticks: {
-          callback: function(value, index, values) {
-            return value.toLocaleString() + 'k';
-          }
-        }
-      }
-    }
+          callback: function (value, index, values) {
+            return value.toLocaleString() + "k";
+          },
+        },
+      },
+    },
   };
 
   const data = {
