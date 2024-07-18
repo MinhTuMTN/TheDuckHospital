@@ -11,6 +11,7 @@ import {formatCurrency} from '../../../utils/currencyUtils';
 import LineInfoComponent from '../../LineInfoComponent';
 import {useTranslation} from 'react-i18next';
 import {BadgeInfo, Info, Star} from 'lucide-react-native';
+import dayjs from 'dayjs';
 
 interface DoctorInfoComponentProps {
   item: any;
@@ -36,8 +37,7 @@ const DoctorInfoComponent = (props: DoctorInfoComponentProps) => {
 
     let dayOfWeeks: number[] = [];
     doctorSchedules.forEach((schedule: any) => {
-      const dayOfWeek = schedule.dayOfWeek;
-
+      const dayOfWeek = dayjs(schedule.date).day() + 1;
       if (dayOfWeeks.indexOf(dayOfWeek) === -1) {
         dayOfWeeks.push(dayOfWeek);
       }
