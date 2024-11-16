@@ -162,7 +162,7 @@ function NavBar(props) {
                 Liên hệ
               </CustomMenuItem>
             </Toolbar>
-            <Box>
+            <Box id="btn-account">
               {!token || !fullName ? (
                 <Button
                   variant="contained"
