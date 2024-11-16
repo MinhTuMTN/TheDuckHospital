@@ -39,6 +39,7 @@ function AccountPopover(props) {
   }, [role, onClose, setToken]);
   return (
     <Popover
+      id="btn-account"
       anchorEl={anchorEl}
       anchorOrigin={{
         vertical: "bottom",
