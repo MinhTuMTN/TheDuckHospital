@@ -322,6 +322,7 @@ function CreateNewProfile(props) {
           </CustomTypography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <CustomDatePicker
+              className="date-picker"
               disabled={profile?.patientCode}
               format="DD/MM/YYYY"
               value={dateOfBirth}
@@ -382,8 +383,8 @@ function CreateNewProfile(props) {
           <FormControl fullWidth>
             <Select
               disabled={profile?.patientCode}
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="gender-select-label"
+              id="gender-select"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
               sx={{
@@ -435,8 +436,8 @@ function CreateNewProfile(props) {
           <FormControl fullWidth>
             <Select
               disabled={profile?.patientCode}
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="national-select-label"
+              id="national-select"
               value={selectedNationId}
               onChange={(event) => setSelectedNationId(event.target.value)}
               sx={{
@@ -469,8 +470,8 @@ function CreateNewProfile(props) {
           </CustomTypography>
           <FormControl fullWidth>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="province-select"
+              id="province-select"
               value={selectedProvinceId}
               onChange={(e) => setSelectedProvinceId(e.target.value)}
               sx={{
