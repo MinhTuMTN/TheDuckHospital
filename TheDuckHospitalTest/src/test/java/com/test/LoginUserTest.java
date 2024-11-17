@@ -16,7 +16,7 @@ import java.time.Duration;
 public class LoginUserTest {
     private final String URL = "http://localhost:3000/";
     private final String URL_LOGIN = "http://localhost:3000/auth/login";
-    private final String notistack_XPath= "//*[@id=\"notistack-snackbar\"]";
+    private final String notistack_XPath = "//*[@id=\"notistack-snackbar\"]";
     private ChromeDriver driver;
 
     private WebDriverWait wait;
@@ -37,7 +37,7 @@ public class LoginUserTest {
         nextStepButton.click();
     }
 
-    private void assertMessAndCurrentURL(String expectedMess, String expectedURL){
+    private void assertMessAndCurrentURL(String expectedMess, String expectedURL) {
         mess = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(notistack_XPath)));
         Assert.assertEquals(mess.getText(), expectedMess);
         currentURL = driver.getCurrentUrl();
@@ -125,7 +125,7 @@ public class LoginUserTest {
     /**
      * Test case: Verify the login feature when the phone number is less than 10 characters
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter a phone number with less than 10 characters in the phone number field.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -138,7 +138,7 @@ public class LoginUserTest {
      * </p>
      */
     @Test
-    public void testLoginWithPhoneNumberLessThan10Characters(){
+    public void testLoginWithPhoneNumberLessThan10Characters() {
         this.inputPhoneNumberAndNextClick("037271743");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
@@ -146,7 +146,7 @@ public class LoginUserTest {
     /**
      * Test case: Verify the login feature when the phone number is more than 10 characters
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter a phone number with more than 10 characters in the phone number field.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -160,7 +160,7 @@ public class LoginUserTest {
      */
 
     @Test
-    public void testLoginWithPhoneNumberMoreThan10Characters(){
+    public void testLoginWithPhoneNumberMoreThan10Characters() {
         this.inputPhoneNumberAndNextClick("03233298483");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
@@ -168,7 +168,7 @@ public class LoginUserTest {
     /**
      * Test case: Verify the login feature when the phone number contains only alphabetic characters
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter only alphabetic characters in the phone number input.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -181,7 +181,7 @@ public class LoginUserTest {
      * </p>
      */
     @Test
-    public void testLoginWithPhoneNumberContainsOnlyAlphabeticCharacters(){
+    public void testLoginWithPhoneNumberContainsOnlyAlphabeticCharacters() {
         this.inputPhoneNumberAndNextClick("fhfhshdhsdfjd");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
@@ -189,7 +189,7 @@ public class LoginUserTest {
     /**
      * Test case: Verify the login feature when the phone number contains both number and alphabetic characters
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter both alphabetic characters and number in the phone number input.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -202,7 +202,7 @@ public class LoginUserTest {
      * </p>
      */
     @Test
-    public void testLoginWithPhoneNumberContainsBothAlphabeticCharactersAndNumber(){
+    public void testLoginWithPhoneNumberContainsBothAlphabeticCharactersAndNumber() {
         this.inputPhoneNumberAndNextClick("0fd2391932");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
@@ -210,7 +210,7 @@ public class LoginUserTest {
     /**
      * Test case: Verify the login feature when the phone number contains both number and special characters
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter both special characters and number in the phone number input.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -223,14 +223,15 @@ public class LoginUserTest {
      * </p>
      */
     @Test
-    public void testLoginWithPhoneNumberContainsBothNumberAndSpecialCharacters(){
+    public void testLoginWithPhoneNumberContainsBothNumberAndSpecialCharacters() {
         this.inputPhoneNumberAndNextClick("03433!3433");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
+
     /**
      * Test case: Verify the login feature when the phone number contains space letter
      * <p>
-     *     Steps:
+     * Steps:
      *     <ul>
      *         <li>Enter the phone number contain the space letter.</li>
      *         <li>Click the continue button: "Tiếp tục"</li>
@@ -243,16 +244,40 @@ public class LoginUserTest {
      * </p>
      */
     @Test
-    public void testLoginWithPhoneNumberContainsSpaceLetter(){
+    public void testLoginWithPhoneNumberContainsSpaceLetter() {
         this.inputPhoneNumberAndNextClick("03456 3432");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
 
     }
 
+    /**
+     * Test case: Verify the login feature with phone number does begin with a numeric character
+     * <p>
+     * Steps:
+     *     <ul>
+     *         <li>Enter the phone number with no begin with a numeric character.</li>
+     *         <li>Click the continue button: "Tiếp tục"</li>
+     *     </ul>
+     *     Expected Result:
+     *     <ul>
+     *         <li>The system displays an error message: "Số điện thoại không hợp lệ!"</li>
+     *         <li>Login is unsuccessful</li>
+     *     </ul>
+     * </p>
+     */
     @Test
-    public void testLoginWithPhoneNumberDoesNotBeginWithANumericCharacter(){
+    public void testLoginWithPhoneNumberDoesNotBeginWithANumericCharacter() {
         this.inputPhoneNumberAndNextClick("!34563432");
         this.assertMessAndCurrentURL("Số điện thoại không hợp lệ!", URL_LOGIN);
     }
 
+    @Test
+    public void testLoginWithWrongPassword() {
+        this.inputPhoneNumberAndNextClick("0372717437");
+        passwordInput = driver.findElement(By.xpath("//*[@id=\"outlined-adornment-password\"]"));
+        passwordInput.sendKeys("Password");
+        submitLoginButton = driver.findElement(By.id("btn-login"));
+        submitLoginButton.click();
+        assertMessAndCurrentURL("Mật khẩu không chính xác", URL_LOGIN);
+    }
 }

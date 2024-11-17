@@ -115,7 +115,7 @@ function InputPassword(props) {
       if (!response.success) {
         enqueueSnackbar(
           response.statusCode === 401
-            ? "Tài khoản hoặc mật khẩu không chính xác"
+            ? "Mật khẩu không chính xác"
             : "Đã có lỗi xảy ra vui lòng thử lại sau",
           { variant: "error" }
         );

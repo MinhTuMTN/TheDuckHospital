@@ -65,12 +65,12 @@ function InputPhoneNumber(props) {
         return false;
       }
 
-      const regex = new RegExp("^0\\d{9}$");
-      if (regex.test(phoneTrim) === false) {
-        enqueueSnackbar("Số điện thoại không hợp lệ!", { variant: "error" });
-        setIsLoading(false);
-        return false;
-      }
+      // const regex = new RegExp("^0\\d{9}$");
+      // if (regex.test(phoneTrim) === false) {
+      //   enqueueSnackbar("Số điện thoại không hợp lệ!", { variant: "error" });
+      //   setIsLoading(false);
+      //   return false;
+      // }
     }
 
     const response = await checkPhoneOrEmail({
