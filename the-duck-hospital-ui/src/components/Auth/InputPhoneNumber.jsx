@@ -65,7 +65,8 @@ function InputPhoneNumber(props) {
         return false;
       }
 
-      if (phoneTrim.length !== 10 || phoneTrim.startsWith("0") === false) {
+      const regex = new RegExp("^0\\d{9}$");
+      if (regex.test(phoneTrim) === false) {
         enqueueSnackbar("Số điện thoại không hợp lệ!", { variant: "error" });
         setIsLoading(false);
         return false;

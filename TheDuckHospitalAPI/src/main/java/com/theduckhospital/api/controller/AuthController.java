@@ -99,7 +99,7 @@ public class AuthController {
     }
 
     @PostMapping("/check-account-exist")
-    public ResponseEntity<?> checkAccountExistAndSendOtp(@RequestBody CheckAccountExistRequest request)
+    public ResponseEntity<?> checkAccountExistAndSendOtp(@RequestBody @Valid CheckAccountExistRequest request)
             throws FirebaseMessagingException {
         if (accountServices.checkAccountExistAndSendOtp(request.getEmailOrPhoneNumber()))
             return ResponseEntity
