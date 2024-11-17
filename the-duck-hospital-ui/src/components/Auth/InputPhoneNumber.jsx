@@ -114,6 +114,7 @@ function InputPhoneNumber(props) {
         }}
       >
         <CustomTextField
+          id="input-phone-number"
           autoFocus
           variant="outlined"
           placeholder="Số điện thoại"
@@ -147,6 +148,7 @@ function InputPhoneNumber(props) {
         ) : null}
       </Box>
       <CustomButton
+        id="btn-continue"
         variant="contained"
         onClick={handleCheckPhone}
         disabled={isLoading}

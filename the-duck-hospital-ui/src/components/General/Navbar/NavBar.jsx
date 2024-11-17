@@ -162,9 +162,10 @@ function NavBar(props) {
                 Liên hệ
               </CustomMenuItem>
             </Toolbar>
-            <Box id="btn-account">
+            <Box>
               {!token || !fullName ? (
                 <Button
+                  id="btn-account"
                   variant="contained"
                   sx={{
                     padding: "10px 18px !important",

@@ -162,6 +162,7 @@ function InputPassword(props) {
       </Typography>
 
       <CustomTextFieldPhone
+        id="txt-phone-number"
         variant="outlined"
         size="large"
         disabled
@@ -263,6 +264,7 @@ function InputPassword(props) {
       </Box>
       <Box>
         <CustomButton
+          id="btn-login"
           variant="contained"
           onClick={handleLogin}
           disabled={isLoading}
